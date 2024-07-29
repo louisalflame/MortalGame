@@ -69,7 +69,9 @@ public class GameplayManager
     private void _DrawCardTurnBegin(PlayerEntity player)
     {
         var drawCount = 0;
-        while(player.HandCard.Cards.Count < 5 && drawCount < 3)
+        while (player.HandCard.Cards.Count < player.HandCard.MaxCount && 
+            player.Deck.Cards.Count > 0 &&
+            drawCount < 3)
         {
             drawCount ++;
             _DrawCard(player);

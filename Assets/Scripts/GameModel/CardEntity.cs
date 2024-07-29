@@ -1,11 +1,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum CardType
+{
+    None = 0,
+    Attack,
+    Defense,
+    Speech,
+    Sneak,
+    Special
+}
+
 public class CardEntity
 {
     public string Title;
     public string Info;
 
+    public CardType Type;
     public int Cost;
     public int Power;
 

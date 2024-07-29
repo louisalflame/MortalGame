@@ -28,6 +28,7 @@ public class Main : MonoBehaviour
 
         var gameplayScene = await _sceneLoadManager.LoadGameplayScene();
 
+        gameplayScene.Initialize();
         await gameplayScene.Run();
     }
 }

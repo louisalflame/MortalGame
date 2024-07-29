@@ -46,7 +46,7 @@ public class PlayerHandCardView : MonoBehaviour
         for (var i = 0; i < _cardViews.Count; i++)
         {
             var cardView = _cardViews[i];
-            var x = widthInterval * i;
+            var x = widthInterval * i - _handCardArea.rect.width / 2 + widthInterval / 2;
             cardView.transform.localPosition = new Vector3(x, 0, 0);
         }
     }

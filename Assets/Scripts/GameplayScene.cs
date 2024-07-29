@@ -8,20 +8,18 @@ public class GameplayScene : MonoBehaviour
     [SerializeField]
     private GameplayView _gameplayView;
 
+    private BattleBuidler _battleBuidler;
+
     public void Initialize()
     {
-
+        _battleBuidler = new BattleBuidler();
     }
 
     public async UniTask Run()
     {
         Debug.Log("-- GameplayScene.Run --");
  
-        var initialState = new GameStatus(
-            state: GameState.None,
-            player: new PlayerEntity(),
-            enemy: new PlayerEntity()
-        ); 
+        var initialState = _battleBuidler.ConstructBattle();
         var gameplayPresenter = new GameplayPresenter(_gameplayView, initialState);
 
         var result = await gameplayPresenter.Run();
