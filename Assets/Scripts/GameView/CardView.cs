@@ -17,15 +17,20 @@ public class CardView : MonoBehaviour
 
     private CompositeDisposable _disposables = new CompositeDisposable();
 
-    public void SetCardInfo(CardInfo cardInfo)
+    public void SetCardInfo(CardInfo cardInfo, IGameplayActionReciever reciever)
     {
         _title.text = cardInfo.Title;
 
         _button.OnClickAsObservable()
-            .Subscribe(_ => Debug.Log("Button Click"))
+            .Subscribe(_ => 
+                reciever.RecieveEvent(
+                    new UseCardAction{ CardIndentity = cardInfo.CardIndentity }))
             .AddTo(_disposables);
         _button.OnPointerEnterAsObservable()
             .Subscribe(_ => Debug.Log("Pointer Enter"))
+            .AddTo(_disposables);
+        _button.OnPointerExitAsObservable()
+            .Subscribe(_ => Debug.Log("Pointer Exit"))
             .AddTo(_disposables);
     }
 
@@ -37,10 +42,18 @@ public class CardView : MonoBehaviour
 
 public class CardInfo
 {
+    public int CardIndentity { get; private set; }
     public string Title { get; private set; }
+    public string Info { get; private set; }
+    public int Cost { get; private set; }
+    public int Power { get; private set; }
 
     public CardInfo(CardEntity card)
     {
+        CardIndentity = card.CardIndentity;
         Title = card.Title;
+        Info = card.Info;
+        Cost = card.Cost;
+        Power = card.Power;
     }
 }

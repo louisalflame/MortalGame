@@ -22,13 +22,13 @@ public class PlayerHandCardView : MonoBehaviour
 
     private List<CardView> _cardViews = new List<CardView>();
 
-    public void CreateCardView(DrawCardEvent drawCardEvent)
+    public void CreateCardView(DrawCardEvent drawCardEvent, IGameplayActionReciever reciever)
     {
         foreach(var cardInfo in drawCardEvent.CardInfos)
         {
             var cardView = _cardViewFactory.CreateCardView();
             cardView.transform.SetParent(_cardViewParent);
-            cardView.SetCardInfo(cardInfo);
+            cardView.SetCardInfo(cardInfo, reciever);
             _cardViews.Add(cardView);
         }
 

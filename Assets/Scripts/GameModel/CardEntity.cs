@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public enum CardType
@@ -13,6 +14,7 @@ public enum CardType
 
 public class CardEntity
 {
+    public int CardIndentity;
     public string Title;
     public string Info;
 
@@ -55,13 +57,13 @@ public class DeckEntity
         Cards = new List<CardEntity>();
     }
 
-    public CardEntity PopCard()
+    public DeckEntity PopCard(out CardEntity card)
     {
-        var cards = new List<CardEntity>(Cards);
-        var card = cards[0];
-        cards.RemoveAt(0);
+        card = Cards.ElementAt(0);
 
-        return card;
+        return new DeckEntity{
+            Cards = Cards.Skip(1).ToArray()
+        };
     }
 
     public DeckEntity Shuffle()

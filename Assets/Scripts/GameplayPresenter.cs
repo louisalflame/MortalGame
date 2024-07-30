@@ -1,7 +1,12 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-public class GameplayPresenter
+public interface IGameplayActionReciever
+{
+    void RecieveEvent(IGameAction gameplayAction);
+}
+
+public class GameplayPresenter : IGameplayActionReciever
 {
     private GameplayView _gameplayView;
     private GameplayManager _gameplayManager;
@@ -26,9 +31,15 @@ public class GameplayPresenter
             await UniTask.NextFrame();
 
             var events = _gameplayManager.PopAllEvents();
-            _gameplayView.Render(events);
+            _gameplayView.Render(events, this);
         }
 
         return _gameplayManager.GameResult;
+    }
+
+    public void RecieveEvent(IGameAction gameAction)
+    {
+        Debug.Log($"-- GameplayPresenter.RecieveEvent:[{gameAction}] --");
+        _gameplayManager.EnqueueAction(gameAction);
     }
 }

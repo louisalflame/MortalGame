@@ -66,6 +66,7 @@ public class BattleBuidler
     {
         return new List<CardEntity>() {
             new CardEntity() {
+                CardIndentity = 10001,
                 Title = "Attack",
                 Info = "Deal 5 damage to enemy",
                 Type = CardType.Attack,
@@ -73,6 +74,7 @@ public class BattleBuidler
                 Power = 5,
             },
             new CardEntity() {
+                CardIndentity = 10002,
                 Title = "Attack",
                 Info = "Deal 5 damage to enemy",
                 Type = CardType.Attack,
@@ -80,6 +82,7 @@ public class BattleBuidler
                 Power = 5,
             },
             new CardEntity() {
+                CardIndentity = 10003,
                 Title = "Attack",
                 Info = "Deal 5 damage to enemy",
                 Type = CardType.Attack,
@@ -87,6 +90,7 @@ public class BattleBuidler
                 Power = 5,
             },
             new CardEntity() {
+                CardIndentity = 10004,
                 Title = "Defend",
                 Info = "Gain 5 block",
                 Type = CardType.Defense,
@@ -94,6 +98,7 @@ public class BattleBuidler
                 Power = 5,
             },
             new CardEntity() {
+                CardIndentity = 10005,
                 Title = "Defend",
                 Info = "Gain 5 block",
                 Type = CardType.Defense,
@@ -101,6 +106,7 @@ public class BattleBuidler
                 Power = 5,
             },
             new CardEntity() {
+                CardIndentity = 10006,
                 Title = "Defend",
                 Info = "Gain 5 block",
                 Type = CardType.Defense,
