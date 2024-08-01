@@ -3,7 +3,12 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-public class GameplayManager
+public interface IGameplayStatusWatcher
+{
+    GameStatus GameStatus { get; }
+}
+
+public class GameplayManager : IGameplayStatusWatcher
 {
     private GameStatus _gameStatus;
     private GameResult _gameResult;
@@ -12,6 +17,7 @@ public class GameplayManager
 
     public bool IsEnd { get{ return _gameResult != null; } }
     public GameResult GameResult { get{ return _gameResult; } }
+    public GameStatus GameStatus { get{ return _gameStatus; } }
 
     public GameplayManager(GameStatus initialState)
     {
@@ -70,8 +76,15 @@ public class GameplayManager
     private void _TurnPreapre(PlayerEntity player)
     {
         _gameStatus = _gameStatus.With(
+            round: player.IsNPC ? _gameStatus.Round + 1 : _gameStatus.Round,
             state: GameState.Player_DrawCard
         );
+        _gameEvents.Add(new RoundStartEvent(){
+            Round = _gameStatus.Round,
+            Player = _gameStatus.Player,
+            Enemy = _gameStatus.Enemy
+        });
+    
     }
 
     private void _TurnDrawCard(PlayerEntity player)
@@ -100,10 +113,19 @@ public class GameplayManager
                     Debug.Log($"-- useCard:{useCardAction.CardIndentity} --");
                     break;
                 case TurnSubmitAction turnSubmitAction:
-                    if(player.IsNPC == turnSubmitAction.IsNPC)
+                    Debug.Log($"-- submit:{turnSubmitAction.IsNPC} --");
+                    if (_gameStatus.State == GameState.Player_Execute &&
+                        !turnSubmitAction.IsNPC)
                     {
                         _gameStatus = _gameStatus.With(
                             state: GameState.Player_Finalize
+                        );
+                    }
+                    else if (_gameStatus.State == GameState.Enemy_Execute &&
+                        turnSubmitAction.IsNPC)
+                    {
+                        _gameStatus = _gameStatus.With(
+                            state: GameState.Enemy_Finalize
                         );
                     }
                     break;

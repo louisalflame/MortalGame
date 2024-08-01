@@ -5,8 +5,10 @@ public class BattleBuidler
     public GameStatus ConstructBattle()
     { 
         var initialState = new GameStatus(
+            round: 0,
             state: GameState.None,
             player: new PlayerEntity() {
+                Name = "趙活",
                 IsNPC = false,
                 Character = new CharacterEntity() {
                     HealthManager = new HealthManager() {
@@ -33,6 +35,7 @@ public class BattleBuidler
                 },
             },
             enemy: new PlayerEntity() {
+                Name = "路人俠",
                 IsNPC = true,
                 Character = new CharacterEntity() {
                     HealthManager = new HealthManager() {

@@ -11,6 +11,8 @@ public class GameplayPresenter : IGameplayActionReciever
     private GameplayView _gameplayView;
     private GameplayManager _gameplayManager;
 
+    public GameStatus GameStatus => _gameplayManager.GameStatus;
+
     public GameplayPresenter(
         GameplayView gameplayView,
         GameStatus gameStatus
@@ -18,6 +20,8 @@ public class GameplayPresenter : IGameplayActionReciever
     {
         _gameplayView = gameplayView;
         _gameplayManager = new GameplayManager(gameStatus);
+
+        _gameplayView.Init(this, _gameplayManager);
     }
 
     public async UniTask<GameResult> Run()

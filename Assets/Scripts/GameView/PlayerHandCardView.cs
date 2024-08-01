@@ -21,6 +21,12 @@ public class PlayerHandCardView : MonoBehaviour
     private float _widthInterval = 20f;
 
     private List<CardView> _cardViews = new List<CardView>();
+    private IGameplayStatusWatcher _statusWatcher;
+
+    public void Init(IGameplayStatusWatcher statusWatcher)
+    {
+        _statusWatcher = statusWatcher;
+    }
 
     public void CreateCardView(DrawCardEvent drawCardEvent, IGameplayActionReciever reciever)
     {
