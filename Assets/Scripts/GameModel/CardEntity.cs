@@ -29,6 +29,9 @@ public class HandCardEntity
     public int MaxCount;
     public IReadOnlyCollection<CardEntity> Cards;
 
+    public IReadOnlyCollection<CardInfo> CardInfos =>
+        Cards.Select(c => new CardInfo(c)).ToArray();
+
     public HandCardEntity()
     {
         MaxCount = 5;
@@ -37,8 +40,18 @@ public class HandCardEntity
 
     public HandCardEntity AddCard(CardEntity card)
     {
-        var cards = new List<CardEntity>(Cards);
-        cards.Add(card);
+        var cards = new List<CardEntity>(Cards.Append(card));
+
+        return new HandCardEntity
+        {
+            MaxCount = MaxCount,
+            Cards = cards
+        };
+    }
+
+    public HandCardEntity RemoveCard(CardEntity card)
+    {
+        var cards = new List<CardEntity>(Cards.Where(c => c.CardIndentity != card.CardIndentity));
 
         return new HandCardEntity
         {
@@ -52,6 +65,9 @@ public class DeckEntity
 {
     public IReadOnlyCollection<CardEntity> Cards;
 
+    public IReadOnlyCollection<CardInfo> CardInfos =>
+        Cards.Select(c => new CardInfo(c)).ToArray();
+    
     public DeckEntity()
     {
         Cards = new List<CardEntity>();
@@ -88,6 +104,9 @@ public class CardGraveyardEntity
 {
     public IReadOnlyCollection<CardEntity> Cards;
 
+    public IReadOnlyCollection<CardInfo> CardInfos =>
+        Cards.Select(c => new CardInfo(c)).ToArray();
+        
     public CardGraveyardEntity()
     {
         Cards = new List<CardEntity>();

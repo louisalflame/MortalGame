@@ -8,12 +8,23 @@ public interface IGameEvent
 
 public class DrawCardEvent : IGameEvent
 {
-    public IReadOnlyCollection<CardInfo> CardInfos;
+    public Faction Faction;
+    public CardInfo NewCardInfo;
+    public IReadOnlyCollection<CardInfo> DeckCardInfos;
+    public IReadOnlyCollection<CardInfo> HandCardInfos;
+}
+public class UsedCardEvent : IGameEvent
+{
+    public Faction Faction;
+    public CardInfo UsedCardInfo;
+    public IReadOnlyCollection<CardInfo> HandCardInfos;
+    public IReadOnlyCollection<CardInfo> GraveyardCardInfos;
 }
 
 public class RoundStartEvent : IGameEvent
 {
     public int Round;
+    public Faction Faction;
     public PlayerEntity Player;
     public PlayerEntity Enemy;
 }

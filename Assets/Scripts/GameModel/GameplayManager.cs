@@ -31,6 +31,7 @@ public class GameplayManager : IGameplayStatusWatcher
         _gameResult = null;
 
         _gameStatus = _gameStatus.With(state: GameState.Player_Prepare);
+        Debug.Log($"-- goto state:{_gameStatus.State} --");
         _NextState(_gameStatus);
     }
 
@@ -76,15 +77,17 @@ public class GameplayManager : IGameplayStatusWatcher
     private void _TurnPreapre(PlayerEntity player)
     {
         _gameStatus = _gameStatus.With(
-            round: player.IsNPC ? _gameStatus.Round + 1 : _gameStatus.Round,
+            round: player.Faction == Faction.Enemy ? _gameStatus.Round + 1 : _gameStatus.Round,
             state: GameState.Player_DrawCard
         );
+        Debug.Log($"-- goto state:{_gameStatus.State} --");
+
         _gameEvents.Add(new RoundStartEvent(){
             Round = _gameStatus.Round,
+            Faction = player.Faction,
             Player = _gameStatus.Player,
             Enemy = _gameStatus.Enemy
         });
-    
     }
 
     private void _TurnDrawCard(PlayerEntity player)
@@ -100,6 +103,7 @@ public class GameplayManager : IGameplayStatusWatcher
         _gameStatus = _gameStatus.With(
             state: GameState.Player_Execute
         );
+        Debug.Log($"-- goto state:{_gameStatus.State} --");
     }
 
     private void _TurnExecute(PlayerEntity player)
@@ -111,26 +115,51 @@ public class GameplayManager : IGameplayStatusWatcher
             {
                 case UseCardAction useCardAction:
                     Debug.Log($"-- useCard:{useCardAction.CardIndentity} --");
+                    _PassCardFromHandToGraveyard(player, useCardAction.CardIndentity);
                     break;
                 case TurnSubmitAction turnSubmitAction:
-                    Debug.Log($"-- submit:{turnSubmitAction.IsNPC} --");
-                    if (_gameStatus.State == GameState.Player_Execute &&
-                        !turnSubmitAction.IsNPC)
-                    {
-                        _gameStatus = _gameStatus.With(
-                            state: GameState.Player_Finalize
-                        );
-                    }
-                    else if (_gameStatus.State == GameState.Enemy_Execute &&
-                        turnSubmitAction.IsNPC)
-                    {
-                        _gameStatus = _gameStatus.With(
-                            state: GameState.Enemy_Finalize
-                        );
-                    }
+                    Debug.Log($"-- submit:{turnSubmitAction.Faction} --");
+                    _FinishExecuteTurn(turnSubmitAction);
                     break;
             }
         }
+    }
+
+    private void _PassCardFromHandToGraveyard(PlayerEntity player, int CardIndentity)
+    {
+        var usedCard = _gameStatus.Player.HandCard.Cards.FirstOrDefault(c => c.CardIndentity == CardIndentity);
+        if (usedCard != null)
+        {
+            _gameStatus.Player.HandCard = _gameStatus.Player.HandCard.RemoveCard(usedCard);
+            _gameStatus.Player.Graveyard = _gameStatus.Player.Graveyard.AddCard(usedCard);
+        }
+
+        var usedCardInfo = new CardInfo(usedCard);
+        _gameEvents.Add(new UsedCardEvent() {
+            Faction = player.Faction,
+            UsedCardInfo = usedCardInfo,
+            HandCardInfos = player.HandCard.CardInfos,
+            GraveyardCardInfos = player.Graveyard.CardInfos
+        });
+    }
+
+    private void _FinishExecuteTurn(TurnSubmitAction turnSubmitAction)
+    {
+        if (_gameStatus.State == GameState.Player_Execute &&
+            turnSubmitAction.Faction == Faction.Player)
+        {
+            _gameStatus = _gameStatus.With(
+                state: GameState.Player_Finalize
+            );
+        }
+        else if (_gameStatus.State == GameState.Enemy_Execute &&
+            turnSubmitAction.Faction == Faction.Enemy)
+        {
+            _gameStatus = _gameStatus.With(
+                state: GameState.Enemy_Finalize
+            );
+        }
+        Debug.Log($"-- goto state:{_gameStatus.State} --");
     }
 
     private void _DrawCard(PlayerEntity player)
@@ -142,7 +171,10 @@ public class GameplayManager : IGameplayStatusWatcher
 
         var newCardInfo = new CardInfo(newCard);
         _gameEvents.Add(new DrawCardEvent(){
-            CardInfos = new List<CardInfo> { newCardInfo }
+            Faction = player.Faction,
+            NewCardInfo = newCardInfo,
+            HandCardInfos = player.HandCard.CardInfos,
+            DeckCardInfos = player.Deck.CardInfos,
         });
     }
 }

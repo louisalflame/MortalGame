@@ -31,6 +31,9 @@ public class GameplayView : MonoBehaviour
                 case DrawCardEvent drawCardEvent:
                     _CreateCardView(drawCardEvent, reciever);
                     break;
+                case UsedCardEvent usedCardEvent:
+                    _RemovedCardView(usedCardEvent);
+                    break;
             }
         }
     }
@@ -44,5 +47,10 @@ public class GameplayView : MonoBehaviour
     private void _CreateCardView(DrawCardEvent drawCardEvent, IGameplayActionReciever reciever)
     {
         _playerHandCardView.CreateCardView(drawCardEvent, reciever);
+    }
+
+    private void _RemovedCardView(UsedCardEvent usedCardEvent)
+    {
+        _playerHandCardView.RemoveCardView(usedCardEvent);
     }
 }

@@ -4343,7 +4343,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1370640219
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4376,6 +4376,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cardViewPrefab: {fileID: 2667077459472162426, guid: bdab98a1511fd8448bf0b9b4b3a157eb, type: 3}
+  _recycleRoot: {fileID: 1370640219}
 --- !u!1 &1372264885
 GameObject:
   m_ObjectHideFlags: 0

@@ -21,6 +21,7 @@ public class PlayerHandCardView : MonoBehaviour
     private float _widthInterval = 20f;
 
     private List<CardView> _cardViews = new List<CardView>();
+    private Dictionary<int, CardView> _cardViewDict = new Dictionary<int, CardView>();
     private IGameplayStatusWatcher _statusWatcher;
 
     public void Init(IGameplayStatusWatcher statusWatcher)
@@ -30,17 +31,31 @@ public class PlayerHandCardView : MonoBehaviour
 
     public void CreateCardView(DrawCardEvent drawCardEvent, IGameplayActionReciever reciever)
     {
-        foreach(var cardInfo in drawCardEvent.CardInfos)
-        {
-            var cardView = _cardViewFactory.CreateCardView();
-            cardView.transform.SetParent(_cardViewParent);
-            cardView.SetCardInfo(cardInfo, reciever);
-            _cardViews.Add(cardView);
-        }
+        var cardView = _cardViewFactory.CreateCardView();
+        cardView.transform.SetParent(_cardViewParent);
+        cardView.SetCardInfo(drawCardEvent.NewCardInfo, reciever);
+
+        _cardViews.Add(cardView);
+        _cardViewDict.Add(drawCardEvent.NewCardInfo.CardIndentity, cardView);
 
         if(_cardViews.Count > 0)
         {
             _RearrangeCardViews();
+        }
+    }
+
+    public void RemoveCardView(UsedCardEvent usedCardEvent)
+    {
+        if(_cardViewDict.TryGetValue(usedCardEvent.UsedCardInfo.CardIndentity, out var cardView))
+        {
+            _cardViews.Remove(cardView);
+            _cardViewDict.Remove(usedCardEvent.UsedCardInfo.CardIndentity);
+            _cardViewFactory.RecycleCardView(cardView);
+
+            if(_cardViews.Count > 0)
+            {
+                _RearrangeCardViews();
+            }
         }
     }
 

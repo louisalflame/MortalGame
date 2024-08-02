@@ -9,7 +9,7 @@ public class BattleBuidler
             state: GameState.None,
             player: new PlayerEntity() {
                 Name = "趙活",
-                IsNPC = false,
+                Faction = Faction.Player,
                 Character = new CharacterEntity() {
                     HealthManager = new HealthManager() {
                         Hp = 100,
@@ -36,7 +36,7 @@ public class BattleBuidler
             },
             enemy: new PlayerEntity() {
                 Name = "路人俠",
-                IsNPC = true,
+                Faction = Faction.Enemy,
                 Character = new CharacterEntity() {
                     HealthManager = new HealthManager() {
                         Hp = 100,

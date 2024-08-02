@@ -13,5 +13,5 @@ public class UseCardAction : IGameAction
 
 public class TurnSubmitAction : IGameAction
 {
-    public bool IsNPC;
+    public Faction Faction;
 }

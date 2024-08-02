@@ -27,10 +27,10 @@ public class CardView : MonoBehaviour
                     new UseCardAction{ CardIndentity = cardInfo.CardIndentity }))
             .AddTo(_disposables);
         _button.OnPointerEnterAsObservable()
-            .Subscribe(_ => Debug.Log("Pointer Enter"))
+            .Subscribe(_ => {})
             .AddTo(_disposables);
         _button.OnPointerExitAsObservable()
-            .Subscribe(_ => Debug.Log("Pointer Exit"))
+            .Subscribe(_ => {})
             .AddTo(_disposables);
     }
 

@@ -10,7 +10,9 @@ public class SubmitView : MonoBehaviour
     public void Init(IGameplayActionReciever reciever)
     {
         _submitButton.OnClickAsObservable()
-            .Subscribe(_ => reciever.RecieveEvent(new TurnSubmitAction { IsNPC = false }))
+            .Subscribe(_ => 
+                reciever.RecieveEvent(
+                    new TurnSubmitAction { Faction = Faction.Player}))
             .AddTo(this);
     }
 }

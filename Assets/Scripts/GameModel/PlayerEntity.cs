@@ -1,8 +1,15 @@
 using UnityEngine;
 
+public enum Faction
+{
+    None = 0,
+    Player,
+    Enemy
+}
+
 public class PlayerEntity
 {
-    public bool IsNPC;
+    public Faction Faction;
     public string Name;
 
     public CharacterEntity Character;
