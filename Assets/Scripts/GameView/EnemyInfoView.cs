@@ -12,6 +12,13 @@ public class EnemyInfoView : MonoBehaviour
 
     [SerializeField]
     private HealthBarView _healthBarView;
+    
+    private IGameplayStatusWatcher _statusWatcher;
+
+    public void Init(IGameplayStatusWatcher statusWatcher)
+    {
+        _statusWatcher = statusWatcher;
+    }
 
     public void SetPlayerInfo(PlayerEntity player)
     {

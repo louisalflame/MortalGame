@@ -81,21 +81,30 @@ public class DeckEntity
             Cards = Cards.Skip(1).ToArray()
         };
     }
+    public DeckEntity EnqueueCards(IReadOnlyCollection<CardEntity> cards)
+    {
+        var newCards = new List<CardEntity>(Cards);
+        newCards.AddRange(cards);
 
+        return new DeckEntity
+        {
+            Cards = newCards
+        };
+    }
     public DeckEntity Shuffle()
     {
-        var cards = new List<CardEntity>(Cards);
-        for (int i = 0; i < cards.Count; i++)
+        var newCards = new List<CardEntity>(Cards);
+        for (int i = 0; i < newCards.Count; i++)
         {
-            var temp = cards[i];
-            var randomIndex = Random.Range(0, cards.Count);
-            cards[i] = cards[randomIndex];
-            cards[randomIndex] = temp;
+            var temp = newCards[i];
+            var randomIndex = Random.Range(0, newCards.Count);
+            newCards[i] = newCards[randomIndex];
+            newCards[randomIndex] = temp;
         }
 
         return new DeckEntity
         {
-            Cards = cards
+            Cards = newCards
         };
     }
 }
@@ -120,6 +129,16 @@ public class CardGraveyardEntity
         return new CardGraveyardEntity
         {
             Cards = cards
+        };
+    }
+
+    public CardGraveyardEntity PopAllCards(out IReadOnlyCollection<CardEntity> allCards)
+    {
+        allCards = Cards;
+
+        return new CardGraveyardEntity
+        {
+            Cards = new List<CardEntity>()
         };
     }
 }

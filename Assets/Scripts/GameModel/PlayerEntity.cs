@@ -3,9 +3,8 @@ using UnityEngine;
 public enum Faction
 {
     None = 0,
-    Player,
-    Enemy
-}
+    Ally,
+    Enemy}
 
 public class PlayerEntity
 {

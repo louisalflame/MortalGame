@@ -6,14 +6,12 @@ using UnityEngine;
 public enum GameState
 {
     None = 0,
-    Player_Prepare,
-    Player_DrawCard,
-    Player_Execute,
-    Player_Finalize,
-    Enemy_Prepare,
-    Enemy_DrawCard,
+    TurnStart,
+    DrawCard,
+    EnemyPrepare,
+    PlayerExecute,
     Enemy_Execute,
-    Enemy_Finalize,
+    TurnEnd,
     GameEnd,
 }
 
@@ -21,7 +19,7 @@ public class GameStatus
 {
     public int Round { get; private set; }
     public GameState State { get; private set; }
-    public PlayerEntity Player { get; private set; }
+    public PlayerEntity Ally { get; private set; }
     public PlayerEntity Enemy { get; private set; }
 
     public GameStatus(
@@ -32,7 +30,7 @@ public class GameStatus
     {
         Round = round;
         State = state;
-        Player = player;
+        Ally = player;
         Enemy = enemy;
     }
 
@@ -45,7 +43,7 @@ public class GameStatus
         return new GameStatus(
             round: round == -1 ? Round : round,
             state: state == GameState.None ? State : state,
-            player: player ?? Player,
+            player: player ?? Ally,
             enemy: enemy ?? Enemy
         );
     }

@@ -18,6 +18,13 @@ public class PlayerInfoView : MonoBehaviour
 
     [SerializeField]
     private EnergyBarView _energyBarView;
+    
+    private IGameplayStatusWatcher _statusWatcher;
+
+    public void Init(IGameplayStatusWatcher statusWatcher)
+    {
+        _statusWatcher = statusWatcher;
+    }
 
     public void SetPlayerInfo(int round, PlayerEntity player)
     {

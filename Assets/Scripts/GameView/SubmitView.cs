@@ -12,7 +12,7 @@ public class SubmitView : MonoBehaviour
         _submitButton.OnClickAsObservable()
             .Subscribe(_ => 
                 reciever.RecieveEvent(
-                    new TurnSubmitAction { Faction = Faction.Player}))
+                    new TurnSubmitAction { Faction = Faction.Ally}))
             .AddTo(this);
     }
 }

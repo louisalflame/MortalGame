@@ -30,7 +30,7 @@ public class GameplayManager : IGameplayStatusWatcher
         _gameActions = new Queue<IGameAction>();
         _gameResult = null;
 
-        _gameStatus = _gameStatus.With(state: GameState.Player_Prepare);
+        _gameStatus = _gameStatus.With(state: GameState.TurnStart);
         Debug.Log($"-- goto state:{_gameStatus.State} --");
         _NextState(_gameStatus);
     }
@@ -52,56 +52,54 @@ public class GameplayManager : IGameplayStatusWatcher
     {
         switch(gameStatus.State)
         {
-            case GameState.Player_Prepare:
-                _TurnPreapre(gameStatus.Player);
+            case GameState.TurnStart:
+                _TurnStart();
                 break;
-            case GameState.Player_DrawCard:
-                _TurnDrawCard(gameStatus.Player);
+            case GameState.DrawCard:
+                _TurnDrawCard();
                 break;
-            case GameState.Player_Execute:
-                _TurnExecute(gameStatus.Player);
+            case GameState.EnemyPrepare:
+                _EnemyPreapre();
                 break;
-            case GameState.Player_Finalize:
-                break;
-            case GameState.Enemy_Prepare:
-                break;
-            case GameState.Enemy_DrawCard:
+            case GameState.PlayerExecute:
+                _TurnExecute(gameStatus.Ally);
                 break;
             case GameState.Enemy_Execute:
+                _EnemyExecute();
                 break;
-            case GameState.Enemy_Finalize:
+            case GameState.TurnEnd:
+                _TurnEnd();
+                break;
+            case GameState.GameEnd:
                 break;
         }
     }
 
-    private void _TurnPreapre(PlayerEntity player)
+    private void _TurnStart()
     {
         _gameStatus = _gameStatus.With(
-            round: player.Faction == Faction.Enemy ? _gameStatus.Round + 1 : _gameStatus.Round,
-            state: GameState.Player_DrawCard
+            round: _gameStatus.Round + 1,
+            state: GameState.DrawCard
         );
-        Debug.Log($"-- goto state:{_gameStatus.State} --");
-
-        _gameEvents.Add(new RoundStartEvent(){
-            Round = _gameStatus.Round,
-            Faction = player.Faction,
-            Player = _gameStatus.Player,
-            Enemy = _gameStatus.Enemy
-        });
+        Debug.Log($"-- goto state:{_gameStatus.State} --");   
     }
 
-    private void _TurnDrawCard(PlayerEntity player)
+    private void _TurnDrawCard()
     {
-        var drawCount = 0;
-        while( player.HandCard.Cards.Count < player.HandCard.MaxCount &&
-               player.Deck.Cards.Count > 0)
-        {
-            drawCount ++;
-            _DrawCard(player);
-        }
+        _DrawCardToMaxCount(_gameStatus.Ally);
+        _DrawCardToMaxCount(_gameStatus.Enemy);
 
         _gameStatus = _gameStatus.With(
-            state: GameState.Player_Execute
+            state: GameState.EnemyPrepare
+        );
+        _gameActions.Clear();
+        Debug.Log($"-- goto state:{_gameStatus.State} --");
+    }
+
+    private void _EnemyPreapre()
+    {
+        _gameStatus = _gameStatus.With(
+            state: GameState.PlayerExecute
         );
         Debug.Log($"-- goto state:{_gameStatus.State} --");
     }
@@ -125,13 +123,29 @@ public class GameplayManager : IGameplayStatusWatcher
         }
     }
 
+    private void _EnemyExecute()
+    {
+        _gameStatus = _gameStatus.With(
+            state: GameState.TurnEnd
+        );
+        Debug.Log($"-- goto state:{_gameStatus.State} --");
+    }
+
+    private void _TurnEnd()
+    {
+        _gameStatus = _gameStatus.With(
+            state: GameState.TurnStart
+        );
+        Debug.Log($"-- goto state:{_gameStatus.State} --");
+    }
+
     private void _PassCardFromHandToGraveyard(PlayerEntity player, int CardIndentity)
     {
-        var usedCard = _gameStatus.Player.HandCard.Cards.FirstOrDefault(c => c.CardIndentity == CardIndentity);
+        var usedCard = _gameStatus.Ally.HandCard.Cards.FirstOrDefault(c => c.CardIndentity == CardIndentity);
         if (usedCard != null)
         {
-            _gameStatus.Player.HandCard = _gameStatus.Player.HandCard.RemoveCard(usedCard);
-            _gameStatus.Player.Graveyard = _gameStatus.Player.Graveyard.AddCard(usedCard);
+            _gameStatus.Ally.HandCard = _gameStatus.Ally.HandCard.RemoveCard(usedCard);
+            _gameStatus.Ally.Graveyard = _gameStatus.Ally.Graveyard.AddCard(usedCard);
         }
 
         var usedCardInfo = new CardInfo(usedCard);
@@ -145,21 +159,39 @@ public class GameplayManager : IGameplayStatusWatcher
 
     private void _FinishExecuteTurn(TurnSubmitAction turnSubmitAction)
     {
-        if (_gameStatus.State == GameState.Player_Execute &&
-            turnSubmitAction.Faction == Faction.Player)
+        if (_gameStatus.State == GameState.PlayerExecute &&
+            turnSubmitAction.Faction == Faction.Ally)
         {
             _gameStatus = _gameStatus.With(
-                state: GameState.Player_Finalize
+                state: GameState.Enemy_Execute
             );
         }
         else if (_gameStatus.State == GameState.Enemy_Execute &&
             turnSubmitAction.Faction == Faction.Enemy)
         {
             _gameStatus = _gameStatus.With(
-                state: GameState.Enemy_Finalize
+                state: GameState.TurnEnd
             );
         }
         Debug.Log($"-- goto state:{_gameStatus.State} --");
+    }
+
+    private void _DrawCardToMaxCount(PlayerEntity player)
+    {
+        while( player.HandCard.Cards.Count < player.HandCard.MaxCount)
+        {
+            if( player.Deck.Cards.Count == 0 &&
+                player.Graveyard.Cards.Count > 0)
+            {
+                player.Graveyard = player.Graveyard.PopAllCards(out IReadOnlyCollection<CardEntity> graveyardCards);
+                player.Deck = player.Deck.EnqueueCards(graveyardCards).Shuffle();
+            }
+
+            if (player.Deck.Cards.Count > 0)
+                _DrawCard(player); 
+            else
+                break;
+        }
     }
 
     private void _DrawCard(PlayerEntity player)

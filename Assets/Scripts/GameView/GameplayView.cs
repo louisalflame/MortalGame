@@ -11,11 +11,19 @@ public class GameplayView : MonoBehaviour
     [SerializeField]
     private PlayerHandCardView _playerHandCardView;
     [SerializeField]
+    private DeckCardView _deckCardView;
+    [SerializeField]
+    private GraveyardCardView _graveyardCardView;
+    [SerializeField]
     private SubmitView _submitView;
 
     public void Init(IGameplayActionReciever reciever, IGameplayStatusWatcher statusWatcher)
     {
+        _playerInfoView.Init(statusWatcher);
+        _enemyInfoView.Init(statusWatcher);
         _playerHandCardView.Init(statusWatcher);
+        _deckCardView.Init(statusWatcher);
+        _graveyardCardView.Init(statusWatcher);
         _submitView.Init(reciever);
     }
 
@@ -46,11 +54,27 @@ public class GameplayView : MonoBehaviour
 
     private void _CreateCardView(DrawCardEvent drawCardEvent, IGameplayActionReciever reciever)
     {
-        _playerHandCardView.CreateCardView(drawCardEvent, reciever);
+        switch (drawCardEvent.Faction)
+        {
+            case Faction.Ally:
+                _playerHandCardView.CreateCardView(drawCardEvent, reciever);
+                _deckCardView.UpdateDeckView(drawCardEvent);
+                break;
+            case Faction.Enemy:
+                break;
+        }
     }
 
     private void _RemovedCardView(UsedCardEvent usedCardEvent)
     {
-        _playerHandCardView.RemoveCardView(usedCardEvent);
+        switch (usedCardEvent.Faction)
+        {
+            case Faction.Ally:
+                _playerHandCardView.RemoveCardView(usedCardEvent);
+                _graveyardCardView.UpdateDeckView(usedCardEvent);
+                break;
+            case Faction.Enemy:
+                break;
+        }
     }
 }
