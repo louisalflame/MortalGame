@@ -24,7 +24,6 @@ public class UsedCardEvent : IGameEvent
 public class RoundStartEvent : IGameEvent
 {
     public int Round;
-    public Faction Faction;
     public PlayerEntity Player;
     public PlayerEntity Enemy;
 }

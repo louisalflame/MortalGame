@@ -12,6 +12,13 @@ public class EnemyInfoView : MonoBehaviour
 
     [SerializeField]
     private HealthBarView _healthBarView;
+
+    [SerializeField]
+    private EnergyBarView _energyBarView;
+
+    [SerializeField]
+    private TextMeshProUGUI _deckText;
+    
     
     private IGameplayStatusWatcher _statusWatcher;
 
@@ -25,5 +32,7 @@ public class EnemyInfoView : MonoBehaviour
         _nameText.text = player.Name;
         _powerText.text = player.Character.PowerManager.Power.ToString();
         _healthBarView.SetHealth(player.Character.HealthManager.Hp, player.Character.HealthManager.MaxHp);
+        _energyBarView.SetEnergy(player.Character.EnergyManager.Energy, player.Character.EnergyManager.MaxEnergy);
+        _deckText.text = player.Deck.Cards.Count.ToString();
     }
 }

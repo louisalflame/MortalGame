@@ -7,9 +7,8 @@ public class BattleBuidler
         var initialState = new GameStatus(
             round: 0,
             state: GameState.None,
-            player: new PlayerEntity() {
+            player: new AllyEntity() {
                 Name = "趙活",
-                Faction = Faction.Ally,
                 Character = new CharacterEntity() {
                     HealthManager = new HealthManager() {
                         Hp = 100,
@@ -23,6 +22,7 @@ public class BattleBuidler
                         MaxEnergy = 100,
                     },
                     StatusManager = new StatusManager(),
+                    DispositionManager = new DispositionManager(5,10),
                 },
                 Deck = new DeckEntity() {
                     Cards = _CreateDeck()
@@ -34,9 +34,8 @@ public class BattleBuidler
                     Cards = new List<CardEntity>(),
                 },
             },
-            enemy: new PlayerEntity() {
+            enemy: new EnemyEntity() {
                 Name = "路人俠",
-                Faction = Faction.Enemy,
                 Character = new CharacterEntity() {
                     HealthManager = new HealthManager() {
                         Hp = 100,
@@ -50,6 +49,7 @@ public class BattleBuidler
                         MaxEnergy = 100,
                     },
                     StatusManager = new StatusManager(),
+                    DispositionManager = new DispositionManager(5,10),
                 },
                 Deck = new DeckEntity() {
                     Cards = _CreateDeck()

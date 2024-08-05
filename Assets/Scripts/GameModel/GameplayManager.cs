@@ -82,6 +82,12 @@ public class GameplayManager : IGameplayStatusWatcher
             state: GameState.DrawCard
         );
         Debug.Log($"-- goto state:{_gameStatus.State} --");   
+
+        _gameEvents.Add(new RoundStartEvent(){
+            Round = _gameStatus.Round,
+            Player = _gameStatus.Ally,
+            Enemy = _gameStatus.Enemy
+        });
     }
 
     private void _TurnDrawCard()
@@ -98,6 +104,8 @@ public class GameplayManager : IGameplayStatusWatcher
 
     private void _EnemyPreapre()
     {
+        _gameStatus.Enemy.PreparedSelectedCards();
+
         _gameStatus = _gameStatus.With(
             state: GameState.PlayerExecute
         );
