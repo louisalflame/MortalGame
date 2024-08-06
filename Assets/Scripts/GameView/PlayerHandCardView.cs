@@ -23,17 +23,19 @@ public class PlayerHandCardView : MonoBehaviour
     private List<CardView> _cardViews = new List<CardView>();
     private Dictionary<int, CardView> _cardViewDict = new Dictionary<int, CardView>();
     private IGameplayStatusWatcher _statusWatcher;
+    private IGameplayActionReciever _reciever;
 
-    public void Init(IGameplayStatusWatcher statusWatcher)
+    public void Init(IGameplayStatusWatcher statusWatcher, IGameplayActionReciever reciever)
     {
         _statusWatcher = statusWatcher;
+        _reciever = reciever;
     }
 
-    public void CreateCardView(DrawCardEvent drawCardEvent, IGameplayActionReciever reciever)
+    public void CreateCardView(DrawCardEvent drawCardEvent)
     {
         var cardView = _cardViewFactory.CreateCardView();
         cardView.transform.SetParent(_cardViewParent);
-        cardView.SetCardInfo(drawCardEvent.NewCardInfo, reciever);
+        cardView.SetCardInfo(drawCardEvent.NewCardInfo, _reciever);
 
         _cardViews.Add(cardView);
         _cardViewDict.Add(drawCardEvent.NewCardInfo.CardIndentity, cardView);

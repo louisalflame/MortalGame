@@ -34,7 +34,6 @@ public class HandCardEntity
 
     public HandCardEntity()
     {
-        MaxCount = 5;
         Cards = new List<CardEntity>();
     }
 

@@ -26,12 +26,12 @@ public class PlayerInfoView : MonoBehaviour
         _statusWatcher = statusWatcher;
     }
 
-    public void SetPlayerInfo(int round, PlayerEntity player)
+    public void SetPlayerInfo(int round, AllyEntity ally)
     {
         _TurnText.text = round.ToString();
-        _nameText.text = player.Name;
-        _powerText.text = player.Character.PowerManager.Power.ToString();
-        _healthBarView.SetHealth(player.Character.HealthManager.Hp, player.Character.HealthManager.MaxHp);
-        _energyBarView.SetEnergy(player.Character.EnergyManager.Energy, player.Character.EnergyManager.MaxEnergy);
+        _nameText.text = ally.Name;
+        _powerText.text = ally.Character.PowerManager.Power.ToString();
+        _healthBarView.SetHealth(ally.Character.HealthManager.Hp, ally.Character.HealthManager.MaxHp);
+        _energyBarView.SetEnergy(ally.Character.EnergyManager.Energy, ally.Character.EnergyManager.MaxEnergy);
     }
 }

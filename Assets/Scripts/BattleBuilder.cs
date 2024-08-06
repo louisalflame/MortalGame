@@ -28,6 +28,7 @@ public class BattleBuidler
                     Cards = _CreateDeck()
                 },
                 HandCard = new HandCardEntity {
+                    MaxCount = 5,
                     Cards = new List<CardEntity>(),
                 },
                 Graveyard = new CardGraveyardEntity {
@@ -55,6 +56,7 @@ public class BattleBuidler
                     Cards = _CreateDeck()
                 },
                 HandCard = new HandCardEntity {
+                    MaxCount = 1,
                     Cards = new List<CardEntity>(),
                 },
                 Graveyard = new CardGraveyardEntity {

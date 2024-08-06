@@ -13,6 +13,11 @@ public class DrawCardEvent : IGameEvent
     public IReadOnlyCollection<CardInfo> DeckCardInfos;
     public IReadOnlyCollection<CardInfo> HandCardInfos;
 }
+public class EnemySelectCardEvent : IGameEvent
+{
+    public CardInfo SelectedCardInfo;
+    public IReadOnlyCollection<CardInfo> SelectedCardInfos;
+}
 public class UsedCardEvent : IGameEvent
 {
     public Faction Faction;
@@ -20,10 +25,9 @@ public class UsedCardEvent : IGameEvent
     public IReadOnlyCollection<CardInfo> HandCardInfos;
     public IReadOnlyCollection<CardInfo> GraveyardCardInfos;
 }
-
 public class RoundStartEvent : IGameEvent
 {
     public int Round;
-    public PlayerEntity Player;
-    public PlayerEntity Enemy;
+    public AllyEntity Player;
+    public EnemyEntity Enemy;
 }

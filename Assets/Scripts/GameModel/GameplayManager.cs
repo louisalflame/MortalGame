@@ -104,7 +104,14 @@ public class GameplayManager : IGameplayStatusWatcher
 
     private void _EnemyPreapre()
     {
-        _gameStatus.Enemy.PreparedSelectedCards();
+        _gameStatus.Enemy.SelectedCards = _gameStatus.Enemy.GetRecommendCards();
+        foreach(var card in _gameStatus.Enemy.SelectedCards)
+        {
+            _gameEvents.Add(new EnemySelectCardEvent(){
+                SelectedCardInfo = new CardInfo(card),
+                SelectedCardInfos = _gameStatus.Enemy.SelectedCards.Select(c => new CardInfo(c)).ToArray()
+            });
+        }
 
         _gameStatus = _gameStatus.With(
             state: GameState.PlayerExecute
@@ -133,6 +140,15 @@ public class GameplayManager : IGameplayStatusWatcher
 
     private void _EnemyExecute()
     {
+        foreach(var card in _gameStatus.Enemy.SelectedCards)
+        {
+            _gameActions.Enqueue(new UseCardAction(){
+                CardIndentity = card.CardIndentity
+            });
+        }
+
+        _TurnExecute(_gameStatus.Enemy);
+
         _gameStatus = _gameStatus.With(
             state: GameState.TurnEnd
         );
@@ -152,8 +168,8 @@ public class GameplayManager : IGameplayStatusWatcher
         var usedCard = _gameStatus.Ally.HandCard.Cards.FirstOrDefault(c => c.CardIndentity == CardIndentity);
         if (usedCard != null)
         {
-            _gameStatus.Ally.HandCard = _gameStatus.Ally.HandCard.RemoveCard(usedCard);
-            _gameStatus.Ally.Graveyard = _gameStatus.Ally.Graveyard.AddCard(usedCard);
+            player.HandCard = player.HandCard.RemoveCard(usedCard);
+            player.Graveyard = player.Graveyard.AddCard(usedCard);
         }
 
         var usedCardInfo = new CardInfo(usedCard);

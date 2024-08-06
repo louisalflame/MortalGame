@@ -11,6 +11,8 @@ public class GameplayView : MonoBehaviour
     [SerializeField]
     private PlayerHandCardView _playerHandCardView;
     [SerializeField]
+    private EnemySelectedCardView _enemySelectedCardView;
+    [SerializeField]
     private DeckCardView _deckCardView;
     [SerializeField]
     private GraveyardCardView _graveyardCardView;
@@ -21,7 +23,8 @@ public class GameplayView : MonoBehaviour
     {
         _playerInfoView.Init(statusWatcher);
         _enemyInfoView.Init(statusWatcher);
-        _playerHandCardView.Init(statusWatcher);
+        _playerHandCardView.Init(statusWatcher, reciever);
+        _enemySelectedCardView.Init(statusWatcher, reciever);
         _deckCardView.Init(statusWatcher);
         _graveyardCardView.Init(statusWatcher);
         _submitView.Init(reciever);
@@ -39,8 +42,11 @@ public class GameplayView : MonoBehaviour
                 case DrawCardEvent drawCardEvent:
                     _CreateCardView(drawCardEvent, reciever);
                     break;
+                case EnemySelectCardEvent enemySelectCardEvent:
+                    _SelectCardView(enemySelectCardEvent);
+                    break;
                 case UsedCardEvent usedCardEvent:
-                    _RemovedCardView(usedCardEvent);
+                    _UsedCardView(usedCardEvent);
                     break;
             }
         }
@@ -57,7 +63,7 @@ public class GameplayView : MonoBehaviour
         switch (drawCardEvent.Faction)
         {
             case Faction.Ally:
-                _playerHandCardView.CreateCardView(drawCardEvent, reciever);
+                _playerHandCardView.CreateCardView(drawCardEvent);
                 _deckCardView.UpdateDeckView(drawCardEvent);
                 break;
             case Faction.Enemy:
@@ -65,7 +71,12 @@ public class GameplayView : MonoBehaviour
         }
     }
 
-    private void _RemovedCardView(UsedCardEvent usedCardEvent)
+    private void _SelectCardView(EnemySelectCardEvent enemySelectCardEvent)
+    {
+        _enemySelectedCardView.CreateCardView(enemySelectCardEvent);
+    }
+
+    private void _UsedCardView(UsedCardEvent usedCardEvent)
     {
         switch (usedCardEvent.Faction)
         {
@@ -74,6 +85,7 @@ public class GameplayView : MonoBehaviour
                 _graveyardCardView.UpdateDeckView(usedCardEvent);
                 break;
             case Faction.Enemy:
+                _enemySelectedCardView.RemoveCardView(usedCardEvent);
                 break;
         }
     }

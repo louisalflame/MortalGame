@@ -37,6 +37,15 @@ public class EnemyEntity : PlayerEntity
         SelectedCards = new List<CardEntity>();
     }
 
+    public IReadOnlyCollection<CardEntity> GetRecommendCards()
+    {
+        // TODO: Implement AI logic
+        var cardList = new List<CardEntity>();
+        if(HandCard.Cards.Count > 0) 
+            cardList.Add(HandCard.Cards.ElementAt(0));
+        return cardList;
+    }
+
     public void PreparedSelectedCards()
     {
         if(HandCard.Cards.Count == 0) 
