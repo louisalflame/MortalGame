@@ -43,6 +43,7 @@ public class GameplayView : MonoBehaviour
                     _DrawCardView(drawCardEvent, reciever);
                     break;
                 case RecycleGraveyardEvent recycleGraveyardEvent:
+                    _RecycleGraveyardEvent(recycleGraveyardEvent);
                     break;
                 case EnemySelectCardEvent enemySelectCardEvent:
                     _SelectCardView(enemySelectCardEvent);
