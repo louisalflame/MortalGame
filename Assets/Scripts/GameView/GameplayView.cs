@@ -42,6 +42,8 @@ public class GameplayView : MonoBehaviour
                 case DrawCardEvent drawCardEvent:
                     _DrawCardView(drawCardEvent, reciever);
                     break;
+                case RecycleGraveyardEvent recycleGraveyardEvent:
+                    break;
                 case EnemySelectCardEvent enemySelectCardEvent:
                     _SelectCardView(enemySelectCardEvent);
                     break;
@@ -68,6 +70,20 @@ public class GameplayView : MonoBehaviour
                 break;
             case Faction.Enemy:
                 _enemySelectedCardView.UpdateDeckView(drawCardEvent);
+                break;
+        }
+    }
+
+    private void _RecycleGraveyardEvent(RecycleGraveyardEvent recycleGraveyardEvent)
+    {
+        switch (recycleGraveyardEvent.Faction)
+        {
+            case Faction.Ally:
+                _deckCardView.UpdateDeckView(recycleGraveyardEvent);
+                _graveyardCardView.UpdateDeckView(recycleGraveyardEvent);
+                break;
+            case Faction.Enemy:
+                _enemySelectedCardView.UpdateDeckView(recycleGraveyardEvent);
                 break;
         }
     }

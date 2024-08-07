@@ -211,6 +211,11 @@ public class GameplayManager : IGameplayStatusWatcher
             {
                 player.Graveyard = player.Graveyard.PopAllCards(out IReadOnlyCollection<CardEntity> graveyardCards);
                 player.Deck = player.Deck.EnqueueCards(graveyardCards).Shuffle();
+                _gameEvents.Add(new RecycleGraveyardEvent() {
+                    Faction = player.Faction,
+                    DeckCardInfos = player.Deck.CardInfos,
+                    GraveyardCardInfos = player.Graveyard.CardInfos
+                });
             }
 
             if (player.Deck.Cards.Count > 0)

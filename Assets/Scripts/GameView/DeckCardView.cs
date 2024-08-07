@@ -27,4 +27,8 @@ public class DeckCardView : MonoBehaviour
     {
         _deckCountText.text = drawCardEvent.DeckCardInfos.Count.ToString();
     }
+    public void UpdateDeckView(RecycleGraveyardEvent recycleGraveyardEvent)
+    {
+        _deckCountText.text = recycleGraveyardEvent.DeckCardInfos.Count.ToString();
+    }
 }

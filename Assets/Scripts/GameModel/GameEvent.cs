@@ -6,6 +6,12 @@ public interface IGameEvent
 
 }
 
+public class RecycleGraveyardEvent : IGameEvent
+{
+    public Faction Faction;
+    public IReadOnlyCollection<CardInfo> DeckCardInfos;
+    public IReadOnlyCollection<CardInfo> GraveyardCardInfos;
+}
 public class DrawCardEvent : IGameEvent
 {
     public Faction Faction;
