@@ -31,7 +31,7 @@ public class BattleBuidler
                     MaxCount = 5,
                     Cards = new List<CardEntity>(),
                 },
-                Graveyard = new CardGraveyardEntity {
+                Graveyard = new GraveyardEntity {
                     Cards = new List<CardEntity>(),
                 },
             },
@@ -56,10 +56,10 @@ public class BattleBuidler
                     Cards = _CreateDeck()
                 },
                 HandCard = new HandCardEntity {
-                    MaxCount = 1,
+                    MaxCount = 3,
                     Cards = new List<CardEntity>(),
                 },
-                Graveyard = new CardGraveyardEntity {
+                Graveyard = new GraveyardEntity {
                     Cards = new List<CardEntity>(),
                 },
             }
@@ -96,14 +96,22 @@ public class BattleBuidler
             },
             new CardEntity() {
                 CardIndentity = 10004,
-                Title = "Defend",
-                Info = "Gain 5 block",
-                Type = CardType.Defense,
+                Title = "Attack",
+                Info = "Deal 5 damage to enemy",
+                Type = CardType.Attack,
                 Cost = 1,
                 Power = 5,
             },
             new CardEntity() {
                 CardIndentity = 10005,
+                Title = "Attack",
+                Info = "Deal 5 damage to enemy",
+                Type = CardType.Attack,
+                Cost = 1,
+                Power = 5,
+            },
+            new CardEntity() {
+                CardIndentity = 20001,
                 Title = "Defend",
                 Info = "Gain 5 block",
                 Type = CardType.Defense,
@@ -111,7 +119,31 @@ public class BattleBuidler
                 Power = 5,
             },
             new CardEntity() {
-                CardIndentity = 10006,
+                CardIndentity = 20002,
+                Title = "Defend",
+                Info = "Gain 5 block",
+                Type = CardType.Defense,
+                Cost = 1,
+                Power = 5,
+            },
+            new CardEntity() {
+                CardIndentity = 20003,
+                Title = "Defend",
+                Info = "Gain 5 block",
+                Type = CardType.Defense,
+                Cost = 1,
+                Power = 5,
+            },
+            new CardEntity() {
+                CardIndentity = 20004,
+                Title = "Defend",
+                Info = "Gain 5 block",
+                Type = CardType.Defense,
+                Cost = 1,
+                Power = 5,
+            },
+            new CardEntity() {
+                CardIndentity = 20005,
                 Title = "Defend",
                 Info = "Gain 5 block",
                 Type = CardType.Defense,

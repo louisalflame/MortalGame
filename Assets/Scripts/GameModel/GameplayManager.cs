@@ -107,6 +107,7 @@ public class GameplayManager : IGameplayStatusWatcher
         _gameStatus.Enemy.SelectedCards = _gameStatus.Enemy.GetRecommendCards();
         foreach(var card in _gameStatus.Enemy.SelectedCards)
         {
+            Debug.Log($"-- enemy recommend card:{card.CardIndentity} --");
             _gameEvents.Add(new EnemySelectCardEvent(){
                 SelectedCardInfo = new CardInfo(card),
                 SelectedCardInfos = _gameStatus.Enemy.SelectedCards.Select(c => new CardInfo(c)).ToArray()
@@ -142,6 +143,7 @@ public class GameplayManager : IGameplayStatusWatcher
     {
         foreach(var card in _gameStatus.Enemy.SelectedCards)
         {
+            Debug.Log($"-- enemy use card:{card.CardIndentity} --");
             _gameActions.Enqueue(new UseCardAction(){
                 CardIndentity = card.CardIndentity
             });
@@ -165,20 +167,20 @@ public class GameplayManager : IGameplayStatusWatcher
 
     private void _PassCardFromHandToGraveyard(PlayerEntity player, int CardIndentity)
     {
-        var usedCard = _gameStatus.Ally.HandCard.Cards.FirstOrDefault(c => c.CardIndentity == CardIndentity);
+        var usedCard = player.HandCard.Cards.FirstOrDefault(c => c.CardIndentity == CardIndentity);
         if (usedCard != null)
         {
             player.HandCard = player.HandCard.RemoveCard(usedCard);
             player.Graveyard = player.Graveyard.AddCard(usedCard);
-        }
 
-        var usedCardInfo = new CardInfo(usedCard);
-        _gameEvents.Add(new UsedCardEvent() {
-            Faction = player.Faction,
-            UsedCardInfo = usedCardInfo,
-            HandCardInfos = player.HandCard.CardInfos,
-            GraveyardCardInfos = player.Graveyard.CardInfos
+            var usedCardInfo = new CardInfo(usedCard);
+            _gameEvents.Add(new UsedCardEvent() {
+                Faction = player.Faction,
+                UsedCardInfo = usedCardInfo,
+                HandCardInfos = player.HandCard.CardInfos,
+                GraveyardCardInfos = player.Graveyard.CardInfos
         });
+        }
     }
 
     private void _FinishExecuteTurn(TurnSubmitAction turnSubmitAction)

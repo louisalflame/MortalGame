@@ -16,7 +16,7 @@ public abstract class PlayerEntity
     public CharacterEntity Character;
     public HandCardEntity HandCard;
     public DeckEntity Deck;
-    public CardGraveyardEntity Graveyard;
+    public GraveyardEntity Graveyard;
 }
 
 public class AllyEntity : PlayerEntity
@@ -43,6 +43,8 @@ public class EnemyEntity : PlayerEntity
         var cardList = new List<CardEntity>();
         if(HandCard.Cards.Count > 0) 
             cardList.Add(HandCard.Cards.ElementAt(0));
+        if(HandCard.Cards.Count > 1) 
+            cardList.Add(HandCard.Cards.ElementAt(1));
         return cardList;
     }
 

@@ -40,7 +40,7 @@ public class GameplayView : MonoBehaviour
                     _UpdateRoundAndPlayer(roundStartEvent);
                     break;
                 case DrawCardEvent drawCardEvent:
-                    _CreateCardView(drawCardEvent, reciever);
+                    _DrawCardView(drawCardEvent, reciever);
                     break;
                 case EnemySelectCardEvent enemySelectCardEvent:
                     _SelectCardView(enemySelectCardEvent);
@@ -58,7 +58,7 @@ public class GameplayView : MonoBehaviour
         _enemyInfoView.SetPlayerInfo(roundStartEvent.Enemy);
     }
 
-    private void _CreateCardView(DrawCardEvent drawCardEvent, IGameplayActionReciever reciever)
+    private void _DrawCardView(DrawCardEvent drawCardEvent, IGameplayActionReciever reciever)
     {
         switch (drawCardEvent.Faction)
         {
@@ -67,6 +67,7 @@ public class GameplayView : MonoBehaviour
                 _deckCardView.UpdateDeckView(drawCardEvent);
                 break;
             case Faction.Enemy:
+                _enemySelectedCardView.UpdateDeckView(drawCardEvent);
                 break;
         }
     }

@@ -1691,7 +1691,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
@@ -2528,7 +2528,7 @@ MonoBehaviour:
   _cardViewFactory: {fileID: 478889518}
   _cardViewParent: {fileID: 1004729037}
   _handCardArea: {fileID: 1004729037}
-  _deckText: {fileID: 1556623162}
+  _deckCountText: {fileID: 1556623162}
   _cardWidth: 100
   _widthInterval: 20
 --- !u!1 &510364804

@@ -12,7 +12,7 @@ public class EnemySelectedCardView : MonoBehaviour
     private RectTransform _handCardArea;
 
     [SerializeField]
-    private TextMeshProUGUI _deckText;
+    private TextMeshProUGUI _deckCountText;
     
     [SerializeField]
     private float _cardWidth = 100f;
@@ -31,15 +31,19 @@ public class EnemySelectedCardView : MonoBehaviour
         _reciever = reciever;
     }
 
+    public void UpdateDeckView(DrawCardEvent drawCardEvent)
+    {
+        _deckCountText.text = drawCardEvent.DeckCardInfos.Count.ToString();
+    }
 
-    public void CreateCardView(EnemySelectCardEvent drawCardEvent)
+    public void CreateCardView(EnemySelectCardEvent enemySelectCardEvent)
     {
         var cardView = _cardViewFactory.CreateCardView();
         cardView.transform.SetParent(_cardViewParent);
-        cardView.SetCardInfo(drawCardEvent.SelectedCardInfo, _reciever);
+        cardView.SetCardInfo(enemySelectCardEvent.SelectedCardInfo, _reciever);
 
         _cardViews.Add(cardView);
-        _cardViewDict.Add(drawCardEvent.SelectedCardInfo.CardIndentity, cardView);
+        _cardViewDict.Add(enemySelectCardEvent.SelectedCardInfo.CardIndentity, cardView);
 
         if(_cardViews.Count > 0)
         {
