@@ -26,5 +26,6 @@ public class CardData
     public ICardEffect[] OnDeckEffects;
 
     [TitleGroup("Localization")]
-    public string TitleKey;
+    public string TitleKey = string.Empty;
+    public string InfoKey = string.Empty;
 }

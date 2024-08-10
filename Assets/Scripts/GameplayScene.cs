@@ -8,11 +8,13 @@ public class GameplayScene : MonoBehaviour
     [SerializeField]
     private GameplayView _gameplayView;
 
+    private Context _context;
     private BattleBuidler _battleBuidler;
 
-    public void Initialize()
+    public void Initialize(Context context)
     {
-        _battleBuidler = new BattleBuidler();
+        _context = context;
+        _battleBuidler = new BattleBuidler(_context);
     }
 
     public async UniTask Run()

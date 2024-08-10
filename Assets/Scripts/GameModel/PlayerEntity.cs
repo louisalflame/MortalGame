@@ -6,7 +6,8 @@ public enum Faction
 {
     None = 0,
     Ally,
-    Enemy}
+    Enemy
+}
 
 public abstract class PlayerEntity
 {
@@ -21,6 +22,8 @@ public abstract class PlayerEntity
 
 public class AllyEntity : PlayerEntity
 {
+    public DispositionManager DispositionManager;
+    
     public AllyEntity()
     {
         Faction = Faction.Ally;

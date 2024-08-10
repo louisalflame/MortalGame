@@ -107,7 +107,7 @@ public class GameplayManager : IGameplayStatusWatcher
         _gameStatus.Enemy.SelectedCards = _gameStatus.Enemy.GetRecommendCards();
         foreach(var card in _gameStatus.Enemy.SelectedCards)
         {
-            Debug.Log($"-- enemy recommend card:{card.CardIndentity} --");
+            Debug.Log($"-- enemy recommend card:{card.Indentity} --");
             _gameEvents.Add(new EnemySelectCardEvent(){
                 SelectedCardInfo = new CardInfo(card),
                 SelectedCardInfos = _gameStatus.Enemy.SelectedCards.Select(c => new CardInfo(c)).ToArray()
@@ -143,9 +143,9 @@ public class GameplayManager : IGameplayStatusWatcher
     {
         foreach(var card in _gameStatus.Enemy.SelectedCards)
         {
-            Debug.Log($"-- enemy use card:{card.CardIndentity} --");
+            Debug.Log($"-- enemy use card:{card.Indentity} --");
             _gameActions.Enqueue(new UseCardAction(){
-                CardIndentity = card.CardIndentity
+                CardIndentity = card.Indentity
             });
         }
 
@@ -165,9 +165,9 @@ public class GameplayManager : IGameplayStatusWatcher
         Debug.Log($"-- goto state:{_gameStatus.State} --");
     }
 
-    private void _PassCardFromHandToGraveyard(PlayerEntity player, int CardIndentity)
+    private void _PassCardFromHandToGraveyard(PlayerEntity player, string CardIndentity)
     {
-        var usedCard = player.HandCard.Cards.FirstOrDefault(c => c.CardIndentity == CardIndentity);
+        var usedCard = player.HandCard.Cards.FirstOrDefault(c => c.Indentity == CardIndentity);
         if (usedCard != null)
         {
             player.HandCard = player.HandCard.RemoveCard(usedCard);

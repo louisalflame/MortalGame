@@ -7,7 +7,11 @@ using UnityEngine.SceneManagement;
 
 public class Main : MonoBehaviour
 {
+    [SerializeField]
+    private ScriptableDataLoader _scriptableDataLoader;
+
     private SceneLoadManager _sceneLoadManager;
+    private Context _context;
 
     async UniTaskVoid Start()
     {
@@ -16,6 +20,8 @@ public class Main : MonoBehaviour
         Application.targetFrameRate = 60;
 
         _sceneLoadManager = new SceneLoadManager();
+        _context = new Context(
+            _scriptableDataLoader);
 
         await _Gameloop();
     }
@@ -28,7 +34,7 @@ public class Main : MonoBehaviour
 
         var gameplayScene = await _sceneLoadManager.LoadGameplayScene();
 
-        gameplayScene.Initialize();
+        gameplayScene.Initialize(_context);
         await gameplayScene.Run();
     }
 }

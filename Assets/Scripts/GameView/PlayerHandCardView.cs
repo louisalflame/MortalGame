@@ -21,7 +21,7 @@ public class PlayerHandCardView : MonoBehaviour
     private float _widthInterval = 20f;
 
     private List<CardView> _cardViews = new List<CardView>();
-    private Dictionary<int, CardView> _cardViewDict = new Dictionary<int, CardView>();
+    private Dictionary<string, CardView> _cardViewDict = new Dictionary<string, CardView>();
     private IGameplayStatusWatcher _statusWatcher;
     private IGameplayActionReciever _reciever;
 

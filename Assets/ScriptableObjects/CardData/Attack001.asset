@@ -88,6 +88,9 @@ MonoBehaviour:
       Entry: 8
       Data: 
     - Name: TitleKey
+      Entry: 1
+      Data: Attack
+    - Name: InfoKey
       Entry: 6
       Data: 
     - Name: 

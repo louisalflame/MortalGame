@@ -28,7 +28,7 @@ public class HandCardEntity
 
     public HandCardEntity RemoveCard(CardEntity card)
     {
-        var cards = new List<CardEntity>(Cards.Where(c => c.CardIndentity != card.CardIndentity));
+        var cards = new List<CardEntity>(Cards.Where(c => c.Indentity != card.Indentity));
 
         return new HandCardEntity
         {

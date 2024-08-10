@@ -42,7 +42,7 @@ public class CardView : MonoBehaviour
 
 public class CardInfo
 {
-    public int CardIndentity { get; private set; }
+    public string CardIndentity { get; private set; }
     public string Title { get; private set; }
     public string Info { get; private set; }
     public int Cost { get; private set; }
@@ -50,7 +50,7 @@ public class CardInfo
 
     public CardInfo(CardEntity card)
     {
-        CardIndentity = card.CardIndentity;
+        CardIndentity = card.Indentity;
         Title = card.Title;
         Info = card.Info;
         Cost = card.Cost;

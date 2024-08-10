@@ -6,7 +6,6 @@ public class CharacterEntity
     public StatusManager StatusManager;
     public PowerManager PowerManager;
     public EnergyManager EnergyManager;
-    public DispositionManager DispositionManager;
 
     public int CurrentHealth => HealthManager.Hp;
     public int CurrentPower => PowerManager.Power;
@@ -46,23 +45,21 @@ public class DispositionManager
     }
 
     public int CurrentDisposition;
-    public int MaxDisposition;
+    public const int MAX_DISPOSITION = 10;
 
-    public DispositionManager(int currentDisposition, int maxDisposition)
+    public DispositionManager(int initialDisposition)
     {
-        CurrentDisposition = currentDisposition;
-        MaxDisposition = maxDisposition;
+        CurrentDisposition = initialDisposition; 
     }
 
     public string GetName() {
-        float ratio = (float)CurrentDisposition / MaxDisposition;
-        if ( ratio < 0.2f )
+        if      ( CurrentDisposition <= 1 )
             return Name.Coward.ToString();
-        else if ( ratio < 0.4f )
+        else if ( CurrentDisposition <= 3 )
             return Name.Cautious.ToString();
-        else if ( ratio <= 0.6f )
+        else if ( CurrentDisposition <= 6 )
             return Name.Moderate.ToString();
-        else if ( ratio <= 0.8f )
+        else if ( CurrentDisposition <= 8 )
             return Name.Brave.ToString();
         else
             return Name.Reckless.ToString();

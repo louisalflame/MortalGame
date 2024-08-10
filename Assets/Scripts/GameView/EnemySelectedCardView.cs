@@ -20,7 +20,7 @@ public class EnemySelectedCardView : MonoBehaviour
     private float _widthInterval = 20f;
 
     private List<AiCardView> _cardViews = new List<AiCardView>();
-    private Dictionary<int, AiCardView> _cardViewDict = new Dictionary<int, AiCardView>();
+    private Dictionary<string, AiCardView> _cardViewDict = new Dictionary<string, AiCardView>();
 
     private IGameplayStatusWatcher _statusWatcher;
     private IGameplayActionReciever _reciever;

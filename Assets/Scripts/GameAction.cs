@@ -8,7 +8,7 @@ public interface IGameAction
 
 public class UseCardAction : IGameAction
 {
-    public int CardIndentity;
+    public string CardIndentity;
 }
 
 public class TurnSubmitAction : IGameAction

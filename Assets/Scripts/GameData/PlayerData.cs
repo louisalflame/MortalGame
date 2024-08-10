@@ -19,9 +19,6 @@ public class PlayerData
     public int InitialEnergy;
     [TitleGroup("BasicData")]
     public int InitialPower;
-    [TitleGroup("BasicData")]
-    [Range(0, 10)]
-    public int InitialDisposition;
 
     [BoxGroup("Cards")]
     public DeckScriptable Deck;
