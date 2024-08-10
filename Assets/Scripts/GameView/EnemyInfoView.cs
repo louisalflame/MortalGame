@@ -31,4 +31,13 @@ public class EnemyInfoView : MonoBehaviour
         _healthBarView.SetHealth(enemy.Character.HealthManager.Hp, enemy.Character.HealthManager.MaxHp);
         _energyBarView.SetEnergy(enemy.Character.EnergyManager.Energy, enemy.Character.EnergyManager.MaxEnergy);
     }
+
+    public void UpdateEnergy(ConsumeEnergyEvent consumeEnergyEvent)
+    {
+        _energyBarView.SetEnergy(consumeEnergyEvent.Energy, consumeEnergyEvent.MaxEnergy);
+    }
+    public void UpdateEnergy(GainEnergyEvent gainEnergyEvent)
+    {
+        _energyBarView.SetEnergy(gainEnergyEvent.Energy, gainEnergyEvent.MaxEnergy);
+    }
 }

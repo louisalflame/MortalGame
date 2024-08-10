@@ -85,6 +85,7 @@ public class BattleBuidler
             Graveyard = new GraveyardEntity(){
                 Cards = new List<CardEntity>(),
             },
+            EnergyRecoverPoint = enemyData.EnergyRecoverPoint,
         };
     }
 
@@ -97,6 +98,8 @@ public class BattleBuidler
             Type = cardData.Type,
             Cost = cardData.Cost,
             Power = cardData.Power,
+            OnUseEffects = cardData.OnUseEffects,
+            OriginData = cardData,
         };
     }
 }

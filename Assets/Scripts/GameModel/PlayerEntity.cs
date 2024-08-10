@@ -23,7 +23,7 @@ public abstract class PlayerEntity
 public class AllyEntity : PlayerEntity
 {
     public DispositionManager DispositionManager;
-    
+
     public AllyEntity()
     {
         Faction = Faction.Ally;
@@ -33,6 +33,7 @@ public class AllyEntity : PlayerEntity
 public class EnemyEntity : PlayerEntity
 {
     public IReadOnlyCollection<CardEntity> SelectedCards;
+    public int EnergyRecoverPoint;
 
     public EnemyEntity()
     {

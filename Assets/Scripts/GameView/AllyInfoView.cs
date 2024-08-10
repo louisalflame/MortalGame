@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerInfoView : MonoBehaviour
+public class AllyInfoView : MonoBehaviour
 {
     [SerializeField]
     private TextMeshProUGUI _TurnText;
@@ -33,5 +33,14 @@ public class PlayerInfoView : MonoBehaviour
         _powerText.text = ally.Character.PowerManager.Power.ToString();
         _healthBarView.SetHealth(ally.Character.HealthManager.Hp, ally.Character.HealthManager.MaxHp);
         _energyBarView.SetEnergy(ally.Character.EnergyManager.Energy, ally.Character.EnergyManager.MaxEnergy);
+    }
+    
+    public void UpdateEnergy(ConsumeEnergyEvent consumeEnergyEvent)
+    {
+        _energyBarView.SetEnergy(consumeEnergyEvent.Energy, consumeEnergyEvent.MaxEnergy);
+    }
+    public void UpdateEnergy(GainEnergyEvent gainEnergyEvent)
+    {
+        _energyBarView.SetEnergy(gainEnergyEvent.Energy, gainEnergyEvent.MaxEnergy);
     }
 }

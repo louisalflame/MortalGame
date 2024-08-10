@@ -13,6 +13,8 @@ public class CardEntity
     public int Cost;
     public int Power;
 
-    public IReadOnlyCollection<ICardEffect> Effects;
+    public IReadOnlyCollection<ICardEffect> OnUseEffects;
+
+    public CardData OriginData;
 }
 

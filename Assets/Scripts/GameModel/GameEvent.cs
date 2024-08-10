@@ -31,6 +31,20 @@ public class UsedCardEvent : IGameEvent
     public IReadOnlyCollection<CardInfo> HandCardInfos;
     public IReadOnlyCollection<CardInfo> GraveyardCardInfos;
 }
+public class ConsumeEnergyEvent : IGameEvent
+{
+    public Faction Faction;
+    public int Energy;
+    public int DeltaEnergy;
+    public int MaxEnergy;
+}
+public class GainEnergyEvent : IGameEvent
+{
+    public Faction Faction;
+    public int Energy;
+    public int DeltaEnergy;
+    public int MaxEnergy;
+}
 public class RoundStartEvent : IGameEvent
 {
     public int Round;

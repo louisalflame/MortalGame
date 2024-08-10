@@ -81,12 +81,29 @@ public class GameplayManager : IGameplayStatusWatcher
             round: _gameStatus.Round + 1,
             state: GameState.DrawCard
         );
-        Debug.Log($"-- goto state:{_gameStatus.State} --");   
 
         _gameEvents.Add(new RoundStartEvent(){
             Round = _gameStatus.Round,
             Player = _gameStatus.Ally,
             Enemy = _gameStatus.Enemy
+        });
+        Debug.Log($"-- goto state:{_gameStatus.State} --");   
+
+        _gameStatus.Ally.Character.EnergyManager = _gameStatus.Ally.Character.EnergyManager.GainEnergy(3, out int deltaEnergy);
+        _gameEvents.Add(new GainEnergyEvent(){
+            Faction = _gameStatus.Ally.Faction,
+            DeltaEnergy = deltaEnergy,
+            Energy = _gameStatus.Ally.Character.EnergyManager.Energy,
+            MaxEnergy = _gameStatus.Ally.Character.EnergyManager.MaxEnergy
+        });
+
+        _gameStatus.Enemy.Character.EnergyManager = _gameStatus.Enemy.Character.EnergyManager.GainEnergy(
+            _gameStatus.Enemy.EnergyRecoverPoint, out deltaEnergy);
+        _gameEvents.Add(new GainEnergyEvent(){
+            Faction = _gameStatus.Enemy.Faction,
+            DeltaEnergy = deltaEnergy,
+            Energy = _gameStatus.Enemy.Character.EnergyManager.Energy,
+            MaxEnergy = _gameStatus.Enemy.Character.EnergyManager.MaxEnergy
         });
     }
 
@@ -129,7 +146,7 @@ public class GameplayManager : IGameplayStatusWatcher
             {
                 case UseCardAction useCardAction:
                     Debug.Log($"-- useCard:{useCardAction.CardIndentity} --");
-                    _PassCardFromHandToGraveyard(player, useCardAction.CardIndentity);
+                    _UseCard(player, useCardAction.CardIndentity);
                     break;
                 case TurnSubmitAction turnSubmitAction:
                     Debug.Log($"-- submit:{turnSubmitAction.Faction} --");
@@ -165,21 +182,38 @@ public class GameplayManager : IGameplayStatusWatcher
         Debug.Log($"-- goto state:{_gameStatus.State} --");
     }
 
-    private void _PassCardFromHandToGraveyard(PlayerEntity player, string CardIndentity)
+    private void _UseCard(PlayerEntity player, string CardIndentity)
     {
         var usedCard = player.HandCard.Cards.FirstOrDefault(c => c.Indentity == CardIndentity);
         if (usedCard != null)
         {
-            player.HandCard = player.HandCard.RemoveCard(usedCard);
-            player.Graveyard = player.Graveyard.AddCard(usedCard);
+            var cardRuntimCost = usedCard.Cost;
 
-            var usedCardInfo = new CardInfo(usedCard);
-            _gameEvents.Add(new UsedCardEvent() {
-                Faction = player.Faction,
-                UsedCardInfo = usedCardInfo,
-                HandCardInfos = player.HandCard.CardInfos,
-                GraveyardCardInfos = player.Graveyard.CardInfos
-        });
+            if (cardRuntimCost <= player.Character.EnergyManager.Energy)
+            {
+                player.Character.EnergyManager = player.Character.EnergyManager.ConsumeEnergy(cardRuntimCost, out int deltaEnergy);
+                _gameEvents.Add(new ConsumeEnergyEvent(){
+                    Faction = player.Faction,
+                    DeltaEnergy = deltaEnergy,
+                    Energy = player.Character.EnergyManager.Energy,
+                    MaxEnergy = player.Character.EnergyManager.MaxEnergy
+                });
+
+                player.HandCard = player.HandCard.RemoveCard(usedCard);
+                player.Graveyard = player.Graveyard.AddCard(usedCard);
+                var usedCardInfo = new CardInfo(usedCard);
+                _gameEvents.Add(new UsedCardEvent() {
+                    Faction = player.Faction,
+                    UsedCardInfo = usedCardInfo,
+                    HandCardInfos = player.HandCard.CardInfos,
+                    GraveyardCardInfos = player.Graveyard.CardInfos
+                });
+
+                foreach(var effect in usedCard.OnUseEffects)
+                {
+                    _ApplyOnUseEffect(player, usedCard, effect);
+                }
+            }
         }
     }
 
@@ -228,9 +262,7 @@ public class GameplayManager : IGameplayStatusWatcher
     private void _DrawCard(PlayerEntity player)
     {
         player.Deck = player.Deck.PopCard(out CardEntity newCard);
-        Debug.Log($"player.Deck.Cards.Count:{player.Deck.Cards.Count}");
         player.HandCard = player.HandCard.AddCard(newCard);
-        Debug.Log($"player.HandCard.Cards.Count:{player.HandCard.Cards.Count}");
 
         var newCardInfo = new CardInfo(newCard);
         _gameEvents.Add(new DrawCardEvent(){
@@ -239,5 +271,16 @@ public class GameplayManager : IGameplayStatusWatcher
             HandCardInfos = player.HandCard.CardInfos,
             DeckCardInfos = player.Deck.CardInfos,
         });
+    }
+
+    private void _ApplyOnUseEffect(PlayerEntity player, CardEntity card, ICardEffect effect)
+    {
+        switch(effect)
+        {
+            case DamageEffect damageEffect: 
+                break;
+            case HealEffect healEffect: 
+                break;
+        }
     }
 }

@@ -20,6 +20,8 @@ public class CardView : MonoBehaviour
     public void SetCardInfo(CardInfo cardInfo, IGameplayActionReciever reciever)
     {
         _title.text = cardInfo.Title;
+        _cost.text = cardInfo.Cost.ToString();
+        _power.text = cardInfo.Power.ToString();
 
         _button.OnClickAsObservable()
             .Subscribe(_ => 

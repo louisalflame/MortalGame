@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerHandCardView : MonoBehaviour
+public class AllyHandCardView : MonoBehaviour
 {
     [SerializeField]
     private CardViewFactory _cardViewFactory;

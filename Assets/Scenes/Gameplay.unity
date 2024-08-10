@@ -725,7 +725,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1815,7 +1815,7 @@ GameObject:
   - component: {fileID: 388512504}
   - component: {fileID: 388512503}
   m_Layer: 5
-  m_Name: PlayerHandCardView
+  m_Name: AllyHandCardView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2625,7 +2625,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2879,7 +2879,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3288,7 +3288,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -5329,9 +5329,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc1a24be4cf4601478cf3f48c0cafcf6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerInfoView: {fileID: 1996861977}
+  _allyInfoView: {fileID: 1996861977}
   _enemyInfoView: {fileID: 428838937}
-  _playerHandCardView: {fileID: 388512502}
+  _allyHandCardView: {fileID: 388512502}
   _enemySelectedCardView: {fileID: 497468357}
   _deckCardView: {fileID: 388512504}
   _graveyardCardView: {fileID: 388512503}
@@ -7636,7 +7636,7 @@ GameObject:
   - component: {fileID: 1996861976}
   - component: {fileID: 1996861978}
   m_Layer: 5
-  m_Name: PlayerInfo
+  m_Name: AllyInfo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

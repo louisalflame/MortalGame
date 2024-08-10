@@ -5,11 +5,11 @@ using UnityEngine;
 public class GameplayView : MonoBehaviour
 {
     [SerializeField]
-    private PlayerInfoView _playerInfoView;
+    private AllyInfoView _allyInfoView;
     [SerializeField]
     private EnemyInfoView  _enemyInfoView;
     [SerializeField]
-    private PlayerHandCardView _playerHandCardView;
+    private AllyHandCardView _allyHandCardView;
     [SerializeField]
     private EnemySelectedCardView _enemySelectedCardView;
     [SerializeField]
@@ -21,9 +21,9 @@ public class GameplayView : MonoBehaviour
 
     public void Init(IGameplayActionReciever reciever, IGameplayStatusWatcher statusWatcher)
     {
-        _playerInfoView.Init(statusWatcher);
+        _allyInfoView.Init(statusWatcher);
         _enemyInfoView.Init(statusWatcher);
-        _playerHandCardView.Init(statusWatcher, reciever);
+        _allyHandCardView.Init(statusWatcher, reciever);
         _enemySelectedCardView.Init(statusWatcher, reciever);
         _deckCardView.Init(statusWatcher);
         _graveyardCardView.Init(statusWatcher);
@@ -51,13 +51,18 @@ public class GameplayView : MonoBehaviour
                 case UsedCardEvent usedCardEvent:
                     _UsedCardView(usedCardEvent);
                     break;
+                case ConsumeEnergyEvent consumeEnergyEvent:
+                    _ConsumeEnergyView(consumeEnergyEvent);
+                    break;
+                case GainEnergyEvent gainEnergyEvent:
+                    break;
             }
         }
     }
 
     private void _UpdateRoundAndPlayer(RoundStartEvent roundStartEvent)
     {
-        _playerInfoView.SetPlayerInfo(roundStartEvent.Round, roundStartEvent.Player);
+        _allyInfoView.SetPlayerInfo(roundStartEvent.Round, roundStartEvent.Player);
         _enemyInfoView.SetPlayerInfo(roundStartEvent.Enemy);
     }
 
@@ -66,7 +71,7 @@ public class GameplayView : MonoBehaviour
         switch (drawCardEvent.Faction)
         {
             case Faction.Ally:
-                _playerHandCardView.CreateCardView(drawCardEvent);
+                _allyHandCardView.CreateCardView(drawCardEvent);
                 _deckCardView.UpdateDeckView(drawCardEvent);
                 break;
             case Faction.Enemy:
@@ -99,11 +104,36 @@ public class GameplayView : MonoBehaviour
         switch (usedCardEvent.Faction)
         {
             case Faction.Ally:
-                _playerHandCardView.RemoveCardView(usedCardEvent);
+                _allyHandCardView.RemoveCardView(usedCardEvent);
                 _graveyardCardView.UpdateDeckView(usedCardEvent);
                 break;
             case Faction.Enemy:
                 _enemySelectedCardView.RemoveCardView(usedCardEvent);
+                break;
+        }
+    }
+
+    private void _ConsumeEnergyView(ConsumeEnergyEvent consumeEnergyEvent)
+    {
+        switch (consumeEnergyEvent.Faction)
+        {
+            case Faction.Ally:
+                _allyInfoView.UpdateEnergy(consumeEnergyEvent);
+                break;
+            case Faction.Enemy:
+                _enemyInfoView.UpdateEnergy(consumeEnergyEvent);
+                break;
+        }
+    }
+    private void _gainEnergyView(GainEnergyEvent gainEnergyEvent)
+    {
+        switch (gainEnergyEvent.Faction)
+        {
+            case Faction.Ally:
+                _allyInfoView.UpdateEnergy(gainEnergyEvent);
+                break;
+            case Faction.Enemy:
+                _enemyInfoView.UpdateEnergy(gainEnergyEvent);
                 break;
         }
     }
