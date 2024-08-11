@@ -33,24 +33,51 @@ MonoBehaviour:
     - Name: Type
       Entry: 3
       Data: 1
+    - Name: Themes
+      Entry: 7
+      Data: 1|CardTheme[], Assembly-CSharp
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: Cost
       Entry: 3
       Data: 1
     - Name: Power
       Entry: 3
       Data: 2
+    - Name: TargetType
+      Entry: 3
+      Data: 1
+    - Name: TargetCard
+      Entry: 7
+      Data: 2|NoneCard, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: TargetPlayer
+      Entry: 7
+      Data: 3|OppositePlayer, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: OnUseEffects
       Entry: 7
-      Data: 1|ICardEffect[], Assembly-CSharp
+      Data: 4|ICardEffect[], Assembly-CSharp
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 2|DrawEffect, Assembly-CSharp
+      Data: 5|DrawEffect, Assembly-CSharp
     - Name: Value
       Entry: 7
-      Data: 3|ThisCardPower, Assembly-CSharp
+      Data: 6|ThisCardPower, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -65,7 +92,7 @@ MonoBehaviour:
       Data: 
     - Name: OnHandEffects
       Entry: 7
-      Data: 4|ICardEffect[], Assembly-CSharp
+      Data: 7|ICardEffect[], Assembly-CSharp
     - Name: 
       Entry: 12
       Data: 0
@@ -77,7 +104,7 @@ MonoBehaviour:
       Data: 
     - Name: OnDeckEffects
       Entry: 7
-      Data: 5|ICardEffect[], Assembly-CSharp
+      Data: 8|ICardEffect[], Assembly-CSharp
     - Name: 
       Entry: 12
       Data: 0

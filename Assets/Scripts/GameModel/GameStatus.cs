@@ -49,6 +49,15 @@ public class GameStatus
     }
 }
 
+public class GameContext
+{
+    public PlayerEntity Caster;
+    public PlayerEntity SelectedPlayer;
+    public CardEntity SelectedCard;
+    public CardEntity UsingCard;
+    public ICardEffect UsingEffect;
+}
+
 public class GameResult
 {
     public bool IsWin { get; }

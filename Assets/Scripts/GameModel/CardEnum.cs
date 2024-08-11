@@ -21,3 +21,13 @@ public enum CardRarity
     Epic,
     Legendary
 }
+
+public enum CardTheme
+{
+    None = 0,
+    TangSect,
+    Emei,
+    Songshan,
+    BeggarClan,
+    DianCang
+}

@@ -18,6 +18,9 @@ public abstract class PlayerEntity
     public HandCardEntity HandCard;
     public DeckEntity Deck;
     public GraveyardEntity Graveyard;
+
+    public bool IsDummy => this == DummyPlayer;
+    public static PlayerEntity DummyPlayer = new DummyPlayer();
 }
 
 public class AllyEntity : PlayerEntity
@@ -60,5 +63,13 @@ public class EnemyEntity : PlayerEntity
         var cards = new List<CardEntity>();
         cards.Add(HandCard.Cards.ElementAt(0));
         SelectedCards = cards;
+    }
+}
+
+public class DummyPlayer : PlayerEntity
+{
+    public DummyPlayer()
+    {
+        Faction = Faction.None;
     }
 }

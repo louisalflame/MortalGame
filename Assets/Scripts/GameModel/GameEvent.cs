@@ -6,6 +6,12 @@ public interface IGameEvent
 
 }
 
+public class RoundStartEvent : IGameEvent
+{
+    public int Round;
+    public AllyEntity Player;
+    public EnemyEntity Enemy;
+}
 public class RecycleGraveyardEvent : IGameEvent
 {
     public Faction Faction;
@@ -45,9 +51,12 @@ public class GainEnergyEvent : IGameEvent
     public int DeltaEnergy;
     public int MaxEnergy;
 }
-public class RoundStartEvent : IGameEvent
+
+public class TakeDamageEvent : IGameEvent
 {
-    public int Round;
-    public AllyEntity Player;
-    public EnemyEntity Enemy;
+    public Faction Faction;
+    public int Hp;
+    public int DeltaHp;
+    public int Damage;
+    public int MaxHp;
 }

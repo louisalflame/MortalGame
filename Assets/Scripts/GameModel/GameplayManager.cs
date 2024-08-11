@@ -11,6 +11,7 @@ public interface IGameplayStatusWatcher
 public class GameplayManager : IGameplayStatusWatcher
 {
     private GameStatus _gameStatus;
+
     private GameResult _gameResult;
     private List<IGameEvent> _gameEvents;
     private Queue<IGameAction> _gameActions;
@@ -145,11 +146,11 @@ public class GameplayManager : IGameplayStatusWatcher
             switch(action)
             {
                 case UseCardAction useCardAction:
-                    Debug.Log($"-- useCard:{useCardAction.CardIndentity} --");
+                    Debug.Log($"-- UseCardAction:{useCardAction.CardIndentity} --");
                     _UseCard(player, useCardAction.CardIndentity);
                     break;
                 case TurnSubmitAction turnSubmitAction:
-                    Debug.Log($"-- submit:{turnSubmitAction.Faction} --");
+                    Debug.Log($"-- TurnSubmitAction:{turnSubmitAction.Faction} --");
                     _FinishExecuteTurn(turnSubmitAction);
                     break;
             }
@@ -184,9 +185,14 @@ public class GameplayManager : IGameplayStatusWatcher
 
     private void _UseCard(PlayerEntity player, string CardIndentity)
     {
+        var context = new GameContext() {
+            Caster = player
+        };
+
         var usedCard = player.HandCard.Cards.FirstOrDefault(c => c.Indentity == CardIndentity);
         if (usedCard != null)
         {
+            context.UsingCard = usedCard;
             var cardRuntimCost = usedCard.Cost;
 
             if (cardRuntimCost <= player.Character.EnergyManager.Energy)
@@ -211,7 +217,8 @@ public class GameplayManager : IGameplayStatusWatcher
 
                 foreach(var effect in usedCard.OnUseEffects)
                 {
-                    _ApplyOnUseEffect(player, usedCard, effect);
+                    context.UsingEffect = effect;
+                    _ApplyOnUseEffect(context);
                 }
             }
         }
@@ -273,14 +280,28 @@ public class GameplayManager : IGameplayStatusWatcher
         });
     }
 
-    private void _ApplyOnUseEffect(PlayerEntity player, CardEntity card, ICardEffect effect)
+    private void _ApplyOnUseEffect(GameContext gameContext)
     {
-        switch(effect)
+        switch(gameContext.UsingEffect)
         {
-            case DamageEffect damageEffect: 
+            case DamageEffect damageEffect:
+                var target = _GetTargetPlayer(gameContext);
+                var damageValue = damageEffect.Value.Eval(_gameStatus, gameContext);
+                target.Character.HealthManager = target.Character.HealthManager.TakeDamage(damageValue, out int deltaHealth);
+                _gameEvents.Add(new TakeDamageEvent(){
+                    Faction = Faction.Enemy,
+                    DeltaHp = deltaHealth,
+                    Damage = damageValue,
+                    Hp = _gameStatus.Enemy.Character.HealthManager.Hp,
+                    MaxHp = _gameStatus.Enemy.Character.HealthManager.MaxHp
+                });
                 break;
             case HealEffect healEffect: 
                 break;
         }
+    }
+    private PlayerEntity _GetTargetPlayer(GameContext gameContext)
+    {
+        return gameContext.UsingCard.TargetPlayer.Eval(_gameStatus, gameContext);
     }
 }

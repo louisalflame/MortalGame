@@ -55,6 +55,10 @@ public class GameplayView : MonoBehaviour
                     _ConsumeEnergyView(consumeEnergyEvent);
                     break;
                 case GainEnergyEvent gainEnergyEvent:
+                    _gainEnergyView(gainEnergyEvent);
+                    break;
+                case TakeDamageEvent takeDamageEvent:
+                    _TakeDamageView(takeDamageEvent);
                     break;
             }
         }
@@ -134,6 +138,19 @@ public class GameplayView : MonoBehaviour
                 break;
             case Faction.Enemy:
                 _enemyInfoView.UpdateEnergy(gainEnergyEvent);
+                break;
+        }
+    }
+
+    private void _TakeDamageView(TakeDamageEvent takeDamageEvent)
+    {
+        switch (takeDamageEvent.Faction)
+        {
+            case Faction.Ally:
+                _allyInfoView.UpdateHealth(takeDamageEvent);
+                break;
+            case Faction.Enemy:
+                _enemyInfoView.UpdateHealth(takeDamageEvent);
                 break;
         }
     }

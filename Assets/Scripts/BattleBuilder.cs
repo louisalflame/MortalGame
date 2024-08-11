@@ -96,9 +96,14 @@ public class BattleBuidler
             Title = cardData.TitleKey,
             Info = cardData.InfoKey,
             Type = cardData.Type,
+            Rarity = cardData.Rarity,
+            Themes = cardData.Themes.ToArray(),
             Cost = cardData.Cost,
             Power = cardData.Power,
-            OnUseEffects = cardData.OnUseEffects,
+            TargetType = cardData.TargetType,
+            TargetCard = cardData.TargetCard,
+            TargetPlayer = cardData.TargetPlayer,
+            OnUseEffects = cardData.OnUseEffects.ToArray(),
             OriginData = cardData,
         };
     }

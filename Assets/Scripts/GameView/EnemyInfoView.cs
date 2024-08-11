@@ -40,4 +40,9 @@ public class EnemyInfoView : MonoBehaviour
     {
         _energyBarView.SetEnergy(gainEnergyEvent.Energy, gainEnergyEvent.MaxEnergy);
     }
+
+    public void UpdateHealth(TakeDamageEvent takeDamageEvent)
+    {
+        _healthBarView.SetHealth(takeDamageEvent.Hp, takeDamageEvent.MaxHp);
+    }
 }

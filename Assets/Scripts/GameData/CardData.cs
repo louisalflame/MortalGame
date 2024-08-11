@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -12,11 +13,21 @@ public class CardData
     [TitleGroup("BasicData")]
     public CardType Type;
     [TitleGroup("BasicData")]
+    public CardTheme[] Themes;
+    [TitleGroup("BasicData")]
     [Range(0, 10)]
     public int Cost;
     [TitleGroup("BasicData")]
     [Range(0, 20)]
     public int Power;
+    
+    [TitleGroup("Target")]
+    public TargetType TargetType = TargetType.Player;
+    [TitleGroup("Target")]
+    public ITargetCardValue TargetCard = new NoneCard();
+    [TitleGroup("Target")]
+    public ITargetPlayerValue TargetPlayer = new NonePlayer();
+
 
     [BoxGroup("Effects")]
     public ICardEffect[] OnUseEffects;
