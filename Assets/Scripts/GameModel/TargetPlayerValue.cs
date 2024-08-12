@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using UniRx;
 using UnityEngine;
 
 public enum TargetType
@@ -9,32 +11,32 @@ public enum TargetType
 
 public interface ITargetPlayerValue
 {
-    PlayerEntity Eval(GameStatus gameStatus, GameContext context);
+    IReadOnlyCollection<PlayerEntity> Eval(GameStatus gameStatus, GameContext context);
 }
 
 [Serializable]
 public class NonePlayer : ITargetPlayerValue
 {
-    public PlayerEntity Eval(GameStatus gameStatus, GameContext context)
+    public IReadOnlyCollection<PlayerEntity> Eval(GameStatus gameStatus, GameContext context)
     {
-        return PlayerEntity.DummyPlayer;
+        return new PlayerEntity[0];
     }
 }
 
 [Serializable]
 public class ThisPlayer : ITargetPlayerValue
 {
-    public PlayerEntity Eval(GameStatus gameStatus, GameContext context)
+    public IReadOnlyCollection<PlayerEntity> Eval(GameStatus gameStatus, GameContext context)
     {
-        return context.Caster;
+        return new PlayerEntity[] { context.Caster };
     }
 }
 
 [Serializable]
 public class OppositePlayer : ITargetPlayerValue
 {
-    public PlayerEntity Eval(GameStatus gameStatus, GameContext context)
+    public IReadOnlyCollection<PlayerEntity> Eval(GameStatus gameStatus, GameContext context)
     {
-        return context.Caster == gameStatus.Ally ? gameStatus.Enemy : gameStatus.Ally;
+        return new PlayerEntity[] { context.Caster == gameStatus.Ally ? gameStatus.Enemy : gameStatus.Ally };
     }
 }

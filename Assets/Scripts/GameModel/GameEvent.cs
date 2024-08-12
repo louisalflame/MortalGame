@@ -56,7 +56,9 @@ public class TakeDamageEvent : IGameEvent
 {
     public Faction Faction;
     public int Hp;
+    public int Shield;
     public int DeltaHp;
+    public int DeltaShield;
     public int Damage;
     public int MaxHp;
 }

@@ -8,6 +8,7 @@ public class CardData
     [BoxGroup("Identification")]
     public string ID;
 
+    [Space]
     [TitleGroup("BasicData")]
     public CardRarity Rarity;
     [TitleGroup("BasicData")]
@@ -22,12 +23,8 @@ public class CardData
     public int Power;
     
     [TitleGroup("Target")]
-    public TargetType TargetType = TargetType.Player;
-    [TitleGroup("Target")]
-    public ITargetCardValue TargetCard = new NoneCard();
-    [TitleGroup("Target")]
-    public ITargetPlayerValue TargetPlayer = new NonePlayer();
-
+    [PropertySpace(SpaceBefore = 0, SpaceAfter = 10)]
+    public List<ITargetSelectable> Selectables = new List<ITargetSelectable>();
 
     [BoxGroup("Effects")]
     public ICardEffect[] OnUseEffects;

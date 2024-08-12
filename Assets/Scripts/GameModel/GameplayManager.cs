@@ -285,23 +285,28 @@ public class GameplayManager : IGameplayStatusWatcher
         switch(gameContext.UsingEffect)
         {
             case DamageEffect damageEffect:
-                var target = _GetTargetPlayer(gameContext);
-                var damageValue = damageEffect.Value.Eval(_gameStatus, gameContext);
-                target.Character.HealthManager = target.Character.HealthManager.TakeDamage(damageValue, out int deltaHealth);
-                _gameEvents.Add(new TakeDamageEvent(){
-                    Faction = Faction.Enemy,
-                    DeltaHp = deltaHealth,
-                    Damage = damageValue,
-                    Hp = _gameStatus.Enemy.Character.HealthManager.Hp,
-                    MaxHp = _gameStatus.Enemy.Character.HealthManager.MaxHp
-                });
+                var targets = damageEffect.Targets.Eval(_gameStatus, gameContext);
+                foreach(var target in targets)
+                {
+                    gameContext.EffectTarget = target;
+                    var value = damageEffect.Value.Eval(_gameStatus, gameContext);
+                    var damagePoint = gameContext.Caster.Character.PowerManager.EvaluateDamagePoint(value, gameContext);
+
+                    target.Character.HealthManager = target.Character.HealthManager.TakeDamage(
+                        damagePoint, gameContext, out int deltaHealth, out int deltaShield);
+                    _gameEvents.Add(new TakeDamageEvent(){
+                        Faction = Faction.Enemy,
+                        DeltaHp = deltaHealth,
+                        DeltaShield = deltaShield,
+                        Damage = damagePoint,
+                        Hp = _gameStatus.Enemy.Character.HealthManager.Hp,
+                        MaxHp = _gameStatus.Enemy.Character.HealthManager.MaxHp,
+                        Shield = _gameStatus.Enemy.Character.HealthManager.Shield
+                    });
+                }
                 break;
             case HealEffect healEffect: 
                 break;
         }
-    }
-    private PlayerEntity _GetTargetPlayer(GameContext gameContext)
-    {
-        return gameContext.UsingCard.TargetPlayer.Eval(_gameStatus, gameContext);
     }
 }

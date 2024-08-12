@@ -47,5 +47,6 @@ public class AllyInfoView : MonoBehaviour
     public void UpdateHealth(TakeDamageEvent takeDamageEvent)
     {
         _healthBarView.SetHealth(takeDamageEvent.Hp, takeDamageEvent.MaxHp);
+        _healthBarView.SetShield(takeDamageEvent.Shield);    
     }
 }

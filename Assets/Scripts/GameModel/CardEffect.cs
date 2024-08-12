@@ -8,6 +8,7 @@ public interface ICardEffect
 [Serializable]
 public class DamageEffect : ICardEffect
 {
+    public ITargetPlayerValue Targets;
     public IIntegerValue Value;
 }
 

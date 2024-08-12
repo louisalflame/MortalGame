@@ -51,30 +51,34 @@ MonoBehaviour:
     - Name: Power
       Entry: 3
       Data: 2
-    - Name: TargetType
-      Entry: 3
-      Data: 1
-    - Name: TargetCard
+    - Name: Selectables
       Entry: 7
-      Data: 2|NoneCard, Assembly-CSharp
+      Data: 2|System.Collections.Generic.List`1[[ITargetSelectable, Assembly-CSharp]],
+        mscorlib
     - Name: 
-      Entry: 8
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
       Data: 
-    - Name: TargetPlayer
-      Entry: 7
-      Data: 3|OppositePlayer, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
     - Name: OnUseEffects
       Entry: 7
-      Data: 4|ICardEffect[], Assembly-CSharp
+      Data: 3|ICardEffect[], Assembly-CSharp
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 5|DrawEffect, Assembly-CSharp
+      Data: 4|DamageEffect, Assembly-CSharp
+    - Name: Targets
+      Entry: 7
+      Data: 5|OppositePlayer, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: Value
       Entry: 7
       Data: 6|ThisCardPower, Assembly-CSharp

@@ -15,9 +15,8 @@ public class CardEntity
     public CardTheme[] Themes = new CardTheme[0];
     public int Cost;
     public int Power;
-    public TargetType TargetType;
-    public ITargetCardValue TargetCard = new NoneCard();
-    public ITargetPlayerValue TargetPlayer = new NonePlayer();
+    
+    public IReadOnlyCollection<ITargetSelectable> Selectables;
 
     public IReadOnlyCollection<ICardEffect> OnUseEffects;
 

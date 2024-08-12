@@ -51,33 +51,31 @@ MonoBehaviour:
     - Name: Power
       Entry: 3
       Data: 5
-    - Name: TargetType
-      Entry: 3
-      Data: 1
-    - Name: TargetCard
+    - Name: Selectables
       Entry: 7
-      Data: 2|NoneCard, Assembly-CSharp
+      Data: 2|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[ITargetSelectable, Assembly-CSharp]],
+        Unity.Plastic.Antlr3.Runtime
     - Name: 
-      Entry: 8
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
       Data: 
-    - Name: TargetPlayer
-      Entry: 7
-      Data: 3|ThisPlayer, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
     - Name: OnUseEffects
       Entry: 7
-      Data: 4|ICardEffect[], Assembly-CSharp
+      Data: 3|ICardEffect[], Assembly-CSharp
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 5|ShieldEffect, Assembly-CSharp
+      Data: 4|ShieldEffect, Assembly-CSharp
     - Name: Value
       Entry: 7
-      Data: 6|ThisCardPower, Assembly-CSharp
+      Data: 5|ThisCardPower, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -92,7 +90,7 @@ MonoBehaviour:
       Data: 
     - Name: OnHandEffects
       Entry: 7
-      Data: 7|ICardEffect[], Assembly-CSharp
+      Data: 6|ICardEffect[], Assembly-CSharp
     - Name: 
       Entry: 12
       Data: 0
@@ -104,7 +102,7 @@ MonoBehaviour:
       Data: 
     - Name: OnDeckEffects
       Entry: 7
-      Data: 8|ICardEffect[], Assembly-CSharp
+      Data: 7|ICardEffect[], Assembly-CSharp
     - Name: 
       Entry: 12
       Data: 0

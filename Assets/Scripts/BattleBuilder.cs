@@ -100,9 +100,7 @@ public class BattleBuidler
             Themes = cardData.Themes.ToArray(),
             Cost = cardData.Cost,
             Power = cardData.Power,
-            TargetType = cardData.TargetType,
-            TargetCard = cardData.TargetCard,
-            TargetPlayer = cardData.TargetPlayer,
+            Selectables = cardData.Selectables.ToArray(),
             OnUseEffects = cardData.OnUseEffects.ToArray(),
             OriginData = cardData,
         };

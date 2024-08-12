@@ -56,6 +56,7 @@ public class GameContext
     public CardEntity SelectedCard;
     public CardEntity UsingCard;
     public ICardEffect UsingEffect;
+    public PlayerEntity EffectTarget;
 }
 
 public class GameResult
