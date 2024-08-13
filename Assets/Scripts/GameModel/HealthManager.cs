@@ -22,4 +22,29 @@ public class HealthManager
             Shield = newShield
         };
     }
+
+    public HealthManager GetHeal(int amount, GameContext context, out int deltaHp)
+    {
+        var newHp = Mathf.Clamp(Hp + amount, Hp, MaxHp);
+        deltaHp = newHp - Hp;
+
+        return new HealthManager()
+        {
+            Hp = newHp,
+            MaxHp = MaxHp,
+            Shield = Shield
+        };
+    }
+    public HealthManager GetShield(int amount, GameContext context, out int deltaShield)
+    {
+        var newShield = Mathf.Max(Shield + amount, 0);
+        deltaShield = newShield - Shield;
+
+        return new HealthManager()
+        {
+            Hp = Hp,
+            MaxHp = MaxHp,
+            Shield = newShield
+        };
+    }
 }

@@ -32,18 +32,14 @@ public class BattleBuidler
                     Hp = allyData.PlayerData.InitialHealth,
                     MaxHp = allyData.PlayerData.MaxHealth,
                 },
-                PowerManager = new PowerManager(){
-                    Power = allyData.PlayerData.InitialPower,
-                },
                 EnergyManager = new EnergyManager(){
                     Energy = allyData.PlayerData.InitialEnergy,
                     MaxEnergy = allyData.PlayerData.MaxEnergy,
                 },
                 StatusManager = new StatusManager(),
             },
-            Deck = new DeckEntity(){
-                Cards = allyData.PlayerData.Deck.Cards.Select(c => _ParseCard(c.Data)).ToList(),
-            },
+            Deck = new DeckEntity(
+                allyData.PlayerData.Deck.Cards.Select(c => _ParseCard(c.Data)).ToList() ),
             HandCard = new HandCardEntity(){
                 MaxCount = allyData.PlayerData.HandCardMaxCount,
                 Cards = new List<CardEntity>(),
@@ -66,18 +62,14 @@ public class BattleBuidler
                     Hp = enemyData.PlayerData.InitialHealth,
                     MaxHp = enemyData.PlayerData.MaxHealth,
                 },
-                PowerManager = new PowerManager(){
-                    Power = enemyData.PlayerData.InitialPower,
-                },
                 EnergyManager = new EnergyManager(){
                     Energy = enemyData.PlayerData.InitialEnergy,
                     MaxEnergy = enemyData.PlayerData.MaxEnergy,
                 },
                 StatusManager = new StatusManager(),
             },
-            Deck = new DeckEntity(){
-                Cards = enemyData.PlayerData.Deck.Cards.Select(c => _ParseCard(c.Data)).ToList(),
-            },
+            Deck = new DeckEntity(
+                enemyData.PlayerData.Deck.Cards.Select(c => _ParseCard(c.Data)).ToList() ),
             HandCard = new HandCardEntity(){
                 MaxCount = enemyData.PlayerData.HandCardMaxCount,
                 Cards = new List<CardEntity>(),

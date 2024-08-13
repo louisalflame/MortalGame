@@ -8,9 +8,6 @@ public class EnemyInfoView : MonoBehaviour
     private TextMeshProUGUI _nameText;
 
     [SerializeField]
-    private TextMeshProUGUI _powerText;
-
-    [SerializeField]
     private HealthBarView _healthBarView;
 
     [SerializeField]
@@ -27,8 +24,8 @@ public class EnemyInfoView : MonoBehaviour
     public void SetPlayerInfo(EnemyEntity enemy)
     {
         _nameText.text = enemy.Name;
-        _powerText.text = enemy.Character.PowerManager.Power.ToString();
         _healthBarView.SetHealth(enemy.Character.HealthManager.Hp, enemy.Character.HealthManager.MaxHp);
+        _healthBarView.SetShield(enemy.Character.HealthManager.Shield);
         _energyBarView.SetEnergy(enemy.Character.EnergyManager.Energy, enemy.Character.EnergyManager.MaxEnergy);
     }
 
@@ -45,5 +42,15 @@ public class EnemyInfoView : MonoBehaviour
     {
         _healthBarView.SetHealth(takeDamageEvent.Hp, takeDamageEvent.MaxHp);
         _healthBarView.SetShield(takeDamageEvent.Shield);
+    }
+    public void UpdateHealth(GetHealEvent getHealEvent)
+    {
+        _healthBarView.SetHealth(getHealEvent.Hp, getHealEvent.MaxHp);
+        _healthBarView.SetShield(getHealEvent.Shield);    
+    }
+    public void UpdateHealth(GetShieldEvent getShieldEvent)
+    {
+        _healthBarView.SetHealth(getShieldEvent.Hp, getShieldEvent.MaxHp);
+        _healthBarView.SetShield(getShieldEvent.Shield);    
     }
 }

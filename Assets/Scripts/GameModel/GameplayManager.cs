@@ -123,9 +123,9 @@ public class GameplayManager : IGameplayStatusWatcher
     private void _EnemyPreapre()
     {
         _gameStatus.Enemy.SelectedCards = _gameStatus.Enemy.GetRecommendCards();
+        _gameEvents.Add(new EnemyClearSelectedCardsEvent());
         foreach(var card in _gameStatus.Enemy.SelectedCards)
         {
-            Debug.Log($"-- enemy recommend card:{card.Indentity} --");
             _gameEvents.Add(new EnemySelectCardEvent(){
                 SelectedCardInfo = new CardInfo(card),
                 SelectedCardInfos = _gameStatus.Enemy.SelectedCards.Select(c => new CardInfo(c)).ToArray()
@@ -146,11 +146,9 @@ public class GameplayManager : IGameplayStatusWatcher
             switch(action)
             {
                 case UseCardAction useCardAction:
-                    Debug.Log($"-- UseCardAction:{useCardAction.CardIndentity} --");
                     _UseCard(player, useCardAction.CardIndentity);
                     break;
                 case TurnSubmitAction turnSubmitAction:
-                    Debug.Log($"-- TurnSubmitAction:{turnSubmitAction.Faction} --");
                     _FinishExecuteTurn(turnSubmitAction);
                     break;
             }
@@ -161,7 +159,6 @@ public class GameplayManager : IGameplayStatusWatcher
     {
         foreach(var card in _gameStatus.Enemy.SelectedCards)
         {
-            Debug.Log($"-- enemy use card:{card.Indentity} --");
             _gameActions.Enqueue(new UseCardAction(){
                 CardIndentity = card.Indentity
             });
@@ -285,28 +282,69 @@ public class GameplayManager : IGameplayStatusWatcher
         switch(gameContext.UsingEffect)
         {
             case DamageEffect damageEffect:
+            {
                 var targets = damageEffect.Targets.Eval(_gameStatus, gameContext);
                 foreach(var target in targets)
                 {
                     gameContext.EffectTarget = target;
-                    var value = damageEffect.Value.Eval(_gameStatus, gameContext);
-                    var damagePoint = gameContext.Caster.Character.PowerManager.EvaluateDamagePoint(value, gameContext);
+                    var damagePoint = damageEffect.Value.Eval(_gameStatus, gameContext);
 
                     target.Character.HealthManager = target.Character.HealthManager.TakeDamage(
                         damagePoint, gameContext, out int deltaHealth, out int deltaShield);
-                    _gameEvents.Add(new TakeDamageEvent(){
-                        Faction = Faction.Enemy,
-                        DeltaHp = deltaHealth,
+                    _gameEvents.Add(new TakeDamageEvent() {
+                        Faction     = target.Faction,
+                        DeltaHp     = deltaHealth,
                         DeltaShield = deltaShield,
-                        Damage = damagePoint,
-                        Hp = _gameStatus.Enemy.Character.HealthManager.Hp,
-                        MaxHp = _gameStatus.Enemy.Character.HealthManager.MaxHp,
-                        Shield = _gameStatus.Enemy.Character.HealthManager.Shield
+                        DamagePoint = damagePoint,
+                        Hp          = target.Character.HealthManager.Hp,
+                        MaxHp       = target.Character.HealthManager.MaxHp,
+                        Shield      = target.Character.HealthManager.Shield
                     });
                 }
                 break;
+            }
             case HealEffect healEffect: 
+            {
+                var targets = healEffect.Targets.Eval(_gameStatus, gameContext);
+                foreach(var target in targets)
+                {
+                    gameContext.EffectTarget = target;
+                    var healPoint = healEffect.Value.Eval(_gameStatus, gameContext);
+
+                    target.Character.HealthManager = target.Character.HealthManager.GetHeal(
+                        healPoint, gameContext, out int deltaHealth);
+                    _gameEvents.Add(new GetHealEvent() {
+                        Faction   = target.Faction,
+                        DeltaHp   = deltaHealth,
+                        HealPoint = healPoint,
+                        Hp        = target.Character.HealthManager.Hp,
+                        Shield    = target.Character.HealthManager.Shield,
+                        MaxHp     = target.Character.HealthManager.MaxHp
+                    });
+                }
                 break;
+            }
+            case ShieldEffect shieldEffect:
+            {
+                var targets = shieldEffect.Targets.Eval(_gameStatus, gameContext);
+                foreach(var target in targets)
+                {
+                    gameContext.EffectTarget = target;
+                    var shieldPoint = shieldEffect.Value.Eval(_gameStatus, gameContext);
+
+                    target.Character.HealthManager = target.Character.HealthManager.GetShield(
+                        shieldPoint, gameContext, out int deltaShield);
+                    _gameEvents.Add(new GetShieldEvent() {
+                        Faction     = target.Faction,
+                        DeltaShield = deltaShield,
+                        ShieldPoint = shieldPoint,
+                        Shield      = target.Character.HealthManager.Shield,
+                        Hp          = target.Character.HealthManager.Hp,
+                        MaxHp       = target.Character.HealthManager.MaxHp
+                    });
+                }
+                break;
+            }
         }
     }
 }

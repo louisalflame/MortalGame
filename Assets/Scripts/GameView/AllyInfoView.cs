@@ -11,9 +11,6 @@ public class AllyInfoView : MonoBehaviour
     private TextMeshProUGUI _nameText;
 
     [SerializeField]
-    private TextMeshProUGUI _powerText;
-
-    [SerializeField]
     private HealthBarView _healthBarView;
 
     [SerializeField]
@@ -30,8 +27,8 @@ public class AllyInfoView : MonoBehaviour
     {
         _TurnText.text = round.ToString();
         _nameText.text = ally.Name;
-        _powerText.text = ally.Character.PowerManager.Power.ToString();
         _healthBarView.SetHealth(ally.Character.HealthManager.Hp, ally.Character.HealthManager.MaxHp);
+        _healthBarView.SetShield(ally.Character.HealthManager.Shield);    
         _energyBarView.SetEnergy(ally.Character.EnergyManager.Energy, ally.Character.EnergyManager.MaxEnergy);
     }
     
@@ -48,5 +45,15 @@ public class AllyInfoView : MonoBehaviour
     {
         _healthBarView.SetHealth(takeDamageEvent.Hp, takeDamageEvent.MaxHp);
         _healthBarView.SetShield(takeDamageEvent.Shield);    
+    }
+    public void UpdateHealth(GetHealEvent getHealEvent)
+    {
+        _healthBarView.SetHealth(getHealEvent.Hp, getHealEvent.MaxHp);
+        _healthBarView.SetShield(getHealEvent.Shield);    
+    }
+    public void UpdateHealth(GetShieldEvent getShieldEvent)
+    {
+        _healthBarView.SetHealth(getShieldEvent.Hp, getShieldEvent.MaxHp);
+        _healthBarView.SetShield(getShieldEvent.Shield);    
     }
 }

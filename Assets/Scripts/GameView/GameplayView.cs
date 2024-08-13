@@ -45,6 +45,9 @@ public class GameplayView : MonoBehaviour
                 case RecycleGraveyardEvent recycleGraveyardEvent:
                     _RecycleGraveyardEvent(recycleGraveyardEvent);
                     break;
+                case EnemyClearSelectedCardsEvent enemyClearSelectedCardsEvent:
+                    _ClearSelectedCardView();
+                    break;
                 case EnemySelectCardEvent enemySelectCardEvent:
                     _SelectCardView(enemySelectCardEvent);
                     break;
@@ -59,6 +62,12 @@ public class GameplayView : MonoBehaviour
                     break;
                 case TakeDamageEvent takeDamageEvent:
                     _TakeDamageView(takeDamageEvent);
+                    break;
+                case GetHealEvent getHealEvent:
+                    _GetHealView(getHealEvent);
+                    break;
+                case GetShieldEvent getShieldEvent:
+                    _GetShieldView(getShieldEvent);
                     break;
             }
         }
@@ -98,6 +107,10 @@ public class GameplayView : MonoBehaviour
         }
     }
 
+    private void _ClearSelectedCardView()
+    {
+        _enemySelectedCardView.ClearCardView();
+    }
     private void _SelectCardView(EnemySelectCardEvent enemySelectCardEvent)
     {
         _enemySelectedCardView.CreateCardView(enemySelectCardEvent);
@@ -151,6 +164,30 @@ public class GameplayView : MonoBehaviour
                 break;
             case Faction.Enemy:
                 _enemyInfoView.UpdateHealth(takeDamageEvent);
+                break;
+        }
+    }
+    private void _GetHealView(GetHealEvent getHealEvent)
+    {
+        switch (getHealEvent.Faction)
+        {
+            case Faction.Ally:
+                _allyInfoView.UpdateHealth(getHealEvent);
+                break;
+            case Faction.Enemy:
+                _enemyInfoView.UpdateHealth(getHealEvent);
+                break;
+        }
+    }
+    private void _GetShieldView(GetShieldEvent getShieldEvent)
+    {
+        switch (getShieldEvent.Faction)
+        {
+            case Faction.Ally:
+                _allyInfoView.UpdateHealth(getShieldEvent);
+                break;
+            case Faction.Enemy:
+                _enemyInfoView.UpdateHealth(getShieldEvent);
                 break;
         }
     }

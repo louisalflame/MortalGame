@@ -14,6 +14,10 @@ public class DeckEntity
     {
         Cards = new List<CardEntity>();
     }
+    public DeckEntity(IReadOnlyCollection<CardEntity> cards)
+    {
+        Cards = _Shuffle(cards);
+    }
 
     public DeckEntity PopCard(out CardEntity card)
     {
@@ -35,7 +39,14 @@ public class DeckEntity
     }
     public DeckEntity Shuffle()
     {
-        var newCards = new List<CardEntity>(Cards);
+        return new DeckEntity
+        {
+            Cards = _Shuffle(Cards)
+        };
+    }
+    private IReadOnlyCollection<CardEntity> _Shuffle(IReadOnlyCollection<CardEntity> cards)
+    {
+        var newCards = new List<CardEntity>(cards);
         for (int i = 0; i < newCards.Count; i++)
         {
             var temp = newCards[i];
@@ -43,10 +54,6 @@ public class DeckEntity
             newCards[i] = newCards[randomIndex];
             newCards[randomIndex] = temp;
         }
-
-        return new DeckEntity
-        {
-            Cards = newCards
-        };
+        return newCards;
     }
 }

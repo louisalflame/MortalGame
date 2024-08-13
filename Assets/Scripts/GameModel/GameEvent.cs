@@ -25,6 +25,8 @@ public class DrawCardEvent : IGameEvent
     public IReadOnlyCollection<CardInfo> DeckCardInfos;
     public IReadOnlyCollection<CardInfo> HandCardInfos;
 }
+public class EnemyClearSelectedCardsEvent : IGameEvent
+{ }
 public class EnemySelectCardEvent : IGameEvent
 {
     public CardInfo SelectedCardInfo;
@@ -59,6 +61,25 @@ public class TakeDamageEvent : IGameEvent
     public int Shield;
     public int DeltaHp;
     public int DeltaShield;
-    public int Damage;
+    public int DamagePoint;
+    public int MaxHp;
+}
+
+public class GetHealEvent : IGameEvent
+{
+    public Faction Faction;
+    public int Hp;
+    public int Shield;
+    public int DeltaHp;
+    public int HealPoint;
+    public int MaxHp;
+}
+public class GetShieldEvent : IGameEvent
+{
+    public Faction Faction;
+    public int Hp;
+    public int Shield;
+    public int DeltaShield;
+    public int ShieldPoint;
     public int MaxHp;
 }

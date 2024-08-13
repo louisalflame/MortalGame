@@ -15,17 +15,20 @@ public class DamageEffect : ICardEffect
 [Serializable]
 public class ShieldEffect : ICardEffect
 {
+    public ITargetPlayerValue Targets;
     public IIntegerValue Value;
 }
 
 [Serializable]
 public class HealEffect : ICardEffect
 {
+    public ITargetPlayerValue Targets;
     public IIntegerValue Value;
 }
 
 [Serializable]
 public class DrawEffect : ICardEffect
 {
+    public ITargetPlayerValue Targets;
     public IIntegerValue Value;
 }

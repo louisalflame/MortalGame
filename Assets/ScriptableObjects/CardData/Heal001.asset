@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ce3be97fe6785cd4fbfc49b770ec0d97, type: 3}
-  m_Name: Defense001
+  m_Name: Heal001
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -26,10 +26,10 @@ MonoBehaviour:
       Data: 0|CardData, Assembly-CSharp
     - Name: ID
       Entry: 1
-      Data: Defense001
+      Data: Heal001
     - Name: Rarity
       Entry: 3
-      Data: 1
+      Data: 2
     - Name: Type
       Entry: 3
       Data: 2
@@ -47,14 +47,14 @@ MonoBehaviour:
       Data: 
     - Name: Cost
       Entry: 3
-      Data: 1
+      Data: 2
     - Name: Power
       Entry: 3
-      Data: 3
+      Data: 5
     - Name: Selectables
       Entry: 7
-      Data: 2|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[ITargetSelectable, Assembly-CSharp]],
-        Unity.Plastic.Antlr3.Runtime
+      Data: 2|System.Collections.Generic.List`1[[ITargetSelectable, Assembly-CSharp]],
+        mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -72,7 +72,7 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 7
-      Data: 4|ShieldEffect, Assembly-CSharp
+      Data: 4|HealEffect, Assembly-CSharp
     - Name: Targets
       Entry: 7
       Data: 5|ThisPlayer, Assembly-CSharp
@@ -120,9 +120,9 @@ MonoBehaviour:
       Data: 
     - Name: TitleKey
       Entry: 1
-      Data: Defend
+      Data: Heal
     - Name: InfoKey
-      Entry: 6
+      Entry: 1
       Data: 
     - Name: 
       Entry: 8
