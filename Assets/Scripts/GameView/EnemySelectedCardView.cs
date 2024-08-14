@@ -39,16 +39,7 @@ public class EnemySelectedCardView : MonoBehaviour
     {
         _deckCountText.text = recycleGraveyardEvent.DeckCardInfos.Count.ToString();
     }
-
-    public void ClearCardView()
-    {
-        foreach (var cardView in _cardViews)
-        {
-            _cardViewFactory.RecycleCardView(cardView);
-        }
-        _cardViews.Clear();
-        _cardViewDict.Clear();
-    }
+ 
     public void CreateCardView(EnemySelectCardEvent enemySelectCardEvent)
     {
         var cardView = _cardViewFactory.CreateCardView();
@@ -70,6 +61,17 @@ public class EnemySelectedCardView : MonoBehaviour
         {
             _cardViews.Remove(cardView);
             _cardViewDict.Remove(usedCardEvent.UsedCardInfo.CardIndentity);
+            _cardViewFactory.RecycleCardView(cardView);
+
+            _RearrangeCardViews();
+        }
+    }
+    public void RemoveCardView(EnemyUnselectedCardEvent enemyUnselectedCardEvent)
+    {
+        if(_cardViewDict.TryGetValue(enemyUnselectedCardEvent.SelectedCardInfo.CardIndentity, out var cardView))
+        {
+            _cardViews.Remove(cardView);
+            _cardViewDict.Remove(enemyUnselectedCardEvent.SelectedCardInfo.CardIndentity);
             _cardViewFactory.RecycleCardView(cardView);
 
             _RearrangeCardViews();

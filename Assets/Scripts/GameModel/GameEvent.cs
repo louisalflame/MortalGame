@@ -25,10 +25,13 @@ public class DrawCardEvent : IGameEvent
     public IReadOnlyCollection<CardInfo> DeckCardInfos;
     public IReadOnlyCollection<CardInfo> HandCardInfos;
 }
-public class EnemyClearSelectedCardsEvent : IGameEvent
-{ }
 public class EnemySelectCardEvent : IGameEvent
 {
+    public CardInfo SelectedCardInfo;
+    public IReadOnlyCollection<CardInfo> SelectedCardInfos;
+}
+public class EnemyUnselectedCardEvent : IGameEvent
+{ 
     public CardInfo SelectedCardInfo;
     public IReadOnlyCollection<CardInfo> SelectedCardInfos;
 }

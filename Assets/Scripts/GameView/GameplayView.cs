@@ -45,11 +45,11 @@ public class GameplayView : MonoBehaviour
                 case RecycleGraveyardEvent recycleGraveyardEvent:
                     _RecycleGraveyardEvent(recycleGraveyardEvent);
                     break;
-                case EnemyClearSelectedCardsEvent enemyClearSelectedCardsEvent:
-                    _ClearSelectedCardView();
-                    break;
                 case EnemySelectCardEvent enemySelectCardEvent:
                     _SelectCardView(enemySelectCardEvent);
+                    break;
+                case EnemyUnselectedCardEvent enemyUnselectedCardEvent:
+                    _UnselectCardView(enemyUnselectedCardEvent);
                     break;
                 case UsedCardEvent usedCardEvent:
                     _UsedCardView(usedCardEvent);
@@ -107,13 +107,13 @@ public class GameplayView : MonoBehaviour
         }
     }
 
-    private void _ClearSelectedCardView()
-    {
-        _enemySelectedCardView.ClearCardView();
-    }
     private void _SelectCardView(EnemySelectCardEvent enemySelectCardEvent)
     {
         _enemySelectedCardView.CreateCardView(enemySelectCardEvent);
+    }
+    private void _UnselectCardView(EnemyUnselectedCardEvent enemyUnselectedCardEvent)
+    {
+        _enemySelectedCardView.RemoveCardView(enemyUnselectedCardEvent);
     }
 
     private void _UsedCardView(UsedCardEvent usedCardEvent)
@@ -125,7 +125,7 @@ public class GameplayView : MonoBehaviour
                 _graveyardCardView.UpdateDeckView(usedCardEvent);
                 break;
             case Faction.Enemy:
-                _enemySelectedCardView.RemoveCardView(usedCardEvent);
+            _enemySelectedCardView.RemoveCardView(usedCardEvent);
                 break;
         }
     }

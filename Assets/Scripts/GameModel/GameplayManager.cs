@@ -122,13 +122,13 @@ public class GameplayManager : IGameplayStatusWatcher
 
     private void _EnemyPreapre()
     {
-        _gameStatus.Enemy.SelectedCards = _gameStatus.Enemy.GetRecommendCards();
-        _gameEvents.Add(new EnemyClearSelectedCardsEvent());
-        foreach(var card in _gameStatus.Enemy.SelectedCards)
+        var recommendCards = _gameStatus.Enemy.GetRecommendCards();
+        foreach(var card in recommendCards)
         {
+            _gameStatus.Enemy.SelectedCards = _gameStatus.Enemy.SelectedCards.EnqueueCard(card);
             _gameEvents.Add(new EnemySelectCardEvent(){
                 SelectedCardInfo = new CardInfo(card),
-                SelectedCardInfos = _gameStatus.Enemy.SelectedCards.Select(c => new CardInfo(c)).ToArray()
+                SelectedCardInfos = _gameStatus.Enemy.SelectedCards.CardInfos
             });
         }
 
@@ -157,14 +157,25 @@ public class GameplayManager : IGameplayStatusWatcher
 
     private void _EnemyExecute()
     {
-        foreach(var card in _gameStatus.Enemy.SelectedCards)
+        while(_gameStatus.Enemy.SelectedCards.Cards.Count > 0)
         {
-            _gameActions.Enqueue(new UseCardAction(){
-                CardIndentity = card.Indentity
-            });
+            _gameStatus.Enemy.SelectedCards = _gameStatus.Enemy.SelectedCards.DequeueCard(out CardEntity selectedCard);
+            
+            if (selectedCard.Cost > _gameStatus.Enemy.Character.EnergyManager.Energy)
+            {
+                _gameEvents.Add(new EnemyUnselectedCardEvent(){
+                    SelectedCardInfo = new CardInfo(selectedCard),
+                    SelectedCardInfos = _gameStatus.Enemy.SelectedCards.CardInfos
+                });
+            }
+            else
+            {
+                _gameActions.Enqueue(new UseCardAction(){
+                    CardIndentity = selectedCard.Indentity
+                });
+                _TurnExecute(_gameStatus.Enemy);
+            }
         }
-
-        _TurnExecute(_gameStatus.Enemy);
 
         _gameStatus = _gameStatus.With(
             state: GameState.TurnEnd
@@ -343,6 +354,10 @@ public class GameplayManager : IGameplayStatusWatcher
                         MaxHp       = target.Character.HealthManager.MaxHp
                     });
                 }
+                break;
+            }
+            case DrawCardEffect drawCardEffect:
+            { 
                 break;
             }
         }

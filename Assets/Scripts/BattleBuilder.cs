@@ -77,6 +77,11 @@ public class BattleBuidler
             Graveyard = new GraveyardEntity(){
                 Cards = new List<CardEntity>(),
             },
+
+            SelectedCards = new SelectedCardEntity(){
+                MaxCount = enemyData.SelectedCardMaxCount,
+                Cards = new List<CardEntity>(),
+            },
             EnergyRecoverPoint = enemyData.EnergyRecoverPoint,
         };
     }

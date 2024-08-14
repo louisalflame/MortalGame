@@ -35,13 +35,12 @@ public class AllyEntity : PlayerEntity
 
 public class EnemyEntity : PlayerEntity
 {
-    public IReadOnlyCollection<CardEntity> SelectedCards;
+    public SelectedCardEntity SelectedCards;
     public int EnergyRecoverPoint;
 
     public EnemyEntity()
     {
         Faction = Faction.Enemy;
-        SelectedCards = new List<CardEntity>();
     }
 
     public IReadOnlyCollection<CardEntity> GetRecommendCards()
@@ -53,16 +52,6 @@ public class EnemyEntity : PlayerEntity
         if(HandCard.Cards.Count > 1) 
             cardList.Add(HandCard.Cards.ElementAt(1));
         return cardList;
-    }
-
-    public void PreparedSelectedCards()
-    {
-        if(HandCard.Cards.Count == 0) 
-            return;
-
-        var cards = new List<CardEntity>();
-        cards.Add(HandCard.Cards.ElementAt(0));
-        SelectedCards = cards;
     }
 }
 
