@@ -25,7 +25,7 @@ public class EnemyInfoView : MonoBehaviour
     {
         _nameText.text = enemy.Name;
         _healthBarView.SetHealth(enemy.Character.HealthManager.Hp, enemy.Character.HealthManager.MaxHp);
-        _healthBarView.SetShield(enemy.Character.HealthManager.Shield);
+        _healthBarView.SetShield(enemy.Character.HealthManager.Dp);
         _energyBarView.SetEnergy(enemy.Character.EnergyManager.Energy, enemy.Character.EnergyManager.MaxEnergy);
     }
 
@@ -41,16 +41,16 @@ public class EnemyInfoView : MonoBehaviour
     public void UpdateHealth(TakeDamageEvent takeDamageEvent)
     {
         _healthBarView.SetHealth(takeDamageEvent.Hp, takeDamageEvent.MaxHp);
-        _healthBarView.SetShield(takeDamageEvent.Shield);
+        _healthBarView.SetShield(takeDamageEvent.Dp);
     }
     public void UpdateHealth(GetHealEvent getHealEvent)
     {
         _healthBarView.SetHealth(getHealEvent.Hp, getHealEvent.MaxHp);
-        _healthBarView.SetShield(getHealEvent.Shield);    
+        _healthBarView.SetShield(getHealEvent.Dp);    
     }
     public void UpdateHealth(GetShieldEvent getShieldEvent)
     {
         _healthBarView.SetHealth(getShieldEvent.Hp, getShieldEvent.MaxHp);
-        _healthBarView.SetShield(getShieldEvent.Shield);    
+        _healthBarView.SetShield(getShieldEvent.Dp);    
     }
 }

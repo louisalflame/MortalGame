@@ -24,7 +24,7 @@ public class AdditionalAttackEffect : ICardEffect
     public IIntegerValue Value;
 }
 [Serializable]
-public class EffectAttackEffect : ICardEffect
+public class EffectiveAttackEffect : ICardEffect
 {
     public ITargetPlayerValue Targets;
     public IIntegerValue Value;
@@ -64,31 +64,30 @@ public class DrawCardEffect : ICardEffect
 [Serializable]
 public class DiscardCardEffect : ICardEffect
 {
-    public ITargetPlayerValue Targets;
-    public IIntegerValue Value;
 }
 [Serializable]
 public class ConsumeCardEffect : ICardEffect
 {
-    public ITargetPlayerValue Targets;
-    public IIntegerValue Value;
 }
 [Serializable]
 public class EternalConsumeCardEffect : ICardEffect
 {
-    public ITargetPlayerValue Targets;
-    public IIntegerValue Value;
 }
 [Serializable]
 public class SealCardEffect : ICardEffect
 {
-    public ITargetPlayerValue Targets;
-    public IIntegerValue Value;
+}
+[Serializable]
+public class CloneTempCardEffect : ICardEffect
+{
+}
+[Serializable]
+public class ReserveCardEffect : ICardEffect
+{
 }
 
 [Serializable]
 public class AddBuffEffect : ICardEffect
 {
     public ITargetPlayerValue Targets;
-    public IIntegerValue Value;
 }

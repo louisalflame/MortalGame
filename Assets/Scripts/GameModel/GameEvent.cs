@@ -42,47 +42,122 @@ public class UsedCardEvent : IGameEvent
     public IReadOnlyCollection<CardInfo> HandCardInfos;
     public IReadOnlyCollection<CardInfo> GraveyardCardInfos;
 }
-public class ConsumeEnergyEvent : IGameEvent
+
+public abstract class EnergyEvent : IGameEvent
 {
     public Faction Faction;
     public int Energy;
     public int DeltaEnergy;
     public int MaxEnergy;
+
+    public EnergyEvent(PlayerEntity player, int deltaEnergy)
+    {
+        Faction = player.Faction;
+        Energy = player.Character.EnergyManager.Energy;
+        DeltaEnergy = deltaEnergy;
+        MaxEnergy = player.Character.EnergyManager.MaxEnergy;
+    }
 }
-public class GainEnergyEvent : IGameEvent
+public class RecoverEnergyEvent : EnergyEvent
 {
-    public Faction Faction;
-    public int Energy;
-    public int DeltaEnergy;
-    public int MaxEnergy;
+    public RecoverEnergyEvent(PlayerEntity player, int deltaEnergy) : base(player, deltaEnergy) { }
+}
+public class ConsumeEnergyEvent : EnergyEvent
+{
+    public ConsumeEnergyEvent(PlayerEntity player, int deltaEnergy) : base(player, deltaEnergy) { }
+}
+public class GainEnergyEvent : EnergyEvent
+{
+    public GainEnergyEvent(PlayerEntity player, int deltaEnergy) : base(player, deltaEnergy) { }
+}
+public class LoseEnergyEvent : EnergyEvent
+{
+    public LoseEnergyEvent(PlayerEntity player, int deltaEnergy) : base(player, deltaEnergy) { }
 }
 
-public class TakeDamageEvent : IGameEvent
+public abstract class HealthEvent : IGameEvent
 {
     public Faction Faction;
     public int Hp;
-    public int Shield;
+    public int Dp;
+    public int MaxHp;
+
+    public HealthEvent(PlayerEntity player)
+    {
+        Faction = player.Faction;
+        Hp = player.Character.HealthManager.Hp;
+        Dp = player.Character.HealthManager.Dp;
+        MaxHp = player.Character.HealthManager.MaxHp;
+    }
+}
+public class TakeDamageEvent : HealthEvent
+{
     public int DeltaHp;
     public int DeltaShield;
     public int DamagePoint;
-    public int MaxHp;
+
+    public TakeDamageEvent(PlayerEntity player, int damagePoint, int deltaHp, int deltaShield) : base(player)
+    {
+        DeltaHp = deltaHp;
+        DeltaShield = deltaShield;
+        DamagePoint = damagePoint;
+    }
+}
+public class TakePenetrateDamageEvent : HealthEvent
+{
+    public int DeltaHp;
+    public int DamagePoint;
+
+    public TakePenetrateDamageEvent(PlayerEntity player, int damagePoint, int deltaHp) : base(player)
+    {
+        DeltaHp = deltaHp;
+        DamagePoint = damagePoint;
+    }
+}
+public class TakeAdditionalDamageEvent : HealthEvent
+{
+    public int DeltaHp;
+    public int DeltaShield;
+    public int DamagePoint;
+
+    public TakeAdditionalDamageEvent(PlayerEntity player, int damagePoint, int deltaHp, int deltaShield) : base(player)
+    {
+        DeltaHp = deltaHp;
+        DeltaShield = deltaShield;
+        DamagePoint = damagePoint;
+    }
+}
+public class TakeEffectiveDamageEvent : HealthEvent
+{
+    public int DeltaHp;
+    public int DamagePoint;
+
+    public TakeEffectiveDamageEvent(PlayerEntity player, int damagePoint, int deltaHp) : base(player)
+    {
+        DeltaHp = deltaHp;
+        DamagePoint = damagePoint;
+    }
 }
 
-public class GetHealEvent : IGameEvent
+public class GetHealEvent : HealthEvent
 {
-    public Faction Faction;
-    public int Hp;
-    public int Shield;
     public int DeltaHp;
     public int HealPoint;
-    public int MaxHp;
+
+    public GetHealEvent(PlayerEntity player, int healPoint, int deltaHp) : base(player)
+    {
+        DeltaHp = deltaHp;
+        HealPoint = healPoint;
+    }
 }
-public class GetShieldEvent : IGameEvent
+public class GetShieldEvent : HealthEvent
 {
-    public Faction Faction;
-    public int Hp;
-    public int Shield;
     public int DeltaShield;
     public int ShieldPoint;
-    public int MaxHp;
+
+    public GetShieldEvent(PlayerEntity player, int shieldPoint, int deltaShield) : base(player)
+    {
+        DeltaShield = deltaShield;
+        ShieldPoint = shieldPoint;
+    }
 }

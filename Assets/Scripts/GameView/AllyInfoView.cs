@@ -28,7 +28,7 @@ public class AllyInfoView : MonoBehaviour
         _TurnText.text = round.ToString();
         _nameText.text = ally.Name;
         _healthBarView.SetHealth(ally.Character.HealthManager.Hp, ally.Character.HealthManager.MaxHp);
-        _healthBarView.SetShield(ally.Character.HealthManager.Shield);    
+        _healthBarView.SetShield(ally.Character.HealthManager.Dp);    
         _energyBarView.SetEnergy(ally.Character.EnergyManager.Energy, ally.Character.EnergyManager.MaxEnergy);
     }
     
@@ -44,16 +44,16 @@ public class AllyInfoView : MonoBehaviour
     public void UpdateHealth(TakeDamageEvent takeDamageEvent)
     {
         _healthBarView.SetHealth(takeDamageEvent.Hp, takeDamageEvent.MaxHp);
-        _healthBarView.SetShield(takeDamageEvent.Shield);    
+        _healthBarView.SetShield(takeDamageEvent.Dp);    
     }
     public void UpdateHealth(GetHealEvent getHealEvent)
     {
         _healthBarView.SetHealth(getHealEvent.Hp, getHealEvent.MaxHp);
-        _healthBarView.SetShield(getHealEvent.Shield);    
+        _healthBarView.SetShield(getHealEvent.Dp);    
     }
     public void UpdateHealth(GetShieldEvent getShieldEvent)
     {
         _healthBarView.SetHealth(getShieldEvent.Hp, getShieldEvent.MaxHp);
-        _healthBarView.SetShield(getShieldEvent.Shield);    
+        _healthBarView.SetShield(getShieldEvent.Dp);    
     }
 }

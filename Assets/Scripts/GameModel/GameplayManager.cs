@@ -15,6 +15,7 @@ public class GameplayManager : IGameplayStatusWatcher
     private GameResult _gameResult;
     private List<IGameEvent> _gameEvents;
     private Queue<IGameAction> _gameActions;
+    private GameContextManager _contextMgr;
 
     public bool IsEnd { get{ return _gameResult != null; } }
     public GameResult GameResult { get{ return _gameResult; } }
@@ -30,6 +31,7 @@ public class GameplayManager : IGameplayStatusWatcher
         _gameEvents = new List<IGameEvent>();
         _gameActions = new Queue<IGameAction>();
         _gameResult = null;
+        _contextMgr = new GameContextManager();
 
         _gameStatus = _gameStatus.With(state: GameState.TurnStart);
         Debug.Log($"-- goto state:{_gameStatus.State} --");
@@ -90,22 +92,12 @@ public class GameplayManager : IGameplayStatusWatcher
         });
         Debug.Log($"-- goto state:{_gameStatus.State} --");   
 
-        _gameStatus.Ally.Character.EnergyManager = _gameStatus.Ally.Character.EnergyManager.GainEnergy(3, out int deltaEnergy);
-        _gameEvents.Add(new GainEnergyEvent(){
-            Faction = _gameStatus.Ally.Faction,
-            DeltaEnergy = deltaEnergy,
-            Energy = _gameStatus.Ally.Character.EnergyManager.Energy,
-            MaxEnergy = _gameStatus.Ally.Character.EnergyManager.MaxEnergy
-        });
+        _gameStatus.Ally.Character.EnergyManager = _gameStatus.Ally.Character.EnergyManager.RecoverEnergy(3, out int deltaEnergy);
+        _gameEvents.Add(new RecoverEnergyEvent(_gameStatus.Ally, deltaEnergy));
 
-        _gameStatus.Enemy.Character.EnergyManager = _gameStatus.Enemy.Character.EnergyManager.GainEnergy(
+        _gameStatus.Enemy.Character.EnergyManager = _gameStatus.Enemy.Character.EnergyManager.RecoverEnergy(
             _gameStatus.Enemy.EnergyRecoverPoint, out deltaEnergy);
-        _gameEvents.Add(new GainEnergyEvent(){
-            Faction = _gameStatus.Enemy.Faction,
-            DeltaEnergy = deltaEnergy,
-            Energy = _gameStatus.Enemy.Character.EnergyManager.Energy,
-            MaxEnergy = _gameStatus.Enemy.Character.EnergyManager.MaxEnergy
-        });
+        _gameEvents.Add(new RecoverEnergyEvent(_gameStatus.Enemy, deltaEnergy));
     }
 
     private void _TurnDrawCard()
@@ -193,25 +185,18 @@ public class GameplayManager : IGameplayStatusWatcher
 
     private void _UseCard(PlayerEntity player, string CardIndentity)
     {
-        var context = new GameContext() {
-            Caster = player
-        };
+        _contextMgr.SetCaster(player);
 
         var usedCard = player.HandCard.Cards.FirstOrDefault(c => c.Indentity == CardIndentity);
         if (usedCard != null)
         {
-            context.UsingCard = usedCard;
+            _contextMgr.SetUsingCard(usedCard);
             var cardRuntimCost = usedCard.Cost;
 
             if (cardRuntimCost <= player.Character.EnergyManager.Energy)
             {
                 player.Character.EnergyManager = player.Character.EnergyManager.ConsumeEnergy(cardRuntimCost, out int deltaEnergy);
-                _gameEvents.Add(new ConsumeEnergyEvent(){
-                    Faction = player.Faction,
-                    DeltaEnergy = deltaEnergy,
-                    Energy = player.Character.EnergyManager.Energy,
-                    MaxEnergy = player.Character.EnergyManager.MaxEnergy
-                });
+                _gameEvents.Add(new ConsumeEnergyEvent(player, deltaEnergy));
 
                 player.HandCard = player.HandCard.RemoveCard(usedCard);
                 player.Graveyard = player.Graveyard.AddCard(usedCard);
@@ -225,11 +210,16 @@ public class GameplayManager : IGameplayStatusWatcher
 
                 foreach(var effect in usedCard.OnUseEffects)
                 {
-                    context.UsingEffect = effect;
-                    _ApplyOnUseEffect(context);
+                    _contextMgr.SetUsingEffect(effect);
+                    _ApplyOnUseEffect();
+                    _contextMgr.Popout();
                 }
             }
+
+            _contextMgr.Popout();
         }
+
+        _contextMgr.Popout();
     }
 
     private void _FinishExecuteTurn(TurnSubmitAction turnSubmitAction)
@@ -253,7 +243,13 @@ public class GameplayManager : IGameplayStatusWatcher
 
     private void _DrawCardToMaxCount(PlayerEntity player)
     {
-        while( player.HandCard.Cards.Count < player.HandCard.MaxCount)
+        var needDrawCount = player.HandCard.MaxCount - player.HandCard.Cards.Count;
+        _DrawCards(player, needDrawCount);
+    }
+
+    private void _DrawCards(PlayerEntity player, int drawCount)
+    {
+        for (int i = 0; i < drawCount; i++)
         {
             if( player.Deck.Cards.Count == 0 &&
                 player.Graveyard.Cards.Count > 0)
@@ -268,9 +264,7 @@ public class GameplayManager : IGameplayStatusWatcher
             }
 
             if (player.Deck.Cards.Count > 0)
-                _DrawCard(player); 
-            else
-                break;
+                _DrawCard(player);
         }
     }
 
@@ -288,76 +282,144 @@ public class GameplayManager : IGameplayStatusWatcher
         });
     }
 
-    private void _ApplyOnUseEffect(GameContext gameContext)
+    private void _ApplyOnUseEffect()
     {
-        switch(gameContext.UsingEffect)
+        switch(_contextMgr.Context.UsingEffect)
         {
             case DamageEffect damageEffect:
             {
-                var targets = damageEffect.Targets.Eval(_gameStatus, gameContext);
+                var targets = damageEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
                 foreach(var target in targets)
                 {
-                    gameContext.EffectTarget = target;
-                    var damagePoint = damageEffect.Value.Eval(_gameStatus, gameContext);
+                    _contextMgr.SetEffectTarget(target);
+                    var damagePoint = damageEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
                     target.Character.HealthManager = target.Character.HealthManager.TakeDamage(
-                        damagePoint, gameContext, out int deltaHealth, out int deltaShield);
-                    _gameEvents.Add(new TakeDamageEvent() {
-                        Faction     = target.Faction,
-                        DeltaHp     = deltaHealth,
-                        DeltaShield = deltaShield,
-                        DamagePoint = damagePoint,
-                        Hp          = target.Character.HealthManager.Hp,
-                        MaxHp       = target.Character.HealthManager.MaxHp,
-                        Shield      = target.Character.HealthManager.Shield
-                    });
+                        damagePoint, _contextMgr.Context, out int deltaHp, out int deltaDp);
+                    _gameEvents.Add(new TakeDamageEvent(target, damagePoint, deltaHp, deltaDp));
+
+                    _contextMgr.Popout();
+                }
+                break;
+            }
+            case PenetrateDamageEffect penetrateDamageEffect:
+            {
+                var targets = penetrateDamageEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
+                foreach(var target in targets)
+                {
+                    _contextMgr.SetEffectTarget(target);
+                    var damagePoint = penetrateDamageEffect.Value.Eval(_gameStatus, _contextMgr.Context);
+
+                    target.Character.HealthManager = target.Character.HealthManager.TakePenetrateDamage(
+                        damagePoint, _contextMgr.Context, out int deltaHp);
+                    _gameEvents.Add(new TakePenetrateDamageEvent(target, damagePoint, deltaHp));
+
+                    _contextMgr.Popout();
+                }
+                break;
+            }
+            case AdditionalAttackEffect additionalAttackEffect:
+            {
+                var targets = additionalAttackEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
+                foreach(var target in targets)
+                {
+                    _contextMgr.SetEffectTarget(target);
+                    var damagePoint = additionalAttackEffect.Value.Eval(_gameStatus, _contextMgr.Context);
+
+                    target.Character.HealthManager = target.Character.HealthManager.TakeAdditionalDamage(
+                        damagePoint, _contextMgr.Context, out int deltaHp, out int deltaDp);
+                    _gameEvents.Add(new TakeAdditionalDamageEvent(target, damagePoint, deltaHp, deltaDp));
+                    _contextMgr.Popout();
+                }
+                break;
+            }
+            case EffectiveAttackEffect effectiveAttackEffect:
+            {
+                var targets = effectiveAttackEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
+                foreach(var target in targets)
+                {
+                    _contextMgr.SetEffectTarget(target);
+                    var damagePoint = effectiveAttackEffect.Value.Eval(_gameStatus, _contextMgr.Context);
+
+                    target.Character.HealthManager = target.Character.HealthManager.TakeEffectiveDamage(
+                        damagePoint, _contextMgr.Context, out int deltaHp);
+                    _gameEvents.Add(new TakeEffectiveDamageEvent(target, damagePoint, deltaHp));
+                    _contextMgr.Popout();
                 }
                 break;
             }
             case HealEffect healEffect: 
             {
-                var targets = healEffect.Targets.Eval(_gameStatus, gameContext);
+                var targets = healEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
                 foreach(var target in targets)
                 {
-                    gameContext.EffectTarget = target;
-                    var healPoint = healEffect.Value.Eval(_gameStatus, gameContext);
+                    _contextMgr.SetEffectTarget(target);
+                    var healPoint = healEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
                     target.Character.HealthManager = target.Character.HealthManager.GetHeal(
-                        healPoint, gameContext, out int deltaHealth);
-                    _gameEvents.Add(new GetHealEvent() {
-                        Faction   = target.Faction,
-                        DeltaHp   = deltaHealth,
-                        HealPoint = healPoint,
-                        Hp        = target.Character.HealthManager.Hp,
-                        Shield    = target.Character.HealthManager.Shield,
-                        MaxHp     = target.Character.HealthManager.MaxHp
-                    });
+                        healPoint, _contextMgr.Context, out int deltaHp);
+                    _gameEvents.Add(new GetHealEvent(target, healPoint, deltaHp));
+                    _contextMgr.Popout();
                 }
                 break;
             }
             case ShieldEffect shieldEffect:
             {
-                var targets = shieldEffect.Targets.Eval(_gameStatus, gameContext);
+                var targets = shieldEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
                 foreach(var target in targets)
                 {
-                    gameContext.EffectTarget = target;
-                    var shieldPoint = shieldEffect.Value.Eval(_gameStatus, gameContext);
+                    _contextMgr.SetEffectTarget(target);
+                    var shieldPoint = shieldEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
                     target.Character.HealthManager = target.Character.HealthManager.GetShield(
-                        shieldPoint, gameContext, out int deltaShield);
-                    _gameEvents.Add(new GetShieldEvent() {
-                        Faction     = target.Faction,
-                        DeltaShield = deltaShield,
-                        ShieldPoint = shieldPoint,
-                        Shield      = target.Character.HealthManager.Shield,
-                        Hp          = target.Character.HealthManager.Hp,
-                        MaxHp       = target.Character.HealthManager.MaxHp
-                    });
+                        shieldPoint, _contextMgr.Context, out int delatDp);
+                    _gameEvents.Add(new GetShieldEvent(target, shieldPoint, delatDp));
+                    _contextMgr.Popout();
                 }
                 break;
             }
+            case GainEnergyEffect gainEnergyEffect:
+            {
+                var targets = gainEnergyEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
+                foreach(var target in targets)
+                {
+                    _contextMgr.SetEffectTarget(target);
+                    var gainEnergy = gainEnergyEffect.Value.Eval(_gameStatus, _contextMgr.Context);
+
+                    target.Character.EnergyManager = target.Character.EnergyManager.GainEnergy(
+                        gainEnergy, out int deltaEnergy);
+                    _gameEvents.Add(new GainEnergyEvent(target, deltaEnergy));
+                    _contextMgr.Popout();
+                }
+                break;
+            }
+            case LoseEnegyEffect loseEnegyEffect:
+            {
+                var targets = loseEnegyEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
+                foreach(var target in targets)
+                {
+                    _contextMgr.SetEffectTarget(target);
+                    var loseEnergy = loseEnegyEffect.Value.Eval(_gameStatus, _contextMgr.Context);
+
+                    target.Character.EnergyManager = target.Character.EnergyManager.LoseEnergy(
+                        loseEnergy, out int deltaEnergy);
+                    _gameEvents.Add(new LoseEnergyEvent(target, deltaEnergy));
+                    _contextMgr.Popout();
+                }
+                break;
+            }
+
+            // === CARD EFFECT ===
             case DrawCardEffect drawCardEffect:
-            { 
+            {
+                var targets = drawCardEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
+                foreach(var target in targets)
+                {
+                    _contextMgr.SetEffectTarget(target);
+                    var drawCount = drawCardEffect.Value.Eval(_gameStatus, _contextMgr.Context);
+                    _DrawCards(target, drawCount);
+                    _contextMgr.Popout();
+                }
                 break;
             }
         }
