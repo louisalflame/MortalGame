@@ -2232,7 +2232,7 @@ MonoBehaviour:
   _image: {fileID: 701538928}
   _hpText: {fileID: 1970355163}
   _maxHpText: {fileID: 1221910286}
-  _shieldText: {fileID: 2091263538}
+  _dpText: {fileID: 2091263538}
   _shieldObjects:
   - {fileID: 259860122}
   - {fileID: 2091263535}
@@ -7394,7 +7394,7 @@ MonoBehaviour:
   _image: {fileID: 549905744}
   _hpText: {fileID: 297551747}
   _maxHpText: {fileID: 911024417}
-  _shieldText: {fileID: 1303382892}
+  _dpText: {fileID: 1303382892}
   _shieldObjects:
   - {fileID: 723496371}
   - {fileID: 1303382889}

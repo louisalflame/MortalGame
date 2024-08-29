@@ -61,6 +61,24 @@ public class AllyHandCardView : MonoBehaviour
         }
     }
 
+    public void RecycleHandCards(RecycleHandCardEvent recycleHandCardEvent)
+    {
+        foreach(var cardInfo in recycleHandCardEvent.RecycledCardInfos)
+        {
+            if(_cardViewDict.TryGetValue(cardInfo.CardIndentity, out var cardView))
+            {
+                _cardViews.Remove(cardView);
+                _cardViewDict.Remove(cardInfo.CardIndentity);
+                _cardViewFactory.RecycleCardView(cardView);
+            }
+        }
+
+        if(_cardViews.Count > 0)
+        {
+            _RearrangeCardViews();
+        }
+    }
+
     private void _RearrangeCardViews()
     {
         var widthInterval = _handCardArea.rect.width / _cardViews.Count; 

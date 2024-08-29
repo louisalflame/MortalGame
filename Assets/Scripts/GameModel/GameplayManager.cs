@@ -177,6 +177,24 @@ public class GameplayManager : IGameplayStatusWatcher
 
     private void _TurnEnd()
     {
+        _gameStatus.Ally.HandCard = _gameStatus.Ally.HandCard.ClearHand(out IReadOnlyCollection<CardEntity> recyclAllyCards);
+        _gameStatus.Ally.Graveyard = _gameStatus.Ally.Graveyard.AddCards(recyclAllyCards);
+        _gameEvents.Add(new RecycleHandCardEvent(){
+            Faction = _gameStatus.Ally.Faction,
+            RecycledCardInfos = recyclAllyCards.Select(c => new CardInfo(c)).ToArray(),
+            HandCardInfos = _gameStatus.Ally.HandCard.CardInfos,
+            GraveyardCardInfos = _gameStatus.Ally.Graveyard.CardInfos
+        });
+
+        _gameStatus.Enemy.HandCard = _gameStatus.Enemy.HandCard.ClearHand(out IReadOnlyCollection<CardEntity> recyclEnemyCards);
+        _gameStatus.Enemy.Graveyard = _gameStatus.Enemy.Graveyard.AddCards(recyclEnemyCards);
+        _gameEvents.Add(new RecycleHandCardEvent(){
+            Faction = _gameStatus.Enemy.Faction,
+            RecycledCardInfos = recyclEnemyCards.Select(c => new CardInfo(c)).ToArray(),
+            HandCardInfos = _gameStatus.Enemy.HandCard.CardInfos,
+            GraveyardCardInfos = _gameStatus.Enemy.Graveyard.CardInfos
+        });
+
         _gameStatus = _gameStatus.With(
             state: GameState.TurnStart
         );

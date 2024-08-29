@@ -18,6 +18,13 @@ public class RecycleGraveyardEvent : IGameEvent
     public IReadOnlyCollection<CardInfo> DeckCardInfos;
     public IReadOnlyCollection<CardInfo> GraveyardCardInfos;
 }
+public class RecycleHandCardEvent : IGameEvent
+{
+    public Faction Faction;    
+    public IReadOnlyCollection<CardInfo> RecycledCardInfos;
+    public IReadOnlyCollection<CardInfo> HandCardInfos;
+    public IReadOnlyCollection<CardInfo> GraveyardCardInfos;
+}
 public class DrawCardEvent : IGameEvent
 {
     public Faction Faction;

@@ -24,6 +24,17 @@ public class GraveyardEntity
             Cards = cards
         };
     }
+    public GraveyardEntity AddCards(IEnumerable<CardEntity> cards)
+    {
+        var cardList = cards.ToList();
+        var newCards = new List<CardEntity>(Cards);
+        newCards.AddRange(cardList);
+
+        return new GraveyardEntity
+        {
+            Cards = newCards
+        };
+    }
 
     public GraveyardEntity PopAllCards(out IReadOnlyCollection<CardEntity> allCards)
     {

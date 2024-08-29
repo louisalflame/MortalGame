@@ -77,6 +77,20 @@ public class EnemySelectedCardView : MonoBehaviour
             _RearrangeCardViews();
         }
     }
+    public void RemoveCardView(RecycleHandCardEvent recycleHandCardEvent)
+    {
+        foreach(var cardInfo in recycleHandCardEvent.RecycledCardInfos)
+        {
+            if(_cardViewDict.TryGetValue(cardInfo.CardIndentity, out var cardView))
+            {
+                _cardViews.Remove(cardView);
+                _cardViewDict.Remove(cardInfo.CardIndentity);
+                _cardViewFactory.RecycleCardView(cardView);
+            }
+        }
+
+        _RearrangeCardViews();
+    }
 
     private void _RearrangeCardViews()
     {

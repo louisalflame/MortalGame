@@ -36,5 +36,16 @@ public class HandCardEntity
             Cards = cards
         };
     }
+
+    public HandCardEntity ClearHand(out IReadOnlyCollection<CardEntity> recycleCards)
+    {
+        recycleCards = Cards;
+
+        return new HandCardEntity
+        {
+            MaxCount = MaxCount,
+            Cards = new List<CardEntity>()
+        };
+    }
 }
 
