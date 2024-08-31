@@ -18,6 +18,7 @@ public abstract class PlayerEntity
     public HandCardEntity HandCard;
     public DeckEntity Deck;
     public GraveyardEntity Graveyard;
+    public BuffManager BuffManager;
 
     public bool IsDummy => this == DummyPlayer;
     public static PlayerEntity DummyPlayer = new DummyPlayer();

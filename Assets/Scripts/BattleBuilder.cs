@@ -47,6 +47,7 @@ public class BattleBuidler
             Graveyard = new GraveyardEntity(){
                 Cards = new List<CardEntity>(),
             },
+            BuffManager = new BuffManager(),
 
             DispositionManager = new DispositionManager(allyData.InitialDisposition),
         };
@@ -82,6 +83,8 @@ public class BattleBuidler
                 MaxCount = enemyData.SelectedCardMaxCount,
                 Cards = new List<CardEntity>(),
             },
+            BuffManager = new BuffManager(),
+            
             EnergyRecoverPoint = enemyData.EnergyRecoverPoint,
         };
     }
