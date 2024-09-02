@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class BuffData
 {
-    public string Id;
+    public string ID;
 
     public int MaxLevel;
 }

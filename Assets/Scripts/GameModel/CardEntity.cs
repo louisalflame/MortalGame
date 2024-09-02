@@ -20,7 +20,7 @@ public class CardEntity
 
     public IReadOnlyCollection<ICardEffect> OnUseEffects;
 
-    public CardData OriginData;
+    public string OriginCardInstanceId;
 
     public bool IsDummy => this == DummyCard;
     public static CardEntity DummyCard = new CardEntity()

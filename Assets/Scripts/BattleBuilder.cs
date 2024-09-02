@@ -22,26 +22,26 @@ public class BattleBuidler
         return initialState;
     }
 
-    private AllyEntity _ParseAlly(AllyData allyData)
+    private AllyEntity _ParseAlly(AllyInstance allyInstance)
     {
         return new AllyEntity() 
         {
-            Name = allyData.PlayerData.NameKey,
+            Name = allyInstance.NameKey,
             Character = new CharacterEntity(){
                 HealthManager = new HealthManager(){
-                    Hp = allyData.PlayerData.InitialHealth,
-                    MaxHp = allyData.PlayerData.MaxHealth,
+                    Hp = allyInstance.CurrentHealth,
+                    MaxHp = allyInstance.MaxHealth,
                 },
                 EnergyManager = new EnergyManager(){
-                    Energy = allyData.PlayerData.InitialEnergy,
-                    MaxEnergy = allyData.PlayerData.MaxEnergy,
+                    Energy = allyInstance.CurrentEnergy,
+                    MaxEnergy = allyInstance.MaxEnergy,
                 },
                 StatusManager = new StatusManager(),
             },
             Deck = new DeckEntity(
-                allyData.PlayerData.Deck.Cards.Select(c => _ParseCard(c.Data)).ToList() ),
+                allyInstance.Deck.Select(cardInstance => _ParseCard(cardInstance)).ToList() ),
             HandCard = new HandCardEntity(){
-                MaxCount = allyData.PlayerData.HandCardMaxCount,
+                MaxCount = allyInstance.HandCardMaxCount,
                 Cards = new List<CardEntity>(),
             },
             Graveyard = new GraveyardEntity(){
@@ -49,12 +49,14 @@ public class BattleBuidler
             },
             BuffManager = new BuffManager(),
 
-            DispositionManager = new DispositionManager(allyData.InitialDisposition),
+            DispositionManager = new DispositionManager(allyInstance.CurrentDisposition),
         };
     }
 
     private EnemyEntity _ParseEnemy(EnemyData enemyData)
     {
+        var enemyCardInstances = enemyData.PlayerData.Deck.Cards.Select(c => CardInstance.Create(c.Data)).ToList(); 
+
         return new EnemyEntity()
         {
             Name = enemyData.PlayerData.NameKey,
@@ -70,7 +72,8 @@ public class BattleBuidler
                 StatusManager = new StatusManager(),
             },
             Deck = new DeckEntity(
-                enemyData.PlayerData.Deck.Cards.Select(c => _ParseCard(c.Data)).ToList() ),
+                enemyCardInstances.Select(cardInstance => _ParseCard(cardInstance)).ToList()
+            ),
             HandCard = new HandCardEntity(){
                 MaxCount = enemyData.PlayerData.HandCardMaxCount,
                 Cards = new List<CardEntity>(),
@@ -84,25 +87,25 @@ public class BattleBuidler
                 Cards = new List<CardEntity>(),
             },
             BuffManager = new BuffManager(),
-            
+
             EnergyRecoverPoint = enemyData.EnergyRecoverPoint,
         };
     }
 
-    private CardEntity _ParseCard(CardData cardData)
+    private CardEntity _ParseCard(CardInstance cardInstance)
     {
         return new CardEntity(){
             Indentity = Guid.NewGuid().ToString(),
-            Title = cardData.TitleKey,
-            Info = cardData.InfoKey,
-            Type = cardData.Type,
-            Rarity = cardData.Rarity,
-            Themes = cardData.Themes.ToArray(),
-            Cost = cardData.Cost,
-            Power = cardData.Power,
-            Selectables = cardData.Selectables.ToArray(),
-            OnUseEffects = cardData.OnUseEffects.ToArray(),
-            OriginData = cardData,
+            Title = cardInstance.TitleKey,
+            Info = cardInstance.InfoKey,
+            Type = cardInstance.Type,
+            Rarity = cardInstance.Rarity,
+            Themes = cardInstance.Themes.ToArray(),
+            Cost = cardInstance.Cost,
+            Power = cardInstance.Power,
+            Selectables = cardInstance.Selectables.ToArray(),
+            OnUseEffects = cardInstance.OnUseEffects.ToArray(),
+            OriginCardInstanceId = cardInstance.InstanceId,
         };
     }
 }

@@ -24,12 +24,12 @@ MonoBehaviour:
     - Name: Data
       Entry: 7
       Data: 0|BuffData, Assembly-CSharp
-    - Name: Id
+    - Name: ID
       Entry: 1
       Data: Poison
     - Name: MaxLevel
       Entry: 3
-      Data: 0
+      Data: 999
     - Name: 
       Entry: 8
       Data: 
