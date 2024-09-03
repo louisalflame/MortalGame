@@ -1,16 +1,18 @@
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BuffView : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    [SerializeField]
+    private Image _buffIcon;
 
-    // Update is called once per frame
-    void Update()
+    [SerializeField]
+    private TextMeshProUGUI _levelText;
+
+    public void Reset()
     {
-        
+        _buffIcon.sprite = null;
+        _levelText.text = string.Empty;
     }
 }

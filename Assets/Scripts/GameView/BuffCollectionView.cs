@@ -2,15 +2,9 @@ using UnityEngine;
 
 public class BuffCollectionView : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    [SerializeField]
+    private BuffViewFactory _buffViewFactory;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    [SerializeField]
+    private Transform _buffViewParent;
 }
