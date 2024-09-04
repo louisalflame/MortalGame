@@ -51,6 +51,9 @@ public class GameStatus
 
 public class GameContextManager
 {
+    public Dictionary<string, BuffData> BuffTable;
+    public Dictionary<string, CardData> CardTable;
+    
     private Stack<GameContext> _contextStack = new Stack<GameContext>();
     public GameContext Context => _contextStack.Peek();
 

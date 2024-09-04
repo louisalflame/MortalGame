@@ -1,51 +1,48 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
-public class HandCardEntity
+public interface IHandCardEntity
 {
-    public int MaxCount;
-    public IReadOnlyCollection<CardEntity> Cards;
+    int MaxCount { get; }
+    IReadOnlyCollection<CardEntity> Cards { get; }
+    IReadOnlyCollection<CardInfo> CardInfos { get; }
+    void AddCard(CardEntity card);
+    bool RemoveCard(CardEntity card);
+    IReadOnlyCollection<CardEntity> ClearHand();
+}
 
+public class HandCardEntity : IHandCardEntity
+{
+    private int _maxCount;
+    private List<CardEntity> _cards;
+
+    public int MaxCount => _maxCount;
+    public IReadOnlyCollection<CardEntity> Cards => _cards;
     public IReadOnlyCollection<CardInfo> CardInfos =>
-        Cards.Select(c => new CardInfo(c)).ToArray();
+        _cards.Select(c => new CardInfo(c)).ToArray();
 
-    public HandCardEntity()
+    public HandCardEntity(int maxCount)
     {
-        Cards = new List<CardEntity>();
+        _maxCount = maxCount;
+        _cards = new List<CardEntity>();
     }
 
-    public HandCardEntity AddCard(CardEntity card)
+    public void AddCard(CardEntity card)
     {
-        var cards = new List<CardEntity>(Cards.Append(card));
-
-        return new HandCardEntity
-        {
-            MaxCount = MaxCount,
-            Cards = cards
-        };
+        _cards.Add(card);
     }
 
-    public HandCardEntity RemoveCard(CardEntity card)
+    public bool RemoveCard(CardEntity card)
     {
-        var cards = new List<CardEntity>(Cards.Where(c => c.Indentity != card.Indentity));
-
-        return new HandCardEntity
-        {
-            MaxCount = MaxCount,
-            Cards = cards
-        };
+        var isRemoved = _cards.Remove(card);
+        return isRemoved;
     }
 
-    public HandCardEntity ClearHand(out IReadOnlyCollection<CardEntity> recycleCards)
+    public IReadOnlyCollection<CardEntity> ClearHand()
     {
-        recycleCards = Cards;
-
-        return new HandCardEntity
-        {
-            MaxCount = MaxCount,
-            Cards = new List<CardEntity>()
-        };
+        var recycleCards = _cards.ToList();
+        _cards = new List<CardEntity>();
+        return recycleCards;
     }
 }
 

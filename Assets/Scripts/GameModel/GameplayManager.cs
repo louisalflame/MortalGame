@@ -92,12 +92,11 @@ public class GameplayManager : IGameplayStatusWatcher
         });
         Debug.Log($"-- goto state:{_gameStatus.State} --");   
 
-        _gameStatus.Ally.Character.EnergyManager = _gameStatus.Ally.Character.EnergyManager.RecoverEnergy(3, out int deltaEnergy);
-        _gameEvents.Add(new RecoverEnergyEvent(_gameStatus.Ally, deltaEnergy));
+        var allyGainEnergyResult = _gameStatus.Ally.Character.EnergyManager.RecoverEnergy(3);
+        _gameEvents.Add(new RecoverEnergyEvent(_gameStatus.Ally, allyGainEnergyResult));
 
-        _gameStatus.Enemy.Character.EnergyManager = _gameStatus.Enemy.Character.EnergyManager.RecoverEnergy(
-            _gameStatus.Enemy.EnergyRecoverPoint, out deltaEnergy);
-        _gameEvents.Add(new RecoverEnergyEvent(_gameStatus.Enemy, deltaEnergy));
+        var enemyGainEnergyResult = _gameStatus.Enemy.Character.EnergyManager.RecoverEnergy(_gameStatus.Enemy.EnergyRecoverPoint);
+        _gameEvents.Add(new RecoverEnergyEvent(_gameStatus.Enemy, enemyGainEnergyResult));
     }
 
     private void _TurnDrawCard()
@@ -153,7 +152,7 @@ public class GameplayManager : IGameplayStatusWatcher
         {
             _gameStatus.Enemy.SelectedCards = _gameStatus.Enemy.SelectedCards.DequeueCard(out CardEntity selectedCard);
             
-            if (selectedCard.Cost > _gameStatus.Enemy.Character.EnergyManager.Energy)
+            if (selectedCard.Cost > _gameStatus.Enemy.Character.CurrentEnergy)
             {
                 _gameEvents.Add(new EnemyUnselectedCardEvent(){
                     SelectedCardInfo = new CardInfo(selectedCard),
@@ -177,8 +176,8 @@ public class GameplayManager : IGameplayStatusWatcher
 
     private void _TurnEnd()
     {
-        _gameStatus.Ally.HandCard = _gameStatus.Ally.HandCard.ClearHand(out IReadOnlyCollection<CardEntity> recyclAllyCards);
-        _gameStatus.Ally.Graveyard = _gameStatus.Ally.Graveyard.AddCards(recyclAllyCards);
+        var recyclAllyCards = _gameStatus.Ally.HandCard.ClearHand();
+        _gameStatus.Ally.Graveyard.AddCards(recyclAllyCards);
         _gameEvents.Add(new RecycleHandCardEvent(){
             Faction = _gameStatus.Ally.Faction,
             RecycledCardInfos = recyclAllyCards.Select(c => new CardInfo(c)).ToArray(),
@@ -186,8 +185,8 @@ public class GameplayManager : IGameplayStatusWatcher
             GraveyardCardInfos = _gameStatus.Ally.Graveyard.CardInfos
         });
 
-        _gameStatus.Enemy.HandCard = _gameStatus.Enemy.HandCard.ClearHand(out IReadOnlyCollection<CardEntity> recyclEnemyCards);
-        _gameStatus.Enemy.Graveyard = _gameStatus.Enemy.Graveyard.AddCards(recyclEnemyCards);
+        var recyclEnemyCards = _gameStatus.Enemy.HandCard.ClearHand();
+        _gameStatus.Enemy.Graveyard.AddCards(recyclEnemyCards);
         _gameEvents.Add(new RecycleHandCardEvent(){
             Faction = _gameStatus.Enemy.Faction,
             RecycledCardInfos = recyclEnemyCards.Select(c => new CardInfo(c)).ToArray(),
@@ -211,26 +210,28 @@ public class GameplayManager : IGameplayStatusWatcher
             _contextMgr.SetUsingCard(usedCard);
             var cardRuntimCost = usedCard.Cost;
 
-            if (cardRuntimCost <= player.Character.EnergyManager.Energy)
+            if (cardRuntimCost <= player.Character.CurrentEnergy)
             {
-                player.Character.EnergyManager = player.Character.EnergyManager.ConsumeEnergy(cardRuntimCost, out int deltaEnergy);
-                _gameEvents.Add(new ConsumeEnergyEvent(player, deltaEnergy));
+                var loseEnergyResult = player.Character.EnergyManager.ConsumeEnergy(cardRuntimCost);
+                _gameEvents.Add(new ConsumeEnergyEvent(player, loseEnergyResult));
 
-                player.HandCard = player.HandCard.RemoveCard(usedCard);
-                player.Graveyard = player.Graveyard.AddCard(usedCard);
-                var usedCardInfo = new CardInfo(usedCard);
-                _gameEvents.Add(new UsedCardEvent() {
-                    Faction = player.Faction,
-                    UsedCardInfo = usedCardInfo,
-                    HandCardInfos = player.HandCard.CardInfos,
-                    GraveyardCardInfos = player.Graveyard.CardInfos
-                });
-
-                foreach(var effect in usedCard.OnUseEffects)
+                if (player.HandCard.RemoveCard(usedCard)) 
                 {
-                    _contextMgr.SetUsingEffect(effect);
-                    _ApplyOnUseEffect();
-                    _contextMgr.Popout();
+                    player.Graveyard.AddCard(usedCard);
+                    var usedCardInfo = new CardInfo(usedCard);
+                    _gameEvents.Add(new UsedCardEvent() {
+                        Faction = player.Faction,
+                        UsedCardInfo = usedCardInfo,
+                        HandCardInfos = player.HandCard.CardInfos,
+                        GraveyardCardInfos = player.Graveyard.CardInfos
+                    });
+
+                    foreach(var effect in usedCard.OnUseEffects)
+                    {
+                        _contextMgr.SetUsingEffect(effect);
+                        _ApplyOnUseEffect();
+                        _contextMgr.Popout();
+                    }
                 }
             }
 
@@ -272,8 +273,8 @@ public class GameplayManager : IGameplayStatusWatcher
             if( player.Deck.Cards.Count == 0 &&
                 player.Graveyard.Cards.Count > 0)
             {
-                player.Graveyard = player.Graveyard.PopAllCards(out IReadOnlyCollection<CardEntity> graveyardCards);
-                player.Deck = player.Deck.EnqueueCards(graveyardCards).Shuffle();
+                var graveyardCards = player.Graveyard.PopAllCards();
+                player.Deck.EnqueueCardsThenShuffle(graveyardCards);
                 _gameEvents.Add(new RecycleGraveyardEvent() {
                     Faction = player.Faction,
                     DeckCardInfos = player.Deck.CardInfos,
@@ -288,16 +289,18 @@ public class GameplayManager : IGameplayStatusWatcher
 
     private void _DrawCard(PlayerEntity player)
     {
-        player.Deck = player.Deck.PopCard(out CardEntity newCard);
-        player.HandCard = player.HandCard.AddCard(newCard);
+        if (player.Deck.PopCard(out CardEntity newCard))
+        {
+            player.HandCard.AddCard(newCard);
 
-        var newCardInfo = new CardInfo(newCard);
-        _gameEvents.Add(new DrawCardEvent(){
-            Faction = player.Faction,
-            NewCardInfo = newCardInfo,
-            HandCardInfos = player.HandCard.CardInfos,
-            DeckCardInfos = player.Deck.CardInfos,
-        });
+            var newCardInfo = new CardInfo(newCard);
+            _gameEvents.Add(new DrawCardEvent(){
+                Faction = player.Faction,
+                NewCardInfo = newCardInfo,
+                HandCardInfos = player.HandCard.CardInfos,
+                DeckCardInfos = player.Deck.CardInfos,
+            });
+        }
     }
 
     private void _ApplyOnUseEffect()
@@ -312,9 +315,8 @@ public class GameplayManager : IGameplayStatusWatcher
                     _contextMgr.SetEffectTarget(target);
                     var damagePoint = damageEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
-                    target.Character.HealthManager = target.Character.HealthManager.TakeDamage(
-                        damagePoint, _contextMgr.Context, out int deltaHp, out int deltaDp);
-                    _gameEvents.Add(new TakeDamageEvent(target, damagePoint, deltaHp, deltaDp));
+                    var takeDamageResult = target.Character.HealthManager.TakeDamage(damagePoint, _contextMgr.Context);
+                    _gameEvents.Add(new TakeDamageEvent(target, takeDamageResult));
 
                     _contextMgr.Popout();
                 }
@@ -328,9 +330,8 @@ public class GameplayManager : IGameplayStatusWatcher
                     _contextMgr.SetEffectTarget(target);
                     var damagePoint = penetrateDamageEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
-                    target.Character.HealthManager = target.Character.HealthManager.TakePenetrateDamage(
-                        damagePoint, _contextMgr.Context, out int deltaHp);
-                    _gameEvents.Add(new TakePenetrateDamageEvent(target, damagePoint, deltaHp));
+                    var takeDamageResult = target.Character.HealthManager.TakePenetrateDamage(damagePoint, _contextMgr.Context);
+                    _gameEvents.Add(new TakePenetrateDamageEvent(target, takeDamageResult));
 
                     _contextMgr.Popout();
                 }
@@ -344,9 +345,8 @@ public class GameplayManager : IGameplayStatusWatcher
                     _contextMgr.SetEffectTarget(target);
                     var damagePoint = additionalAttackEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
-                    target.Character.HealthManager = target.Character.HealthManager.TakeAdditionalDamage(
-                        damagePoint, _contextMgr.Context, out int deltaHp, out int deltaDp);
-                    _gameEvents.Add(new TakeAdditionalDamageEvent(target, damagePoint, deltaHp, deltaDp));
+                    var takeDamageResult = target.Character.HealthManager.TakeAdditionalDamage(damagePoint, _contextMgr.Context);
+                    _gameEvents.Add(new TakeAdditionalDamageEvent(target, takeDamageResult));
                     _contextMgr.Popout();
                 }
                 break;
@@ -359,9 +359,8 @@ public class GameplayManager : IGameplayStatusWatcher
                     _contextMgr.SetEffectTarget(target);
                     var damagePoint = effectiveAttackEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
-                    target.Character.HealthManager = target.Character.HealthManager.TakeEffectiveDamage(
-                        damagePoint, _contextMgr.Context, out int deltaHp);
-                    _gameEvents.Add(new TakeEffectiveDamageEvent(target, damagePoint, deltaHp));
+                    var takeDamageResult = target.Character.HealthManager.TakeEffectiveDamage(damagePoint, _contextMgr.Context);
+                    _gameEvents.Add(new TakeEffectiveDamageEvent(target, takeDamageResult));
                     _contextMgr.Popout();
                 }
                 break;
@@ -374,9 +373,8 @@ public class GameplayManager : IGameplayStatusWatcher
                     _contextMgr.SetEffectTarget(target);
                     var healPoint = healEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
-                    target.Character.HealthManager = target.Character.HealthManager.GetHeal(
-                        healPoint, _contextMgr.Context, out int deltaHp);
-                    _gameEvents.Add(new GetHealEvent(target, healPoint, deltaHp));
+                    var getHealResult = target.Character.HealthManager.GetHeal(healPoint, _contextMgr.Context);
+                    _gameEvents.Add(new GetHealEvent(target, getHealResult));
                     _contextMgr.Popout();
                 }
                 break;
@@ -389,9 +387,8 @@ public class GameplayManager : IGameplayStatusWatcher
                     _contextMgr.SetEffectTarget(target);
                     var shieldPoint = shieldEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
-                    target.Character.HealthManager = target.Character.HealthManager.GetShield(
-                        shieldPoint, _contextMgr.Context, out int delatDp);
-                    _gameEvents.Add(new GetShieldEvent(target, shieldPoint, delatDp));
+                    var getShieldResult = target.Character.HealthManager.GetShield(shieldPoint, _contextMgr.Context);
+                    _gameEvents.Add(new GetShieldEvent(target, getShieldResult));
                     _contextMgr.Popout();
                 }
                 break;
@@ -404,9 +401,8 @@ public class GameplayManager : IGameplayStatusWatcher
                     _contextMgr.SetEffectTarget(target);
                     var gainEnergy = gainEnergyEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
-                    target.Character.EnergyManager = target.Character.EnergyManager.GainEnergy(
-                        gainEnergy, out int deltaEnergy);
-                    _gameEvents.Add(new GainEnergyEvent(target, deltaEnergy));
+                    var gainEnergyResult = target.Character.EnergyManager.GainEnergy(gainEnergy);
+                    _gameEvents.Add(new GainEnergyEvent(target, gainEnergyResult));
                     _contextMgr.Popout();
                 }
                 break;
@@ -419,9 +415,8 @@ public class GameplayManager : IGameplayStatusWatcher
                     _contextMgr.SetEffectTarget(target);
                     var loseEnergy = loseEnegyEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
-                    target.Character.EnergyManager = target.Character.EnergyManager.LoseEnergy(
-                        loseEnergy, out int deltaEnergy);
-                    _gameEvents.Add(new LoseEnergyEvent(target, deltaEnergy));
+                    var loseEnergyResult = target.Character.EnergyManager.LoseEnergy(loseEnergy);
+                    _gameEvents.Add(new LoseEnergyEvent(target, loseEnergyResult));
                     _contextMgr.Popout();
                 }
                 break;
@@ -436,6 +431,20 @@ public class GameplayManager : IGameplayStatusWatcher
                     _contextMgr.SetEffectTarget(target);
                     var drawCount = drawCardEffect.Value.Eval(_gameStatus, _contextMgr.Context);
                     _DrawCards(target, drawCount);
+                    _contextMgr.Popout();
+                }
+                break;
+            }
+
+            case AddBuffEffect addBuffEffect:
+            {
+                var targets = addBuffEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
+                foreach(var target in targets)
+                {
+                    _contextMgr.SetEffectTarget(target);
+                    var level = addBuffEffect.Level.Eval(_gameStatus, _contextMgr.Context);
+                    var buff = target.Character.BuffManager.AddBuff(addBuffEffect.BuffId, level);
+                    _gameEvents.Add(new AddBuffEvent(target, buff));
                     _contextMgr.Popout();
                 }
                 break;

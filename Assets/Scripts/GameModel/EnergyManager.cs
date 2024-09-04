@@ -1,54 +1,94 @@
 using UnityEngine;
 
-
-public class EnergyManager
+public interface IEnergyManager
 {
-    public int Energy;
-    public int MaxEnergy;
+    int Energy { get; }
+    int MaxEnergy { get; }
+    GainEnergyResult RecoverEnergy(int amount);
+    LoseEnergyResult ConsumeEnergy(int amount);
+    GainEnergyResult GainEnergy(int amount);
+    LoseEnergyResult LoseEnergy(int amount);
+}
+public class EnergyManager : IEnergyManager
+{
+    private int _energy;
+    private int _maxEnergy;
 
-    public EnergyManager RecoverEnergy(int amount, out int deltaEnergy)
+    public int Energy => _energy;
+    public int MaxEnergy => _maxEnergy;
+
+    public EnergyManager(int energy, int maxEnergy)
     {
-        var newEnergy = Mathf.Clamp(Energy + amount, Energy, MaxEnergy);
-        deltaEnergy = newEnergy - Energy;
-
-        return new EnergyManager()
-        {
-            Energy = newEnergy,
-            MaxEnergy = MaxEnergy,
-        };
-    }
-    public EnergyManager ConsumeEnergy(int amount, out int deltaEnergy)
-    {
-        var newEnergy = Mathf.Clamp(Energy - amount, 0, Energy);
-        deltaEnergy = Energy - newEnergy;
-
-        return new EnergyManager()
-        {
-            Energy = newEnergy,
-            MaxEnergy = MaxEnergy,
-        };
+        _energy = energy;
+        _maxEnergy = maxEnergy;
     }
 
-    public EnergyManager GainEnergy(int amount, out int deltaEnergy)
+    public GainEnergyResult RecoverEnergy(int amount)
     {
-        var newEnergy = Mathf.Clamp(Energy + amount, Energy, MaxEnergy);
-        deltaEnergy = newEnergy - Energy;
+        var deltaEp = _AcceptEnergyGain(amount, out var energyOver);
 
-        return new EnergyManager()
+        return new GainEnergyResult()
         {
-            Energy = newEnergy,
-            MaxEnergy = MaxEnergy,
+            Type = EnergyGainType.Recover,
+            EnergyPoint = amount,
+            DeltaEp = deltaEp,
+            OverEp = energyOver,
         };
     }
-    public EnergyManager LoseEnergy(int amount, out int deltaEnergy)
+    public LoseEnergyResult ConsumeEnergy(int amount)
     {
-        var newEnergy = Mathf.Clamp(Energy - amount, 0, Energy);
-        deltaEnergy = Energy - newEnergy;
+        var deltaEp = _AcceptEnergyLoss(amount, out var energyOver);
 
-        return new EnergyManager()
+        return new LoseEnergyResult()
         {
-            Energy = newEnergy,
-            MaxEnergy = MaxEnergy,
+            Type = EnergyLoseType.Consume,
+            EnergyPoint = amount,
+            DeltaEp = deltaEp,
+            OverEp = energyOver,
         };
+    }
+
+    public GainEnergyResult GainEnergy(int amount)
+    {
+        var deltaEp = _AcceptEnergyGain(amount, out var energyOver);
+
+        return new GainEnergyResult()
+        {
+            Type = EnergyGainType.GainEffect,
+            EnergyPoint = amount,
+            DeltaEp = deltaEp,
+            OverEp = energyOver,
+        };
+    }
+    public LoseEnergyResult LoseEnergy(int amount)
+    {
+        var deltaEp = _AcceptEnergyLoss(amount, out var energyOver);
+
+        return new LoseEnergyResult()
+        {
+            Type = EnergyLoseType.LoseEffect,
+            EnergyPoint = amount,
+            DeltaEp = deltaEp,
+            OverEp = energyOver,
+        };
+    }
+
+    private int _AcceptEnergyGain(int amount, out int energyOver)
+    {
+        var originEnergy = _energy;
+        _energy = Mathf.Clamp(_energy + amount, originEnergy, _maxEnergy);
+        var deltaEnergy = _energy - originEnergy;
+        energyOver = Mathf.Max(amount - deltaEnergy, 0);
+
+        return deltaEnergy;
+    }
+    private int _AcceptEnergyLoss(int amount, out int energyOver)
+    {
+        var originEnergy = _energy;
+        _energy = Mathf.Clamp(_energy - amount, 0, originEnergy);
+        var deltaEnergy = originEnergy - _energy;
+        energyOver = Mathf.Max(amount - deltaEnergy, 0);
+
+        return deltaEnergy;
     }
 }

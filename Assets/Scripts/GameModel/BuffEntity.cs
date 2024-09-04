@@ -8,4 +8,12 @@ public class BuffEntity
 
     public PlayerEntity Owner;
     public PlayerEntity Caster;
+
+    public BuffEntity(
+        string id,
+        int level,
+        PlayerEntity owner,
+        PlayerEntity caster) 
+    {
+    }
 }

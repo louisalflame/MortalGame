@@ -27,9 +27,9 @@ public class AllyInfoView : MonoBehaviour
     {
         _TurnText.text = round.ToString();
         _nameText.text = ally.Name;
-        _healthBarView.SetHealth(ally.Character.HealthManager.Hp, ally.Character.HealthManager.MaxHp);
-        _healthBarView.SetShield(ally.Character.HealthManager.Dp);    
-        _energyBarView.SetEnergy(ally.Character.EnergyManager.Energy, ally.Character.EnergyManager.MaxEnergy);
+        _healthBarView.SetHealth(ally.Character.CurrentHealth, ally.Character.MaxHealth);
+        _healthBarView.SetShield(ally.Character.CurrentArmor);    
+        _energyBarView.SetEnergy(ally.Character.CurrentEnergy, ally.Character.MaxEnergy);
     }
     
     public void UpdateEnergy(ConsumeEnergyEvent consumeEnergyEvent)

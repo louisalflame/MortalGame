@@ -28,26 +28,14 @@ public class BattleBuidler
         {
             Name = allyInstance.NameKey,
             Character = new CharacterEntity(){
-                HealthManager = new HealthManager(){
-                    Hp = allyInstance.CurrentHealth,
-                    MaxHp = allyInstance.MaxHealth,
-                },
-                EnergyManager = new EnergyManager(){
-                    Energy = allyInstance.CurrentEnergy,
-                    MaxEnergy = allyInstance.MaxEnergy,
-                },
-                StatusManager = new StatusManager(),
+                HealthManager = new HealthManager(allyInstance.CurrentHealth, allyInstance.MaxHealth),
+                EnergyManager = new EnergyManager(allyInstance.CurrentEnergy, allyInstance.MaxEnergy),
+                BuffManager = new BuffManager(),
             },
             Deck = new DeckEntity(
                 allyInstance.Deck.Select(cardInstance => _ParseCard(cardInstance)).ToList() ),
-            HandCard = new HandCardEntity(){
-                MaxCount = allyInstance.HandCardMaxCount,
-                Cards = new List<CardEntity>(),
-            },
-            Graveyard = new GraveyardEntity(){
-                Cards = new List<CardEntity>(),
-            },
-            BuffManager = new BuffManager(),
+            HandCard = new HandCardEntity(allyInstance.HandCardMaxCount),
+            Graveyard = new GraveyardEntity(),
 
             DispositionManager = new DispositionManager(allyInstance.CurrentDisposition),
         };
@@ -61,32 +49,20 @@ public class BattleBuidler
         {
             Name = enemyData.PlayerData.NameKey,
             Character = new CharacterEntity(){
-                HealthManager = new HealthManager(){
-                    Hp = enemyData.PlayerData.InitialHealth,
-                    MaxHp = enemyData.PlayerData.MaxHealth,
-                },
-                EnergyManager = new EnergyManager(){
-                    Energy = enemyData.PlayerData.InitialEnergy,
-                    MaxEnergy = enemyData.PlayerData.MaxEnergy,
-                },
-                StatusManager = new StatusManager(),
+                HealthManager = new HealthManager(enemyData.PlayerData.InitialHealth, enemyData.PlayerData.MaxHealth),
+                EnergyManager = new EnergyManager(enemyData.PlayerData.InitialEnergy, enemyData.PlayerData.MaxEnergy),
+                BuffManager = new BuffManager(),
             },
             Deck = new DeckEntity(
                 enemyCardInstances.Select(cardInstance => _ParseCard(cardInstance)).ToList()
             ),
-            HandCard = new HandCardEntity(){
-                MaxCount = enemyData.PlayerData.HandCardMaxCount,
-                Cards = new List<CardEntity>(),
-            },
-            Graveyard = new GraveyardEntity(){
-                Cards = new List<CardEntity>(),
-            },
+            HandCard = new HandCardEntity(enemyData.PlayerData.HandCardMaxCount),
+            Graveyard = new GraveyardEntity(),
 
             SelectedCards = new SelectedCardEntity(){
                 MaxCount = enemyData.SelectedCardMaxCount,
                 Cards = new List<CardEntity>(),
             },
-            BuffManager = new BuffManager(),
 
             EnergyRecoverPoint = enemyData.EnergyRecoverPoint,
         };

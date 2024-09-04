@@ -24,9 +24,9 @@ public class EnemyInfoView : MonoBehaviour
     public void SetPlayerInfo(EnemyEntity enemy)
     {
         _nameText.text = enemy.Name;
-        _healthBarView.SetHealth(enemy.Character.HealthManager.Hp, enemy.Character.HealthManager.MaxHp);
-        _healthBarView.SetShield(enemy.Character.HealthManager.Dp);
-        _energyBarView.SetEnergy(enemy.Character.EnergyManager.Energy, enemy.Character.EnergyManager.MaxEnergy);
+        _healthBarView.SetHealth(enemy.Character.CurrentHealth, enemy.Character.MaxHealth);
+        _healthBarView.SetShield(enemy.Character.CurrentArmor);
+        _energyBarView.SetEnergy(enemy.Character.CurrentEnergy, enemy.Character.MaxEnergy);
     }
 
     public void UpdateEnergy(ConsumeEnergyEvent consumeEnergyEvent)

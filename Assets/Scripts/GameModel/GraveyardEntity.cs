@@ -1,48 +1,40 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
-public class GraveyardEntity
+public interface IGraveyardEntity
 {
-    public IReadOnlyCollection<CardEntity> Cards;
+    IReadOnlyCollection<CardEntity> Cards { get; }
+    IReadOnlyCollection<CardInfo> CardInfos { get; }
+    void AddCard(CardEntity card);
+    void AddCards(IEnumerable<CardEntity> cards);
+    IReadOnlyCollection<CardEntity> PopAllCards();
+}
+public class GraveyardEntity : IGraveyardEntity
+{
+    private List<CardEntity> _cards;
+    public IReadOnlyCollection<CardEntity> Cards => _cards;
 
     public IReadOnlyCollection<CardInfo> CardInfos =>
-        Cards.Select(c => new CardInfo(c)).ToArray();
+        _cards.Select(c => new CardInfo(c)).ToArray();
         
     public GraveyardEntity()
     {
-        Cards = new List<CardEntity>();
+        _cards = new List<CardEntity>();
     }
 
-    public GraveyardEntity AddCard(CardEntity card)
+    public void AddCard(CardEntity card)
     {
-        var cards = new List<CardEntity>(Cards);
-        cards.Add(card);
-
-        return new GraveyardEntity
-        {
-            Cards = cards
-        };
+        _cards.Add(card);
     }
-    public GraveyardEntity AddCards(IEnumerable<CardEntity> cards)
+    public void AddCards(IEnumerable<CardEntity> cards)
     {
-        var cardList = cards.ToList();
-        var newCards = new List<CardEntity>(Cards);
-        newCards.AddRange(cardList);
-
-        return new GraveyardEntity
-        {
-            Cards = newCards
-        };
+        _cards.AddRange(cards);
     }
 
-    public GraveyardEntity PopAllCards(out IReadOnlyCollection<CardEntity> allCards)
+    public IReadOnlyCollection<CardEntity> PopAllCards()
     {
-        allCards = Cards;
-
-        return new GraveyardEntity
-        {
-            Cards = new List<CardEntity>()
-        };
+        var cards = _cards.ToList();
+        _cards = new List<CardEntity>();
+        return cards;
     }
 }

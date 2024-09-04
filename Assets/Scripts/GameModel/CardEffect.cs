@@ -90,4 +90,6 @@ public class ReserveCardEffect : ICardEffect
 public class AddBuffEffect : ICardEffect
 {
     public ITargetPlayerValue Targets;
+    public string BuffId;
+    public IIntegerValue Level;
 }

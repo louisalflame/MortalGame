@@ -2,23 +2,15 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public enum Faction
-{
-    None = 0,
-    Ally,
-    Enemy
-}
-
 public abstract class PlayerEntity
 {
     public Faction Faction { get; protected set; }
     public string Name;
 
     public CharacterEntity Character;
-    public HandCardEntity HandCard;
-    public DeckEntity Deck;
-    public GraveyardEntity Graveyard;
-    public BuffManager BuffManager;
+    public IHandCardEntity HandCard;
+    public IDeckEntity Deck;
+    public IGraveyardEntity Graveyard;
 
     public bool IsDummy => this == DummyPlayer;
     public static PlayerEntity DummyPlayer = new DummyPlayer();
