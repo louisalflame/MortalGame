@@ -443,8 +443,8 @@ public class GameplayManager : IGameplayStatusWatcher
                 {
                     _contextMgr.SetEffectTarget(target);
                     var level = addBuffEffect.Level.Eval(_gameStatus, _contextMgr.Context);
-                    var buff = target.Character.BuffManager.AddBuff(addBuffEffect.BuffId, level);
-                    _gameEvents.Add(new AddBuffEvent(target, buff));
+                    var buff = target.Character.BuffManager.AddBuff(_contextMgr.Context, addBuffEffect.BuffId, level);
+                    _gameEvents.Add(new AddBuffEvent(target, buff.ToInfo()));
                     _contextMgr.Popout();
                 }
                 break;

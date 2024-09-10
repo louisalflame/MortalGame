@@ -7,12 +7,12 @@ public class BuffViewFactory : MonoBehaviour
     [SerializeField]
     private Transform _recycleRoot;
 
-    public BuffView CreateCardView()
+    public BuffView CreateBuffView()
     {
         return Instantiate(_buffViewPrefab, transform);
     }
 
-    public void RecycleCardView(BuffView buffView)
+    public void RecycleBuffView(BuffView buffView)
     {
         buffView.Reset();
         buffView.transform.SetParent(_recycleRoot);

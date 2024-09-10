@@ -1,10 +1,11 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public interface IBuffManager
 {
     IReadOnlyCollection<BuffEntity> Buffs { get; }
-    BuffEntity AddBuff(string buffId, int level);
+    BuffEntity AddBuff(GameContext gameContext, string buffId, int level);
 }
 
 public class BuffManager : IBuffManager
@@ -19,9 +20,9 @@ public class BuffManager : IBuffManager
         _buffs = new List<BuffEntity>();
     }
 
-    public BuffEntity AddBuff(string buffId, int level)
+    public BuffEntity AddBuff(GameContext gameContext, string buffId, int level)
     {
-        var buff = new BuffEntity(buffId, level, _gameContextManager.Context.Caster, _gameContextManager.Context.EffectTarget);
+        var buff = new BuffEntity(buffId, Guid.NewGuid().ToString(), level, gameContext.Caster, gameContext.EffectTarget);
         _buffs.Add(buff);
         return buff;
     }

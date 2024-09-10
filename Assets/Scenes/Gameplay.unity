@@ -2315,6 +2315,7 @@ MonoBehaviour:
   _nameText: {fileID: 1656281964}
   _healthBarView: {fileID: 428838939}
   _energyBarView: {fileID: 428838938}
+  _buffCollectionView: {fileID: 428838940}
 --- !u!114 &428838938
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2361,7 +2362,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4fcf8b7e265e034592db1863b254789, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _buffViewFactory: {fileID: 0}
+  _buffViewFactory: {fileID: 684498601}
   _buffViewParent: {fileID: 802284647}
 --- !u!1 &449283836
 GameObject:
@@ -7728,6 +7729,7 @@ MonoBehaviour:
   _nameText: {fileID: 317015267}
   _healthBarView: {fileID: 1996861976}
   _energyBarView: {fileID: 1996861978}
+  _buffCollectionView: {fileID: 1996861979}
 --- !u!114 &1996861978
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7755,7 +7757,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4fcf8b7e265e034592db1863b254789, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _buffViewFactory: {fileID: 0}
+  _buffViewFactory: {fileID: 213086066}
   _buffViewParent: {fileID: 415583735}
 --- !u!1 &2004047650
 GameObject:

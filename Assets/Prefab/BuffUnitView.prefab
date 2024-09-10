@@ -50,6 +50,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 270202c354fa0c041881dee3885b5fc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _buffIcon: {fileID: 2451288658000177863}
+  _levelText: {fileID: 1754664810024585105}
 --- !u!1 &2612449294720998422
 GameObject:
   m_ObjectHideFlags: 0

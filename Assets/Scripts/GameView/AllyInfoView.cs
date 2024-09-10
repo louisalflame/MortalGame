@@ -15,6 +15,9 @@ public class AllyInfoView : MonoBehaviour
 
     [SerializeField]
     private EnergyBarView _energyBarView;
+
+    [SerializeField]
+    private BuffCollectionView _buffCollectionView;
     
     private IGameplayStatusWatcher _statusWatcher;
 
@@ -55,5 +58,10 @@ public class AllyInfoView : MonoBehaviour
     {
         _healthBarView.SetHealth(getShieldEvent.Hp, getShieldEvent.MaxHp);
         _healthBarView.SetShield(getShieldEvent.Dp);    
+    }
+
+    public void AddBuff(AddBuffEvent addBuffEvent)
+    {
+        _buffCollectionView.AddBuff(addBuffEvent.Buff);
     }
 }

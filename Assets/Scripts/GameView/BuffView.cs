@@ -10,9 +10,21 @@ public class BuffView : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI _levelText;
 
+    public void SetBuffInfo(BuffInfo buffInfo)
+    {
+        _levelText.text = buffInfo.Level.ToString();
+    }
+
     public void Reset()
     {
         _buffIcon.sprite = null;
         _levelText.text = string.Empty;
     }
+}
+
+public class BuffInfo
+{
+    public string BuffId;
+    public string BuffIdentity;
+    public int Level;
 }

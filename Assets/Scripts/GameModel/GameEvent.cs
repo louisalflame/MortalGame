@@ -172,9 +172,9 @@ public class GetShieldEvent : HealthEvent
 public class AddBuffEvent : IGameEvent
 {
     public Faction Faction;
-    public BuffEntity Buff;
+    public BuffInfo Buff;
 
-    public AddBuffEvent(PlayerEntity player, BuffEntity buff)
+    public AddBuffEvent(PlayerEntity player, BuffInfo buff)
     {
         Faction = player.Faction;
         Buff = buff;
