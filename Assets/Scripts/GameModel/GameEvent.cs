@@ -180,3 +180,25 @@ public class AddBuffEvent : IGameEvent
         Buff = buff;
     }
 }
+public class UpdateBuffEvent : IGameEvent
+{
+    public Faction Faction;
+    public BuffInfo Buff;
+
+    public UpdateBuffEvent(PlayerEntity player, BuffInfo buff)
+    {
+        Faction = player.Faction;
+        Buff = buff;
+    }
+}
+public class RemoveBuffEvent : IGameEvent
+{
+    public Faction Faction;
+    public BuffInfo Buff;
+
+    public RemoveBuffEvent(PlayerEntity player, BuffInfo buff)
+    {
+        Faction = player.Faction;
+        Buff = buff;
+    }
+}

@@ -22,3 +22,14 @@ public class ThisCardCost : IIntegerValue
         return gameContext.UsingCard.Cost;
     }
 }
+
+[Serializable]
+public class ConstInteger : IIntegerValue
+{
+    public int Value;
+
+    public int Eval(GameStatus gameStatus, GameContext gameContext)
+    {
+        return Value;
+    }
+}

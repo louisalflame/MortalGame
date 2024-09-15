@@ -64,24 +64,50 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: OnUseEffects
+    - Name: Effects
       Entry: 7
-      Data: 3|ICardEffect[], Assembly-CSharp
+      Data: 3|System.Collections.Generic.Dictionary`2[[CardTiming, Assembly-CSharp],[ICardEffect[],
+        Assembly-CSharp]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 4|System.Collections.Generic.EnumEqualityComparer`1[[CardTiming, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 4|ShieldEffect, Assembly-CSharp
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 1
+    - Name: $v
+      Entry: 7
+      Data: 5|ICardEffect[], Assembly-CSharp
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 6|ShieldEffect, Assembly-CSharp
     - Name: Targets
       Entry: 7
-      Data: 5|ThisPlayer, Assembly-CSharp
+      Data: 7|ThisPlayer, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
     - Name: Value
       Entry: 7
-      Data: 6|ThisCardPower, Assembly-CSharp
+      Data: 8|ThisCardPower, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -94,24 +120,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: OnHandEffects
-      Entry: 7
-      Data: 7|ICardEffect[], Assembly-CSharp
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
     - Name: 
       Entry: 8
       Data: 
-    - Name: OnDeckEffects
-      Entry: 7
-      Data: 8|ICardEffect[], Assembly-CSharp
-    - Name: 
-      Entry: 12
-      Data: 0
     - Name: 
       Entry: 13
       Data: 

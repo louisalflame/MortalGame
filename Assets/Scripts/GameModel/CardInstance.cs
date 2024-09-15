@@ -19,6 +19,7 @@ public class CardInstance
     public ICardEffect[] OnUseEffects;
     public ICardEffect[] OnHandEffects;
     public ICardEffect[] OnDeckEffects;
+    public IReadOnlyDictionary<CardTiming, ICardEffect[]> Effects;
 
     public string OriginCardDataId;
 
@@ -35,10 +36,10 @@ public class CardInstance
             Cost = cardData.Cost,
             Power = cardData.Power,
             Selectables = cardData.Selectables.ToList(),
-            OnUseEffects = cardData.OnUseEffects.ToArray(),
-            OnHandEffects = cardData.OnHandEffects.ToArray(),
-            OnDeckEffects = cardData.OnDeckEffects.ToArray(),
-
+            Effects = cardData.Effects.ToDictionary(
+                pair => pair.Key,
+                pair => pair.Value.ToArray()
+            ),
             OriginCardDataId = cardData.ID,
         };
     }

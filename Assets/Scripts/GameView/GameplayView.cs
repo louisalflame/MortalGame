@@ -75,6 +75,9 @@ public class GameplayView : MonoBehaviour
                 case AddBuffEvent addBuffEvent:
                     _AddBuffView(addBuffEvent);
                     break;
+                case UpdateBuffEvent updateBuffEvent:
+                    _UpdateBuffView(updateBuffEvent);
+                    break;
             }
         }
     }
@@ -220,6 +223,18 @@ public class GameplayView : MonoBehaviour
                 break;
             case Faction.Enemy:
                 _enemyInfoView.AddBuff(addBuffEvent);
+                break;
+        }
+    }
+    private void _UpdateBuffView(UpdateBuffEvent updateBuffEvent)
+    {
+        switch (updateBuffEvent.Faction)
+        {
+            case Faction.Ally:
+                _allyInfoView.UpdateBuff(updateBuffEvent);
+                break;
+            case Faction.Enemy:
+                _enemyInfoView.UpdateBuff(updateBuffEvent);
                 break;
         }
     }

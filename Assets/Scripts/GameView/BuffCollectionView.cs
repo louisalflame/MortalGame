@@ -25,4 +25,20 @@ public class BuffCollectionView : MonoBehaviour
         _buffViews.Add(buffView);
         _buffViewDict.Add(buffInfo.BuffIdentity, buffView);
     }
+    public void RemoveBuff(BuffInfo buffInfo)
+    {
+        if (_buffViewDict.TryGetValue(buffInfo.BuffIdentity, out var buffView))
+        {
+            _buffViews.Remove(buffView);
+            _buffViewDict.Remove(buffInfo.BuffIdentity);
+            _buffViewFactory.RecycleBuffView(buffView);
+        }
+    }
+    public void UpdateBuff(BuffInfo buffInfo)
+    {
+        if (_buffViewDict.TryGetValue(buffInfo.BuffIdentity, out var buffView))
+        {
+            buffView.SetBuffInfo(buffInfo);
+        }
+    }
 }

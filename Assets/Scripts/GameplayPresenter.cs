@@ -15,11 +15,12 @@ public class GameplayPresenter : IGameplayActionReciever
 
     public GameplayPresenter(
         GameplayView gameplayView,
-        GameStatus gameStatus
+        GameStatus gameStatus,
+        GameContextManager gameContextManager
     )
     {
         _gameplayView = gameplayView;
-        _gameplayManager = new GameplayManager(gameStatus);
+        _gameplayManager = new GameplayManager(gameStatus, gameContextManager);
 
         _gameplayView.Init(this, _gameplayManager);
     }

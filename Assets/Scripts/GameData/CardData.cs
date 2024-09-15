@@ -27,11 +27,7 @@ public class CardData
     public List<ITargetSelectable> Selectables = new List<ITargetSelectable>();
 
     [BoxGroup("Effects")]
-    public ICardEffect[] OnUseEffects;
-    [BoxGroup("Effects")]
-    public ICardEffect[] OnHandEffects;
-    [BoxGroup("Effects")]
-    public ICardEffect[] OnDeckEffects;
+    public Dictionary<CardTiming, ICardEffect[]> Effects = new Dictionary<CardTiming, ICardEffect[]>();
 
     [TitleGroup("Localization")]
     public string TitleKey = string.Empty;

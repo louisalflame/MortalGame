@@ -21,6 +21,13 @@ public class BattleBuidler
         ); 
         return initialState;
     }
+    public GameContextManager ConstructBattleManager()
+    {
+        var cardLibrary = new CardLibrary(_context.CardTable);
+        var buffLibrary = new BuffLibrary(_context.BuffTable);
+
+        return new GameContextManager(cardLibrary, buffLibrary);
+    }
 
     private AllyEntity _ParseAlly(AllyInstance allyInstance)
     {
@@ -80,7 +87,10 @@ public class BattleBuidler
             Cost = cardInstance.Cost,
             Power = cardInstance.Power,
             Selectables = cardInstance.Selectables.ToArray(),
-            OnUseEffects = cardInstance.OnUseEffects.ToArray(),
+            Effects = cardInstance.Effects.ToDictionary(
+                pair => pair.Key,
+                pair => pair.Value.ToArray()
+            ),
             OriginCardInstanceId = cardInstance.InstanceId,
         };
     }

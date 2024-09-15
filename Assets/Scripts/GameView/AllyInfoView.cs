@@ -64,4 +64,12 @@ public class AllyInfoView : MonoBehaviour
     {
         _buffCollectionView.AddBuff(addBuffEvent.Buff);
     }
+    public void RemoveBuff(RemoveBuffEvent removeBuffEvent)
+    {
+        _buffCollectionView.RemoveBuff(removeBuffEvent.Buff);
+    }
+    public void UpdateBuff(UpdateBuffEvent updateBuffEvent)
+    {
+        _buffCollectionView.UpdateBuff(updateBuffEvent.Buff);
+    }
 }

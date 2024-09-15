@@ -93,3 +93,9 @@ public class AddBuffEffect : ICardEffect
     public string BuffId;
     public IIntegerValue Level;
 }
+[Serializable]
+public class RemoveBuffEffect : ICardEffect
+{
+    public ITargetPlayerValue Targets;
+    public string BuffId;
+}

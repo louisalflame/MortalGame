@@ -18,7 +18,7 @@ public class CardEntity
     
     public IReadOnlyCollection<ITargetSelectable> Selectables;
 
-    public IReadOnlyCollection<ICardEffect> OnUseEffects;
+    public IReadOnlyDictionary<CardTiming, ICardEffect[]> Effects;
 
     public string OriginCardInstanceId;
 

@@ -21,9 +21,10 @@ public class GameplayManager : IGameplayStatusWatcher
     public GameResult GameResult { get{ return _gameResult; } }
     public GameStatus GameStatus { get{ return _gameStatus; } }
 
-    public GameplayManager(GameStatus initialState)
+    public GameplayManager(GameStatus initialState, GameContextManager contextManager)
     {
         _gameStatus = initialState;
+        _contextMgr = contextManager;
     }
 
     public void Start()
@@ -31,7 +32,6 @@ public class GameplayManager : IGameplayStatusWatcher
         _gameEvents = new List<IGameEvent>();
         _gameActions = new Queue<IGameAction>();
         _gameResult = null;
-        _contextMgr = new GameContextManager();
 
         _gameStatus = _gameStatus.With(state: GameState.TurnStart);
         Debug.Log($"-- goto state:{_gameStatus.State} --");
@@ -226,10 +226,13 @@ public class GameplayManager : IGameplayStatusWatcher
                         GraveyardCardInfos = player.Graveyard.CardInfos
                     });
 
-                    foreach(var effect in usedCard.OnUseEffects)
+                    if(usedCard.Effects.TryGetValue(CardTiming.OnPlayCard, out var onPlayEffects))
                     {
-                        _contextMgr.SetUsingEffect(effect);
-                        _ApplyOnUseEffect();
+                        _contextMgr.SetCardTiming(CardTiming.OnPlayCard);
+                        foreach(var effect in onPlayEffects)
+                        {
+                            _ApplyCardEffect(effect);
+                        }
                         _contextMgr.Popout();
                     }
                 }
@@ -303,8 +306,9 @@ public class GameplayManager : IGameplayStatusWatcher
         }
     }
 
-    private void _ApplyOnUseEffect()
+    private void _ApplyCardEffect(ICardEffect usingEffect)
     {
+        _contextMgr.SetUsingEffect(usingEffect);
         switch(_contextMgr.Context.UsingEffect)
         {
             case DamageEffect damageEffect:
@@ -443,12 +447,42 @@ public class GameplayManager : IGameplayStatusWatcher
                 {
                     _contextMgr.SetEffectTarget(target);
                     var level = addBuffEffect.Level.Eval(_gameStatus, _contextMgr.Context);
-                    var buff = target.Character.BuffManager.AddBuff(_contextMgr.Context, addBuffEffect.BuffId, level);
-                    _gameEvents.Add(new AddBuffEvent(target, buff.ToInfo()));
+                    if (target.Character.BuffManager.AddBuff(
+                        _contextMgr.BuffLibrary, 
+                        _contextMgr.Context, 
+                        addBuffEffect.BuffId, 
+                        level,
+                        out BuffEntity resultBuff))
+                    {
+                        _gameEvents.Add(new AddBuffEvent(target, resultBuff.ToInfo()));
+                    }
+                    else
+                    {
+                        _gameEvents.Add(new UpdateBuffEvent(target, resultBuff.ToInfo()));
+                    }
+                    _contextMgr.Popout();
+                }
+                break;
+            }
+            case RemoveBuffEffect removeBuffEffect:
+            {
+                var targets = removeBuffEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
+                foreach(var target in targets)
+                {
+                    _contextMgr.SetEffectTarget(target);
+                    if(target.Character.BuffManager.RemoveBuff(
+                        _contextMgr.BuffLibrary, 
+                        _contextMgr.Context, 
+                        removeBuffEffect.BuffId,
+                        out BuffEntity resultBuff))
+                    {
+                        _gameEvents.Add(new RemoveBuffEvent(target, resultBuff.ToInfo()));
+                    }
                     _contextMgr.Popout();
                 }
                 break;
             }
         }
+        _contextMgr.Popout();
     }
 }

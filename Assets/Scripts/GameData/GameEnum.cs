@@ -26,3 +26,15 @@ public enum EnergyLoseType
     Consume,
 
 }
+
+public enum CardTiming
+{
+    None = 0,
+    OnPlayCard,
+}
+
+public enum BuffTiming
+{
+    None = 0,
+    OnTurnStart,
+}
