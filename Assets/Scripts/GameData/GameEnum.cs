@@ -38,3 +38,36 @@ public enum BuffTiming
     None = 0,
     OnTurnStart,
 }
+
+public enum PropertyDuration
+{
+    None = 0,
+    ThisTurn,
+    ThisBattle,
+    ThisGame
+}
+public enum CardProperty
+{
+    None = 0,
+    OnPlayExtraTimes,
+    ExtraPower,
+    ExtraCost,
+    OverWritePower,
+    OverWriteCost,
+    InitialPriority,
+    Preserved,
+    Sealed,
+}
+public enum BuffProperty
+{
+    None = 0,
+    AttackIncrease,
+    PenetrateAttackIncrease,
+    AdditionalAttackIncrease,
+    EffectiveAttackIncrease,
+    DefenseIncrease,
+    HealIncrease,
+    EnergyIncrease,
+    MaxHealthIncrease,
+    MaxEnergyIncrease,
+}

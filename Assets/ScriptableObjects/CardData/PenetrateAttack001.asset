@@ -64,70 +64,13 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: OnUseEffects
-      Entry: 7
-      Data: 3|ICardEffect[], Assembly-CSharp
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 4|AddBuffEffect, Assembly-CSharp
-    - Name: Targets
-      Entry: 7
-      Data: 5|ThisPlayer, Assembly-CSharp
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: BuffId
-      Entry: 1
-      Data: ComboAttack
-    - Name: Level
-      Entry: 7
-      Data: 6|ThisCardCost, Assembly-CSharp
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: OnHandEffects
-      Entry: 7
-      Data: 7|ICardEffect[], Assembly-CSharp
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: OnDeckEffects
-      Entry: 7
-      Data: 8|ICardEffect[], Assembly-CSharp
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: Effects
       Entry: 7
-      Data: 9|Unity.VisualScripting.Dictionary`2[[CardTiming, Assembly-CSharp],[ICardEffect[],
-        Assembly-CSharp]], Unity.VisualScripting.Core
+      Data: 3|System.Collections.Generic.Dictionary`2[[CardTiming, Assembly-CSharp],[ICardEffect[],
+        Assembly-CSharp]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 10|System.Collections.Generic.EnumEqualityComparer`1[[CardTiming, Assembly-CSharp]],
+      Data: 4|System.Collections.Generic.EnumEqualityComparer`1[[CardTiming, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -149,22 +92,22 @@ MonoBehaviour:
       Data: 1
     - Name: $v
       Entry: 7
-      Data: 11|ICardEffect[], Assembly-CSharp
+      Data: 5|ICardEffect[], Assembly-CSharp
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 12|PenetrateDamageEffect, Assembly-CSharp
+      Data: 6|PenetrateDamageEffect, Assembly-CSharp
     - Name: Targets
       Entry: 7
-      Data: 13|OppositePlayer, Assembly-CSharp
+      Data: 7|OppositePlayer, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
     - Name: Value
       Entry: 7
-      Data: 14|ThisCardPower, Assembly-CSharp
+      Data: 8|ThisCardPower, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -180,6 +123,19 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PropertyDatas
+      Entry: 7
+      Data: 9|System.Collections.Generic.List`1[[CardPropertyData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
     - Name: 
       Entry: 13
       Data: 

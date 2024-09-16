@@ -29,7 +29,17 @@ public class CardData
     [BoxGroup("Effects")]
     public Dictionary<CardTiming, ICardEffect[]> Effects = new Dictionary<CardTiming, ICardEffect[]>();
 
+    [BoxGroup("Properties")]
+    public List<CardPropertyData> PropertyDatas = new List<CardPropertyData>();
+
     [TitleGroup("Localization")]
     public string TitleKey = string.Empty;
     public string InfoKey = string.Empty;
+}
+
+public class CardPropertyData
+{
+    public CardProperty Property;
+    public PropertyDuration Duration;
+    public IIntegerValue Value;
 }
