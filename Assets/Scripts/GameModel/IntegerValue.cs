@@ -33,3 +33,12 @@ public class ConstInteger : IIntegerValue
         return Value;
     }
 }
+
+[Serializable]
+public class ThisBuffLevel : IIntegerValue
+{
+    public int Eval(GameStatus gameStatus, GameContext gameContext)
+    {
+        return gameContext.UsingBuff.Level;
+    }
+}

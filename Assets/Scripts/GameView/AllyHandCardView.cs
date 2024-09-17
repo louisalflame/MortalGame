@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -21,7 +22,7 @@ public class AllyHandCardView : MonoBehaviour
     private float _widthInterval = 20f;
 
     private List<CardView> _cardViews = new List<CardView>();
-    private Dictionary<string, CardView> _cardViewDict = new Dictionary<string, CardView>();
+    private Dictionary<Guid, CardView> _cardViewDict = new Dictionary<Guid, CardView>();
     private IGameplayStatusWatcher _statusWatcher;
     private IGameplayActionReciever _reciever;
 
@@ -38,7 +39,7 @@ public class AllyHandCardView : MonoBehaviour
         cardView.SetCardInfo(drawCardEvent.NewCardInfo, _reciever);
 
         _cardViews.Add(cardView);
-        _cardViewDict.Add(drawCardEvent.NewCardInfo.CardIndentity, cardView);
+        _cardViewDict.Add(drawCardEvent.NewCardInfo.Indentity, cardView);
 
         if(_cardViews.Count > 0)
         {
@@ -48,10 +49,10 @@ public class AllyHandCardView : MonoBehaviour
 
     public void RemoveCardView(UsedCardEvent usedCardEvent)
     {
-        if(_cardViewDict.TryGetValue(usedCardEvent.UsedCardInfo.CardIndentity, out var cardView))
+        if(_cardViewDict.TryGetValue(usedCardEvent.UsedCardInfo.Indentity, out var cardView))
         {
             _cardViews.Remove(cardView);
-            _cardViewDict.Remove(usedCardEvent.UsedCardInfo.CardIndentity);
+            _cardViewDict.Remove(usedCardEvent.UsedCardInfo.Indentity);
             _cardViewFactory.RecycleCardView(cardView);
 
             if(_cardViews.Count > 0)
@@ -65,10 +66,10 @@ public class AllyHandCardView : MonoBehaviour
     {
         foreach(var cardInfo in recycleHandCardEvent.RecycledCardInfos)
         {
-            if(_cardViewDict.TryGetValue(cardInfo.CardIndentity, out var cardView))
+            if(_cardViewDict.TryGetValue(cardInfo.Indentity, out var cardView))
             {
                 _cardViews.Remove(cardView);
-                _cardViewDict.Remove(cardInfo.CardIndentity);
+                _cardViewDict.Remove(cardInfo.Indentity);
                 _cardViewFactory.RecycleCardView(cardView);
             }
         }

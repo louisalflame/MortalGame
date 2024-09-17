@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UniRx;
 using UniRx.Triggers;
@@ -26,7 +27,7 @@ public class CardView : MonoBehaviour
         _button.OnClickAsObservable()
             .Subscribe(_ => 
                 reciever.RecieveEvent(
-                    new UseCardAction{ CardIndentity = cardInfo.CardIndentity }))
+                    new UseCardAction{ CardIndentity = cardInfo.Indentity }))
             .AddTo(_disposables);
         _button.OnPointerEnterAsObservable()
             .Subscribe(_ => {})
@@ -44,7 +45,7 @@ public class CardView : MonoBehaviour
 
 public class CardInfo
 {
-    public string CardIndentity { get; private set; }
+    public Guid Indentity { get; private set; }
     public string Title { get; private set; }
     public string Info { get; private set; }
     public int Cost { get; private set; }
@@ -52,7 +53,7 @@ public class CardInfo
 
     public CardInfo(CardEntity card)
     {
-        CardIndentity = card.Indentity;
+        Indentity = card.Indentity;
         Title = card.Title;
         Info = card.Info;
         Cost = card.Cost;

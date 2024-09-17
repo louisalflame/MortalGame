@@ -33,7 +33,14 @@ public class BuffManager : IBuffManager
             }
         }
 
-        resultBuff = new BuffEntity(buffId, Guid.NewGuid().ToString(), level, gameContext.Caster, gameContext.EffectTarget);
+        var buffData = buffLibrary.GetBuffData(buffId);
+        resultBuff = new BuffEntity(
+            buffId, 
+            Guid.NewGuid(), 
+            level, 
+            gameContext.EffectTarget,
+            gameContext.CardCaster,
+            buffData);
         _buffs.Add(resultBuff);
         return true;
     }

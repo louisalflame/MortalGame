@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,7 +25,7 @@ public class BuffView : MonoBehaviour
 
 public class BuffInfo
 {
-    public string BuffId;
-    public string BuffIdentity;
+    public string Id;
+    public Guid Identity;
     public int Level;
 }

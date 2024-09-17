@@ -78,7 +78,7 @@ public class BattleBuidler
     private CardEntity _ParseCard(CardInstance cardInstance)
     {
         return new CardEntity(){
-            Indentity = Guid.NewGuid().ToString(),
+            Indentity = Guid.NewGuid(),
             Title = cardInstance.TitleKey,
             Info = cardInstance.InfoKey,
             Type = cardInstance.Type,

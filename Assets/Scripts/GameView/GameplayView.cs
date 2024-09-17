@@ -63,14 +63,8 @@ public class GameplayView : MonoBehaviour
                 case GainEnergyEvent gainEnergyEvent:
                     _gainEnergyView(gainEnergyEvent);
                     break;
-                case TakeDamageEvent takeDamageEvent:
-                    _TakeDamageView(takeDamageEvent);
-                    break;
-                case GetHealEvent getHealEvent:
-                    _GetHealView(getHealEvent);
-                    break;
-                case GetShieldEvent getShieldEvent:
-                    _GetShieldView(getShieldEvent);
+                case HealthEvent healthEvent:
+                    _updateHealthView(healthEvent);
                     break;
                 case AddBuffEvent addBuffEvent:
                     _AddBuffView(addBuffEvent);
@@ -177,39 +171,15 @@ public class GameplayView : MonoBehaviour
         }
     }
 
-    private void _TakeDamageView(TakeDamageEvent takeDamageEvent)
+    private void _updateHealthView(HealthEvent healthEvent)
     {
-        switch (takeDamageEvent.Faction)
+        switch (healthEvent.Faction)
         {
             case Faction.Ally:
-                _allyInfoView.UpdateHealth(takeDamageEvent);
+                _allyInfoView.UpdateHealth(healthEvent);
                 break;
             case Faction.Enemy:
-                _enemyInfoView.UpdateHealth(takeDamageEvent);
-                break;
-        }
-    }
-    private void _GetHealView(GetHealEvent getHealEvent)
-    {
-        switch (getHealEvent.Faction)
-        {
-            case Faction.Ally:
-                _allyInfoView.UpdateHealth(getHealEvent);
-                break;
-            case Faction.Enemy:
-                _enemyInfoView.UpdateHealth(getHealEvent);
-                break;
-        }
-    }
-    private void _GetShieldView(GetShieldEvent getShieldEvent)
-    {
-        switch (getShieldEvent.Faction)
-        {
-            case Faction.Ally:
-                _allyInfoView.UpdateHealth(getShieldEvent);
-                break;
-            case Faction.Enemy:
-                _enemyInfoView.UpdateHealth(getShieldEvent);
+                _enemyInfoView.UpdateHealth(healthEvent);
                 break;
         }
     }

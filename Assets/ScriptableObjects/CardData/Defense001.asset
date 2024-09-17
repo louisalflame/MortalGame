@@ -101,7 +101,7 @@ MonoBehaviour:
       Data: 6|ShieldEffect, Assembly-CSharp
     - Name: Targets
       Entry: 7
-      Data: 7|ThisPlayer, Assembly-CSharp
+      Data: 7|CardCaster, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 

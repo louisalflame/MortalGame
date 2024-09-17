@@ -37,6 +37,8 @@ public enum BuffTiming
 {
     None = 0,
     OnTurnStart,
+    OnExecuteEnd,
+    OnTurnEnd,
 }
 
 public enum PropertyDuration

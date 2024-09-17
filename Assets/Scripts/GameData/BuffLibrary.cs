@@ -8,5 +8,10 @@ public class BuffLibrary
     public BuffLibrary(IReadOnlyDictionary<string, BuffData> buffs)
     {
         _buffs = new Dictionary<string, BuffData>(buffs);
-    }   
+    }
+
+    public BuffData GetBuffData(string buffId)
+    {
+        return _buffs[buffId];
+    }
 }
