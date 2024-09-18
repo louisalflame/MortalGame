@@ -40,8 +40,9 @@ public class HandCardEntity : IHandCardEntity
 
     public IReadOnlyCollection<CardEntity> ClearHand()
     {
-        var recycleCards = _cards.ToList();
-        _cards = new List<CardEntity>();
+        var preservedCards = _cards.Where(c => c.HasProperty(CardProperty.Preserved)).ToList();
+        var recycleCards = _cards.Except(preservedCards).ToList();
+        _cards = preservedCards;
         return recycleCards;
     }
 }

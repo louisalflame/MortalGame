@@ -31,3 +31,18 @@ public enum CardTheme
     BeggarClan,
     DianCang
 }
+
+public enum CardTiming
+{
+    None = 0,
+    OnPlayCard,
+}
+
+public enum CardProperty
+{
+    None = 0,
+    OnPlayExtraTimes,
+    InitialPriority,
+    Preserved,
+    Sealed,
+}

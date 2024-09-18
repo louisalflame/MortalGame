@@ -20,6 +20,6 @@ public class BuffData
 public class BuffPropertyData
 {
     public BuffProperty Property;
-    public PropertyDuration Duration;
+    public BuffPropertyDuration Duration;
     public IIntegerValue Value;
 }

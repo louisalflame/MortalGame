@@ -89,9 +89,13 @@ public class BattleBuidler
             Selectables = cardInstance.Selectables.ToArray(),
             Effects = cardInstance.Effects.ToDictionary(
                 pair => pair.Key,
-                pair => pair.Value.ToArray()
+                pair => pair.Value.ToList()
             ),
-            OriginCardInstanceId = cardInstance.InstanceId,
+            Properties = cardInstance.PropertyDatas.ToDictionary(
+                pair => pair.Key,
+                pair => pair.Value.Select(data => data.CreateEntity()).ToList()
+            ),
+            OriginCardInstanceGuid = cardInstance.InstanceGuid,
         };
     }
 }

@@ -1,5 +1,12 @@
 using UnityEngine;
 
+public enum AlgorithmType
+{
+    None = 0,
+    Add,
+    Multiply,
+    Overwrite
+}
 public enum Faction
 {
     None = 0,
@@ -27,11 +34,6 @@ public enum EnergyLoseType
 
 }
 
-public enum CardTiming
-{
-    None = 0,
-    OnPlayCard,
-}
 
 public enum BuffTiming
 {
@@ -41,24 +43,12 @@ public enum BuffTiming
     OnTurnEnd,
 }
 
-public enum PropertyDuration
+public enum BuffPropertyDuration
 {
     None = 0,
     ThisTurn,
     ThisBattle,
     ThisGame
-}
-public enum CardProperty
-{
-    None = 0,
-    OnPlayExtraTimes,
-    ExtraPower,
-    ExtraCost,
-    OverWritePower,
-    OverWriteCost,
-    InitialPriority,
-    Preserved,
-    Sealed,
 }
 public enum BuffProperty
 {

@@ -199,7 +199,6 @@ public class GameplayManager : IGameplayStatusWatcher
     }   
     private void _FinishEnemyExecuteTurn()
     {
-        Debug.Log($"_FinishEnemyExecuteTurn");
         _TriggerBuffs(_gameStatus.Enemy, BuffTiming.OnExecuteEnd);
 
         _gameActions.Clear();

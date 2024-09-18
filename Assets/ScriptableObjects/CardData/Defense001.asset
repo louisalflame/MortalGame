@@ -131,11 +131,63 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 9|System.Collections.Generic.List`1[[CardPropertyData, Assembly-CSharp]],
+      Data: 9|System.Collections.Generic.Dictionary`2[[CardProperty, Assembly-CSharp],[CardPropertyData[],
+        Assembly-CSharp]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 10|System.Collections.Generic.EnumEqualityComparer`1[[CardProperty, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 3
+    - Name: $v
+      Entry: 7
+      Data: 11|CardPropertyData[], Assembly-CSharp
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 12|CardPropertyData, Assembly-CSharp
+    - Name: Lifetime
+      Entry: 7
+      Data: 13|Always, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Algorithm
+      Entry: 3
+      Data: 0
+    - Name: InitValue
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 

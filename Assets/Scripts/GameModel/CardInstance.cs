@@ -1,10 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 public class CardInstance
 {
-    public string InstanceId;
+    public Guid InstanceGuid;
     public string TitleKey;
     public string InfoKey;
 
@@ -20,6 +20,7 @@ public class CardInstance
     public ICardEffect[] OnHandEffects;
     public ICardEffect[] OnDeckEffects;
     public IReadOnlyDictionary<CardTiming, ICardEffect[]> Effects;
+    public IReadOnlyDictionary<CardProperty, CardPropertyData[]> PropertyDatas;
 
     public string OriginCardDataId;
 
@@ -27,7 +28,7 @@ public class CardInstance
     {
         return new CardInstance()
         {
-            InstanceId = System.Guid.NewGuid().ToString(),
+            InstanceGuid = Guid.NewGuid(),
             TitleKey = cardData.TitleKey,
             InfoKey = cardData.InfoKey,
             Rarity = cardData.Rarity,
@@ -37,6 +38,10 @@ public class CardInstance
             Power = cardData.Power,
             Selectables = cardData.Selectables.ToList(),
             Effects = cardData.Effects.ToDictionary(
+                pair => pair.Key,
+                pair => pair.Value.ToArray()
+            ),
+            PropertyDatas = cardData.PropertyDatas.ToDictionary(
                 pair => pair.Key,
                 pair => pair.Value.ToArray()
             ),

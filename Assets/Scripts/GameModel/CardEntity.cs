@@ -19,9 +19,10 @@ public class CardEntity
     
     public IReadOnlyCollection<ITargetSelectable> Selectables;
 
-    public IReadOnlyDictionary<CardTiming, ICardEffect[]> Effects;
+    public IReadOnlyDictionary<CardTiming, List<ICardEffect>> Effects;
+    public IReadOnlyDictionary<CardProperty, List<CardPropertyEntity>> Properties;
 
-    public string OriginCardInstanceId;
+    public Guid OriginCardInstanceGuid;
 
     public bool IsDummy => this == DummyCard;
     public static CardEntity DummyCard = new CardEntity()
@@ -29,4 +30,3 @@ public class CardEntity
         Indentity = Guid.Empty,
     };
 }
-
