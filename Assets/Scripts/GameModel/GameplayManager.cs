@@ -228,6 +228,41 @@ public class GameplayManager : IGameplayStatusWatcher
             GraveyardCardInfos = _gameStatus.Enemy.Graveyard.CardInfos
         });
 
+        //update card timing
+        foreach(var c in _gameStatus.Ally.HandCard.Cards)
+        {
+            foreach(var property in c.Properties.Keys)
+            {
+                var propertyEntities = c.Properties[property].ToList();
+                foreach(var propertyEntity in propertyEntities)
+                {
+                    if (!propertyEntity.Lifetime.NextTurn())
+                    {
+                        Debug.Log($"remove property:{property} from card:{c.Title}");
+                        c.Properties[property].Remove(propertyEntity);
+                    }
+                }
+            }
+
+            c.Properties = c.Properties.Where(p => p.Value.Count > 0).ToDictionary(p => p.Key, p => p.Value);
+        }
+        foreach(var c in _gameStatus.Enemy.HandCard.Cards)
+        {
+            foreach(var property in c.Properties.Keys)
+            {
+                var propertyEntities = c.Properties[property].ToList();
+                foreach(var propertyEntity in propertyEntities)
+                {
+                    if (!propertyEntity.Lifetime.NextTurn())
+                    {
+                        c.Properties[property].Remove(propertyEntity);
+                    }
+                }
+            }
+
+            c.Properties = c.Properties.Where(p => p.Value.Count > 0).ToDictionary(p => p.Key, p => p.Value);
+        }
+
         _gameStatus = _gameStatus.With(
             state: GameState.TurnStart
         );

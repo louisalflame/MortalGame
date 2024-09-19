@@ -166,16 +166,19 @@ MonoBehaviour:
       Data: 12|CardPropertyData, Assembly-CSharp
     - Name: Lifetime
       Entry: 7
-      Data: 13|Always, Assembly-CSharp
+      Data: 13|CardPropertyTurnCountData, Assembly-CSharp
+    - Name: Turns
+      Entry: 3
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
-    - Name: Algorithm
-      Entry: 3
-      Data: 0
-    - Name: InitValue
-      Entry: 3
-      Data: 0
+    - Name: Value
+      Entry: 7
+      Data: 14|NoneValue, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 8
       Data: 

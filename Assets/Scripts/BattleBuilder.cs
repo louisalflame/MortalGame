@@ -91,10 +91,7 @@ public class BattleBuidler
                 pair => pair.Key,
                 pair => pair.Value.ToList()
             ),
-            Properties = cardInstance.PropertyDatas.ToDictionary(
-                pair => pair.Key,
-                pair => pair.Value.Select(data => data.CreateEntity()).ToList()
-            ),
+            Properties = cardInstance.CreateCardProperties(),
             OriginCardInstanceGuid = cardInstance.InstanceGuid,
         };
     }
