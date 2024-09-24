@@ -18,9 +18,9 @@ public class DeckCardView : MonoBehaviour
         _statusWatcher = statusWatcher;
         
         _deckButton.OnClickAsObservable()
-            .Subscribe(_ => Debug.Log($" Deck:[{_statusWatcher.GameStatus.Ally.Deck.Cards.Count}]  "))
+            .Subscribe(_ => Debug.Log($" Deck:[{_statusWatcher.GameStatus.Ally.CardManager.Deck.Cards.Count}]  "))
             .AddTo(_disposables);
-        _deckCountText.text = _statusWatcher.GameStatus.Ally.Deck.Cards.Count.ToString();
+        _deckCountText.text = _statusWatcher.GameStatus.Ally.CardManager.Deck.Cards.Count.ToString();
     }
 
     public void UpdateDeckView(DrawCardEvent drawCardEvent)

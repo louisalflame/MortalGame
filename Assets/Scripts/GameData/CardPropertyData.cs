@@ -2,35 +2,26 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class CardPropertyData
+public interface ICardPropertyData
+{
+    ICardPropertyEntity CreateEntity();
+}
+
+public class PreservedPropertyData : ICardPropertyData
 {
     public ICardPropertyLifetimeData Lifetime;
     public ICardPropertyValue Value;
 
-    public CardPropertyEntity CreateEntity()
+    public ICardPropertyEntity CreateEntity()
     {
-        return new CardPropertyEntity
-        {
-            Lifetime = Lifetime.CreateEntity(),
-            Value = Value
-        };
+        return new PreservedPropertyEntity(Lifetime.CreateEntity(), Value);
     }
 }
 
 public static class CardPropertyDataExtensions
 {
-    public static Dictionary<CardProperty, List<CardPropertyEntity>> CreateCardProperties(this CardInstance instance)
-    {
-        var properties = new Dictionary<CardProperty, List<CardPropertyEntity>>();
-        foreach (var pair in instance.PropertyDatas)
-        {
-            properties.Add(pair.Key, pair.Value.Select(data => data.CreateEntity()).ToList());
-        }
-        return properties;
-    }
-
     public static bool HasProperty(this CardEntity card, CardProperty property)
     { 
-        return card.Properties.ContainsKey(property);
+        return card.Properties.Any(p => p.Property == property);
     }
 }

@@ -146,21 +146,8 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 11|System.Collections.Generic.Dictionary`2[[CardProperty, Assembly-CSharp],[CardPropertyData[],
-        Assembly-CSharp]], mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 12|System.Collections.Generic.EnumEqualityComparer`1[[CardProperty, Assembly-CSharp]],
+      Data: 11|System.Collections.Generic.List`1[[ICardPropertyData, Assembly-CSharp]],
         mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 12
       Data: 0

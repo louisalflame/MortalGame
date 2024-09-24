@@ -18,9 +18,9 @@ public class GraveyardCardView : MonoBehaviour
         _statusWatcher = statusWatcher;
         
         _deckButton.OnClickAsObservable()
-            .Subscribe(_ => Debug.Log($" Graveyard:[{_statusWatcher.GameStatus.Ally.Graveyard.Cards.Count}]  "))
+            .Subscribe(_ => Debug.Log($" Graveyard:[{_statusWatcher.GameStatus.Ally.CardManager.Graveyard.Cards.Count}]  "))
             .AddTo(_disposables);
-        _graveyardCountText.text = _statusWatcher.GameStatus.Ally.Graveyard.Cards.Count.ToString();
+        _graveyardCountText.text = _statusWatcher.GameStatus.Ally.CardManager.Graveyard.Cards.Count.ToString();
     }
 
     public void UpdateDeckView(UsedCardEvent usedCardEvent)

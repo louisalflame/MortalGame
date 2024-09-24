@@ -210,57 +210,20 @@ public class GameplayManager : IGameplayStatusWatcher
 
     private void _TurnEnd()
     {
-        var recyclAllyCards = _gameStatus.Ally.HandCard.ClearHand();
-        _gameStatus.Ally.Graveyard.AddCards(recyclAllyCards);
-        _gameEvents.Add(new RecycleHandCardEvent(){
-            Faction = _gameStatus.Ally.Faction,
-            RecycledCardInfos = recyclAllyCards.Select(c => new CardInfo(c)).ToArray(),
-            HandCardInfos = _gameStatus.Ally.HandCard.CardInfos,
-            GraveyardCardInfos = _gameStatus.Ally.Graveyard.CardInfos
-        });
-
-        var recyclEnemyCards = _gameStatus.Enemy.HandCard.ClearHand();
-        _gameStatus.Enemy.Graveyard.AddCards(recyclEnemyCards);
-        _gameEvents.Add(new RecycleHandCardEvent(){
-            Faction = _gameStatus.Enemy.Faction,
-            RecycledCardInfos = recyclEnemyCards.Select(c => new CardInfo(c)).ToArray(),
-            HandCardInfos = _gameStatus.Enemy.HandCard.CardInfos,
-            GraveyardCardInfos = _gameStatus.Enemy.Graveyard.CardInfos
-        });
-
-        //update card timing
-        foreach(var c in _gameStatus.Ally.HandCard.Cards)
+        using(_contextMgr.SetExecutePlayer(_gameStatus.Ally))
         {
-            foreach(var property in c.Properties.Keys)
-            {
-                var propertyEntities = c.Properties[property].ToList();
-                foreach(var propertyEntity in propertyEntities)
-                {
-                    if (!propertyEntity.Lifetime.NextTurn())
-                    {
-                        Debug.Log($"remove property:{property} from card:{c.Title}");
-                        c.Properties[property].Remove(propertyEntity);
-                    }
-                }
-            }
-
-            c.Properties = c.Properties.Where(p => p.Value.Count > 0).ToDictionary(p => p.Key, p => p.Value);
+            _gameEvents.AddRange(
+                _gameStatus.Ally.CardManager.ClearHandOnTurnEnd(_contextMgr));
+            _gameEvents.AddRange(
+                _gameStatus.Ally.CardManager.UpdateCardsOnTiming(_contextMgr, CardTiming.TurnEnd));
         }
-        foreach(var c in _gameStatus.Enemy.HandCard.Cards)
-        {
-            foreach(var property in c.Properties.Keys)
-            {
-                var propertyEntities = c.Properties[property].ToList();
-                foreach(var propertyEntity in propertyEntities)
-                {
-                    if (!propertyEntity.Lifetime.NextTurn())
-                    {
-                        c.Properties[property].Remove(propertyEntity);
-                    }
-                }
-            }
 
-            c.Properties = c.Properties.Where(p => p.Value.Count > 0).ToDictionary(p => p.Key, p => p.Value);
+        using(_contextMgr.SetExecutePlayer(_gameStatus.Enemy))
+        {
+            _gameEvents.AddRange(
+                _gameStatus.Enemy.CardManager.ClearHandOnTurnEnd(_contextMgr));
+            _gameEvents.AddRange(
+                _gameStatus.Enemy.CardManager.UpdateCardsOnTiming(_contextMgr, CardTiming.TurnEnd));
         }
 
         _gameStatus = _gameStatus.With(
@@ -273,7 +236,7 @@ public class GameplayManager : IGameplayStatusWatcher
     {
         using(_contextMgr.SetCardCaster(player))
         {
-            var usedCard = player.HandCard.Cards.FirstOrDefault(c => c.Indentity == CardIndentity);
+            var usedCard = player.CardManager.HandCard.Cards.FirstOrDefault(c => c.Indentity == CardIndentity);
             if (usedCard != null)
             {
                 using(_contextMgr.SetUsingCard(usedCard))
@@ -284,15 +247,15 @@ public class GameplayManager : IGameplayStatusWatcher
                         var loseEnergyResult = player.Character.EnergyManager.ConsumeEnergy(cardRuntimCost);
                         _gameEvents.Add(new ConsumeEnergyEvent(player, loseEnergyResult));
 
-                        if (player.HandCard.RemoveCard(usedCard)) 
+                        if (player.CardManager.HandCard.RemoveCard(usedCard)) 
                         {
-                            player.Graveyard.AddCard(usedCard);
+                            player.CardManager.Graveyard.AddCard(usedCard);
                             var usedCardInfo = new CardInfo(usedCard);
                             _gameEvents.Add(new UsedCardEvent() {
                                 Faction = player.Faction,
                                 UsedCardInfo = usedCardInfo,
-                                HandCardInfos = player.HandCard.CardInfos,
-                                GraveyardCardInfos = player.Graveyard.CardInfos
+                                HandCardInfos = player.CardManager.HandCard.CardInfos,
+                                GraveyardCardInfos = player.CardManager.Graveyard.CardInfos
                             });
 
                             if(usedCard.Effects.TryGetValue(CardTiming.OnPlayCard, out var onPlayEffects))
@@ -314,7 +277,7 @@ public class GameplayManager : IGameplayStatusWatcher
 
     private void _DrawCardToMaxCount(PlayerEntity player)
     {
-        var needDrawCount = player.HandCard.MaxCount - player.HandCard.Cards.Count;
+        var needDrawCount = player.CardManager.HandCard.MaxCount - player.CardManager.HandCard.Cards.Count;
         _DrawCards(player, needDrawCount);
     }
 
@@ -322,35 +285,35 @@ public class GameplayManager : IGameplayStatusWatcher
     {
         for (int i = 0; i < drawCount; i++)
         {
-            if( player.Deck.Cards.Count == 0 &&
-                player.Graveyard.Cards.Count > 0)
+            if( player.CardManager.Deck.Cards.Count == 0 &&
+                player.CardManager.Graveyard.Cards.Count > 0)
             {
-                var graveyardCards = player.Graveyard.PopAllCards();
-                player.Deck.EnqueueCardsThenShuffle(graveyardCards);
+                var graveyardCards = player.CardManager.Graveyard.PopAllCards();
+                player.CardManager.Deck.EnqueueCardsThenShuffle(graveyardCards);
                 _gameEvents.Add(new RecycleGraveyardEvent() {
                     Faction = player.Faction,
-                    DeckCardInfos = player.Deck.CardInfos,
-                    GraveyardCardInfos = player.Graveyard.CardInfos
+                    DeckCardInfos = player.CardManager.Deck.CardInfos,
+                    GraveyardCardInfos = player.CardManager.Graveyard.CardInfos
                 });
             }
 
-            if (player.Deck.Cards.Count > 0)
+            if (player.CardManager.Deck.Cards.Count > 0)
                 _DrawCard(player);
         }
     }
 
     private void _DrawCard(PlayerEntity player)
     {
-        if (player.Deck.PopCard(out CardEntity newCard))
+        if (player.CardManager.Deck.PopCard(out CardEntity newCard))
         {
-            player.HandCard.AddCard(newCard);
+            player.CardManager.HandCard.AddCard(newCard);
 
             var newCardInfo = new CardInfo(newCard);
             _gameEvents.Add(new DrawCardEvent(){
                 Faction = player.Faction,
                 NewCardInfo = newCardInfo,
-                HandCardInfos = player.HandCard.CardInfos,
-                DeckCardInfos = player.Deck.CardInfos,
+                HandCardInfos = player.CardManager.HandCard.CardInfos,
+                DeckCardInfos = player.CardManager.Deck.CardInfos,
             });
         }
     }

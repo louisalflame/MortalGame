@@ -21,6 +21,16 @@ public class CharacterEntity : ICharacterEntity
     public int CurrentEnergy => EnergyManager.Energy;
     public int MaxEnergy => EnergyManager.MaxEnergy;
 
+    public CharacterEntity(
+        int currentHealth,
+        int maxHealth,
+        int currentEnergy,
+        int maxEnergy)
+    {
+        HealthManager = new HealthManager(currentHealth, maxHealth);
+        EnergyManager = new EnergyManager(currentEnergy, maxEnergy);
+        BuffManager = new BuffManager();
+    }
 }
 
 

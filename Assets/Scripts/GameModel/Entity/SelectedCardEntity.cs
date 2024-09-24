@@ -10,9 +10,10 @@ public class SelectedCardEntity
     public IReadOnlyCollection<CardInfo> CardInfos =>
         Cards.Select(c => new CardInfo(c)).ToArray();
 
-    public SelectedCardEntity()
+    public SelectedCardEntity(int selectedCardMaxCount, IEnumerable<CardEntity> cards)
     {
-        Cards = new List<CardEntity>();
+        MaxCount = selectedCardMaxCount;
+        Cards = cards.ToList();
     }
  
     public SelectedCardEntity EnqueueCard(CardEntity card)
@@ -20,11 +21,7 @@ public class SelectedCardEntity
         var newCards = new List<CardEntity>(Cards);
         newCards.Add(card);
 
-        return new SelectedCardEntity
-        {
-            MaxCount = MaxCount,
-            Cards = newCards
-        };
+        return new SelectedCardEntity(MaxCount, newCards);
     }
 
     public SelectedCardEntity DequeueCard(out CardEntity card)
@@ -32,11 +29,7 @@ public class SelectedCardEntity
         card = Cards.FirstOrDefault();
         var newCards = new List<CardEntity>(Cards.Skip(1));
 
-        return new SelectedCardEntity
-        {
-            MaxCount = MaxCount,
-            Cards = newCards
-        };
+        return new SelectedCardEntity(MaxCount, newCards);
     }
 }
 

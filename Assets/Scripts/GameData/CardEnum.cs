@@ -25,24 +25,31 @@ public enum CardRarity
 public enum CardTheme
 {
     None = 0,
-    TangSect,
-    Emei,
-    Songshan,
-    BeggarClan,
-    DianCang
+    TangSect,   // 唐門
+    Emei,       // 峨嵋
+    Songshan,   // 嵩山
+    BeggarClan, // 丐幫
+    DianCang    // 點蒼
 }
 
 public enum CardTiming
 {
     None = 0,
     OnPlayCard,
+    TurnEnd,
 }
 
 public enum CardProperty
 {
     None = 0,
-    OnPlayExtraTimes,
+    EffectTimes,
+    RecycleTimes,
+    PowerAdjust,
+    CostAdjust,
     InitialPriority,
     Preserved,
     Sealed,
+    Consumable,
+    AutoDispose,
+    Removable,
 }

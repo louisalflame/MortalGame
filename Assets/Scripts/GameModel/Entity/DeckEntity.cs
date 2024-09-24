@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,7 +8,7 @@ public interface IDeckEntity
     IReadOnlyCollection<CardEntity> Cards { get; }
     IReadOnlyCollection<CardInfo> CardInfos { get; }
     bool PopCard(out CardEntity card);
-    void EnqueueCardsThenShuffle(IReadOnlyCollection<CardEntity> cards);
+    void EnqueueCardsThenShuffle(IEnumerable<CardEntity> cards);
 }
 public class DeckEntity : IDeckEntity
 {
@@ -17,10 +18,11 @@ public class DeckEntity : IDeckEntity
     public IReadOnlyCollection<CardInfo> CardInfos =>
         Cards.Select(c => new CardInfo(c)).ToArray();
     
-    public DeckEntity(IReadOnlyCollection<CardEntity> cards)
+    public DeckEntity(IEnumerable<CardInstance> cards)
     {
         _cards = new List<CardEntity>();
-        EnqueueCardsThenShuffle(cards);
+        EnqueueCardsThenShuffle(
+            cards.Select(c => CardEntity.Create(c)));
     }
 
     public bool PopCard(out CardEntity card)
@@ -34,7 +36,7 @@ public class DeckEntity : IDeckEntity
         _cards = Cards.Skip(1).ToList();
         return true;
     }
-    public void EnqueueCardsThenShuffle(IReadOnlyCollection<CardEntity> cards)
+    public void EnqueueCardsThenShuffle(IEnumerable<CardEntity> cards)
     {
         _cards.AddRange(cards);
         
