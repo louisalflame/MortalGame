@@ -8,13 +8,14 @@ public interface IGameplayActionReciever
 
 public class GameplayPresenter : IGameplayActionReciever
 {
-    private GameplayView _gameplayView;
+    private IGameplayView _gameplayView;
     private GameplayManager _gameplayManager;
+    private UniTask _viewTask;
 
     public GameStatus GameStatus => _gameplayManager.GameStatus;
 
     public GameplayPresenter(
-        GameplayView gameplayView,
+        IGameplayView gameplayView,
         GameStatus gameStatus,
         GameContextManager gameContextManager
     )
@@ -30,14 +31,17 @@ public class GameplayPresenter : IGameplayActionReciever
         Debug.Log("-- GameplayPresenter.Run --");
 
         _gameplayManager.Start();
- 
+        _viewTask = _gameplayView.Run();
+
         while(!_gameplayManager.IsEnd)
         {
             await UniTask.NextFrame();
-
+            
             var events = _gameplayManager.PopAllEvents();
             _gameplayView.Render(events, this);
         }
+
+        await _viewTask;
 
         return _gameplayManager.GameResult;
     }

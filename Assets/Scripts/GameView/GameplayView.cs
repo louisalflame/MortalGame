@@ -1,8 +1,26 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class GameplayView : MonoBehaviour
+public interface IGameplayView
+{
+    void Init(IGameplayActionReciever reciever, IGameplayStatusWatcher statusWatcher);
+    void Render(IReadOnlyCollection<IGameEvent> events, IGameplayActionReciever reciever);
+    UniTask Run();
+
+    void ClickDeckDetailPanel();
+    void ClickGraveyardDetailPanel();
+}
+
+public enum GameplayViewState
+{
+    Idle = 0,
+    DeckDetailPanel,
+    GraveyardDetailPanel,
+}
+
+public class GameplayView : MonoBehaviour, IGameplayView
 {
     [SerializeField]
     private AllyInfoView _allyInfoView;
@@ -15,9 +33,15 @@ public class GameplayView : MonoBehaviour
     [SerializeField]
     private DeckCardView _deckCardView;
     [SerializeField]
+    private DeckDetailPanel _deckDetailPanel;
+    [SerializeField]
     private GraveyardCardView _graveyardCardView;
     [SerializeField]
+    private GraveyardDetailPanel _graveyardDetailPanel;
+    [SerializeField]
     private SubmitView _submitView;
+
+    private GameplayViewState _state = GameplayViewState.Idle;
 
     public void Init(IGameplayActionReciever reciever, IGameplayStatusWatcher statusWatcher)
     {
@@ -25,9 +49,44 @@ public class GameplayView : MonoBehaviour
         _enemyInfoView.Init(statusWatcher);
         _allyHandCardView.Init(statusWatcher, reciever);
         _enemySelectedCardView.Init(statusWatcher, reciever);
-        _deckCardView.Init(statusWatcher);
-        _graveyardCardView.Init(statusWatcher);
+        _deckCardView.Init(statusWatcher, this);
+        _graveyardCardView.Init(statusWatcher, this);
         _submitView.Init(reciever);
+    }
+
+    public void ClickDeckDetailPanel()
+    {
+        if (_state == GameplayViewState.Idle)
+            _state = GameplayViewState.DeckDetailPanel;
+    }
+
+    public void ClickGraveyardDetailPanel()
+    {
+        if (_state == GameplayViewState.Idle)
+            _state = GameplayViewState.GraveyardDetailPanel;
+    }
+
+    public async UniTask Run()
+    {
+        while (true)
+        {
+            switch(_state)
+            {
+                case GameplayViewState.Idle:
+                    await UniTask.NextFrame();
+                    break;
+                case GameplayViewState.DeckDetailPanel:
+                    _state = GameplayViewState.DeckDetailPanel;
+                    await _deckDetailPanel.Run();
+                    _state = GameplayViewState.Idle;
+                    break;
+                case GameplayViewState.GraveyardDetailPanel:
+                    _state = GameplayViewState.GraveyardDetailPanel;
+                    await _graveyardDetailPanel.Run();
+                    _state = GameplayViewState.Idle;
+                    break;
+            }
+        }
     }
 
     public void Render(IReadOnlyCollection<IGameEvent> events, IGameplayActionReciever reciever) 
