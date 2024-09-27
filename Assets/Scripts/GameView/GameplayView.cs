@@ -113,8 +113,14 @@ public class GameplayView : MonoBehaviour, IGameplayView
                 case EnemyUnselectedCardEvent enemyUnselectedCardEvent:
                     _UnselectCardView(enemyUnselectedCardEvent);
                     break;
+                case PlayerExecuteStartEvent playerExecuteStartEvent:
+                    _PlayerExecuteStart(playerExecuteStartEvent);
+                    break;
                 case UsedCardEvent usedCardEvent:
                     _UsedCardView(usedCardEvent);
+                    break;
+                case PlayerExecuteEndEvent playerExecuteEndEvent:
+                    _PlayerExecuteEnd(playerExecuteEndEvent);
                     break;
                 case ConsumeEnergyEvent consumeEnergyEvent:
                     _ConsumeEnergyView(consumeEnergyEvent);
@@ -191,6 +197,14 @@ public class GameplayView : MonoBehaviour, IGameplayView
         _enemySelectedCardView.RemoveCardView(enemyUnselectedCardEvent);
     }
 
+    private void _PlayerExecuteStart(PlayerExecuteStartEvent playerExecuteStartEvent)
+    {
+        _allyHandCardView.EnableHandCardsUseCardAction(playerExecuteStartEvent);
+    }
+    private void _PlayerExecuteEnd(PlayerExecuteEndEvent playerExecuteEndEvent)
+    {
+        _allyHandCardView.DisableHandCardsUseCardAction(playerExecuteEndEvent);
+    }
     private void _UsedCardView(UsedCardEvent usedCardEvent)
     {
         switch (usedCardEvent.Faction)

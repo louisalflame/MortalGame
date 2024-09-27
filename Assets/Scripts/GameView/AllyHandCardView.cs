@@ -36,7 +36,7 @@ public class AllyHandCardView : MonoBehaviour
     {
         var cardView = _cardViewFactory.CreateCardView();
         cardView.transform.SetParent(_cardViewParent);
-        cardView.SetCardInfo(drawCardEvent.NewCardInfo, _reciever);
+        cardView.SetCardInfo(drawCardEvent.NewCardInfo);
 
         _cardViews.Add(cardView);
         _cardViewDict.Add(drawCardEvent.NewCardInfo.Indentity, cardView);
@@ -77,6 +77,27 @@ public class AllyHandCardView : MonoBehaviour
         if(_cardViews.Count > 0)
         {
             _RearrangeCardViews();
+        }
+    }
+
+    public void EnableHandCardsUseCardAction(PlayerExecuteStartEvent playerExecuteStartEvent)
+    {
+        foreach(var cardInfo in playerExecuteStartEvent.HandCardInfos)
+        {
+            if(_cardViewDict.TryGetValue(cardInfo.Indentity, out var cardView))
+            {
+                cardView.EnableUseCardAction(cardInfo, _reciever);
+            }
+        }
+    }
+    public void DisableHandCardsUseCardAction(PlayerExecuteEndEvent playerExecuteEndEvent)
+    {
+        foreach(var cardInfo in playerExecuteEndEvent.HandCardInfos)
+        {
+            if(_cardViewDict.TryGetValue(cardInfo.Indentity, out var cardView))
+            {
+                cardView.DisableUseCardAction();
+            }
         }
     }
 

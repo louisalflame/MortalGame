@@ -42,12 +42,22 @@ public class EnemyUnselectedCardEvent : IGameEvent
     public CardInfo SelectedCardInfo;
     public IReadOnlyCollection<CardInfo> SelectedCardInfos;
 }
+public class PlayerExecuteStartEvent : IGameEvent
+{
+    public Faction Faction;
+    public IReadOnlyCollection<CardInfo> HandCardInfos;
+}
 public class UsedCardEvent : IGameEvent
 {
     public Faction Faction;
     public CardInfo UsedCardInfo;
     public IReadOnlyCollection<CardInfo> HandCardInfos;
     public IReadOnlyCollection<CardInfo> GraveyardCardInfos;
+}
+public class PlayerExecuteEndEvent : IGameEvent
+{
+    public Faction Faction;
+    public IReadOnlyCollection<CardInfo> HandCardInfos;
 }
 
 public abstract class EnergyEvent : IGameEvent

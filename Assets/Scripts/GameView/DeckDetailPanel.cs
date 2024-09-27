@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
@@ -9,11 +11,16 @@ public class DeckDetailPanel : MonoBehaviour
     private Button[] _closeButtons;
     [SerializeField]
     private GameObject _panel;
+    [SerializeField]
+    private Transform _cardViewParent;
+    [SerializeField]
+    private CardViewFactory _cardViewFactory;
+
+    private IGameplayStatusWatcher _statusWatcher;
+    private Dictionary<Guid, CardView> _cardViewDict = new Dictionary<Guid, CardView>();
 
     public async UniTask Run()
     {
-        Debug.Log("-- DeckDetailPanel.Run --");
-        
         var isOpen = true;
         var disposables = new CompositeDisposable();
         foreach (var button in _closeButtons)
@@ -21,6 +28,15 @@ public class DeckDetailPanel : MonoBehaviour
             button.OnClickAsObservable()
                 .Subscribe(_ => isOpen = false)
                 .AddTo(disposables);
+        }
+
+        var cardInfos = _statusWatcher.GameStatus.Ally.CardManager.Graveyard.CardInfos;
+        foreach (var cardInfo in cardInfos)
+        {
+            var cardView = _cardViewFactory.CreateCardView();
+            cardView.transform.SetParent(_cardViewParent, false);
+            cardView.SetCardInfo(cardInfo);
+            _cardViewDict.Add(cardInfo.Indentity, cardView);
         }
         
         using (disposables)
@@ -34,5 +50,11 @@ public class DeckDetailPanel : MonoBehaviour
 
             _panel.SetActive(false);
         }
+
+        foreach (var cardView in _cardViewDict.Values)
+        {
+            _cardViewFactory.RecycleCardView(cardView);
+        }
+        _cardViewDict.Clear();
     }
 }

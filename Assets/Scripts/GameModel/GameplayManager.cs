@@ -132,6 +132,11 @@ public class GameplayManager : IGameplayStatusWatcher
 
     public void _PlayerExecute()
     {
+        _gameEvents.Add(new PlayerExecuteStartEvent() {
+            Faction = _gameStatus.Ally.Faction,
+            HandCardInfos = _gameStatus.Ally.CardManager.HandCard.CardInfos
+        });
+
         _TurnExecute(_gameStatus.Ally);
     }
     private void _EnemyExecute()
@@ -189,6 +194,11 @@ public class GameplayManager : IGameplayStatusWatcher
 
     private void _FinishPlayerExecuteTurn()
     {
+        _gameEvents.Add(new PlayerExecuteEndEvent(){
+            Faction = _gameStatus.Ally.Faction,
+            HandCardInfos = _gameStatus.Ally.CardManager.HandCard.CardInfos
+        });
+        
         _TriggerBuffs(_gameStatus.Ally, BuffTiming.OnExecuteEnd);
 
         _gameActions.Clear();
