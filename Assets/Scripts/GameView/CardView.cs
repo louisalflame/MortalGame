@@ -35,20 +35,22 @@ public class CardView : MonoBehaviour
 
     public void EnableUseCardAction(CardInfo cardInfo, IGameplayActionReciever reciever)
     {
+        _button.interactable = true;
         _button.OnClickAsObservable()
             .Subscribe(_ => 
                 reciever.RecieveEvent(
                     new UseCardAction{ CardIndentity = cardInfo.Indentity }))
-            .AddTo(_useCardDisposables);
+            .AddTo(_useCardDisposables); 
     }
     public void DisableUseCardAction()
     {
+        _button.interactable = false;
         _useCardDisposables.Clear();
     }
 
-
     public void Reset()
     {
+        _button.interactable = false;
         _disposables.Clear();
         _useCardDisposables.Clear();
     }  

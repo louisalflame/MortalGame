@@ -19,6 +19,11 @@ public class DeckDetailPanel : MonoBehaviour
     private IGameplayStatusWatcher _statusWatcher;
     private Dictionary<Guid, CardView> _cardViewDict = new Dictionary<Guid, CardView>();
 
+    public void Init(IGameplayStatusWatcher statusWatcher)
+    {
+        _statusWatcher = statusWatcher;
+    }
+
     public async UniTask Run()
     {
         var isOpen = true;
@@ -30,7 +35,7 @@ public class DeckDetailPanel : MonoBehaviour
                 .AddTo(disposables);
         }
 
-        var cardInfos = _statusWatcher.GameStatus.Ally.CardManager.Graveyard.CardInfos;
+        var cardInfos = _statusWatcher.GameStatus.Ally.CardManager.Deck.CardInfos;
         foreach (var cardInfo in cardInfos)
         {
             var cardView = _cardViewFactory.CreateCardView();

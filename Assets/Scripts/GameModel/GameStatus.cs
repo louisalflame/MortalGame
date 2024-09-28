@@ -9,6 +9,7 @@ public enum GameState
     TurnStart,
     DrawCard,
     EnemyPrepare,
+    PlayerPrepare,
     PlayerExecute,
     Enemy_Execute,
     TurnEnd,

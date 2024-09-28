@@ -50,7 +50,9 @@ public class GameplayView : MonoBehaviour, IGameplayView
         _allyHandCardView.Init(statusWatcher, reciever);
         _enemySelectedCardView.Init(statusWatcher, reciever);
         _deckCardView.Init(statusWatcher, this);
+        _deckDetailPanel.Init(statusWatcher);
         _graveyardCardView.Init(statusWatcher, this);
+        _graveyardDetailPanel.Init(statusWatcher);
         _submitView.Init(reciever);
     }
 

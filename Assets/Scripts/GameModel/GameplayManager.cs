@@ -65,6 +65,9 @@ public class GameplayManager : IGameplayStatusWatcher
             case GameState.EnemyPrepare:
                 _EnemyPreapre();
                 break;
+            case GameState.PlayerPrepare:
+                _PlayerPrepare();
+                break;
             case GameState.PlayerExecute:
                 _PlayerExecute();
                 break;
@@ -125,18 +128,25 @@ public class GameplayManager : IGameplayStatusWatcher
         }
 
         _gameStatus = _gameStatus.With(
-            state: GameState.PlayerExecute
+            state: GameState.PlayerPrepare
         );
         Debug.Log($"-- goto state:{_gameStatus.State} --");
     }
 
-    public void _PlayerExecute()
+    private void _PlayerPrepare()
     {
         _gameEvents.Add(new PlayerExecuteStartEvent() {
             Faction = _gameStatus.Ally.Faction,
             HandCardInfos = _gameStatus.Ally.CardManager.HandCard.CardInfos
         });
 
+        _gameStatus = _gameStatus.With(
+            state: GameState.PlayerExecute
+        );
+        Debug.Log($"-- goto state:{_gameStatus.State} --");
+    }
+    public void _PlayerExecute()
+    {
         _TurnExecute(_gameStatus.Ally);
     }
     private void _EnemyExecute()
