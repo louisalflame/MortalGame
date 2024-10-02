@@ -49,15 +49,12 @@ MonoBehaviour:
     - Name: InitialEnergy
       Entry: 3
       Data: 5
-    - Name: InitialPower
-      Entry: 3
-      Data: 2
     - Name: Deck
       Entry: 10
       Data: 0
     - Name: HandCardMaxCount
       Entry: 3
-      Data: 5
+      Data: 10
     - Name: NameKey
       Entry: 1
       Data: "\u8D99\u6D3B"

@@ -9,17 +9,13 @@ public class AllyHandCardView : MonoBehaviour
     [SerializeField]
     private Transform _cardViewParent;
     [SerializeField]
-    private RectTransform _handCardArea;
+    private float _arcAngle;
     [SerializeField]
-    private AnimationCurve _positionCurve;
+    private float _arcRadiusX;
     [SerializeField]
-    private AnimationCurve _rotationCurve;
-
-    
+    private float _arcRadiusY;
     [SerializeField]
-    private float _cardWidth = 100f;
-    [SerializeField]
-    private float _widthInterval = 20f;
+    private float _arcStepMinAngle;
 
     private List<CardView> _cardViews = new List<CardView>();
     private Dictionary<Guid, CardView> _cardViewDict = new Dictionary<Guid, CardView>();
@@ -103,14 +99,22 @@ public class AllyHandCardView : MonoBehaviour
 
     private void _RearrangeCardViews()
     {
-        var widthInterval = _handCardArea.rect.width / _cardViews.Count; 
-        widthInterval = widthInterval > (_cardWidth + _widthInterval) ? (_cardWidth + _widthInterval) : widthInterval;
+        var cardCount = _cardViews.Count; 
+        if(cardCount <= 0 ) return;
+        
+        float centerIndex = (cardCount - 1) / 2f;
+        var angleStep = _arcAngle / (cardCount-1);
+        angleStep = Mathf.Min(angleStep, _arcStepMinAngle);
 
-        for (var i = 0; i < _cardViews.Count; i++)
+        for(var i = 0; i < cardCount; i++)
         {
             var cardView = _cardViews[i];
-            var x = widthInterval * i - _handCardArea.rect.width / 2 + widthInterval / 2;
-            cardView.transform.localPosition = new Vector3(x, 0, 0);
+            float angle = 90+ (i - centerIndex) * angleStep; 
+
+            var x = _arcRadiusX * Mathf.Cos(angle * Mathf.Deg2Rad);
+            var y = _arcRadiusY * Mathf.Sin(angle * Mathf.Deg2Rad);
+            cardView.transform.localPosition = new Vector3(x, y, 0);
+            cardView.transform.localRotation = Quaternion.Euler(0, 0, angle - 90);
         }
     }
 }
