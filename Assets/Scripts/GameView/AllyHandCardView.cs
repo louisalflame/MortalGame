@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class AllyHandCardView : MonoBehaviour
@@ -16,11 +17,15 @@ public class AllyHandCardView : MonoBehaviour
     private float _arcRadiusY;
     [SerializeField]
     private float _arcStepMinAngle;
+    [SerializeField]
+    private float _focusOffsetX;
 
     private List<CardView> _cardViews = new List<CardView>();
     private Dictionary<Guid, CardView> _cardViewDict = new Dictionary<Guid, CardView>();
     private IGameplayStatusWatcher _statusWatcher;
     private IGameplayActionReciever _reciever;
+
+    private CardCollectionInfo _cardCollectionInfo;
 
     public void Init(IGameplayStatusWatcher statusWatcher, IGameplayActionReciever reciever)
     {
@@ -30,31 +35,82 @@ public class AllyHandCardView : MonoBehaviour
 
     public void CreateCardView(DrawCardEvent drawCardEvent)
     {
+        _cardCollectionInfo = drawCardEvent.HandCardInfo;
         var cardView = _cardViewFactory.CreateCardView();
         cardView.transform.SetParent(_cardViewParent);
         cardView.SetCardInfo(drawCardEvent.NewCardInfo);
 
+        cardView.OnFocusStart += _FocusStart;
+        cardView.OnFocusStop += _FocusStop;
+
         _cardViews.Add(cardView);
         _cardViewDict.Add(drawCardEvent.NewCardInfo.Indentity, cardView);
 
-        if(_cardViews.Count > 0)
-        {
-            _RearrangeCardViews();
+        _RearrangeCardViews();
+    }
+
+    private void _FocusStart(CardView focusView)
+    {
+        var x = _cardViewDict.First(kvp => kvp.Value == focusView);
+        if(x.Value != null)
+        { 
+            focusView.transform.SetAsLastSibling();
+            var focusIdentity = x.Key;
+            var focusIndex = _cardCollectionInfo.CardInfos
+                .First(kvp => kvp.Key.Indentity == focusIdentity).Value;
+            
+            var smaller = _cardCollectionInfo.CardInfos
+                .Where(kvp => kvp.Value < focusIndex)
+                .Select(kvp => kvp.Key.Indentity);
+            var larger = _cardCollectionInfo.CardInfos
+                .Where(kvp => kvp.Value > focusIndex)
+                .Select(kvp => kvp.Key.Indentity);
+            
+            foreach(var identity in smaller)
+            {
+                if(_cardViewDict.TryGetValue(identity, out var cardView))
+                {
+                    cardView.AddLocationOffset(focusIdentity, new Vector3(_focusOffsetX, 0, 0));
+                }
+            }
+            foreach(var identity in larger)
+            {
+                if(_cardViewDict.TryGetValue(identity, out var cardView))
+                {
+                    cardView.AddLocationOffset(focusIdentity, new Vector3(-_focusOffsetX, 0, 0));
+                }
+            }
+        }
+    }
+    private void _FocusStop(CardView focusView)
+    {
+        var x = _cardViewDict.First(kvp => kvp.Value == focusView);
+        if(x.Value != null)
+        { 
+            var focusIdentity = x.Key;
+            var focusIndex = _cardCollectionInfo.CardInfos
+                .First(kvp => kvp.Key.Indentity == focusIdentity).Value;
+            focusView.transform.SetSiblingIndex(focusIndex);
+            
+            foreach(var cardView in _cardViews)
+            {
+                cardView.RemoveLocationOffset(focusIdentity);
+            }
         }
     }
 
     public void RemoveCardView(UsedCardEvent usedCardEvent)
     {
+        _cardCollectionInfo = usedCardEvent.HandCardInfo;
         if(_cardViewDict.TryGetValue(usedCardEvent.UsedCardInfo.Indentity, out var cardView))
         {
             _cardViews.Remove(cardView);
             _cardViewDict.Remove(usedCardEvent.UsedCardInfo.Indentity);
             _cardViewFactory.RecycleCardView(cardView);
 
-            if(_cardViews.Count > 0)
-            {
-                _RearrangeCardViews();
-            }
+            foreach(var view in _cardViews)
+                view.RemoveLocationOffset(usedCardEvent.UsedCardInfo.Indentity);
+            _RearrangeCardViews();
         }
     }
 
@@ -67,18 +123,17 @@ public class AllyHandCardView : MonoBehaviour
                 _cardViews.Remove(cardView);
                 _cardViewDict.Remove(cardInfo.Indentity);
                 _cardViewFactory.RecycleCardView(cardView);
+                foreach(var view in _cardViews)
+                    view.RemoveLocationOffset(cardInfo.Indentity);
             }
         }
 
-        if(_cardViews.Count > 0)
-        {
-            _RearrangeCardViews();
-        }
+        _RearrangeCardViews();
     }
 
     public void EnableHandCardsUseCardAction(PlayerExecuteStartEvent playerExecuteStartEvent)
     {
-        foreach(var cardInfo in playerExecuteStartEvent.HandCardInfos)
+        foreach(var cardInfo in playerExecuteStartEvent.HandCardInfo.CardInfos.Keys)
         {
             if(_cardViewDict.TryGetValue(cardInfo.Indentity, out var cardView))
             {
@@ -88,7 +143,7 @@ public class AllyHandCardView : MonoBehaviour
     }
     public void DisableHandCardsUseCardAction(PlayerExecuteEndEvent playerExecuteEndEvent)
     {
-        foreach(var cardInfo in playerExecuteEndEvent.HandCardInfos)
+        foreach(var cardInfo in playerExecuteEndEvent.HandCardInfo.CardInfos.Keys)
         {
             if(_cardViewDict.TryGetValue(cardInfo.Indentity, out var cardView))
             {
@@ -113,8 +168,9 @@ public class AllyHandCardView : MonoBehaviour
 
             var x = _arcRadiusX * Mathf.Cos(angle * Mathf.Deg2Rad);
             var y = _arcRadiusY * Mathf.Sin(angle * Mathf.Deg2Rad);
-            cardView.transform.localPosition = new Vector3(x, y, 0);
-            cardView.transform.localRotation = Quaternion.Euler(0, 0, angle - 90);
+            var localPosition = new Vector3(x, y, 0);
+            var localRotation = Quaternion.Euler(0, 0, angle - 90);
+            cardView.SetPositionAndRotation(localPosition, localRotation);
         }
     }
 }

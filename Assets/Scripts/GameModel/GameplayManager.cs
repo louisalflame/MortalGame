@@ -137,7 +137,7 @@ public class GameplayManager : IGameplayStatusWatcher
     {
         _gameEvents.Add(new PlayerExecuteStartEvent() {
             Faction = _gameStatus.Ally.Faction,
-            HandCardInfos = _gameStatus.Ally.CardManager.HandCard.CardInfos
+            HandCardInfo = _gameStatus.Ally.CardManager.HandCard.CardCollectionInfo
         });
 
         _gameStatus = _gameStatus.With(
@@ -206,7 +206,7 @@ public class GameplayManager : IGameplayStatusWatcher
     {
         _gameEvents.Add(new PlayerExecuteEndEvent(){
             Faction = _gameStatus.Ally.Faction,
-            HandCardInfos = _gameStatus.Ally.CardManager.HandCard.CardInfos
+            HandCardInfo = _gameStatus.Ally.CardManager.HandCard.CardCollectionInfo
         });
         
         _TriggerBuffs(_gameStatus.Ally, BuffTiming.OnExecuteEnd);
@@ -274,8 +274,8 @@ public class GameplayManager : IGameplayStatusWatcher
                             _gameEvents.Add(new UsedCardEvent() {
                                 Faction = player.Faction,
                                 UsedCardInfo = usedCardInfo,
-                                HandCardInfos = player.CardManager.HandCard.CardInfos,
-                                GraveyardCardInfos = player.CardManager.Graveyard.CardInfos
+                                HandCardInfo = player.CardManager.HandCard.CardCollectionInfo,
+                                GraveyardInfo = player.CardManager.Graveyard.CardCollectionInfo
                             });
 
                             if(usedCard.Effects.TryGetValue(CardTiming.OnPlayCard, out var onPlayEffects))
@@ -312,8 +312,8 @@ public class GameplayManager : IGameplayStatusWatcher
                 player.CardManager.Deck.EnqueueCardsThenShuffle(graveyardCards);
                 _gameEvents.Add(new RecycleGraveyardEvent() {
                     Faction = player.Faction,
-                    DeckCardInfos = player.CardManager.Deck.CardInfos,
-                    GraveyardCardInfos = player.CardManager.Graveyard.CardInfos
+                    DeckInfo = player.CardManager.Deck.CardCollectionInfo,
+                    GraveyardInfo = player.CardManager.Graveyard.CardCollectionInfo
                 });
             }
 
@@ -332,8 +332,8 @@ public class GameplayManager : IGameplayStatusWatcher
             _gameEvents.Add(new DrawCardEvent(){
                 Faction = player.Faction,
                 NewCardInfo = newCardInfo,
-                HandCardInfos = player.CardManager.HandCard.CardInfos,
-                DeckCardInfos = player.CardManager.Deck.CardInfos,
+                HandCardInfo = player.CardManager.HandCard.CardCollectionInfo,
+                DeckInfo = player.CardManager.Deck.CardCollectionInfo,
             });
         }
     }

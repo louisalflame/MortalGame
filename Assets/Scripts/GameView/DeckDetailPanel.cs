@@ -35,7 +35,7 @@ public class DeckDetailPanel : MonoBehaviour
                 .AddTo(disposables);
         }
 
-        var cardInfos = _statusWatcher.GameStatus.Ally.CardManager.Deck.CardInfos;
+        var cardInfos = _statusWatcher.GameStatus.Ally.CardManager.Deck.CardCollectionInfo.CardInfos.Keys;
         foreach (var cardInfo in cardInfos)
         {
             var cardView = _cardViewFactory.CreateCardView();

@@ -37,8 +37,8 @@ public class PlayerCardManager : IPlayerCardManager
         events.Add(new RecycleHandCardEvent(){
             Faction = contextManager.Context.ExecutePlayer.Faction,
             RecycledCardInfos = recyclAllyCards.Select(c => new CardInfo(c)).ToArray(),
-            HandCardInfos = HandCard.CardInfos,
-            GraveyardCardInfos = Graveyard.CardInfos
+            HandCardInfo = HandCard.CardCollectionInfo,
+            GraveyardInfo = Graveyard.CardCollectionInfo
         });
 
         return events;

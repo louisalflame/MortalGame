@@ -6,7 +6,7 @@ using UnityEngine;
 public interface IDeckEntity
 {
     IReadOnlyCollection<CardEntity> Cards { get; }
-    IReadOnlyCollection<CardInfo> CardInfos { get; }
+    CardCollectionInfo CardCollectionInfo { get; }
     bool PopCard(out CardEntity card);
     void EnqueueCardsThenShuffle(IEnumerable<CardEntity> cards);
 }
@@ -15,8 +15,9 @@ public class DeckEntity : IDeckEntity
     private List<CardEntity> _cards;
     public IReadOnlyCollection<CardEntity> Cards => _cards;
 
-    public IReadOnlyCollection<CardInfo> CardInfos =>
-        Cards.Select(c => new CardInfo(c)).ToArray();
+    public 
+    CardCollectionInfo CardCollectionInfo =>
+        Cards.Select(c => new CardInfo(c)).ToArray().ToCardCollectionInfo();
     
     public DeckEntity(IEnumerable<CardInstance> cards)
     {

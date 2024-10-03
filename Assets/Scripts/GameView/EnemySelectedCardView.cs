@@ -34,11 +34,11 @@ public class EnemySelectedCardView : MonoBehaviour
 
     public void UpdateDeckView(DrawCardEvent drawCardEvent)
     {
-        _deckCountText.text = drawCardEvent.DeckCardInfos.Count.ToString();
+        _deckCountText.text = drawCardEvent.DeckInfo.Count.ToString();
     }
     public void UpdateDeckView(RecycleGraveyardEvent recycleGraveyardEvent)
     {
-        _deckCountText.text = recycleGraveyardEvent.DeckCardInfos.Count.ToString();
+        _deckCountText.text = recycleGraveyardEvent.DeckInfo.Count.ToString();
     }
  
     public void CreateCardView(EnemySelectCardEvent enemySelectCardEvent)

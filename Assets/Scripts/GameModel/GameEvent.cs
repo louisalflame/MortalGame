@@ -15,22 +15,22 @@ public class RoundStartEvent : IGameEvent
 public class RecycleGraveyardEvent : IGameEvent
 {
     public Faction Faction;
-    public IReadOnlyCollection<CardInfo> DeckCardInfos;
-    public IReadOnlyCollection<CardInfo> GraveyardCardInfos;
+    public CardCollectionInfo DeckInfo;
+    public CardCollectionInfo GraveyardInfo;
 }
 public class RecycleHandCardEvent : IGameEvent
 {
     public Faction Faction;    
     public IReadOnlyCollection<CardInfo> RecycledCardInfos;
-    public IReadOnlyCollection<CardInfo> HandCardInfos;
-    public IReadOnlyCollection<CardInfo> GraveyardCardInfos;
+    public CardCollectionInfo HandCardInfo;
+    public CardCollectionInfo GraveyardInfo;
 }
 public class DrawCardEvent : IGameEvent
 {
     public Faction Faction;
     public CardInfo NewCardInfo;
-    public IReadOnlyCollection<CardInfo> DeckCardInfos;
-    public IReadOnlyCollection<CardInfo> HandCardInfos;
+    public CardCollectionInfo DeckInfo;
+    public CardCollectionInfo HandCardInfo;
 }
 public class EnemySelectCardEvent : IGameEvent
 {
@@ -45,19 +45,19 @@ public class EnemyUnselectedCardEvent : IGameEvent
 public class PlayerExecuteStartEvent : IGameEvent
 {
     public Faction Faction;
-    public IReadOnlyCollection<CardInfo> HandCardInfos;
+    public CardCollectionInfo HandCardInfo;
+}
+public class PlayerExecuteEndEvent : IGameEvent
+{
+    public Faction Faction;
+    public CardCollectionInfo HandCardInfo;
 }
 public class UsedCardEvent : IGameEvent
 {
     public Faction Faction;
     public CardInfo UsedCardInfo;
-    public IReadOnlyCollection<CardInfo> HandCardInfos;
-    public IReadOnlyCollection<CardInfo> GraveyardCardInfos;
-}
-public class PlayerExecuteEndEvent : IGameEvent
-{
-    public Faction Faction;
-    public IReadOnlyCollection<CardInfo> HandCardInfos;
+    public CardCollectionInfo HandCardInfo;
+    public CardCollectionInfo GraveyardInfo;
 }
 
 public abstract class EnergyEvent : IGameEvent

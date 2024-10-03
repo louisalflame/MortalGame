@@ -35,7 +35,7 @@ public class GraveyardDetailPanel : MonoBehaviour
                 .AddTo(disposables);
         }
 
-        var cardInfos = _statusWatcher.GameStatus.Ally.CardManager.Graveyard.CardInfos;
+        var cardInfos = _statusWatcher.GameStatus.Ally.CardManager.Graveyard.CardCollectionInfo.CardInfos.Keys;
         foreach (var cardInfo in cardInfos)
         {
             var cardView = _cardViewFactory.CreateCardView();

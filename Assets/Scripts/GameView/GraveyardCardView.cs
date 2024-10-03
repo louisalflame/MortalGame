@@ -25,14 +25,14 @@ public class GraveyardCardView : MonoBehaviour
 
     public void UpdateDeckView(UsedCardEvent usedCardEvent)
     {
-        _graveyardCountText.text = usedCardEvent.GraveyardCardInfos.Count.ToString();
+        _graveyardCountText.text = usedCardEvent.GraveyardInfo.Count.ToString();
     }
     public void UpdateDeckView(RecycleHandCardEvent recycleHandCardEvent)
     {
-        _graveyardCountText.text = recycleHandCardEvent.GraveyardCardInfos.Count.ToString();
+        _graveyardCountText.text = recycleHandCardEvent.GraveyardInfo.Count.ToString();
     }
     public void UpdateDeckView(RecycleGraveyardEvent recycleGraveyardEvent)
     {
-        _graveyardCountText.text = recycleGraveyardEvent.GraveyardCardInfos.Count.ToString();
+        _graveyardCountText.text = recycleGraveyardEvent.GraveyardInfo.Count.ToString();
     }
 }
