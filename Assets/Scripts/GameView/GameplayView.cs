@@ -78,12 +78,10 @@ public class GameplayView : MonoBehaviour, IGameplayView
                     await UniTask.NextFrame();
                     break;
                 case GameplayViewState.DeckDetailPanel:
-                    _state = GameplayViewState.DeckDetailPanel;
                     await _deckDetailPanel.Run();
                     _state = GameplayViewState.Idle;
                     break;
                 case GameplayViewState.GraveyardDetailPanel:
-                    _state = GameplayViewState.GraveyardDetailPanel;
                     await _graveyardDetailPanel.Run();
                     _state = GameplayViewState.Idle;
                     break;

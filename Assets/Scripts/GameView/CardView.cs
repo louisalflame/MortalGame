@@ -19,10 +19,7 @@ public class CardView : MonoBehaviour
 
     [BoxGroup("UI")]
     [SerializeField]
-    private Button _clickButton;
-    [BoxGroup("UI")]
-    [SerializeField]
-    private Button _pointButton;
+    private Button _button;
 
     [BoxGroup("Focus")]
     [SerializeField]
@@ -36,11 +33,7 @@ public class CardView : MonoBehaviour
     [BoxGroup("Focus")]
     private float _focusDuration = 0.5f;
 
-    public event Action<CardView> OnFocusStart;
-    public event Action<CardView> OnFocusStop;
-
     private CompositeDisposable _disposables = new CompositeDisposable();
-    private CompositeDisposable _useCardDisposables = new CompositeDisposable();
     private Vector3 _localPosition;
     private Quaternion _localRotation; 
     private Dictionary<Guid, List<Vector3>> _offsets = new Dictionary<Guid, List<Vector3>>();
@@ -51,41 +44,54 @@ public class CardView : MonoBehaviour
         _title.text = cardInfo.Title;
         _cost.text = cardInfo.Cost.ToString();
         _power.text = cardInfo.Power.ToString();
-
-        _pointButton.interactable = true;
-        _pointButton.OnPointerEnterAsObservable()
-            .Subscribe(_ => _ShowFocusContent(cardInfo)) 
-            .AddTo(_disposables);
-        _pointButton.OnPointerExitAsObservable()
-            .Subscribe(_ => _HideFocusContent(cardInfo)) 
-            .AddTo(_disposables);
     }
 
-    public void EnableUseCardAction(CardInfo cardInfo, IGameplayActionReciever reciever)
+    public void EnableHandCardAction(CardInfo cardInfo, IHandCardViewHandler handler)
     {
-        _clickButton.interactable = true;
-        _clickButton.OnClickAsObservable()
-            .Subscribe(_ => 
-                reciever.RecieveEvent(
-                    new UseCardAction{ CardIndentity = cardInfo.Indentity }))
-            .AddTo(_useCardDisposables); 
+        _button.interactable = true;
+        _button.OnClickAsObservable()
+            .Subscribe(_ => handler.UseCard(cardInfo.Indentity))
+            .AddTo(_disposables); 
+        _button.OnPointerEnterAsObservable()
+            .Subscribe(_ => handler.FocusStart(cardInfo.Indentity)) 
+            .AddTo(_disposables);
+        _button.OnPointerExitAsObservable()
+            .Subscribe(_ => handler.FocusStop(cardInfo.Indentity)) 
+            .AddTo(_disposables);
     }
-    public void DisableUseCardAction()
+    public void EnableSimpleCardAction(CardInfo cardInfo, ISimpleCardViewHandler handler)
     {
-        _clickButton.interactable = false;
-        _useCardDisposables.Clear();
+        _button.interactable = true;
+        _button.OnClickAsObservable()
+            .Subscribe(_ => handler.ReadCard(cardInfo.Indentity))
+            .AddTo(_disposables);
+    }
+    public void DisableCardAction()
+    {
+        _button.interactable = false;
+        _disposables.Dispose();
+        _disposables.Clear();
+    }
+
+    public void ShowHandCardFocusContent()
+    {
+        _content.localPosition = _focusOffset;
+        _content.localRotation = Quaternion.Inverse(_localRotation);
+        _content.localScale = Vector3.one * _focusScale;
+        transform.SetAsLastSibling();
+    }
+    public void HideHandCardFocusContent(int originSiblingIndex)
+    {
+        _ResetFocusContent();
+        transform.SetSiblingIndex(originSiblingIndex);
     }
 
     public void Reset()
     {
-        _clickButton.interactable = false;
-        _pointButton.interactable = false;
-        _disposables.Clear();
-        _useCardDisposables.Clear();
         _offsets.Clear();
         _UpdateLocalPosition();
-        _content.localRotation = Quaternion.identity;
-        _content.localScale = Vector3.one;
+        _ResetFocusContent();
+        DisableCardAction();
     } 
 
     public void SetPositionAndRotation(Vector3 position, Quaternion rotation)
@@ -114,22 +120,6 @@ public class CardView : MonoBehaviour
         _UpdateLocalPosition(_focusDuration);
     }
 
-    private void _ShowFocusContent(CardInfo cardInfo)
-    {
-        _content.localPosition = _focusOffset;
-        _content.localRotation = Quaternion.Inverse(_localRotation);
-        _content.localScale = Vector3.one * _focusScale;
-        OnFocusStart?.Invoke(this);
-    }
-
-    private void _HideFocusContent(CardInfo cardInfo)
-    {
-        _content.localPosition = Vector3.zero;
-        _content.localRotation = Quaternion.identity;
-        _content.localScale = Vector3.one;
-        OnFocusStop?.Invoke(this);
-    }
-
     private void _UpdateLocalPosition(float duration = 0f)
     {
         var offset = Vector3.zero;
@@ -154,5 +144,12 @@ public class CardView : MonoBehaviour
         {
             _currentMoveTween = transform.DOLocalMove(_localPosition + offset, 0.5f).SetEase(Ease.OutExpo);
         }
+    }
+
+    private void _ResetFocusContent()
+    {
+        _content.localPosition = Vector3.zero;
+        _content.localRotation = Quaternion.identity;
+        _content.localScale = Vector3.one;
     }
 }

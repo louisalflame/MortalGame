@@ -249,8 +249,7 @@ MonoBehaviour:
   _title: {fileID: 6072334631632945810}
   _cost: {fileID: 5769463107790059947}
   _power: {fileID: 5865926486654199960}
-  _clickButton: {fileID: 6242041121471611408}
-  _pointButton: {fileID: 6242041121471611408}
+  _button: {fileID: 6242041121471611408}
   _content: {fileID: 2071801199941433192}
   _focusScale: 3
   _focusOffset: {x: 0, y: 300, z: 0}

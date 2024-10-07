@@ -3,7 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class AllyHandCardView : MonoBehaviour
+public interface IHandCardViewHandler
+{
+    void UseCard(Guid cardIdentity);
+    void FocusStart(Guid cardIdentity);
+    void FocusStop(Guid cardIdentity);
+}
+
+public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
 {
     [SerializeField]
     private CardViewFactory _cardViewFactory;
@@ -24,7 +31,6 @@ public class AllyHandCardView : MonoBehaviour
     private Dictionary<Guid, CardView> _cardViewDict = new Dictionary<Guid, CardView>();
     private IGameplayStatusWatcher _statusWatcher;
     private IGameplayActionReciever _reciever;
-
     private CardCollectionInfo _cardCollectionInfo;
 
     public void Init(IGameplayStatusWatcher statusWatcher, IGameplayActionReciever reciever)
@@ -39,25 +45,23 @@ public class AllyHandCardView : MonoBehaviour
         var cardView = _cardViewFactory.CreateCardView();
         cardView.transform.SetParent(_cardViewParent);
         cardView.SetCardInfo(drawCardEvent.NewCardInfo);
-
-        cardView.OnFocusStart += _FocusStart;
-        cardView.OnFocusStop += _FocusStop;
-
         _cardViews.Add(cardView);
         _cardViewDict.Add(drawCardEvent.NewCardInfo.Indentity, cardView);
 
         _RearrangeCardViews();
     }
 
-    private void _FocusStart(CardView focusView)
+    public void UseCard(Guid cardIdentity)
     {
-        var x = _cardViewDict.First(kvp => kvp.Value == focusView);
-        if(x.Value != null)
-        { 
-            focusView.transform.SetAsLastSibling();
-            var focusIdentity = x.Key;
+        _reciever.RecieveEvent(new UseCardAction{ CardIndentity = cardIdentity });
+    }   
+    public void FocusStart(Guid focusIdentity)
+    {
+        if (_cardViewDict.TryGetValue(focusIdentity, out var focusView))
+        {
             var focusIndex = _cardCollectionInfo.CardInfos
-                .First(kvp => kvp.Key.Indentity == focusIdentity).Value;
+                .FirstOrDefault(kvp => kvp.Key.Indentity == focusIdentity).Value;
+            focusView.ShowHandCardFocusContent();
             
             var smaller = _cardCollectionInfo.CardInfos
                 .Where(kvp => kvp.Value < focusIndex)
@@ -82,15 +86,13 @@ public class AllyHandCardView : MonoBehaviour
             }
         }
     }
-    private void _FocusStop(CardView focusView)
+    public void FocusStop(Guid focusIdentity)
     {
-        var x = _cardViewDict.First(kvp => kvp.Value == focusView);
-        if(x.Value != null)
-        { 
-            var focusIdentity = x.Key;
-            var focusIndex = _cardCollectionInfo.CardInfos
-                .First(kvp => kvp.Key.Indentity == focusIdentity).Value;
-            focusView.transform.SetSiblingIndex(focusIndex);
+        if (_cardViewDict.TryGetValue(focusIdentity, out var focusView))
+        {
+            var originSiblingIndex = _cardCollectionInfo.CardInfos
+                .FirstOrDefault(kvp => kvp.Key.Indentity == focusIdentity).Value;
+            focusView.HideHandCardFocusContent(originSiblingIndex);
             
             foreach(var cardView in _cardViews)
             {
@@ -137,7 +139,7 @@ public class AllyHandCardView : MonoBehaviour
         {
             if(_cardViewDict.TryGetValue(cardInfo.Indentity, out var cardView))
             {
-                cardView.EnableUseCardAction(cardInfo, _reciever);
+                cardView.EnableHandCardAction(cardInfo, this);
             }
         }
     }
@@ -147,7 +149,7 @@ public class AllyHandCardView : MonoBehaviour
         {
             if(_cardViewDict.TryGetValue(cardInfo.Indentity, out var cardView))
             {
-                cardView.DisableUseCardAction();
+                cardView.DisableCardAction();
             }
         }
     }
