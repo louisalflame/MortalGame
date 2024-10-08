@@ -4,7 +4,7 @@ using UniRx.Triggers;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class AiCardView : MonoBehaviour
+public class AiCardView : MonoBehaviour, IRecyclable
 {
     [SerializeField]
     private TextMeshProUGUI _title;

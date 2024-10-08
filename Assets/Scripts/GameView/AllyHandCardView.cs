@@ -42,7 +42,7 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
     public void CreateCardView(DrawCardEvent drawCardEvent)
     {
         _cardCollectionInfo = drawCardEvent.HandCardInfo;
-        var cardView = _cardViewFactory.CreateCardView();
+        var cardView = _cardViewFactory.CreatePrefab();
         cardView.transform.SetParent(_cardViewParent);
         cardView.SetCardInfo(drawCardEvent.NewCardInfo);
         _cardViews.Add(cardView);
@@ -108,7 +108,7 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
         {
             _cardViews.Remove(cardView);
             _cardViewDict.Remove(usedCardEvent.UsedCardInfo.Indentity);
-            _cardViewFactory.RecycleCardView(cardView);
+            _cardViewFactory.RecyclePrefab(cardView);
 
             foreach(var view in _cardViews)
                 view.RemoveLocationOffset(usedCardEvent.UsedCardInfo.Indentity);
@@ -124,7 +124,7 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
             {
                 _cardViews.Remove(cardView);
                 _cardViewDict.Remove(cardInfo.Indentity);
-                _cardViewFactory.RecycleCardView(cardView);
+                _cardViewFactory.RecyclePrefab(cardView);
                 foreach(var view in _cardViews)
                     view.RemoveLocationOffset(cardInfo.Indentity);
             }

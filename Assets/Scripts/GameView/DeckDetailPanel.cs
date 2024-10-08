@@ -54,7 +54,7 @@ public class DeckDetailPanel : MonoBehaviour, ISimpleCardViewHandler
         var cardInfos = _statusWatcher.GameStatus.Ally.CardManager.Deck.CardCollectionInfo.CardInfos.Keys;
         foreach (var cardInfo in cardInfos)
         {
-            var cardView = _cardViewFactory.CreateCardView();
+            var cardView = _cardViewFactory.CreatePrefab();
             cardView.transform.SetParent(_cardViewParent, false);
             cardView.SetCardInfo(cardInfo);
             cardView.EnableSimpleCardAction(cardInfo, this);
@@ -87,7 +87,7 @@ public class DeckDetailPanel : MonoBehaviour, ISimpleCardViewHandler
         foreach (var cardView in _cardViewDict.Values)
         {
             cardView.DisableCardAction();
-            _cardViewFactory.RecycleCardView(cardView);
+            _cardViewFactory.RecyclePrefab(cardView);
         }
         _cardViewDict.Clear();
     }

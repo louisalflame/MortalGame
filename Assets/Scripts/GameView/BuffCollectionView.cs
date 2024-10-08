@@ -19,7 +19,7 @@ public class BuffCollectionView : MonoBehaviour
 
     public void AddBuff(BuffInfo buffInfo)
     {
-        var buffView = _buffViewFactory.CreateBuffView();
+        var buffView = _buffViewFactory.CreatePrefab();
         buffView.transform.SetParent(_buffViewParent);
         buffView.SetBuffInfo(buffInfo);
 
@@ -32,7 +32,7 @@ public class BuffCollectionView : MonoBehaviour
         {
             _buffViews.Remove(buffView);
             _buffViewDict.Remove(buffInfo.Identity);
-            _buffViewFactory.RecycleBuffView(buffView);
+            _buffViewFactory.RecyclePrefab(buffView);
         }
     }
     public void UpdateBuff(BuffInfo buffInfo)

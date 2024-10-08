@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BuffView : MonoBehaviour
+public class BuffView : MonoBehaviour, IRecyclable
 {
     [SerializeField]
     private Image _buffIcon;

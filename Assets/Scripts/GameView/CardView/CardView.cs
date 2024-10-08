@@ -8,7 +8,7 @@ using UniRx.Triggers;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CardView : MonoBehaviour
+public class CardView : MonoBehaviour, IRecyclable
 {
     [SerializeField]
     private TextMeshProUGUI _title;

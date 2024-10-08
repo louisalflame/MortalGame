@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Sirenix.OdinInspector;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -22,22 +23,39 @@ public enum GameplayViewState
 
 public class GameplayView : MonoBehaviour, IGameplayView
 {
+    [BoxGroup("AllyView")]
     [SerializeField]
     private AllyInfoView _allyInfoView;
+    [BoxGroup("AllyView")]
+    [SerializeField]
+    private AllyCharacterView _allyCharacterView;
+    
+    [BoxGroup("EnemyView")]
     [SerializeField]
     private EnemyInfoView  _enemyInfoView;
+    [BoxGroup("EnemyView")]
     [SerializeField]
-    private AllyHandCardView _allyHandCardView;
+    private EnemyCharacterView _enemyCharacterView;
+    [BoxGroup("EnemyView")]
     [SerializeField]
     private EnemySelectedCardView _enemySelectedCardView;
+    
+    [BoxGroup("HandView")]
+    [SerializeField]
+    private AllyHandCardView _allyHandCardView;
+    [BoxGroup("HandView")]
     [SerializeField]
     private DeckCardView _deckCardView;
+    [BoxGroup("HandView")]
     [SerializeField]
     private DeckDetailPanel _deckDetailPanel;
+    [BoxGroup("HandView")]
     [SerializeField]
     private GraveyardCardView _graveyardCardView;
+    [BoxGroup("HandView")]
     [SerializeField]
     private GraveyardDetailPanel _graveyardDetailPanel;
+    [BoxGroup("HandView")]
     [SerializeField]
     private SubmitView _submitView;
 

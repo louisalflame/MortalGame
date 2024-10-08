@@ -43,7 +43,7 @@ public class EnemySelectedCardView : MonoBehaviour
  
     public void CreateCardView(EnemySelectCardEvent enemySelectCardEvent)
     {
-        var cardView = _cardViewFactory.CreateCardView();
+        var cardView = _cardViewFactory.CreatePrefab();
         cardView.transform.SetParent(_cardViewParent);
         cardView.SetCardInfo(enemySelectCardEvent.SelectedCardInfo, _reciever);
 
@@ -62,7 +62,7 @@ public class EnemySelectedCardView : MonoBehaviour
         {
             _cardViews.Remove(cardView);
             _cardViewDict.Remove(usedCardEvent.UsedCardInfo.Indentity);
-            _cardViewFactory.RecycleCardView(cardView);
+            _cardViewFactory.RecyclePrefab(cardView);
 
             _RearrangeCardViews();
         }
@@ -73,7 +73,7 @@ public class EnemySelectedCardView : MonoBehaviour
         {
             _cardViews.Remove(cardView);
             _cardViewDict.Remove(enemyUnselectedCardEvent.SelectedCardInfo.Indentity);
-            _cardViewFactory.RecycleCardView(cardView);
+            _cardViewFactory.RecyclePrefab(cardView);
 
             _RearrangeCardViews();
         }
@@ -86,7 +86,7 @@ public class EnemySelectedCardView : MonoBehaviour
             {
                 _cardViews.Remove(cardView);
                 _cardViewDict.Remove(cardInfo.Indentity);
-                _cardViewFactory.RecycleCardView(cardView);
+                _cardViewFactory.RecyclePrefab(cardView);
             }
         }
 
