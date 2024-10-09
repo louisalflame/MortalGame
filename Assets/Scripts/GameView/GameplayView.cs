@@ -268,6 +268,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
         {
             case Faction.Ally:
                 _allyInfoView.UpdateHealth(healthEvent);
+                _allyCharacterView.UpdateHealth(healthEvent);
                 break;
             case Faction.Enemy:
                 _enemyInfoView.UpdateHealth(healthEvent);

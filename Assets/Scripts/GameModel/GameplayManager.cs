@@ -353,7 +353,7 @@ public class GameplayManager : IGameplayStatusWatcher
                         {
                             var damagePoint = damageEffect.Value.Eval(_gameStatus, _contextMgr.Context);
                             var takeDamageResult = target.Character.HealthManager.TakeDamage(damagePoint, _contextMgr.Context);
-                            _gameEvents.Add(new TakeDamageEvent(target, takeDamageResult));
+                            _gameEvents.Add(new DamageEvent(target, takeDamageResult));
                         }
                     }
                     break;
@@ -368,7 +368,7 @@ public class GameplayManager : IGameplayStatusWatcher
                             var damagePoint = penetrateDamageEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
                             var takeDamageResult = target.Character.HealthManager.TakePenetrateDamage(damagePoint, _contextMgr.Context);
-                            _gameEvents.Add(new TakePenetrateDamageEvent(target, takeDamageResult));
+                            _gameEvents.Add(new DamageEvent(target, takeDamageResult));
                         }
                     }
                     break;
@@ -383,7 +383,7 @@ public class GameplayManager : IGameplayStatusWatcher
                             var damagePoint = additionalAttackEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
                             var takeDamageResult = target.Character.HealthManager.TakeAdditionalDamage(damagePoint, _contextMgr.Context);
-                            _gameEvents.Add(new TakeAdditionalDamageEvent(target, takeDamageResult));
+                            _gameEvents.Add(new DamageEvent(target, takeDamageResult));
                         }
                     }
                     break;
@@ -398,7 +398,7 @@ public class GameplayManager : IGameplayStatusWatcher
                             var damagePoint = effectiveAttackEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
                             var takeDamageResult = target.Character.HealthManager.TakeEffectiveDamage(damagePoint, _contextMgr.Context);
-                            _gameEvents.Add(new TakeEffectiveDamageEvent(target, takeDamageResult));
+                            _gameEvents.Add(new DamageEvent(target, takeDamageResult));
                         }
                     }
                     break;
@@ -560,8 +560,7 @@ public class GameplayManager : IGameplayStatusWatcher
                         {
                             var damagePoint = effectiveDamageBuffEffect.Value.Eval(_gameStatus, _contextMgr.Context);
                             var takeDamageResult = target.Character.HealthManager.TakeEffectiveDamage(damagePoint, _contextMgr.Context);
-        Debug.Log($"_ApplyBuffEffect:{buffEffect} target:{target} damagePoint:{damagePoint} takeDamageResult:{takeDamageResult.DeltaHp}");
-                            _gameEvents.Add(new TakeEffectiveDamageEvent(target, takeDamageResult));
+                            _gameEvents.Add(new DamageEvent(target, takeDamageResult));
                         }
                     }
                     break;

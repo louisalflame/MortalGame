@@ -107,51 +107,18 @@ public abstract class HealthEvent : IGameEvent
         MaxHp = player.Character.MaxHealth;
     }
 }
-public class TakeDamageEvent : HealthEvent
+public class DamageEvent : HealthEvent
 {
+    public DamageType Type;
     public int DeltaHp;
     public int DeltaShield;
     public int DamagePoint;
 
-    public TakeDamageEvent(PlayerEntity player, TakeDamageResult takeDamageResult) : base(player)
+    public DamageEvent(PlayerEntity player, TakeDamageResult takeDamageResult) : base(player)
     {
+        Type = takeDamageResult.Type;
         DeltaHp = takeDamageResult.DeltaHp;
         DeltaShield = takeDamageResult.DeltaDp;
-        DamagePoint = takeDamageResult.DamagePoint;
-    }
-}
-public class TakePenetrateDamageEvent : HealthEvent
-{
-    public int DeltaHp;
-    public int DamagePoint;
-
-    public TakePenetrateDamageEvent(PlayerEntity player, TakeDamageResult takeDamageResult) : base(player)
-    { 
-        DeltaHp = takeDamageResult.DeltaHp;
-        DamagePoint = takeDamageResult.DamagePoint;
-    }
-}
-public class TakeAdditionalDamageEvent : HealthEvent
-{
-    public int DeltaHp;
-    public int DeltaShield;
-    public int DamagePoint;
-
-    public TakeAdditionalDamageEvent(PlayerEntity player, TakeDamageResult takeDamageResult) : base(player)
-    {
-        DeltaHp = takeDamageResult.DeltaHp;
-        DeltaShield = takeDamageResult.DeltaDp;
-        DamagePoint = takeDamageResult.DamagePoint;
-    }
-}
-public class TakeEffectiveDamageEvent : HealthEvent
-{
-    public int DeltaHp;
-    public int DamagePoint;
-
-    public TakeEffectiveDamageEvent(PlayerEntity player, TakeDamageResult takeDamageResult) : base(player)
-    {
-        DeltaHp = takeDamageResult.DeltaHp;
         DamagePoint = takeDamageResult.DamagePoint;
     }
 }
