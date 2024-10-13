@@ -64,9 +64,12 @@ public class GameplayView : MonoBehaviour, IGameplayView
     public void Init(IGameplayActionReciever reciever, IGameplayStatusWatcher statusWatcher)
     {
         _allyInfoView.Init(statusWatcher);
-        _enemyInfoView.Init(statusWatcher);
         _allyHandCardView.Init(statusWatcher, reciever);
+        _allyCharacterView.Init(statusWatcher);
+
+        _enemyInfoView.Init(statusWatcher);
         _enemySelectedCardView.Init(statusWatcher, reciever);
+
         _deckCardView.Init(statusWatcher, this);
         _deckDetailPanel.Init(statusWatcher);
         _graveyardCardView.Init(statusWatcher, this);
@@ -79,7 +82,6 @@ public class GameplayView : MonoBehaviour, IGameplayView
         if (_state == GameplayViewState.Idle)
             _state = GameplayViewState.DeckDetailPanel;
     }
-
     public void ClickGraveyardDetailPanel()
     {
         if (_state == GameplayViewState.Idle)
@@ -113,6 +115,12 @@ public class GameplayView : MonoBehaviour, IGameplayView
         {
             switch (gameEvent)
             {
+                case AllySummonEvent allySummonEvent:
+                    _AllySummonEvent(allySummonEvent);
+                    break;
+                case EnemySummonEvent enemySummonEvent:
+                    _EnemySummonEvent(enemySummonEvent);
+                    break;
                 case RoundStartEvent roundStartEvent:
                     _UpdateRoundAndPlayer(roundStartEvent);
                     break;
@@ -159,6 +167,14 @@ public class GameplayView : MonoBehaviour, IGameplayView
         }
     }
 
+    private void _AllySummonEvent(AllySummonEvent allySummonEvent)
+    {
+        _allyCharacterView.SummonAlly(allySummonEvent);
+    }
+    private void _EnemySummonEvent(EnemySummonEvent enemySummonEvent)
+    {
+
+    }
     private void _UpdateRoundAndPlayer(RoundStartEvent roundStartEvent)
     {
         _allyInfoView.SetPlayerInfo(roundStartEvent.Round, roundStartEvent.Player);
@@ -272,6 +288,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
                 break;
             case Faction.Enemy:
                 _enemyInfoView.UpdateHealth(healthEvent);
+                _allyCharacterView.UpdateHealth(healthEvent);
                 break;
         }
     }

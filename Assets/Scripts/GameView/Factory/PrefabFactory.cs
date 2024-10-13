@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public interface IRecyclable
@@ -12,8 +13,15 @@ public class PrefabFactory<T> : MonoBehaviour where T : MonoBehaviour, IRecyclab
     [SerializeField]
     private Transform _recycleRoot;
 
+    private Stack<T> _pool = new Stack<T>();
+
     public T CreatePrefab()
     {
+        if (_pool.Count > 0) 
+        {
+            return _pool.Pop();
+        }
+
         return Instantiate(_prefab, transform);
     }
 
@@ -21,5 +29,6 @@ public class PrefabFactory<T> : MonoBehaviour where T : MonoBehaviour, IRecyclab
     {
         view.Reset();
         view.transform.SetParent(_recycleRoot);
+        _pool.Push(view);
     }
 }

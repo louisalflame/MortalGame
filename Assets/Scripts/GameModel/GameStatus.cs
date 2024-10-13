@@ -6,6 +6,7 @@ using UnityEngine;
 public enum GameState
 {
     None = 0,
+    GameStart,
     TurnStart,
     DrawCard,
     EnemyPrepare,

@@ -12,7 +12,7 @@ public class ShieldEventView: MonoBehaviour, IRecyclable, IHealthEventView
 
     public void SetEventInfo(GetShieldEvent getShieldEvent, Transform parent)
     {
-        transform.SetParent(parent);
+        transform.SetParent(parent, false);
         _text.text = getShieldEvent.DeltaShield.ToString();
     }
 

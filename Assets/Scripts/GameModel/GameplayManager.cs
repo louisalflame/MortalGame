@@ -22,9 +22,10 @@ public class GameplayManager : IGameplayStatusWatcher
     public GameResult GameResult { get{ return _gameResult; } }
     public GameStatus GameStatus { get{ return _gameStatus; } }
 
-    public GameplayManager(GameStatus initialState, GameContextManager contextManager)
+    public GameplayManager(GameStatus initialStatus, GameContextManager contextManager)
     {
-        _gameStatus = initialState;
+        // TODO split gamestatus and gamesnapshot and gameparams
+        _gameStatus = initialStatus;
         _contextMgr = contextManager;
     }
 
@@ -34,8 +35,6 @@ public class GameplayManager : IGameplayStatusWatcher
         _gameActions = new Queue<IGameAction>();
         _gameResult = null;
 
-        _gameStatus = _gameStatus.With(state: GameState.TurnStart);
-        Debug.Log($"-- goto state:{_gameStatus.State} --");
         _NextState(_gameStatus);
     }
 
@@ -56,6 +55,9 @@ public class GameplayManager : IGameplayStatusWatcher
     {
         switch(gameStatus.State)
         {
+            case GameState.GameStart:
+                _GameStart();
+                break;
             case GameState.TurnStart:
                 _TurnStart();
                 break;
@@ -82,25 +84,39 @@ public class GameplayManager : IGameplayStatusWatcher
         }
     }
 
+    private void _GameStart()
+    {
+        _gameEvents.Add(new AllySummonEvent() {
+            Player = _gameStatus.Ally 
+        });
+        _gameEvents.Add(new EnemySummonEvent() {
+            Enemy = _gameStatus.Enemy 
+        });
+
+        _gameStatus = _gameStatus.With(
+            state: GameState.TurnStart
+        );
+        Debug.Log($"-- goto state:{_gameStatus.State} --"); 
+    }
+
     private void _TurnStart()
     {
-        _gameStatus = _gameStatus.With(
-            round: _gameStatus.Round + 1,
-            state: GameState.DrawCard
-        );
-
         _gameEvents.Add(new RoundStartEvent(){
             Round = _gameStatus.Round,
             Player = _gameStatus.Ally,
             Enemy = _gameStatus.Enemy
         });
-        Debug.Log($"-- goto state:{_gameStatus.State} --");   
-
         var allyGainEnergyResult = _gameStatus.Ally.Character.EnergyManager.RecoverEnergy(3);
         _gameEvents.Add(new RecoverEnergyEvent(_gameStatus.Ally, allyGainEnergyResult));
 
         var enemyGainEnergyResult = _gameStatus.Enemy.Character.EnergyManager.RecoverEnergy(_gameStatus.Enemy.EnergyRecoverPoint);
         _gameEvents.Add(new RecoverEnergyEvent(_gameStatus.Enemy, enemyGainEnergyResult));
+
+        _gameStatus = _gameStatus.With(
+            round: _gameStatus.Round + 1,
+            state: GameState.DrawCard
+        );
+        Debug.Log($"-- goto state:{_gameStatus.State} --");   
     }
 
     private void _TurnDrawCard()

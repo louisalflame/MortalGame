@@ -12,7 +12,7 @@ public class HealEventView: MonoBehaviour, IRecyclable, IHealthEventView
     
     public void SetEventInfo(GetHealEvent getHealEvent, Transform parent)
     {
-        transform.SetParent(parent);
+        transform.SetParent(parent, false);
         _text.text = getHealEvent.DeltaHp.ToString();
     }
 

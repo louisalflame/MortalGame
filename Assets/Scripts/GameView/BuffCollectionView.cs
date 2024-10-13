@@ -20,7 +20,7 @@ public class BuffCollectionView : MonoBehaviour
     public void AddBuff(BuffInfo buffInfo)
     {
         var buffView = _buffViewFactory.CreatePrefab();
-        buffView.transform.SetParent(_buffViewParent);
+        buffView.transform.SetParent(_buffViewParent, false);
         buffView.SetBuffInfo(buffInfo);
 
         _buffViews.Add(buffView);

@@ -6,6 +6,14 @@ public interface IGameEvent
 
 }
 
+public class AllySummonEvent : IGameEvent
+{
+    public AllyEntity Player;
+}
+public class EnemySummonEvent : IGameEvent
+{
+    public EnemyEntity Enemy;
+}
 public class RoundStartEvent : IGameEvent
 {
     public int Round;

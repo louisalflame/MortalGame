@@ -44,7 +44,7 @@ public class EnemySelectedCardView : MonoBehaviour
     public void CreateCardView(EnemySelectCardEvent enemySelectCardEvent)
     {
         var cardView = _cardViewFactory.CreatePrefab();
-        cardView.transform.SetParent(_cardViewParent);
+        cardView.transform.SetParent(_cardViewParent, false);
         cardView.SetCardInfo(enemySelectCardEvent.SelectedCardInfo, _reciever);
 
         _cardViews.Add(cardView);

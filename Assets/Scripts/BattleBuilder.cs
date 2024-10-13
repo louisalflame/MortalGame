@@ -15,7 +15,7 @@ public class BattleBuidler
     { 
         var initialState = new GameStatus(
             round: 0,
-            state: GameState.None,
+            state: GameState.GameStart,
             player: _ParseAlly(_context.Ally),
             enemy: _ParseEnemy(_context.AllEnemies[0])
         ); 

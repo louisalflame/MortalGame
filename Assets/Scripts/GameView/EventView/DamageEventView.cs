@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Playables;
 
-public class     DamageEventView : MonoBehaviour, IRecyclable, IHealthEventView
+public class DamageEventView : MonoBehaviour, IRecyclable, IHealthEventView
 {
     [SerializeField]
     private TextMeshProUGUI _text;
@@ -12,7 +12,7 @@ public class     DamageEventView : MonoBehaviour, IRecyclable, IHealthEventView
 
     public void SetEventInfo(DamageEvent damageEvent, Transform parent)
     {
-        transform.SetParent(parent);
+        transform.SetParent(parent, false);
         _text.text = damageEvent.DeltaHp.ToString();
     }
 
