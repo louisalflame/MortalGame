@@ -69,6 +69,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
 
         _enemyInfoView.Init(statusWatcher);
         _enemySelectedCardView.Init(statusWatcher, reciever);
+        _enemyCharacterView.Init(statusWatcher);
 
         _deckCardView.Init(statusWatcher, this);
         _deckDetailPanel.Init(statusWatcher);
@@ -173,7 +174,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
     }
     private void _EnemySummonEvent(EnemySummonEvent enemySummonEvent)
     {
-
+        _enemyCharacterView.SummonEnemy(enemySummonEvent);
     }
     private void _UpdateRoundAndPlayer(RoundStartEvent roundStartEvent)
     {
@@ -288,7 +289,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
                 break;
             case Faction.Enemy:
                 _enemyInfoView.UpdateHealth(healthEvent);
-                _allyCharacterView.UpdateHealth(healthEvent);
+                _enemyCharacterView.UpdateHealth(healthEvent);
                 break;
         }
     }

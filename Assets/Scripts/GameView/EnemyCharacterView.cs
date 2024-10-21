@@ -1,11 +1,19 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyCharacterView : MonoBehaviour
+public class EnemyCharacterView : BaseCharacterView
 {
-    [SerializeField]
-    private DamageEventViewFactory _damageEventViewFactory;
-    [SerializeField]
-    private HealEventViewFactory _healEventViewFactory;
-    [SerializeField]
-    private ShieldEventViewFactory _shieldEventViewFactory;
+    public void Init(IGameplayStatusWatcher statusWatcher) 
+    {
+        _statusWatcher = statusWatcher;
+        _timmer = 0;
+        _healthEventBuffer = new Queue<HealthEvent>();
+    }
+
+    public void SummonEnemy(EnemySummonEvent enemySummonEvent)
+    {
+        Debug.Log($"Summon Enemy: {enemySummonEvent.Enemy.Name}");
+
+        _Run().Forget();
+    }
 }

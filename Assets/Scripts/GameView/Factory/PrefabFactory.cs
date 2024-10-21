@@ -28,7 +28,7 @@ public class PrefabFactory<T> : MonoBehaviour where T : MonoBehaviour, IRecyclab
     public void RecyclePrefab(T view)
     {
         view.Reset();
-        view.transform.SetParent(_recycleRoot);
+        view.transform.SetParent(_recycleRoot, false);
         _pool.Push(view);
     }
 }

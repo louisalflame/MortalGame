@@ -70,7 +70,9 @@ public class CardView : MonoBehaviour, IRecyclable
     {
         _button.interactable = false;
         _disposables.Dispose();
-        _disposables.Clear();
+
+        // Disposed object can't be reused by same instance.
+        _disposables = new CompositeDisposable();
     }
 
     public void ShowHandCardFocusContent()
