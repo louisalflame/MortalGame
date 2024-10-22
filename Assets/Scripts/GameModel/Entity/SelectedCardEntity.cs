@@ -2,34 +2,49 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class SelectedCardEntity
+public interface ISelectedCardEntity
 {
-    public int MaxCount;
-    public IReadOnlyCollection<CardEntity> Cards;
+    IReadOnlyCollection<CardEntity> Cards { get; }
+    IReadOnlyCollection<CardInfo> CardInfos { get; }
+    bool TryEnqueueCard(CardEntity card);
+    bool TryDequeueCard(out CardEntity card);
+}
+
+public class SelectedCardEntity : ISelectedCardEntity
+{
+    public IReadOnlyCollection<CardEntity> Cards => _cards;
+
+    private int _maxCount;
+    private Queue<CardEntity> _cards;
 
     public IReadOnlyCollection<CardInfo> CardInfos =>
         Cards.Select(c => new CardInfo(c)).ToArray();
 
     public SelectedCardEntity(int selectedCardMaxCount, IEnumerable<CardEntity> cards)
     {
-        MaxCount = selectedCardMaxCount;
-        Cards = cards.ToList();
+        _maxCount = selectedCardMaxCount;
+        _cards = new Queue<CardEntity>(cards); 
     }
  
-    public SelectedCardEntity EnqueueCard(CardEntity card)
+    public bool TryEnqueueCard(CardEntity card)
     {
-        var newCards = new List<CardEntity>(Cards);
-        newCards.Add(card);
-
-        return new SelectedCardEntity(MaxCount, newCards);
+        if (Cards.Count < _maxCount)
+        {
+            _cards.Enqueue(card);
+            return true;
+        }
+        return false;
     }
 
-    public SelectedCardEntity DequeueCard(out CardEntity card)
-    {
-        card = Cards.FirstOrDefault();
-        var newCards = new List<CardEntity>(Cards.Skip(1));
-
-        return new SelectedCardEntity(MaxCount, newCards);
+    public bool TryDequeueCard(out CardEntity card)
+    { 
+        if (Cards.Count > 0)
+        {
+            card = _cards.Dequeue();
+            return true;
+        }
+        card = null;
+        return false;
     }
 }
 

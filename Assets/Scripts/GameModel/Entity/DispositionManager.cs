@@ -1,34 +1,58 @@
 using UnityEngine;
 
-public class DispositionManager
+public interface IDispositionManager
 {
-    public enum Name 
-    {
-        Coward = -2,
-        Cautious = -1,
-        Moderate = 0,
-        Brave = 1,
-        Reckless = 2,
-    }
+    int RecoverEnergyPoint { get; }
+    int TurnStartDrawCardCount { get; }
+    string Name { get; }
+}
 
-    public int CurrentDisposition;
-    public const int MAX_DISPOSITION = 10;
+public class DispositionManager : IDispositionManager
+{
+    public readonly int[] DIPOSITION_RANGE = new int[] { 1, 3, 6, 8, 10 };
+    public readonly string[] DISPODITION_NAMES = new string[]  { "Coward", "Cautious", "Moderate", "Brave", "Reckless", };
+    public readonly int[] RECOVER_ENERGY_POINT = new int[] { 4, 4, 5, 5, 6, };
+    public readonly int[] TURN_START_DRAW_CARD_COUNT = new int[] { 6, 5, 5, 4, 4, };
+
+    public int CurrentDisposition => _disposition;
+    private int _disposition;
 
     public DispositionManager(int initialDisposition)
     {
-        CurrentDisposition = initialDisposition; 
+        _disposition = initialDisposition; 
     }
 
-    public string GetName() {
-        if      ( CurrentDisposition <= 1 )
-            return Name.Coward.ToString();
-        else if ( CurrentDisposition <= 3 )
-            return Name.Cautious.ToString();
-        else if ( CurrentDisposition <= 6 )
-            return Name.Moderate.ToString();
-        else if ( CurrentDisposition <= 8 )
-            return Name.Brave.ToString();
-        else
-            return Name.Reckless.ToString();
+    public int RecoverEnergyPoint
+    {
+        get
+        {
+            return RECOVER_ENERGY_POINT[_GetDispositionIndex(_disposition)];
+        }
+    }
+
+    public int TurnStartDrawCardCount
+    {
+        get
+        {
+            return TURN_START_DRAW_CARD_COUNT[_GetDispositionIndex(_disposition)];
+        }
+    }
+
+    public string Name
+    {
+        get
+        {
+            return DISPODITION_NAMES[_GetDispositionIndex(_disposition)];
+        }
+    }
+
+    private int _GetDispositionIndex(int disposition)
+    {
+        for (int i = 0; i < DIPOSITION_RANGE.Length; i++)
+        {
+            if (disposition <= DIPOSITION_RANGE[i])
+                return i;
+        }
+        return DIPOSITION_RANGE.Length - 1;
     }
 }

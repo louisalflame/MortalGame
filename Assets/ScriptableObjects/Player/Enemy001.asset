@@ -25,9 +25,21 @@ MonoBehaviour:
     - Name: Enemy
       Entry: 7
       Data: 0|EnemyData, Assembly-CSharp
+    - Name: EnemyID
+      Entry: 1
+      Data: enemy001
     - Name: Level
       Entry: 3
       Data: 1
+    - Name: SelectedCardMaxCount
+      Entry: 3
+      Data: 2
+    - Name: TurnStartDrawCardCount
+      Entry: 3
+      Data: 3
+    - Name: EnergyRecoverPoint
+      Entry: 3
+      Data: 2
     - Name: PlayerData
       Entry: 7
       Data: 1|PlayerData, Assembly-CSharp
@@ -46,9 +58,6 @@ MonoBehaviour:
     - Name: InitialEnergy
       Entry: 3
       Data: 8
-    - Name: InitialPower
-      Entry: 3
-      Data: 1
     - Name: Deck
       Entry: 10
       Data: 0

@@ -48,15 +48,16 @@ public class BattleBuidler
         var enemyCardInstances = enemyData.PlayerData.Deck.Cards.Select(c => CardInstance.Create(c.Data)).ToList(); 
 
         return new EnemyEntity(
-            nameKey             : enemyData.PlayerData.NameKey,
-            initialHealth       : enemyData.PlayerData.InitialHealth,
-            maxHealth           : enemyData.PlayerData.MaxHealth,
-            initialEnergy       : enemyData.PlayerData.InitialEnergy,
-            maxEnergy           : enemyData.PlayerData.MaxEnergy,
-            handCardMaxCount    : enemyData.PlayerData.HandCardMaxCount,
-            enemyCardInstances  : enemyCardInstances,
-            selectedCardMaxCount: enemyData.SelectedCardMaxCount,
-            energyRecoverPoint  : enemyData.EnergyRecoverPoint
+            nameKey                 : enemyData.PlayerData.NameKey,
+            initialHealth           : enemyData.PlayerData.InitialHealth,
+            maxHealth               : enemyData.PlayerData.MaxHealth,
+            initialEnergy           : enemyData.PlayerData.InitialEnergy,
+            maxEnergy               : enemyData.PlayerData.MaxEnergy,
+            handCardMaxCount        : enemyData.PlayerData.HandCardMaxCount,
+            enemyCardInstances      : enemyCardInstances,
+            selectedCardMaxCount    : enemyData.SelectedCardMaxCount,
+            turnStartDrawCardCount  : enemyData.TurnStartDrawCardCount,
+            energyRecoverPoint      : enemyData.EnergyRecoverPoint
         );
     }
 }

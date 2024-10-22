@@ -24,7 +24,7 @@ public abstract class PlayerEntity : IPlayerEntity
 
 public class AllyEntity : PlayerEntity
 {
-    public DispositionManager DispositionManager;
+    public IDispositionManager DispositionManager;
 
     public AllyEntity(
         string nameKey,
@@ -46,8 +46,9 @@ public class AllyEntity : PlayerEntity
 
 public class EnemyEntity : PlayerEntity
 {
-    public SelectedCardEntity SelectedCards;
+    public ISelectedCardEntity SelectedCards;
     public int EnergyRecoverPoint;
+    public int TurnStartDrawCardCount;
 
     public EnemyEntity(
         string nameKey,
@@ -58,6 +59,7 @@ public class EnemyEntity : PlayerEntity
         int handCardMaxCount,
         IEnumerable<CardInstance> enemyCardInstances,
         int selectedCardMaxCount,
+        int turnStartDrawCardCount,
         int energyRecoverPoint)
     {
         Faction = Faction.Enemy;
@@ -65,6 +67,7 @@ public class EnemyEntity : PlayerEntity
         Character = new CharacterEntity(initialHealth, maxHealth, initialEnergy, maxEnergy);
         CardManager = new PlayerCardManager(handCardMaxCount, enemyCardInstances);
         SelectedCards = new SelectedCardEntity(selectedCardMaxCount, new List<CardEntity>());
+        TurnStartDrawCardCount = turnStartDrawCardCount;
         EnergyRecoverPoint = energyRecoverPoint;
     }
 

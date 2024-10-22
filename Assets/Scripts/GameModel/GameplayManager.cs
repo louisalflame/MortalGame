@@ -106,7 +106,7 @@ public class GameplayManager : IGameplayStatusWatcher
             Player = _gameStatus.Ally,
             Enemy = _gameStatus.Enemy
         });
-        var allyGainEnergyResult = _gameStatus.Ally.Character.EnergyManager.RecoverEnergy(3);
+        var allyGainEnergyResult = _gameStatus.Ally.Character.EnergyManager.RecoverEnergy(_gameStatus.Ally.DispositionManager.RecoverEnergyPoint);
         _gameEvents.Add(new RecoverEnergyEvent(_gameStatus.Ally, allyGainEnergyResult));
 
         var enemyGainEnergyResult = _gameStatus.Enemy.Character.EnergyManager.RecoverEnergy(_gameStatus.Enemy.EnergyRecoverPoint);
@@ -121,8 +121,8 @@ public class GameplayManager : IGameplayStatusWatcher
 
     private void _TurnDrawCard()
     {
-        _DrawCardToMaxCount(_gameStatus.Ally);
-        _DrawCardToMaxCount(_gameStatus.Enemy);
+        _DrawCards(_gameStatus.Ally, _gameStatus.Ally.DispositionManager.TurnStartDrawCardCount);    
+        _DrawCards(_gameStatus.Enemy, _gameStatus.Enemy.TurnStartDrawCardCount);
 
         _gameStatus = _gameStatus.With(
             state: GameState.EnemyPrepare
@@ -136,11 +136,13 @@ public class GameplayManager : IGameplayStatusWatcher
         var recommendCards = _gameStatus.Enemy.GetRecommendCards();
         foreach(var card in recommendCards)
         {
-            _gameStatus.Enemy.SelectedCards = _gameStatus.Enemy.SelectedCards.EnqueueCard(card);
-            _gameEvents.Add(new EnemySelectCardEvent(){
-                SelectedCardInfo = new CardInfo(card),
-                SelectedCardInfos = _gameStatus.Enemy.SelectedCards.CardInfos
-            });
+            if(_gameStatus.Enemy.SelectedCards.TryEnqueueCard(card))
+            {
+                _gameEvents.Add(new EnemySelectCardEvent(){
+                    SelectedCardInfo = new CardInfo(card),
+                    SelectedCardInfos = _gameStatus.Enemy.SelectedCards.CardInfos
+                });
+            }
         }
 
         _gameStatus = _gameStatus.With(
@@ -167,10 +169,8 @@ public class GameplayManager : IGameplayStatusWatcher
     }
     private void _EnemyExecute()
     {
-        while(_gameStatus.Enemy.SelectedCards.Cards.Count > 0)
+        while(_gameStatus.Enemy.SelectedCards.TryDequeueCard(out CardEntity selectedCard))
         {
-            _gameStatus.Enemy.SelectedCards = _gameStatus.Enemy.SelectedCards.DequeueCard(out CardEntity selectedCard);
-            
             if (selectedCard.Cost > _gameStatus.Enemy.Character.CurrentEnergy)
             {
                 _gameEvents.Add(new EnemyUnselectedCardEvent(){
@@ -309,12 +309,6 @@ public class GameplayManager : IGameplayStatusWatcher
                 }
             }
         }
-    }
-
-    private void _DrawCardToMaxCount(PlayerEntity player)
-    {
-        var needDrawCount = player.CardManager.HandCard.MaxCount - player.CardManager.HandCard.Cards.Count;
-        _DrawCards(player, needDrawCount);
     }
 
     private void _DrawCards(PlayerEntity player, int drawCount)
