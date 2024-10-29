@@ -91,6 +91,9 @@ public class CardView : MonoBehaviour, IRecyclable
     public void Reset()
     {
         _offsets.Clear();
+        _localPosition = Vector3.zero;
+        _localRotation = Quaternion.identity;
+        transform.localRotation = _localRotation;
         _UpdateLocalPosition();
         _ResetFocusContent();
         DisableCardAction();

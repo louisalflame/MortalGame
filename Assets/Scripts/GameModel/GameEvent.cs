@@ -30,6 +30,7 @@ public class RecycleHandCardEvent : IGameEvent
 {
     public Faction Faction;    
     public IReadOnlyCollection<CardInfo> RecycledCardInfos;
+    public IReadOnlyCollection<CardInfo> ExcludedCardInfos;
     public CardCollectionInfo HandCardInfo;
     public CardCollectionInfo GraveyardInfo;
 }

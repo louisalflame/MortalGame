@@ -10,11 +10,60 @@ public interface ICardPropertyData
 public class PreservedPropertyData : ICardPropertyData
 {
     public ICardPropertyLifetimeData Lifetime;
-    public ICardPropertyValue Value;
 
     public ICardPropertyEntity CreateEntity()
     {
-        return new PreservedPropertyEntity(Lifetime.CreateEntity(), Value);
+        return new PreservedPropertyEntity(Lifetime.CreateEntity());
+    }
+}
+
+public class InitialPriorityPropertyData : ICardPropertyData
+{
+    public ICardPropertyLifetimeData Lifetime;
+
+    public ICardPropertyEntity CreateEntity()
+    {
+        return new InitialPriorityPropertyEntity(Lifetime.CreateEntity());
+    }
+}
+
+public class ConsumablePropertyData : ICardPropertyData
+{
+    public ICardPropertyLifetimeData Lifetime;
+
+    public ICardPropertyEntity CreateEntity()
+    {
+        return new ConsumablePropertyEntity(Lifetime.CreateEntity());
+    }
+}
+
+public class DisposePropertyData : ICardPropertyData
+{
+    public ICardPropertyLifetimeData Lifetime;
+
+    public ICardPropertyEntity CreateEntity()
+    {
+        return new DisposePropertyEntity(Lifetime.CreateEntity());
+    }
+}
+
+public class AutoDisposePropertyData : ICardPropertyData
+{
+    public ICardPropertyLifetimeData Lifetime;
+
+    public ICardPropertyEntity CreateEntity()
+    {
+        return new AutoDisposePropertyEntity(Lifetime.CreateEntity());
+    }
+}
+
+public class SealedPropertyData : ICardPropertyData
+{
+    public ICardPropertyLifetimeData Lifetime;
+
+    public ICardPropertyEntity CreateEntity()
+    {
+        return new SealedPropertyEntity(Lifetime.CreateEntity());
     }
 }
 

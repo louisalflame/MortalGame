@@ -144,13 +144,7 @@ MonoBehaviour:
       Data: 11|CardPropertyTurnCountData, Assembly-CSharp
     - Name: TurnCount
       Entry: 3
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: Value
-      Entry: 7
-      Data: 12|NoneValue, Assembly-CSharp
+      Data: 3
     - Name: 
       Entry: 8
       Data: 

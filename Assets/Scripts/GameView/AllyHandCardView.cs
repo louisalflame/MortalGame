@@ -118,7 +118,7 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
 
     public void RecycleHandCards(RecycleHandCardEvent recycleHandCardEvent)
     {
-        foreach(var cardInfo in recycleHandCardEvent.RecycledCardInfos)
+        foreach(var cardInfo in recycleHandCardEvent.RecycledCardInfos.Concat(recycleHandCardEvent.ExcludedCardInfos))
         {
             if(_cardViewDict.TryGetValue(cardInfo.Indentity, out var cardView))
             {

@@ -50,6 +50,6 @@ public enum CardProperty
     Preserved,
     Sealed,
     Consumable,
+    Dispose,
     AutoDispose,
-    Removable,
 }

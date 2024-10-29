@@ -285,14 +285,15 @@ public class GameplayManager : IGameplayStatusWatcher
 
                         if (player.CardManager.HandCard.RemoveCard(usedCard)) 
                         {
-                            player.CardManager.Graveyard.AddCard(usedCard);
-                            var usedCardInfo = new CardInfo(usedCard);
-                            _gameEvents.Add(new UsedCardEvent() {
-                                Faction = player.Faction,
-                                UsedCardInfo = usedCardInfo,
-                                HandCardInfo = player.CardManager.HandCard.CardCollectionInfo,
-                                GraveyardInfo = player.CardManager.Graveyard.CardCollectionInfo
-                            });
+                            if (usedCard.HasProperty(CardProperty.Dispose) ||
+                                usedCard.HasProperty(CardProperty.AutoDispose))
+                            {
+                                player.CardManager.ExclusionZone.AddCard(usedCard);
+                            }
+                            else
+                            {
+                                player.CardManager.Graveyard.AddCard(usedCard);
+                            }
 
                             if(usedCard.Effects.TryGetValue(CardTiming.OnPlayCard, out var onPlayEffects))
                             {
@@ -304,6 +305,14 @@ public class GameplayManager : IGameplayStatusWatcher
                                     }
                                 }
                             }
+
+                            var usedCardInfo = new CardInfo(usedCard);
+                            _gameEvents.Add(new UsedCardEvent() {
+                                Faction = player.Faction,
+                                UsedCardInfo = usedCardInfo,
+                                HandCardInfo = player.CardManager.HandCard.CardCollectionInfo,
+                                GraveyardInfo = player.CardManager.Graveyard.CardCollectionInfo
+                            });
                         }
                     }
                 }
