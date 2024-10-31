@@ -71,6 +71,6 @@ public static class CardPropertyDataExtensions
 {
     public static bool HasProperty(this CardEntity card, CardProperty property)
     { 
-        return card.Properties.Any(p => p.Property == property);
+        return card.AllProperties.Any(p => p.Property == property);
     }
 }

@@ -8,81 +8,68 @@ public interface ICardPropertyEntity
     ICardPropertyValue Value { get; }
 }
 
-
-public class PreservedPropertyEntity : ICardPropertyEntity
+public abstract class CardPropertyEntity : ICardPropertyEntity
 {
-    public CardProperty Property => CardProperty.Preserved;
-    public ICardPropertyLifetimeEntity Lifetime { get; private set; }
-    public ICardPropertyValue Value { get; private set; }
+    public abstract CardProperty Property { get; }
+    public ICardPropertyLifetimeEntity Lifetime { get; protected set; }
+    public ICardPropertyValue Value { get; protected set; }
 
-    public PreservedPropertyEntity(ICardPropertyLifetimeEntity lifetime)
+    public CardPropertyEntity(ICardPropertyLifetimeEntity lifetime, ICardPropertyValue value)
     {
         Lifetime = lifetime;
-        Value = new NoneValue();
+        Value = value;
     }
 }
 
-public class InitialPriorityPropertyEntity : ICardPropertyEntity
+public class PreservedPropertyEntity : CardPropertyEntity
 {
-    public CardProperty Property => CardProperty.InitialPriority;
-    public ICardPropertyLifetimeEntity Lifetime { get; private set; }
-    public ICardPropertyValue Value { get; private set; }
+    public override CardProperty Property => CardProperty.Preserved;
 
-    public InitialPriorityPropertyEntity(ICardPropertyLifetimeEntity lifetime)
+    public PreservedPropertyEntity(ICardPropertyLifetimeEntity lifetime) : base(lifetime, new NoneValue())
     {
-        Lifetime = lifetime;
-        Value = new NoneValue();
+    }
+}
+
+public class InitialPriorityPropertyEntity : CardPropertyEntity
+{
+    public override CardProperty Property => CardProperty.InitialPriority;
+
+    public InitialPriorityPropertyEntity(ICardPropertyLifetimeEntity lifetime) : base(lifetime, new NoneValue())
+    {
     }
 }   
 
-public class ConsumablePropertyEntity : ICardPropertyEntity
+public class ConsumablePropertyEntity : CardPropertyEntity
 {
-    public CardProperty Property => CardProperty.Consumable;
-    public ICardPropertyLifetimeEntity Lifetime { get; private set; }
-    public ICardPropertyValue Value { get; private set; }
+    public override CardProperty Property => CardProperty.Consumable;
 
-    public ConsumablePropertyEntity(ICardPropertyLifetimeEntity lifetime)
+    public ConsumablePropertyEntity(ICardPropertyLifetimeEntity lifetime) : base(lifetime, new NoneValue())
     {
-        Lifetime = lifetime;
-        Value = new NoneValue();
     }
 }
 
-public class DisposePropertyEntity : ICardPropertyEntity
+public class DisposePropertyEntity : CardPropertyEntity
 {
-    public CardProperty Property => CardProperty.Dispose;
-    public ICardPropertyLifetimeEntity Lifetime { get; private set; }
-    public ICardPropertyValue Value { get; private set; }
-
-    public DisposePropertyEntity(ICardPropertyLifetimeEntity lifetime)
+    public override CardProperty Property => CardProperty.Dispose;
+    public DisposePropertyEntity(ICardPropertyLifetimeEntity lifetime) : base(lifetime, new NoneValue())
     {
-        Lifetime = lifetime;
-        Value = new NoneValue();
     }
 }
 
-public class AutoDisposePropertyEntity : ICardPropertyEntity
+public class AutoDisposePropertyEntity : CardPropertyEntity
 {
-    public CardProperty Property => CardProperty.AutoDispose;
-    public ICardPropertyLifetimeEntity Lifetime { get; private set; }
-    public ICardPropertyValue Value { get; private set; }
+    public override CardProperty Property => CardProperty.AutoDispose;
 
-    public AutoDisposePropertyEntity(ICardPropertyLifetimeEntity lifetime)
+    public AutoDisposePropertyEntity(ICardPropertyLifetimeEntity lifetime) : base(lifetime, new NoneValue())
     {
-        Lifetime = lifetime;
-        Value = new NoneValue();
     }
 }
 
-public class SealedPropertyEntity : ICardPropertyEntity
+public class SealedPropertyEntity : CardPropertyEntity
 {
-    public CardProperty Property => CardProperty.Sealed;
-    public ICardPropertyLifetimeEntity Lifetime { get; private set; }
-    public ICardPropertyValue Value { get; private set; }
+    public override CardProperty Property => CardProperty.Sealed;
 
-    public SealedPropertyEntity(ICardPropertyLifetimeEntity lifetime)
+    public SealedPropertyEntity(ICardPropertyLifetimeEntity lifetime) : base(lifetime, new NoneValue())
     {
-        Lifetime = lifetime;
-        Value = new NoneValue();
     }
 }

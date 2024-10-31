@@ -5,7 +5,6 @@ public interface IHandCardEntity
 {
     int MaxCount { get; }
     IReadOnlyCollection<CardEntity> Cards { get; }
-    CardCollectionInfo CardCollectionInfo { get; }
     void AddCard(CardEntity card);
     bool RemoveCard(CardEntity card);
     IReadOnlyCollection<CardEntity> ClearHand();
@@ -18,8 +17,6 @@ public class HandCardEntity : IHandCardEntity
 
     public int MaxCount => _maxCount;
     public IReadOnlyCollection<CardEntity> Cards => _cards;
-    public CardCollectionInfo CardCollectionInfo =>
-        _cards.Select(c => (new CardInfo(c))).ToArray().ToCardCollectionInfo();
 
     public HandCardEntity(int maxCount)
     {

@@ -5,7 +5,6 @@ using UnityEngine;
 public interface ISelectedCardEntity
 {
     IReadOnlyCollection<CardEntity> Cards { get; }
-    IReadOnlyCollection<CardInfo> CardInfos { get; }
     bool TryEnqueueCard(CardEntity card);
     bool TryDequeueCard(out CardEntity card);
 }
@@ -16,9 +15,6 @@ public class SelectedCardEntity : ISelectedCardEntity
 
     private int _maxCount;
     private Queue<CardEntity> _cards;
-
-    public IReadOnlyCollection<CardInfo> CardInfos =>
-        Cards.Select(c => new CardInfo(c)).ToArray();
 
     public SelectedCardEntity(int selectedCardMaxCount, IEnumerable<CardEntity> cards)
     {

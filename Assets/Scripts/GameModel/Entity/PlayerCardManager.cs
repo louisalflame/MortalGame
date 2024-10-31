@@ -43,10 +43,10 @@ public class PlayerCardManager : IPlayerCardManager
         Graveyard.AddCards(recycleCards);
         events.Add(new RecycleHandCardEvent(){
             Faction = contextManager.Context.ExecutePlayer.Faction,
-            RecycledCardInfos = recycleCards.Select(c => new CardInfo(c)).ToArray(),
-            ExcludedCardInfos = excludeCards.Select(c => new CardInfo(c)).ToArray(),
-            HandCardInfo = HandCard.CardCollectionInfo,
-            GraveyardInfo = Graveyard.CardCollectionInfo
+            RecycledCardInfos = recycleCards.Select(c => new CardInfo(c, contextManager.Context)).ToArray(),
+            ExcludedCardInfos = excludeCards.Select(c => new CardInfo(c, contextManager.Context)).ToArray(),
+            HandCardInfo = HandCard.Cards.ToCardCollectionInfo(contextManager.Context),
+            GraveyardInfo = Graveyard.Cards.ToCardCollectionInfo(contextManager.Context),
         });
 
         return events;
@@ -58,11 +58,10 @@ public class PlayerCardManager : IPlayerCardManager
 
         foreach(var card in HandCard.Cards)
         {
-            foreach(var property in card.Properties)
+            if(card.TryUpdateCardsOnTiming(contextManager, timing, out var cardEvent))
             {
-                property.Lifetime.UpdateTiming(contextManager, timing);
+                events.Add(cardEvent);
             }
-            card.Properties = card.Properties.Where(p => !p.Lifetime.IsExpired).ToList();
         }
 
         return events;

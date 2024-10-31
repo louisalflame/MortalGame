@@ -12,8 +12,6 @@ public class GameplayPresenter : IGameplayActionReciever
     private GameplayManager _gameplayManager;
     private UniTask _viewTask;
 
-    public GameStatus GameStatus => _gameplayManager.GameStatus;
-
     public GameplayPresenter(
         IGameplayView gameplayView,
         GameStatus gameStatus,

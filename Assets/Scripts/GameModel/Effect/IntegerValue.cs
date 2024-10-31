@@ -10,7 +10,7 @@ public class ThisCardPower : IIntegerValue
 {   
     public int Eval(GameStatus gameStatus, GameContext gameContext)
     {
-        return gameContext.UsingCard.Power;
+        return gameContext.UsingCard.EvalPower(gameContext);
     }
 }
 
@@ -19,7 +19,7 @@ public class ThisCardCost : IIntegerValue
 {
     public int Eval(GameStatus gameStatus, GameContext gameContext)
     {
-        return gameContext.UsingCard.Cost;
+        return gameContext.UsingCard.EvalCost(gameContext);
     }
 }
 

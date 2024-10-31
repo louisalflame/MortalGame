@@ -4,7 +4,6 @@ using System.Linq;
 public interface IGraveyardEntity
 {
     IReadOnlyCollection<CardEntity> Cards { get; }
-    CardCollectionInfo CardCollectionInfo { get; }
     void AddCard(CardEntity card);
     void AddCards(IEnumerable<CardEntity> cards);
     IReadOnlyCollection<CardEntity> PopAllCards();
@@ -13,9 +12,6 @@ public class GraveyardEntity : IGraveyardEntity
 {
     private List<CardEntity> _cards;
     public IReadOnlyCollection<CardEntity> Cards => _cards;
-
-    public CardCollectionInfo CardCollectionInfo =>
-        _cards.Select(c => new CardInfo(c)).ToArray().ToCardCollectionInfo();
         
     public GraveyardEntity()
     {

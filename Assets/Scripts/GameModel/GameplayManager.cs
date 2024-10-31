@@ -7,6 +7,7 @@ using UnityEngine;
 public interface IGameplayStatusWatcher
 {
     GameStatus GameStatus { get; }
+    GameContext GameContext { get; }
 }
 
 public class GameplayManager : IGameplayStatusWatcher
@@ -20,7 +21,8 @@ public class GameplayManager : IGameplayStatusWatcher
 
     public bool IsEnd { get{ return _gameResult != null; } }
     public GameResult GameResult { get{ return _gameResult; } }
-    public GameStatus GameStatus { get{ return _gameStatus; } }
+    GameStatus IGameplayStatusWatcher.GameStatus { get{ return _gameStatus; } }
+    GameContext IGameplayStatusWatcher.GameContext { get{ return _contextMgr.Context; } }
 
     public GameplayManager(GameStatus initialStatus, GameContextManager contextManager)
     {
@@ -96,7 +98,6 @@ public class GameplayManager : IGameplayStatusWatcher
         _gameStatus = _gameStatus.With(
             state: GameState.TurnStart
         );
-        Debug.Log($"-- goto state:{_gameStatus.State} --"); 
     }
 
     private void _TurnStart()
@@ -116,7 +117,6 @@ public class GameplayManager : IGameplayStatusWatcher
             round: _gameStatus.Round + 1,
             state: GameState.DrawCard
         );
-        Debug.Log($"-- goto state:{_gameStatus.State} --");   
     }
 
     private void _TurnDrawCard()
@@ -128,7 +128,6 @@ public class GameplayManager : IGameplayStatusWatcher
             state: GameState.EnemyPrepare
         );
         _gameActions.Clear();
-        Debug.Log($"-- goto state:{_gameStatus.State} --");
     }
 
     private void _EnemyPreapre()
@@ -139,8 +138,8 @@ public class GameplayManager : IGameplayStatusWatcher
             if(_gameStatus.Enemy.SelectedCards.TryEnqueueCard(card))
             {
                 _gameEvents.Add(new EnemySelectCardEvent(){
-                    SelectedCardInfo = new CardInfo(card),
-                    SelectedCardInfos = _gameStatus.Enemy.SelectedCards.CardInfos
+                    SelectedCardInfo = new CardInfo(card, _contextMgr.Context),
+                    SelectedCardInfos = _gameStatus.Enemy.SelectedCards.Cards.ToCardInfos(_contextMgr.Context)
                 });
             }
         }
@@ -148,20 +147,18 @@ public class GameplayManager : IGameplayStatusWatcher
         _gameStatus = _gameStatus.With(
             state: GameState.PlayerPrepare
         );
-        Debug.Log($"-- goto state:{_gameStatus.State} --");
     }
 
     private void _PlayerPrepare()
     {
         _gameEvents.Add(new PlayerExecuteStartEvent() {
             Faction = _gameStatus.Ally.Faction,
-            HandCardInfo = _gameStatus.Ally.CardManager.HandCard.CardCollectionInfo
+            HandCardInfo = _gameStatus.Ally.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context)
         });
 
         _gameStatus = _gameStatus.With(
             state: GameState.PlayerExecute
         );
-        Debug.Log($"-- goto state:{_gameStatus.State} --");
     }
     public void _PlayerExecute()
     {
@@ -171,19 +168,20 @@ public class GameplayManager : IGameplayStatusWatcher
     {
         while(_gameStatus.Enemy.SelectedCards.TryDequeueCard(out CardEntity selectedCard))
         {
-            if (selectedCard.Cost > _gameStatus.Enemy.Character.CurrentEnergy)
-            {
-                _gameEvents.Add(new EnemyUnselectedCardEvent(){
-                    SelectedCardInfo = new CardInfo(selectedCard),
-                    SelectedCardInfos = _gameStatus.Enemy.SelectedCards.CardInfos
-                });
-            }
-            else
+            var cardRuntimCost = selectedCard.EvalCost(_contextMgr.Context);
+            if (cardRuntimCost <= _gameStatus.Enemy.Character.CurrentEnergy)
             {
                 _gameActions.Enqueue(new UseCardAction(){
                     CardIndentity = selectedCard.Indentity
                 });
+            }
+            else
+            {
                 _TurnExecute(_gameStatus.Enemy);
+                _gameEvents.Add(new EnemyUnselectedCardEvent(){
+                    SelectedCardInfo = new CardInfo(selectedCard, _contextMgr.Context),
+                    SelectedCardInfos = _gameStatus.Enemy.SelectedCards.Cards.ToCardInfos(_contextMgr.Context)
+                });
             }
         }
         
@@ -192,7 +190,6 @@ public class GameplayManager : IGameplayStatusWatcher
         _gameStatus = _gameStatus.With(
             state: GameState.TurnEnd
         );
-        Debug.Log($"-- goto state:{_gameStatus.State} --");
     }
     private void _TurnExecute(PlayerEntity player)
     {
@@ -222,7 +219,7 @@ public class GameplayManager : IGameplayStatusWatcher
     {
         _gameEvents.Add(new PlayerExecuteEndEvent(){
             Faction = _gameStatus.Ally.Faction,
-            HandCardInfo = _gameStatus.Ally.CardManager.HandCard.CardCollectionInfo
+            HandCardInfo = _gameStatus.Ally.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context)
         });
         
         _TriggerBuffs(_gameStatus.Ally, BuffTiming.OnExecuteEnd);
@@ -231,7 +228,6 @@ public class GameplayManager : IGameplayStatusWatcher
         _gameStatus = _gameStatus.With(
             state: GameState.Enemy_Execute
         );
-        Debug.Log($"-- goto state:{_gameStatus.State} --");
     }   
     private void _FinishEnemyExecuteTurn()
     {
@@ -241,7 +237,6 @@ public class GameplayManager : IGameplayStatusWatcher
         _gameStatus = _gameStatus.With(
             state: GameState.TurnEnd
         );
-        Debug.Log($"-- goto state:{_gameStatus.State} --");
     }
 
     private void _TurnEnd()
@@ -265,7 +260,6 @@ public class GameplayManager : IGameplayStatusWatcher
         _gameStatus = _gameStatus.With(
             state: GameState.TurnStart
         );
-        Debug.Log($"-- goto state:{_gameStatus.State} --");
     }
 
     private void _UseCard(PlayerEntity player, Guid CardIndentity)
@@ -273,11 +267,12 @@ public class GameplayManager : IGameplayStatusWatcher
         using(_contextMgr.SetCardCaster(player))
         {
             var usedCard = player.CardManager.HandCard.Cards.FirstOrDefault(c => c.Indentity == CardIndentity);
-            if (usedCard != null)
+            if (usedCard != null &&
+                !usedCard.HasProperty(CardProperty.Sealed))
             {
                 using(_contextMgr.SetUsingCard(usedCard))
                 {
-                    var cardRuntimCost = usedCard.Cost;
+                    var cardRuntimCost = usedCard.EvalCost(_contextMgr.Context);
                     if (cardRuntimCost <= player.Character.CurrentEnergy)
                     {
                         var loseEnergyResult = player.Character.EnergyManager.ConsumeEnergy(cardRuntimCost);
@@ -306,12 +301,12 @@ public class GameplayManager : IGameplayStatusWatcher
                                 }
                             }
 
-                            var usedCardInfo = new CardInfo(usedCard);
+                            var usedCardInfo = new CardInfo(usedCard, _contextMgr.Context);
                             _gameEvents.Add(new UsedCardEvent() {
                                 Faction = player.Faction,
                                 UsedCardInfo = usedCardInfo,
-                                HandCardInfo = player.CardManager.HandCard.CardCollectionInfo,
-                                GraveyardInfo = player.CardManager.Graveyard.CardCollectionInfo
+                                HandCardInfo = player.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context),
+                                GraveyardInfo = player.CardManager.Graveyard.Cards.ToCardCollectionInfo(_contextMgr.Context)
                             });
                         }
                     }
@@ -331,8 +326,8 @@ public class GameplayManager : IGameplayStatusWatcher
                 player.CardManager.Deck.EnqueueCardsThenShuffle(graveyardCards);
                 _gameEvents.Add(new RecycleGraveyardEvent() {
                     Faction = player.Faction,
-                    DeckInfo = player.CardManager.Deck.CardCollectionInfo,
-                    GraveyardInfo = player.CardManager.Graveyard.CardCollectionInfo
+                    DeckInfo = player.CardManager.Deck.Cards.ToCardCollectionInfo(_contextMgr.Context),
+                    GraveyardInfo = player.CardManager.Graveyard.Cards.ToCardCollectionInfo(_contextMgr.Context)
                 });
             }
 
@@ -347,12 +342,12 @@ public class GameplayManager : IGameplayStatusWatcher
         {
             player.CardManager.HandCard.AddCard(newCard);
 
-            var newCardInfo = new CardInfo(newCard);
+            var newCardInfo = new CardInfo(newCard, _contextMgr.Context);
             _gameEvents.Add(new DrawCardEvent(){
                 Faction = player.Faction,
                 NewCardInfo = newCardInfo,
-                HandCardInfo = player.CardManager.HandCard.CardCollectionInfo,
-                DeckInfo = player.CardManager.Deck.CardCollectionInfo,
+                HandCardInfo = player.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context),
+                DeckInfo = player.CardManager.Deck.Cards.ToCardCollectionInfo(_contextMgr.Context)
             });
         }
     }

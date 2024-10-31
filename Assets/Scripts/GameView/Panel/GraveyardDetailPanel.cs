@@ -46,7 +46,8 @@ public class GraveyardDetailPanel : MonoBehaviour, ISimpleCardViewHandler
                 .AddTo(disposables);
         }
 
-        var cardInfos = _statusWatcher.GameStatus.Ally.CardManager.Graveyard.CardCollectionInfo.CardInfos.Keys;
+        var cardInfos = _statusWatcher.GameStatus.Ally.CardManager.Graveyard.Cards
+            .ToCardInfos(_statusWatcher.GameContext);
         foreach (var cardInfo in cardInfos)
         {
             var cardView = _cardViewFactory.CreatePrefab();
@@ -89,9 +90,10 @@ public class GraveyardDetailPanel : MonoBehaviour, ISimpleCardViewHandler
 
     public void ReadCard(Guid cardIdentity)
     {
-        _selectedCardInfo = _statusWatcher.GameStatus.Ally.CardManager.Graveyard
-            .CardCollectionInfo.CardInfos.Keys
-            .FirstOrDefault(kvp => kvp.Indentity == cardIdentity);
+        _selectedCardInfo = _statusWatcher.GameStatus.Ally.CardManager.Deck.Cards
+            .Where(card => card.Indentity == cardIdentity)
+            .Select(card => new CardInfo(card, _statusWatcher.GameContext))
+            .FirstOrDefault();
         if (_selectedCardInfo != null)
             _state = GraveyardDetailPanelState.SinglePopup;
     }

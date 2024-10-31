@@ -6,6 +6,11 @@ public interface IGameEvent
 
 }
 
+public class NoneEvent : IGameEvent
+{
+    public static readonly NoneEvent Instance = new NoneEvent();
+}
+
 public class AllySummonEvent : IGameEvent
 {
     public AllyEntity Player;

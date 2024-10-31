@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public enum AlgorithmType
+public enum ArithmeticType
 {
     None = 0,
     Add,
