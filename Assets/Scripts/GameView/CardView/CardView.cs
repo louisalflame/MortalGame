@@ -33,6 +33,8 @@ public class CardView : MonoBehaviour, IRecyclable
     [BoxGroup("Focus")]
     private float _focusDuration = 0.5f;
 
+    public Transform Content => _content;
+
     private CompositeDisposable _disposables = new CompositeDisposable();
     private Vector3 _localPosition;
     private Quaternion _localRotation; 

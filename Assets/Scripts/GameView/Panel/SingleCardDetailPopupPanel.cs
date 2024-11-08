@@ -17,6 +17,8 @@ public class SingleCardDetailPopupPanel : MonoBehaviour
     private GameObject _panel;
     [SerializeField]
     private CardView _cardView;
+    [SerializeField]
+    private CardPropertyHint _cardPropertyHint;
 
     private SingleCardDetailPopupPanelState _state;
 
@@ -37,12 +39,16 @@ public class SingleCardDetailPopupPanel : MonoBehaviour
             _state = SingleCardDetailPopupPanelState.Idle;
             _panel.SetActive(true);
 
+            _cardPropertyHint.ShowHint(cardInfo, _cardView, false);
+
             while (_state != SingleCardDetailPopupPanelState.Close)
             {
                 await UniTask.Yield();
             }
 
             _panel.SetActive(false);
+
+            _cardPropertyHint.HideHint();
         }
     }
 }

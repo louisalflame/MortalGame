@@ -11,13 +11,19 @@ public class CardPropertyHint : MonoBehaviour
     private Transform _cardPropertyInfoViewParent;
     [SerializeField]
     private RectTransform _layoutGroupRectTransfrom;
+    
+    [SerializeField]
+    private Vector2 _localPosition;
 
+    private Transform _originParent;
     private List<CardPropertyInfoView> _propertyViews = new List<CardPropertyInfoView>();
 
     public void ShowHint(CardInfo cardInfo, CardView cardView, bool smallDirection)
     {
+        _originParent = transform.parent;
         _hintTransform.gameObject.SetActive(true);
-        _hintTransform.SetParent(cardView.transform, false);
+        _hintTransform.SetParent(cardView.Content, false);
+        _hintTransform.localPosition = _localPosition;
 
         foreach(var appendProperty in cardInfo.AppendProperties)
         {
@@ -25,7 +31,6 @@ public class CardPropertyHint : MonoBehaviour
             cardPropertyInfoView.transform.SetParent(_cardPropertyInfoViewParent, false);
             _propertyViews.Add(cardPropertyInfoView);
             //TODO : cardPropertyInfoView.setInfo(appendProperty);
-
         }
 
         if(_propertyViews.Count > 5) // If layout reach bottom, move anchor/pivot to bottom
@@ -44,6 +49,10 @@ public class CardPropertyHint : MonoBehaviour
 
     public void HideHint()
     {
+        if(_originParent != null)
+        {
+            _hintTransform.SetParent(_originParent, false);
+        }
         _hintTransform.gameObject.SetActive(false);
 
         foreach (var propertyView in _propertyViews)

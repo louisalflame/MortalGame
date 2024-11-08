@@ -39,17 +39,18 @@ public enum CardTiming
     TurnEnd,
 }
 
-public enum CardProperty
+public enum CardProperty : int
 {
-    None = 0,
-    EffectTimes,
-    RecycleTimes,
-    PowerAdjust,
-    CostAdjust,
-    InitialPriority,
-    Preserved,
-    Sealed,
-    Consumable,
-    Dispose,
-    AutoDispose,
+    None                = 0,
+    EffectTimes         = 1,
+    RecycleTimes        = 1 << 1,
+    PowerAdjust         = 1 << 2, 
+    CostAdjust          = 1 << 3,
+    InitialPriority     = 1 << 4,
+    Preserved           = 1 << 5,
+    Sealed              = 1 << 6,
+    Consumable          = 1 << 7,
+    Dispose             = 1 << 8,
+    AutoDispose         = 1 << 9,
+    AppendEffect        = 1 << 10,
 }

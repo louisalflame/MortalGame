@@ -23,7 +23,6 @@ public class CardEntity
     public List<ITargetSelectable> Selectables;
 
     public Dictionary<CardTiming, List<ICardEffect>> Effects { get; private set; }
-    public Dictionary<CardTiming, List<ICardEffect>> AppendEffects { get; private set; }
 
     public List<ICardPropertyEntity> Properties { get; private set; }
     public List<ICardPropertyEntity> AppendProperties { get; private set; }
@@ -53,7 +52,6 @@ public class CardEntity
                 pair => pair.Key,
                 pair => pair.Value.ToList()
             ),
-            AppendEffects = new Dictionary<CardTiming, List<ICardEffect>>(),
             Properties = cardInstance.PropertyDatas.Select(p => p.CreateEntity()).ToList(),
             AppendProperties = new List<ICardPropertyEntity>(),
             OriginCardInstanceGuid = cardInstance.InstanceGuid,
