@@ -43,13 +43,13 @@ public class EnemySelectedCardView : MonoBehaviour
  
     public void CreateCardView(EnemySelectCardEvent enemySelectCardEvent)
     {
+Debug.Log($"==> enemyselect create cardview: {enemySelectCardEvent.SelectedCardInfo.Indentity}");
         var cardView = _cardViewFactory.CreatePrefab();
         cardView.transform.SetParent(_cardViewParent, false);
         cardView.SetCardInfo(enemySelectCardEvent.SelectedCardInfo, _reciever);
 
         _cardViews.Add(cardView);
         _cardViewDict.Add(enemySelectCardEvent.SelectedCardInfo.Indentity, cardView);
-
         if(_cardViews.Count > 0)
         {
             _RearrangeCardViews();
@@ -58,6 +58,7 @@ public class EnemySelectedCardView : MonoBehaviour
 
     public void RemoveCardView(UsedCardEvent usedCardEvent)
     {
+Debug.Log($"==> enemyselect create cardview: {usedCardEvent.UsedCardInfo.Indentity}");
         if(_cardViewDict.TryGetValue(usedCardEvent.UsedCardInfo.Indentity, out var cardView))
         {
             _cardViews.Remove(cardView);
@@ -69,6 +70,7 @@ public class EnemySelectedCardView : MonoBehaviour
     }
     public void RemoveCardView(EnemyUnselectedCardEvent enemyUnselectedCardEvent)
     {
+Debug.Log($"==> enemyselect create cardview: {enemyUnselectedCardEvent.SelectedCardInfo.Indentity}");
         if(_cardViewDict.TryGetValue(enemyUnselectedCardEvent.SelectedCardInfo.Indentity, out var cardView))
         {
             _cardViews.Remove(cardView);
@@ -82,6 +84,7 @@ public class EnemySelectedCardView : MonoBehaviour
     {
         foreach(var cardInfo in recycleHandCardEvent.RecycledCardInfos)
         {
+Debug.Log($"==> enemyselect create cardview: {cardInfo.Indentity}");
             if(_cardViewDict.TryGetValue(cardInfo.Indentity, out var cardView))
             {
                 _cardViews.Remove(cardView);

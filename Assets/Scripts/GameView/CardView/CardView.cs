@@ -59,7 +59,7 @@ public class CardView : MonoBehaviour, IRecyclable
             .Subscribe(_ => handler.FocusStop(cardInfo.Indentity)) 
             .AddTo(_disposables);
     }
-    public void EnableSimpleCardAction(CardInfo cardInfo, ISimpleCardViewHandler handler)
+    public void EnableSimpleCardAction(CardInfo cardInfo, IAllCardViewHandler handler)
     {
         _button.interactable = true;
         _button.OnClickAsObservable()

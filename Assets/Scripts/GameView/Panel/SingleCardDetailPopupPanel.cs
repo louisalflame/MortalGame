@@ -39,7 +39,7 @@ public class SingleCardDetailPopupPanel : MonoBehaviour
 
             while (_state != SingleCardDetailPopupPanelState.Close)
             {
-                await UniTask.NextFrame();
+                await UniTask.Yield();
             }
 
             _panel.SetActive(false);

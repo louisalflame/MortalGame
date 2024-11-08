@@ -13,12 +13,12 @@ public class DeckCardView : MonoBehaviour
     private IGameplayStatusWatcher _statusWatcher;
     private CompositeDisposable _disposables = new CompositeDisposable();
 
-    public void Init(IGameplayStatusWatcher statusWatcher, IGameplayView gameplayView)
+    public void Init(IGameplayStatusWatcher statusWatcher, IGameplayActionReciever actionReciever)
     {
         _statusWatcher = statusWatcher;
         
         _deckButton.OnClickAsObservable()
-            .Subscribe(_ => gameplayView.ClickDeckDetailPanel())
+            .Subscribe(_ => actionReciever.ShowDeckDetailPanel())
             .AddTo(_disposables);
         _deckCountText.text = _statusWatcher.GameStatus.Ally.CardManager.Deck.Cards.Count.ToString();
     }

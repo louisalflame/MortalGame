@@ -13,12 +13,12 @@ public class GraveyardCardView : MonoBehaviour
     private IGameplayStatusWatcher _statusWatcher;
     private CompositeDisposable _disposables = new CompositeDisposable();
 
-    public void Init(IGameplayStatusWatcher statusWatcher, IGameplayView gameplayView)
+    public void Init(IGameplayStatusWatcher statusWatcher, IGameplayActionReciever actionReciever)
     {
         _statusWatcher = statusWatcher;
         
         _deckButton.OnClickAsObservable()
-            .Subscribe(_ => gameplayView.ClickGraveyardDetailPanel())
+            .Subscribe(_ => actionReciever.ShowGraveyardDetailPanel())
             .AddTo(_disposables);
         _graveyardCountText.text = _statusWatcher.GameStatus.Ally.CardManager.Graveyard.Cards.Count.ToString();
     }

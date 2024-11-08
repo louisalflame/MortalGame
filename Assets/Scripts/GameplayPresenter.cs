@@ -4,16 +4,18 @@ using UnityEngine;
 public interface IGameplayActionReciever
 {
     void RecieveEvent(IGameAction gameplayAction);
+    void ShowDeckDetailPanel();
+    void ShowGraveyardDetailPanel();
 }
 
 public class GameplayPresenter : IGameplayActionReciever
 {
     private IGameplayView _gameplayView;
     private GameplayManager _gameplayManager;
-    private UniTask _viewTask;
+    private IAllCardDetailPresenter _allCardDetailPresenter;
 
     public GameplayPresenter(
-        IGameplayView gameplayView,
+        GameplayView gameplayView,
         GameStatus gameStatus,
         GameContextManager gameContextManager
     )
@@ -22,24 +24,21 @@ public class GameplayPresenter : IGameplayActionReciever
         _gameplayManager = new GameplayManager(gameStatus, gameContextManager);
 
         _gameplayView.Init(this, _gameplayManager);
+        _allCardDetailPresenter = new AllCardDetailPresenter(_gameplayView, _gameplayManager);
     }
 
     public async UniTask<GameResult> Run()
     {
-        Debug.Log("-- GameplayPresenter.Run --");
-
         _gameplayManager.Start();
-        _viewTask = _gameplayView.Run();
+        var v = _allCardDetailPresenter.Run();
 
         while(!_gameplayManager.IsEnd)
         {
-            await UniTask.NextFrame();
+            await UniTask.Yield();
             
             var events = _gameplayManager.PopAllEvents();
             _gameplayView.Render(events, this);
         }
-
-        await _viewTask;
 
         return _gameplayManager.GameResult;
     }
@@ -48,5 +47,14 @@ public class GameplayPresenter : IGameplayActionReciever
     {
         Debug.Log($"-- GameplayPresenter.RecieveEvent:[{gameAction}] --");
         _gameplayManager.EnqueueAction(gameAction);
+    }
+
+    public void ShowDeckDetailPanel()
+    {
+        _allCardDetailPresenter.ShowDeckDetail();
+    }
+    public void ShowGraveyardDetailPanel()
+    {
+        _allCardDetailPresenter.ShowGraveyardDetail();
     }
 }

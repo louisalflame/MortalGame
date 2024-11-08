@@ -4,21 +4,16 @@ using Sirenix.OdinInspector;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public interface IGameplayView
+public interface IGameplayView : IAllCardDetailPanelView
 {
     void Init(IGameplayActionReciever reciever, IGameplayStatusWatcher statusWatcher);
     void Render(IReadOnlyCollection<IGameEvent> events, IGameplayActionReciever reciever);
-    UniTask Run();
-
-    void ClickDeckDetailPanel();
-    void ClickGraveyardDetailPanel();
 }
 
-public enum GameplayViewState
+public interface IAllCardDetailPanelView
 {
-    Idle = 0,
-    DeckDetailPanel,
-    GraveyardDetailPanel,
+    AllCardDetailPanel DetailPanel { get; }
+    SingleCardDetailPopupPanel SinglePopupPanel { get; }
 }
 
 public class GameplayView : MonoBehaviour, IGameplayView
@@ -48,18 +43,20 @@ public class GameplayView : MonoBehaviour, IGameplayView
     private DeckCardView _deckCardView;
     [BoxGroup("HandView")]
     [SerializeField]
-    private DeckDetailPanel _deckDetailPanel;
-    [BoxGroup("HandView")]
-    [SerializeField]
     private GraveyardCardView _graveyardCardView;
-    [BoxGroup("HandView")]
-    [SerializeField]
-    private GraveyardDetailPanel _graveyardDetailPanel;
     [BoxGroup("HandView")]
     [SerializeField]
     private SubmitView _submitView;
 
-    private GameplayViewState _state = GameplayViewState.Idle;
+    [BoxGroup("Popup")]
+    [SerializeField]
+    private AllCardDetailPanel _allCardDetailPanel;
+    [BoxGroup("Popup")]
+    [SerializeField]
+    private SingleCardDetailPopupPanel _singleCardDetailPopupPanel;
+
+    public AllCardDetailPanel DetailPanel => _allCardDetailPanel;
+    public SingleCardDetailPopupPanel SinglePopupPanel => _singleCardDetailPopupPanel;
 
     public void Init(IGameplayActionReciever reciever, IGameplayStatusWatcher statusWatcher)
     {
@@ -71,43 +68,9 @@ public class GameplayView : MonoBehaviour, IGameplayView
         _enemySelectedCardView.Init(statusWatcher, reciever);
         _enemyCharacterView.Init(statusWatcher);
 
-        _deckCardView.Init(statusWatcher, this);
-        _deckDetailPanel.Init(statusWatcher);
-        _graveyardCardView.Init(statusWatcher, this);
-        _graveyardDetailPanel.Init(statusWatcher);
+        _deckCardView.Init(statusWatcher, reciever);
+        _graveyardCardView.Init(statusWatcher, reciever);
         _submitView.Init(reciever);
-    }
-
-    public void ClickDeckDetailPanel()
-    {
-        if (_state == GameplayViewState.Idle)
-            _state = GameplayViewState.DeckDetailPanel;
-    }
-    public void ClickGraveyardDetailPanel()
-    {
-        if (_state == GameplayViewState.Idle)
-            _state = GameplayViewState.GraveyardDetailPanel;
-    }
-
-    public async UniTask Run()
-    {
-        while (true)
-        {
-            switch(_state)
-            {
-                case GameplayViewState.Idle:
-                    await UniTask.NextFrame();
-                    break;
-                case GameplayViewState.DeckDetailPanel:
-                    await _deckDetailPanel.Run();
-                    _state = GameplayViewState.Idle;
-                    break;
-                case GameplayViewState.GraveyardDetailPanel:
-                    await _graveyardDetailPanel.Run();
-                    _state = GameplayViewState.Idle;
-                    break;
-            }
-        }
     }
 
     public void Render(IReadOnlyCollection<IGameEvent> events, IGameplayActionReciever reciever) 

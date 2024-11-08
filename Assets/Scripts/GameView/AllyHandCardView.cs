@@ -26,6 +26,9 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
     private float _arcStepMinAngle;
     [SerializeField]
     private float _focusOffsetX;
+    
+    [SerializeField]
+    private CardPropertyHint _cardPropertyHint;
 
     private List<CardView> _cardViews = new List<CardView>();
     private Dictionary<Guid, CardView> _cardViewDict = new Dictionary<Guid, CardView>();
@@ -59,8 +62,10 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
     {
         if (_cardViewDict.TryGetValue(focusIdentity, out var focusView))
         {
-            var focusIndex = _cardCollectionInfo.CardInfos
-                .FirstOrDefault(kvp => kvp.Key.Indentity == focusIdentity).Value;
+            var focusKvp = _cardCollectionInfo.CardInfos
+                .FirstOrDefault(kvp => kvp.Key.Indentity == focusIdentity);
+            var focusCardInfo = focusKvp.Key;
+            var focusIndex = focusKvp.Value;
             focusView.ShowHandCardFocusContent();
             
             var smaller = _cardCollectionInfo.CardInfos
@@ -84,6 +89,8 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
                     cardView.AddLocationOffset(focusIdentity, new Vector3(-_focusOffsetX, 0, 0));
                 }
             }
+ 
+            _cardPropertyHint.ShowHint(focusCardInfo, focusView, smaller.Count() < larger.Count());
         }
     }
     public void FocusStop(Guid focusIdentity)
@@ -98,6 +105,8 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
             {
                 cardView.RemoveLocationOffset(focusIdentity);
             }
+
+            _cardPropertyHint.HideHint();
         }
     }
 

@@ -174,10 +174,10 @@ public class GameplayManager : IGameplayStatusWatcher
                 _gameActions.Enqueue(new UseCardAction(){
                     CardIndentity = selectedCard.Indentity
                 });
+                _TurnExecute(_gameStatus.Enemy);
             }
             else
             {
-                _TurnExecute(_gameStatus.Enemy);
                 _gameEvents.Add(new EnemyUnselectedCardEvent(){
                     SelectedCardInfo = new CardInfo(selectedCard, _contextMgr.Context),
                     SelectedCardInfos = _gameStatus.Enemy.SelectedCards.Cards.ToCardInfos(_contextMgr.Context)
