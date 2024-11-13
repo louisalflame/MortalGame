@@ -13,7 +13,7 @@ public class DamageEventView : MonoBehaviour, IRecyclable, IHealthEventView
     public void SetEventInfo(DamageEvent damageEvent, Transform parent)
     {
         transform.SetParent(parent, false);
-        _text.text = damageEvent.DeltaHp.ToString();
+        _text.text = damageEvent.DamagePoint.ToString();
     }
 
     public void Reset()

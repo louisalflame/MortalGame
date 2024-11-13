@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 public interface IHandCardViewHandler
@@ -12,23 +13,33 @@ public interface IHandCardViewHandler
 
 public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
 {
+    [BoxGroup("Card View")]
     [SerializeField]
     private CardViewFactory _cardViewFactory;
+    [BoxGroup("Card View")]
     [SerializeField]
     private Transform _cardViewParent;
+
+    [BoxGroup("Arc Setting")]
     [SerializeField]
     private float _arcAngle;
+    [BoxGroup("Arc Setting")]
     [SerializeField]
     private float _arcRadiusX;
+    [BoxGroup("Arc Setting")]
     [SerializeField]
     private float _arcRadiusY;
+    [BoxGroup("Arc Setting")]
     [SerializeField]
     private float _arcStepMinAngle;
+    [BoxGroup("Arc Setting")]
     [SerializeField]
     private float _focusOffsetX;
     
     [SerializeField]
     private CardPropertyHint _cardPropertyHint;
+    [SerializeField]
+    private LineRenderer _lineRenderer;
 
     private List<CardView> _cardViews = new List<CardView>();
     private Dictionary<Guid, CardView> _cardViewDict = new Dictionary<Guid, CardView>();
