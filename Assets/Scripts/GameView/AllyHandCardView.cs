@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public interface IHandCardViewHandler
 {
     void UseCard(Guid cardIdentity);
     void FocusStart(Guid cardIdentity);
     void FocusStop(Guid cardIdentity);
+    void BeginDrag(Guid cardIdentity, PointerEventData pointerEventData);
+    void Drag(Guid cardIdentity, PointerEventData pointerEventData);
+    void EndDrag(Guid cardIdentity, PointerEventData pointerEventData);
 }
 
 public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
@@ -40,12 +44,15 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
     private CardPropertyHint _cardPropertyHint;
     [SerializeField]
     private LineRenderer _lineRenderer;
+    [SerializeField]
+    private Canvas _canvas;
 
     private List<CardView> _cardViews = new List<CardView>();
     private Dictionary<Guid, CardView> _cardViewDict = new Dictionary<Guid, CardView>();
     private IGameplayStatusWatcher _statusWatcher;
     private IGameplayActionReciever _reciever;
     private CardCollectionInfo _cardCollectionInfo;
+    private bool _isDragging = false;
 
     public void Init(IGameplayStatusWatcher statusWatcher, IGameplayActionReciever reciever)
     {
@@ -71,7 +78,8 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
     }   
     public void FocusStart(Guid focusIdentity)
     {
-        if (_cardViewDict.TryGetValue(focusIdentity, out var focusView))
+        if (!_isDragging &&
+            _cardViewDict.TryGetValue(focusIdentity, out var focusView))
         {
             var focusKvp = _cardCollectionInfo.CardInfos
                 .FirstOrDefault(kvp => kvp.Key.Indentity == focusIdentity);
@@ -106,7 +114,8 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
     }
     public void FocusStop(Guid focusIdentity)
     {
-        if (_cardViewDict.TryGetValue(focusIdentity, out var focusView))
+        if (!_isDragging &&
+            _cardViewDict.TryGetValue(focusIdentity, out var focusView))
         {
             var originSiblingIndex = _cardCollectionInfo.CardInfos
                 .FirstOrDefault(kvp => kvp.Key.Indentity == focusIdentity).Value;
@@ -118,6 +127,47 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
             }
 
             _cardPropertyHint.HideHint();
+        }
+    }
+
+    public void BeginDrag(Guid dragIdentity, PointerEventData pointerEventData)
+    {
+        if (!_isDragging &&
+            _cardViewDict.TryGetValue(dragIdentity, out var dragView))
+        {
+            _isDragging = true;
+
+            // Clear focus content
+            var originSiblingIndex = _cardCollectionInfo.CardInfos
+                .FirstOrDefault(kvp => kvp.Key.Indentity == dragIdentity).Value;
+            dragView.HideHandCardFocusContent(originSiblingIndex);            
+            foreach(var cardView in _cardViews.Where(view => view != dragView))
+            {
+                cardView.RemoveLocationOffset(dragIdentity);
+            }
+            _cardPropertyHint.HideHint();
+
+            dragView.BeginDrag(pointerEventData, _canvas);
+            _lineRenderer.gameObject.SetActive(true);
+        }
+    }
+    public void Drag(Guid dragIdentity, PointerEventData pointerEventData)
+    {
+        if (_isDragging &&
+            _cardViewDict.TryGetValue(dragIdentity, out var dragView))
+        {
+            dragView.Drag(pointerEventData, _canvas);
+        }
+    }
+    public void EndDrag(Guid dragIdentity, PointerEventData pointerEventData)
+    {
+        if (_isDragging &&
+            _cardViewDict.TryGetValue(dragIdentity, out var dragView))
+        {
+            _isDragging = false;
+
+            dragView.EndDrag(pointerEventData);
+            _lineRenderer.gameObject.SetActive(false);
         }
     }
 

@@ -6,6 +6,7 @@ using TMPro;
 using UniRx;
 using UniRx.Triggers;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class CardView : MonoBehaviour, IRecyclable
@@ -40,6 +41,8 @@ public class CardView : MonoBehaviour, IRecyclable
     private Quaternion _localRotation; 
     private Dictionary<Guid, List<Vector3>> _offsets = new Dictionary<Guid, List<Vector3>>();
     private Tween _currentMoveTween;
+    private Vector2 _beginDragPosition;
+    private Vector2 _dragOffset;
 
     public void SetCardInfo(CardInfo cardInfo)
     {
@@ -51,14 +54,22 @@ public class CardView : MonoBehaviour, IRecyclable
     public void EnableHandCardAction(CardInfo cardInfo, IHandCardViewHandler handler)
     {
         _button.interactable = true;
-        _button.OnClickAsObservable()
-            .Subscribe(_ => handler.UseCard(cardInfo.Indentity))
-            .AddTo(_disposables); 
+        
         _button.OnPointerEnterAsObservable()
             .Subscribe(_ => handler.FocusStart(cardInfo.Indentity)) 
             .AddTo(_disposables);
         _button.OnPointerExitAsObservable()
             .Subscribe(_ => handler.FocusStop(cardInfo.Indentity)) 
+            .AddTo(_disposables);
+        
+        _button.OnBeginDragAsObservable()
+            .Subscribe(pointerEventData => handler.BeginDrag(cardInfo.Indentity, pointerEventData))
+            .AddTo(_disposables);
+        _button.OnDragAsObservable()
+            .Subscribe(pointerEventData => handler.Drag(cardInfo.Indentity, pointerEventData))
+            .AddTo(_disposables);
+        _button.OnEndDragAsObservable()
+            .Subscribe(pointerEventData => handler.EndDrag(cardInfo.Indentity, pointerEventData))
             .AddTo(_disposables);
     }
     public void EnableSimpleCardAction(CardInfo cardInfo, IAllCardViewHandler handler)
@@ -88,6 +99,26 @@ public class CardView : MonoBehaviour, IRecyclable
     {
         _ResetFocusContent();
         transform.SetSiblingIndex(originSiblingIndex);
+    }
+
+    public void BeginDrag(PointerEventData pointerEventData, Canvas canvas)
+    {
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvas.transform as RectTransform, pointerEventData.position, canvas.worldCamera, out Vector2 localPoint);
+ 
+        _beginDragPosition = transform.GetComponent<RectTransform>().anchoredPosition;
+        _dragOffset = _beginDragPosition - localPoint;
+    }
+    public void Drag(PointerEventData pointerEventData, Canvas canvas)
+    {
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvas.transform as RectTransform, pointerEventData.position, canvas.worldCamera, out Vector2 localPoint);
+        
+        transform.GetComponent<RectTransform>().anchoredPosition = localPoint + _dragOffset;
+    }
+    public void EndDrag(PointerEventData pointerEventData)
+    {
+        transform.GetComponent<RectTransform>().anchoredPosition = _beginDragPosition;
     }
 
     public void Reset()
@@ -149,7 +180,10 @@ public class CardView : MonoBehaviour, IRecyclable
         }
         else
         {
-            _currentMoveTween = transform.DOLocalMove(_localPosition + offset, 0.5f).SetEase(Ease.OutExpo);
+            _currentMoveTween = transform
+                .DOLocalMove(_localPosition + offset, 0.5f)
+                .SetEase(Ease.OutExpo)
+                .OnComplete(() => _currentMoveTween.Kill());
         }
     }
 
