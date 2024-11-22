@@ -51,19 +51,19 @@ MonoBehaviour:
     - Name: Power
       Entry: 3
       Data: 1
-    - Name: Selectables
+    - Name: MainSelectable
       Entry: 7
-      Data: 2|System.Collections.Generic.List`1[[ITargetSelectable, Assembly-CSharp]],
-        mscorlib
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 3|PlayerSelectable, Assembly-CSharp
+      Data: 2|NoneSelectable, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
+    - Name: SubSelectables
+      Entry: 7
+      Data: 3|System.Collections.Generic.List`1[[ISubTargetSelectable, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
     - Name: 
       Entry: 13
       Data: 

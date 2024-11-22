@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sirenix.OdinInspector;
+using Unity.Burst.Intrinsics;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -40,19 +41,34 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
     [SerializeField]
     private float _focusOffsetX;
     
-    [SerializeField]
-    private CardPropertyHint _cardPropertyHint;
-    [SerializeField]
-    private LineRenderer _lineRenderer;
+    [BoxGroup("Arrow Setting")]
     [SerializeField]
     private Canvas _canvas;
+    [BoxGroup("Arrow Setting")]
+    [SerializeField]
+    private LineRenderer _lineRenderer;
+    [BoxGroup("Arrow Setting")]
+    [SerializeField]
+    private float _curveHeight;
+    [BoxGroup("Arrow Setting")]
+    [SerializeField]
+    private int _curveResolution;
+    
+    [SerializeField]
+    private CardPropertyHint _cardPropertyHint;
 
     private List<CardView> _cardViews = new List<CardView>();
     private Dictionary<Guid, CardView> _cardViewDict = new Dictionary<Guid, CardView>();
     private IGameplayStatusWatcher _statusWatcher;
     private IGameplayActionReciever _reciever;
     private CardCollectionInfo _cardCollectionInfo;
+
+    // Dragging
     private bool _isDragging = false;
+    private Vector2 _beginDragPosition;
+    private Vector2 _dragOffset;
+
+    public IEnumerable<ISelectableView> SelectableViews => _cardViews;
 
     public void Init(IGameplayStatusWatcher statusWatcher, IGameplayActionReciever reciever)
     {
@@ -147,8 +163,11 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
             }
             _cardPropertyHint.HideHint();
 
-            dragView.BeginDrag(pointerEventData, _canvas);
-            _lineRenderer.gameObject.SetActive(true);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                _canvas.transform as RectTransform, pointerEventData.position, _canvas.worldCamera, out Vector2 localPoint);    
+            _beginDragPosition = dragView.transform.GetComponent<RectTransform>().anchoredPosition;
+            _dragOffset = _beginDragPosition - localPoint;
+            dragView.BeginDrag(_beginDragPosition);
         }
     }
     public void Drag(Guid dragIdentity, PointerEventData pointerEventData)
@@ -156,7 +175,26 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
         if (_isDragging &&
             _cardViewDict.TryGetValue(dragIdentity, out var dragView))
         {
-            dragView.Drag(pointerEventData, _canvas);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                _canvas.transform as RectTransform, pointerEventData.position, _canvas.worldCamera, out Vector2 localPoint);
+            var localDragPoint = localPoint + _dragOffset;
+
+            var selectView = _reciever.SelectableViews
+                .Where(view => RectTransformUtility.RectangleContainsScreenPoint(view.RectTransform, pointerEventData.position, _canvas.worldCamera))
+                .FirstOrDefault();
+            if (selectView != null && selectView != dragView as ISelectableView)
+            {
+                _lineRenderer.gameObject.SetActive(true);
+                var points = _GenerateCurvePoints(_beginDragPosition, localDragPoint);
+                _lineRenderer.positionCount = points.Length;
+                _lineRenderer.SetPositions(points);
+                dragView.Drag(localDragPoint, true);  
+            }
+            else
+            {
+                _lineRenderer.gameObject.SetActive(false);
+                dragView.Drag(localDragPoint, false);  
+            }      
         }
     }
     public void EndDrag(Guid dragIdentity, PointerEventData pointerEventData)
@@ -165,9 +203,12 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
             _cardViewDict.TryGetValue(dragIdentity, out var dragView))
         {
             _isDragging = false;
-
-            dragView.EndDrag(pointerEventData);
             _lineRenderer.gameObject.SetActive(false);
+
+            dragView.EndDrag(_beginDragPosition);
+
+            // TODO: append select targets
+            _reciever.RecieveEvent(new UseCardAction{ CardIndentity = dragIdentity });
         }
     }
 
@@ -244,5 +285,36 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
             var localRotation = Quaternion.Euler(0, 0, angle - 90);
             cardView.SetPositionAndRotation(localPosition, localRotation);
         }
+    }
+     
+    private Vector3[] _GenerateCurvePoints(Vector3 startPoint, Vector3 endPoint)
+    {
+        var points = new Vector3[_curveResolution];
+        Vector3 midPoint = (startPoint + endPoint) / 2;
+        midPoint += Vector3.up * _curveHeight;
+
+        Vector3 controlPoint0 = startPoint + (startPoint - midPoint);
+        Vector3 controlPoint1 = startPoint;
+        Vector3 controlPoint2 = endPoint;
+        Vector3 controlPoint3 = endPoint + (endPoint - midPoint);
+
+        for (int i = 0; i < _curveResolution; i++)
+        {
+            float t = (float)i / (_curveResolution - 1);
+            Vector3 point = _CatmullRom(controlPoint0, controlPoint1, controlPoint2, controlPoint3, t);
+            points[i] = point;
+        }
+
+        return points;
+    }
+    private Vector3 _CatmullRom(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float t)
+    {
+        float t2 = t * t;
+        float t3 = t2 * t;
+
+        return 0.5f * ((2.0f * p1) +
+                       (-p0 + p2) * t +
+                       (2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3) * t2 +
+                       (-p0 + 3.0f * p1 - 3.0f * p2 + p3) * t3);
     }
 }

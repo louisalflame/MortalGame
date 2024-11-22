@@ -8,6 +8,8 @@ public interface IGameplayView : IAllCardDetailPanelView
 {
     void Init(IGameplayActionReciever reciever, IGameplayStatusWatcher statusWatcher);
     void Render(IReadOnlyCollection<IGameEvent> events, IGameplayActionReciever reciever);
+
+    IEnumerable<ISelectableView> SelectableViews { get; }
 }
 
 public interface IAllCardDetailPanelView
@@ -57,6 +59,9 @@ public class GameplayView : MonoBehaviour, IGameplayView
 
     public AllCardDetailPanel DetailPanel => _allCardDetailPanel;
     public SingleCardDetailPopupPanel SinglePopupPanel => _singleCardDetailPopupPanel;
+
+    public IEnumerable<ISelectableView> SelectableViews => 
+        _allyHandCardView.SelectableViews;
 
     public void Init(IGameplayActionReciever reciever, IGameplayStatusWatcher statusWatcher)
     {

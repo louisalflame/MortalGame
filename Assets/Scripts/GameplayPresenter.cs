@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -6,6 +8,8 @@ public interface IGameplayActionReciever
     void RecieveEvent(IGameAction gameplayAction);
     void ShowDeckDetailPanel();
     void ShowGraveyardDetailPanel();
+
+    IEnumerable<ISelectableView> SelectableViews { get; }
 }
 
 public class GameplayPresenter : IGameplayActionReciever
@@ -13,6 +17,8 @@ public class GameplayPresenter : IGameplayActionReciever
     private IGameplayView _gameplayView;
     private GameplayManager _gameplayManager;
     private IAllCardDetailPresenter _allCardDetailPresenter;
+
+    public IEnumerable<ISelectableView> SelectableViews => _gameplayView.SelectableViews;
 
     public GameplayPresenter(
         GameplayView gameplayView,

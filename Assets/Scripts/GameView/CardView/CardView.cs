@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class CardView : MonoBehaviour, IRecyclable
+public class CardView : MonoBehaviour, IRecyclable, ISelectableView
 {
     [SerializeField]
     private TextMeshProUGUI _title;
@@ -21,6 +21,10 @@ public class CardView : MonoBehaviour, IRecyclable
     [BoxGroup("UI")]
     [SerializeField]
     private Button _button;
+    [BoxGroup("UI")]
+    [SerializeField]
+    private CanvasGroup _canvasGroup;
+
 
     [BoxGroup("Focus")]
     [SerializeField]
@@ -35,20 +39,23 @@ public class CardView : MonoBehaviour, IRecyclable
     private float _focusDuration = 0.5f;
 
     public Transform Content => _content;
+    public RectTransform RectTransform => transform.GetComponent<RectTransform>();
 
     private CompositeDisposable _disposables = new CompositeDisposable();
     private Vector3 _localPosition;
     private Quaternion _localRotation; 
     private Dictionary<Guid, List<Vector3>> _offsets = new Dictionary<Guid, List<Vector3>>();
     private Tween _currentMoveTween;
-    private Vector2 _beginDragPosition;
-    private Vector2 _dragOffset;
 
     public void SetCardInfo(CardInfo cardInfo)
     {
         _title.text = cardInfo.Title;
         _cost.text = cardInfo.Cost.ToString();
         _power.text = cardInfo.Power.ToString();
+    }
+
+    public void OnSelect()
+    {
     }
 
     public void EnableHandCardAction(CardInfo cardInfo, IHandCardViewHandler handler)
@@ -101,24 +108,21 @@ public class CardView : MonoBehaviour, IRecyclable
         transform.SetSiblingIndex(originSiblingIndex);
     }
 
-    public void BeginDrag(PointerEventData pointerEventData, Canvas canvas)
+    public void BeginDrag(Vector2 dragPosition)
     {
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            canvas.transform as RectTransform, pointerEventData.position, canvas.worldCamera, out Vector2 localPoint);
- 
-        _beginDragPosition = transform.GetComponent<RectTransform>().anchoredPosition;
-        _dragOffset = _beginDragPosition - localPoint;
+        RectTransform.rotation = Quaternion.identity;
+        _canvasGroup.alpha = 1f;
     }
-    public void Drag(PointerEventData pointerEventData, Canvas canvas)
-    {
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            canvas.transform as RectTransform, pointerEventData.position, canvas.worldCamera, out Vector2 localPoint);
-        
-        transform.GetComponent<RectTransform>().anchoredPosition = localPoint + _dragOffset;
+    public void Drag(Vector2 dragPosition, bool isSelecting)
+    {        
+        RectTransform.anchoredPosition = dragPosition;
+        _canvasGroup.alpha = isSelecting ? 0f : 1f;
     }
-    public void EndDrag(PointerEventData pointerEventData)
+    public void EndDrag(Vector2 beginDragPosition)
     {
-        transform.GetComponent<RectTransform>().anchoredPosition = _beginDragPosition;
+        RectTransform.rotation = _localRotation;
+        RectTransform.anchoredPosition = beginDragPosition;
+        _canvasGroup.alpha = 1f;
     }
 
     public void Reset()

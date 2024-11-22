@@ -20,7 +20,8 @@ public class CardEntity
     public int Cost { get; private set; }
     public int Power { get; private set; }
     
-    public List<ITargetSelectable> Selectables;
+    public IMainTargetSelectable MainSelectable;
+    public List<ISubTargetSelectable> SubSelectables;
 
     public Dictionary<CardTiming, List<ICardEffect>> Effects { get; private set; }
 
@@ -47,7 +48,8 @@ public class CardEntity
             Themes = cardInstance.Themes.ToArray(),
             Cost = cardInstance.Cost,
             Power = cardInstance.Power,
-            Selectables = cardInstance.Selectables.ToList(),
+            MainSelectable = cardInstance.MainSelectable,
+            SubSelectables = cardInstance.SubSelectables.ToList(),
             Effects = cardInstance.Effects.ToDictionary(
                 pair => pair.Key,
                 pair => pair.Value.ToList()

@@ -51,10 +51,16 @@ MonoBehaviour:
     - Name: Power
       Entry: 3
       Data: 3
-    - Name: Selectables
+    - Name: MainSelectable
       Entry: 7
-      Data: 2|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[ITargetSelectable, Assembly-CSharp]],
-        Unity.Plastic.Antlr3.Runtime
+      Data: 2|NoneSelectable, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: SubSelectables
+      Entry: 7
+      Data: 3|System.Collections.Generic.List`1[[ISubTargetSelectable, Assembly-CSharp]],
+        mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -66,11 +72,11 @@ MonoBehaviour:
       Data: 
     - Name: Effects
       Entry: 7
-      Data: 3|System.Collections.Generic.Dictionary`2[[CardTiming, Assembly-CSharp],[ICardEffect[],
+      Data: 4|System.Collections.Generic.Dictionary`2[[CardTiming, Assembly-CSharp],[ICardEffect[],
         Assembly-CSharp]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 4|System.Collections.Generic.EnumEqualityComparer`1[[CardTiming, Assembly-CSharp]],
+      Data: 5|System.Collections.Generic.EnumEqualityComparer`1[[CardTiming, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -92,22 +98,22 @@ MonoBehaviour:
       Data: 1
     - Name: $v
       Entry: 7
-      Data: 5|ICardEffect[], Assembly-CSharp
+      Data: 6|ICardEffect[], Assembly-CSharp
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 6|ShieldEffect, Assembly-CSharp
+      Data: 7|ShieldEffect, Assembly-CSharp
     - Name: Targets
       Entry: 7
-      Data: 7|CardCaster, Assembly-CSharp
+      Data: 8|CardCaster, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
     - Name: Value
       Entry: 7
-      Data: 8|ThisCardPower, Assembly-CSharp
+      Data: 9|ThisCardPower, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -131,17 +137,17 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 9|System.Collections.Generic.List`1[[ICardPropertyData, Assembly-CSharp]],
+      Data: 10|System.Collections.Generic.List`1[[ICardPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 10|PreservedPropertyData, Assembly-CSharp
+      Data: 11|PreservedPropertyData, Assembly-CSharp
     - Name: Lifetime
       Entry: 7
-      Data: 11|CardPropertyTurnCountData, Assembly-CSharp
+      Data: 12|CardPropertyTurnCountData, Assembly-CSharp
     - Name: TurnCount
       Entry: 3
       Data: 3

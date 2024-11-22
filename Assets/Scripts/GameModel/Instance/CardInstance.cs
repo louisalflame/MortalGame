@@ -16,7 +16,8 @@ public class CardInstance
     public int Cost;
     public int Power;
 
-    public List<ITargetSelectable> Selectables;
+    public IMainTargetSelectable MainSelectable;
+    public List<ISubTargetSelectable> SubSelectables;
     public ICardEffect[] OnUseEffects;
     public ICardEffect[] OnHandEffects;
     public ICardEffect[] OnDeckEffects;
@@ -35,7 +36,8 @@ public class CardInstance
             Themes = cardData.Themes.ToArray(),
             Cost = cardData.Cost,
             Power = cardData.Power,
-            Selectables = cardData.Selectables.ToList(),
+            MainSelectable = cardData.MainSelectable,
+            SubSelectables = cardData.SubSelectables.ToList(),
             Effects = cardData.Effects.ToDictionary(
                 pair => pair.Key,
                 pair => pair.Value.ToArray()

@@ -250,6 +250,7 @@ MonoBehaviour:
   _cost: {fileID: 5769463107790059947}
   _power: {fileID: 5865926486654199960}
   _button: {fileID: 6242041121471611408}
+  _canvasGroup: {fileID: 5205158365657331062}
   _content: {fileID: 2071801199941433192}
   _focusScale: 3
   _focusOffset: {x: 0, y: 300, z: 0}
@@ -398,6 +399,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2071801199941433192}
+  - component: {fileID: 5205158365657331062}
   m_Layer: 5
   m_Name: Content
   m_TagString: Untagged
@@ -428,6 +430,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!225 &5205158365657331062
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5189569119096856599}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &5529170782915416997
 GameObject:
   m_ObjectHideFlags: 0

@@ -24,7 +24,8 @@ public class CardData
     
     [TitleGroup("Target")]
     [PropertySpace(SpaceBefore = 0, SpaceAfter = 10)]
-    public List<ITargetSelectable> Selectables = new List<ITargetSelectable>();
+    public IMainTargetSelectable MainSelectable;
+    public List<ISubTargetSelectable> SubSelectables;
 
     [BoxGroup("Effects")]
     public Dictionary<CardTiming, ICardEffect[]> Effects = new Dictionary<CardTiming, ICardEffect[]>();

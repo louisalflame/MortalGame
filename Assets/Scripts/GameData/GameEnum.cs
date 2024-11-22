@@ -34,7 +34,6 @@ public enum EnergyLoseType
 
 }
 
-
 public enum BuffTiming
 {
     None = 0,
@@ -62,4 +61,11 @@ public enum BuffProperty
     EnergyIncrease,
     MaxHealthIncrease,
     MaxEnergyIncrease,
+}
+
+public enum TargetType
+{
+    None = 0,
+    Player = 1,
+    Card
 }

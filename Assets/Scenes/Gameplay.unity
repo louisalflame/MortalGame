@@ -2392,9 +2392,11 @@ MonoBehaviour:
   _arcRadiusY: 1000
   _arcStepMinAngle: 8
   _focusOffsetX: 50
-  _cardPropertyHint: {fileID: 1928135746}
-  _lineRenderer: {fileID: 5723044721832711093}
   _canvas: {fileID: 270676522}
+  _lineRenderer: {fileID: 5723044721832711093}
+  _curveHeight: 1500
+  _curveResolution: 100
+  _cardPropertyHint: {fileID: 1928135746}
 --- !u!114 &388512503
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9111,7 +9113,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1945149003}
-  - {fileID: 5723044721832711092}
   m_Father: {fileID: 181218631}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
@@ -10020,7 +10021,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 5723044721832711092}
   m_Father: {fileID: 1660534059}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
@@ -11403,7 +11405,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 1660534059}
+    m_TransformParent: {fileID: 1945149003}
     m_Modifications:
     - target: {fileID: 7198247611764716166, guid: a911a28266e52614393e500d6dc99b7d, type: 3}
       propertyPath: m_Pivot.x
@@ -11488,6 +11490,10 @@ PrefabInstance:
     - target: {fileID: 8270429474642784927, guid: a911a28266e52614393e500d6dc99b7d, type: 3}
       propertyPath: m_Name
       value: LineRenderer
+      objectReference: {fileID: 0}
+    - target: {fileID: 8270429474642784927, guid: a911a28266e52614393e500d6dc99b7d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

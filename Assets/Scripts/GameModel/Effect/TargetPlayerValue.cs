@@ -4,12 +4,6 @@ using System.Linq;
 using UniRx;
 using UnityEngine;
 
-public enum TargetType
-{
-    Player = 1,
-    Card
-}
-
 public interface ITargetPlayerValue
 {
     IReadOnlyCollection<PlayerEntity> Eval(GameStatus gameStatus, GameContext context);
