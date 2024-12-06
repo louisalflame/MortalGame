@@ -11,10 +11,16 @@ using UnityEngine.UI;
 
 public class CardView : MonoBehaviour, IRecyclable, ISelectableView
 {
+    [BoxGroup("Content")]
+    [SerializeField]
+    private RectTransform _rectTransform;
+    [BoxGroup("Content")]
     [SerializeField]
     private TextMeshProUGUI _title;
+    [BoxGroup("Content")]
     [SerializeField]
     private TextMeshProUGUI _cost;
+    [BoxGroup("Content")]
     [SerializeField]
     private TextMeshProUGUI _power;
 
@@ -25,21 +31,7 @@ public class CardView : MonoBehaviour, IRecyclable, ISelectableView
     [SerializeField]
     private CanvasGroup _canvasGroup;
 
-
-    [BoxGroup("Focus")]
-    [SerializeField]
-    private Transform _content;
-    [SerializeField]
-    [BoxGroup("Focus")]
-    private float _focusScale;
-    [SerializeField]
-    [BoxGroup("Focus")]
-    private Vector3 _focusOffset;
-    [BoxGroup("Focus")]
-    private float _focusDuration = 0.5f;
-
-    public Transform Content => _content;
-    public RectTransform RectTransform => transform.GetComponent<RectTransform>();
+    public RectTransform RectTransform => _rectTransform;
 
     private CompositeDisposable _disposables = new CompositeDisposable();
     private Vector3 _localPosition;
@@ -47,9 +39,9 @@ public class CardView : MonoBehaviour, IRecyclable, ISelectableView
     private Dictionary<Guid, List<Vector3>> _offsets = new Dictionary<Guid, List<Vector3>>();
     private Tween _currentMoveTween;
 
-    public void SetCardInfo(CardInfo cardInfo)
+    public void SetCardInfo(CardInfo cardInfo, LocalizeLibrary localizeLibrary)
     {
-        _title.text = cardInfo.Title;
+        _title.text = localizeLibrary.Get(LocalizeType.CardTitle, cardInfo.Title);
         _cost.text = cardInfo.Cost.ToString();
         _power.text = cardInfo.Power.ToString();
     }
@@ -97,42 +89,41 @@ public class CardView : MonoBehaviour, IRecyclable, ISelectableView
 
     public void ShowHandCardFocusContent()
     {
-        _content.localPosition = _focusOffset;
-        _content.localRotation = Quaternion.Inverse(_localRotation);
-        _content.localScale = Vector3.one * _focusScale;
-        transform.SetAsLastSibling();
+        _canvasGroup.alpha = 0f;
     }
-    public void HideHandCardFocusContent(int originSiblingIndex)
+    public void HideHandCardFocusContent()
     {
-        _ResetFocusContent();
-        transform.SetSiblingIndex(originSiblingIndex);
+        _canvasGroup.alpha = 1f;
     }
 
     public void BeginDrag(Vector2 dragPosition)
     {
         RectTransform.rotation = Quaternion.identity;
         _canvasGroup.alpha = 1f;
+        transform.SetAsLastSibling();
     }
-    public void Drag(Vector2 dragPosition, bool isSelecting)
+    public void Drag(Vector2 dragPosition, TargetType targetType, bool isSelecting)
     {        
         RectTransform.anchoredPosition = dragPosition;
-        _canvasGroup.alpha = isSelecting ? 0f : 1f;
+        _canvasGroup.alpha = 
+            isSelecting ? (targetType == TargetType.None ? 1f: 0f) : 0.5f;
     }
-    public void EndDrag(Vector2 beginDragPosition)
+    public void EndDrag(Vector2 beginDragPosition, int originSiblingIndex)
     {
         RectTransform.rotation = _localRotation;
         RectTransform.anchoredPosition = beginDragPosition;
         _canvasGroup.alpha = 1f;
+        transform.SetSiblingIndex(originSiblingIndex);
     }
 
     public void Reset()
     {
+        _canvasGroup.alpha = 1f;
         _offsets.Clear();
         _localPosition = Vector3.zero;
         _localRotation = Quaternion.identity;
         transform.localRotation = _localRotation;
         _UpdateLocalPosition();
-        _ResetFocusContent();
         DisableCardAction();
     } 
 
@@ -144,22 +135,22 @@ public class CardView : MonoBehaviour, IRecyclable, ISelectableView
         transform.localRotation = _localRotation;
     }
 
-    public void AddLocationOffset(Guid guid, Vector3 offset)
+    public void AddLocationOffset(Guid guid, Vector3 offset, float duration)
     {
         if(!_offsets.ContainsKey(guid))
         {
             _offsets.Add(guid, new List<Vector3>());
         }
         _offsets[guid].Add(offset);
-        _UpdateLocalPosition(_focusDuration);
+        _UpdateLocalPosition(duration);
     }
-    public void RemoveLocationOffset(Guid guid)
+    public void RemoveLocationOffset(Guid guid, float duration)
     {
         if(_offsets.ContainsKey(guid))
         {
             _offsets.Remove(guid);
         }
-        _UpdateLocalPosition(_focusDuration);
+        _UpdateLocalPosition(duration);
     }
 
     private void _UpdateLocalPosition(float duration = 0f)
@@ -189,12 +180,5 @@ public class CardView : MonoBehaviour, IRecyclable, ISelectableView
                 .SetEase(Ease.OutExpo)
                 .OnComplete(() => _currentMoveTween.Kill());
         }
-    }
-
-    private void _ResetFocusContent()
-    {
-        _content.localPosition = Vector3.zero;
-        _content.localRotation = Quaternion.identity;
-        _content.localScale = Vector3.one;
     }
 }

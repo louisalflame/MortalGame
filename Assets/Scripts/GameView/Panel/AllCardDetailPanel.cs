@@ -4,11 +4,12 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 using UnityEngine.UI;
 
 public interface IAllCardDetailPanel
 {
-    void Init(IAllCardViewHandler handler);
+    void Init(IAllCardViewHandler handler, LocalizeLibrary localizeLibrary);
     void ShowCardInfoCollections(IAllCardViewHandler handler, IEnumerable<CardInfo> cardInfos);
     void Open();
     void Close();
@@ -34,9 +35,10 @@ public class AllCardDetailPanel : MonoBehaviour, IAllCardDetailPanel
     private CompositeDisposable _disposables = new CompositeDisposable();
     private CardInfo _selectedCardInfo;
     private IGameplayStatusWatcher _statusWatcher;
+    private LocalizeLibrary _localizeLibrary;
     private Dictionary<Guid, CardView> _cardViewDict = new Dictionary<Guid, CardView>();
 
-    public void Init(IAllCardViewHandler handler)
+    public void Init(IAllCardViewHandler handler, LocalizeLibrary localizeLibrary)
     {
         foreach (var button in _closeButtons)
         {
@@ -54,6 +56,8 @@ public class AllCardDetailPanel : MonoBehaviour, IAllCardDetailPanel
         _graveyardButton.OnClickAsObservable()
             .Subscribe(_ => handler.ShowGraveyardDetail())
             .AddTo(_disposables);
+
+        _localizeLibrary = localizeLibrary;
     }
 
     public void ShowCardInfoCollections(IAllCardViewHandler handler, IEnumerable<CardInfo> cardInfos)
@@ -63,7 +67,7 @@ public class AllCardDetailPanel : MonoBehaviour, IAllCardDetailPanel
         {
             var cardView = _cardViewFactory.CreatePrefab();
             cardView.transform.SetParent(_cardViewParent, false);
-            cardView.SetCardInfo(cardInfo);
+            cardView.SetCardInfo(cardInfo, _localizeLibrary);
             cardView.EnableSimpleCardAction(cardInfo, handler);
             _cardViewDict.Add(cardInfo.Indentity, cardView);
         }

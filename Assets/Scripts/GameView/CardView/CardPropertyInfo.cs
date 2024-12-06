@@ -7,6 +7,9 @@ public class CardPropertyInfo
     public CardPropertyValueInfo valueInfo { get; private set; }
     public CardPropertyLifetimeInfo lifetimeInfo { get; private set; }
 
+    public string TitleKey { get; private set; }
+    public string InfoKey { get; private set; }
+
     public CardPropertyInfo(ICardPropertyEntity propertyEntity)     
     {
         Property = propertyEntity.Property;

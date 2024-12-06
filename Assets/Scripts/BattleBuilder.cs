@@ -21,12 +21,13 @@ public class BattleBuidler
         ); 
         return initialState;
     }
-    public GameContextManager ConstructBattleManager()
+    public GameContextManager ConstructGameContextManager()
     {
         var cardLibrary = new CardLibrary(_context.CardTable);
         var buffLibrary = new BuffLibrary(_context.BuffTable);
+        var localizeLibrary = new LocalizeLibrary(_context.LocalizeSetting);
 
-        return new GameContextManager(cardLibrary, buffLibrary);
+        return new GameContextManager(cardLibrary, buffLibrary, localizeLibrary);
     }
 
     private AllyEntity _ParseAlly(AllyInstance allyInstance)

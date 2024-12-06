@@ -4,6 +4,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 
 public enum AllCardDetailPanelState
 {
@@ -39,13 +40,13 @@ public class AllCardDetailPresenter : IAllCardDetailPresenter
     private CardInfo _selectedCardInfo;
     private IReadOnlyCollection<CardInfo> _cardInfos;
 
-    public AllCardDetailPresenter(IAllCardDetailPanelView view, IGameplayStatusWatcher statusWatcher)
+    public AllCardDetailPresenter(IAllCardDetailPanelView view, IGameplayStatusWatcher statusWatcher, LocalizeLibrary localizeLibrary)
     {
         _detailPanel = view.DetailPanel;
         _singlePopupPanel = view.SinglePopupPanel;
         _statusWatcher = statusWatcher;
 
-        _detailPanel.Init(this);
+        _detailPanel.Init(this, localizeLibrary);
 
         _state = AllCardDetailPanelState.Close;
     }

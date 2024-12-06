@@ -5,9 +5,6 @@ using UnityEngine.UI;
 public class AllyInfoView : MonoBehaviour
 {
     [SerializeField]
-    private TextMeshProUGUI _TurnText;
-
-    [SerializeField]
     private TextMeshProUGUI _nameText;
 
     [SerializeField]
@@ -20,15 +17,17 @@ public class AllyInfoView : MonoBehaviour
     private BuffCollectionView _buffCollectionView;
     
     private IGameplayStatusWatcher _statusWatcher;
+    private TopBarInfoView _topBarInfoView;
 
-    public void Init(IGameplayStatusWatcher statusWatcher)
+    public void Init(IGameplayStatusWatcher statusWatcher, TopBarInfoView topBarInfoView)
     {
         _statusWatcher = statusWatcher;
+        _topBarInfoView = topBarInfoView;
     }
 
     public void SetPlayerInfo(int round, AllyEntity ally)
     {
-        _TurnText.text = round.ToString();
+        _topBarInfoView.UpdateTurnInfo(round);
         _nameText.text = ally.Name;
         _healthBarView.SetHealth(ally.Character.CurrentHealth, ally.Character.MaxHealth);
         _healthBarView.SetShield(ally.Character.CurrentArmor);    

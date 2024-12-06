@@ -19,6 +19,8 @@ public class EnemySelectedCardView : MonoBehaviour
     private float _cardWidth = 100f;
     [SerializeField]
     private float _widthInterval = 20f;
+    
+    public IEnumerable<ISelectableView> SelectableViews => _cardViews;
 
     private List<AiCardView> _cardViews = new List<AiCardView>();
     private Dictionary<Guid, AiCardView> _cardViewDict = new Dictionary<Guid, AiCardView>();
@@ -43,7 +45,6 @@ public class EnemySelectedCardView : MonoBehaviour
  
     public void CreateCardView(EnemySelectCardEvent enemySelectCardEvent)
     {
-Debug.Log($"==> enemyselect create cardview: {enemySelectCardEvent.SelectedCardInfo.Indentity}");
         var cardView = _cardViewFactory.CreatePrefab();
         cardView.transform.SetParent(_cardViewParent, false);
         cardView.SetCardInfo(enemySelectCardEvent.SelectedCardInfo, _reciever);
@@ -58,7 +59,6 @@ Debug.Log($"==> enemyselect create cardview: {enemySelectCardEvent.SelectedCardI
 
     public void RemoveCardView(UsedCardEvent usedCardEvent)
     {
-Debug.Log($"==> enemyselect create cardview: {usedCardEvent.UsedCardInfo.Indentity}");
         if(_cardViewDict.TryGetValue(usedCardEvent.UsedCardInfo.Indentity, out var cardView))
         {
             _cardViews.Remove(cardView);

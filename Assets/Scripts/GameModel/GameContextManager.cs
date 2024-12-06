@@ -3,18 +3,21 @@ using System.Collections.Generic;
 
 public class GameContextManager : IDisposable
 {
-    public CardLibrary CardLibrary;
-    public BuffLibrary BuffLibrary;
+    public readonly CardLibrary CardLibrary;
+    public readonly BuffLibrary BuffLibrary;
+    public readonly LocalizeLibrary LocalizeLibrary;
     
     private Stack<GameContext> _contextStack = new Stack<GameContext>();
     public GameContext Context => _contextStack.Peek();
 
     public GameContextManager(
         CardLibrary cardLibrary,
-        BuffLibrary buffLibrary)
+        BuffLibrary buffLibrary,
+        LocalizeLibrary localizeLibrary)
     {
         CardLibrary = cardLibrary;
         BuffLibrary = buffLibrary;
+        LocalizeLibrary = localizeLibrary;
         _contextStack.Push(new GameContext());
     }
 

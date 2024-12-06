@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using Unity.VisualScripting;
@@ -6,20 +7,37 @@ using UnityEngine;
 
 public interface IGameplayView : IAllCardDetailPanelView
 {
-    void Init(IGameplayActionReciever reciever, IGameplayStatusWatcher statusWatcher);
+    void Init(IGameplayActionReciever reciever, IGameplayStatusWatcher statusWatcher, LocalizeLibrary localizeLibrary);
     void Render(IReadOnlyCollection<IGameEvent> events, IGameplayActionReciever reciever);
 
     IEnumerable<ISelectableView> SelectableViews { get; }
+    ISelectableView BasicSelectableView { get; }
 }
 
 public interface IAllCardDetailPanelView
 {
     AllCardDetailPanel DetailPanel { get; }
     SingleCardDetailPopupPanel SinglePopupPanel { get; }
+    FocusCardDetailView FocusCardDetailView { get; }
 }
 
 public class GameplayView : MonoBehaviour, IGameplayView
 {
+    [BoxGroup("Canvas")]
+    [SerializeField]
+    private Canvas _handCardCanvas;
+    [BoxGroup("Canvas")]
+    [SerializeField]
+    private Canvas _overlayCanvas;
+
+    [BoxGroup("PlayGround")]
+    [SerializeField]
+    private PlaygroundView _playGround;
+
+    [BoxGroup("PlayGround")]
+    [SerializeField]
+    private TopBarInfoView _topBarInfoView;
+
     [BoxGroup("AllyView")]
     [SerializeField]
     private AllyInfoView _allyInfoView;
@@ -56,17 +74,28 @@ public class GameplayView : MonoBehaviour, IGameplayView
     [BoxGroup("Popup")]
     [SerializeField]
     private SingleCardDetailPopupPanel _singleCardDetailPopupPanel;
+    [BoxGroup("Popup")]
+    [SerializeField]
+    private FocusCardDetailView _focusCardDetailView;
 
     public AllCardDetailPanel DetailPanel => _allCardDetailPanel;
     public SingleCardDetailPopupPanel SinglePopupPanel => _singleCardDetailPopupPanel;
+    public FocusCardDetailView FocusCardDetailView => _focusCardDetailView;
 
-    public IEnumerable<ISelectableView> SelectableViews => 
-        _allyHandCardView.SelectableViews;
-
-    public void Init(IGameplayActionReciever reciever, IGameplayStatusWatcher statusWatcher)
+    public IEnumerable<ISelectableView> SelectableViews
     {
-        _allyInfoView.Init(statusWatcher);
-        _allyHandCardView.Init(statusWatcher, reciever);
+        get
+        {
+            return _allyHandCardView.SelectableViews
+                .Concat(_enemySelectedCardView.SelectableViews);
+        }
+    }
+    public ISelectableView BasicSelectableView => _playGround;
+
+    public void Init(IGameplayActionReciever reciever, IGameplayStatusWatcher statusWatcher, LocalizeLibrary localizeLibrary)
+    {
+        _allyInfoView.Init(statusWatcher, _topBarInfoView);
+        _allyHandCardView.Init(statusWatcher, reciever, this, localizeLibrary);
         _allyCharacterView.Init(statusWatcher);
 
         _enemyInfoView.Init(statusWatcher);
@@ -76,6 +105,9 @@ public class GameplayView : MonoBehaviour, IGameplayView
         _deckCardView.Init(statusWatcher, reciever);
         _graveyardCardView.Init(statusWatcher, reciever);
         _submitView.Init(reciever);
+
+        _focusCardDetailView.Init(_overlayCanvas, localizeLibrary);
+        _singleCardDetailPopupPanel.Init(localizeLibrary);
     }
 
     public void Render(IReadOnlyCollection<IGameEvent> events, IGameplayActionReciever reciever) 

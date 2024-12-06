@@ -1,63 +1,52 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CardPropertyHint : MonoBehaviour
 {
-    [SerializeField]
-    private Transform _hintTransform;
     [SerializeField]
     private CardPropertyInfoViewFactory _cardPropertyInfoViewFactory;
     [SerializeField]
     private Transform _cardPropertyInfoViewParent;
     [SerializeField]
-    private RectTransform _layoutGroupRectTransfrom;
-    
+    private RectTransform _content;
     [SerializeField]
-    private Vector2 _localPosition;
+    private float _offsetX;
 
-    private Transform _originParent;
+    private LocalizeLibrary _localizeLibrary;
     private List<CardPropertyInfoView> _propertyViews = new List<CardPropertyInfoView>();
 
-    public void ShowHint(CardInfo cardInfo, CardView cardView, bool smallDirection)
+    public void Init(LocalizeLibrary localizeLibrary)
     {
-        _originParent = transform.parent;
-        _hintTransform.gameObject.SetActive(true);
-        _hintTransform.SetParent(cardView.Content, false);
-        _hintTransform.localPosition = _localPosition;
+        _localizeLibrary = localizeLibrary;
+    }
 
-        foreach(var appendProperty in cardInfo.AppendProperties)
+    public void ShowHint(CardInfo cardInfo, bool smallDirection)
+    {
+        _UpdateContentAnchorPivotX(smallDirection);
+        foreach(var property in cardInfo.Properties.Concat(cardInfo.AppendProperties))
         {
             var cardPropertyInfoView = _cardPropertyInfoViewFactory.CreatePrefab();
             cardPropertyInfoView.transform.SetParent(_cardPropertyInfoViewParent, false);
             _propertyViews.Add(cardPropertyInfoView);
-            //TODO : cardPropertyInfoView.setInfo(appendProperty);
-        }
 
-        if(_propertyViews.Count > 5) // If layout reach bottom, move anchor/pivot to bottom
-        {
-            _layoutGroupRectTransfrom.anchorMin = new Vector2(_layoutGroupRectTransfrom.anchorMin.x, 0);
-            _layoutGroupRectTransfrom.anchorMax = new Vector2(_layoutGroupRectTransfrom.anchorMax.x, 0);
-            _layoutGroupRectTransfrom.pivot = new Vector2(_layoutGroupRectTransfrom.pivot.x, 0);
-        }
-        else
-        {
-            _layoutGroupRectTransfrom.anchorMin = new Vector2(_layoutGroupRectTransfrom.anchorMin.x, 1);
-            _layoutGroupRectTransfrom.anchorMax = new Vector2(_layoutGroupRectTransfrom.anchorMax.x, 1);
-            _layoutGroupRectTransfrom.pivot = new Vector2(_layoutGroupRectTransfrom.pivot.x, 1);
+            cardPropertyInfoView.SetInfo(property, _localizeLibrary);
         }
     }
 
     public void HideHint()
     {
-        if(_originParent != null)
-        {
-            _hintTransform.SetParent(_originParent, false);
-        }
-        _hintTransform.gameObject.SetActive(false);
-
         foreach (var propertyView in _propertyViews)
         {
             _cardPropertyInfoViewFactory.RecyclePrefab(propertyView);
         }
+        _propertyViews.Clear();
+    }
+
+    private void _UpdateContentAnchorPivotX(bool isRightSide)
+    {
+        _content.pivot = new Vector2(isRightSide ? 0 : 1, _content.pivot.y);
+        _content.anchoredPosition = new Vector2(isRightSide ? _offsetX : -_offsetX, _content.anchoredPosition.y);
     }
 }

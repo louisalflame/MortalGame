@@ -246,14 +246,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ad74b643e2c3a8488ac390979dfe162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _rectTransform: {fileID: 1827428045161050801}
   _title: {fileID: 6072334631632945810}
   _cost: {fileID: 5769463107790059947}
   _power: {fileID: 5865926486654199960}
   _button: {fileID: 6242041121471611408}
   _canvasGroup: {fileID: 5205158365657331062}
-  _content: {fileID: 2071801199941433192}
-  _focusScale: 3
-  _focusOffset: {x: 0, y: 300, z: 0}
 --- !u!1 &4967465272055129769
 GameObject:
   m_ObjectHideFlags: 0

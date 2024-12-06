@@ -20,11 +20,18 @@ public class SingleCardDetailPopupPanel : MonoBehaviour
     [SerializeField]
     private CardPropertyHint _cardPropertyHint;
 
+    private LocalizeLibrary _localizeLibrary;
     private SingleCardDetailPopupPanelState _state;
+
+    public void Init(LocalizeLibrary localizeLibrary)
+    {
+        _localizeLibrary = localizeLibrary;
+        _cardPropertyHint.Init(_localizeLibrary);
+    }
 
     public async UniTask Run(CardInfo cardInfo)
     {
-        _cardView.SetCardInfo(cardInfo);
+        _cardView.SetCardInfo(cardInfo, _localizeLibrary);
 
         var disposables = new CompositeDisposable();
         foreach (var button in _closeButtons)
@@ -39,7 +46,7 @@ public class SingleCardDetailPopupPanel : MonoBehaviour
             _state = SingleCardDetailPopupPanelState.Idle;
             _panel.SetActive(true);
 
-            _cardPropertyHint.ShowHint(cardInfo, _cardView, false);
+            _cardPropertyHint.ShowHint(cardInfo, false);
 
             while (_state != SingleCardDetailPopupPanelState.Close)
             {

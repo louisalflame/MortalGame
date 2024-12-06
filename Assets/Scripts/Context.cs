@@ -8,6 +8,7 @@ public class Context
     public Dictionary<string, BuffData> BuffTable { get; private set; }
     public EnemyData[] AllEnemies { get; private set; }
     public AllyInstance Ally{ get; private set; }
+    public Dictionary<LocalizeType, LocalizeData> LocalizeSetting { get; private set; }
 
     public Context(
         ScriptableDataLoader scriptableDataLoader)
@@ -28,5 +29,6 @@ public class Context
             HandCardMaxCount = scriptableDataLoader.Ally.PlayerData.HandCardMaxCount,
         };
 
+        LocalizeSetting = scriptableDataLoader.LocalizeSetting;
     }
 }

@@ -14,6 +14,9 @@ public class CardInfo
     public int OriginPower { get; private set; }
     public int Power { get; private set; }
 
+    public MainSelectableInfo MainSelectable;
+    public List<SubSelectableInfo> SubSelectables;
+
     public List<CardPropertyInfo> Properties { get; private set; }
     public List<CardPropertyInfo> AppendProperties { get; private set; }
 
@@ -27,6 +30,9 @@ public class CardInfo
         Cost = card.EvalCost(gameContext);
         OriginPower = card.Power;
         Power = card.EvalPower(gameContext);
+
+        MainSelectable = new MainSelectableInfo(card.MainSelectable.TargetType);
+        SubSelectables = card.SubSelectables.Select(s => new SubSelectableInfo(s.TargetType, s.TargetCount)).ToList();
 
         Properties = card.Properties.Select(p => new CardPropertyInfo(p)).ToList();
         AppendProperties = card.AppendProperties.Select(p => new CardPropertyInfo(p)).ToList();

@@ -141,7 +141,7 @@ MonoBehaviour:
         mscorlib
     - Name: 
       Entry: 12
-      Data: 1
+      Data: 7
     - Name: 
       Entry: 7
       Data: 11|PreservedPropertyData, Assembly-CSharp
@@ -151,6 +151,78 @@ MonoBehaviour:
     - Name: TurnCount
       Entry: 3
       Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 13|PreservedPropertyData, Assembly-CSharp
+    - Name: Lifetime
+      Entry: 7
+      Data: 14|CardPropertyAlwaysData, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 15|PreservedPropertyData, Assembly-CSharp
+    - Name: Lifetime
+      Entry: 7
+      Data: 16|CardPropertyAlwaysData, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 17|PreservedPropertyData, Assembly-CSharp
+    - Name: Lifetime
+      Entry: 7
+      Data: 18|CardPropertyAlwaysData, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 19|PreservedPropertyData, Assembly-CSharp
+    - Name: Lifetime
+      Entry: 7
+      Data: 20|CardPropertyAlwaysData, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 21|PreservedPropertyData, Assembly-CSharp
+    - Name: Lifetime
+      Entry: 7
+      Data: 22|CardPropertyAlwaysData, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 23|PreservedPropertyData, Assembly-CSharp
+    - Name: Lifetime
+      Entry: 7
+      Data: 24|CardPropertyAlwaysData, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 

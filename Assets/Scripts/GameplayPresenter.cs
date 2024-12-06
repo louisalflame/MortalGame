@@ -10,6 +10,7 @@ public interface IGameplayActionReciever
     void ShowGraveyardDetailPanel();
 
     IEnumerable<ISelectableView> SelectableViews { get; }
+    ISelectableView BasicSelectableView { get; }
 }
 
 public class GameplayPresenter : IGameplayActionReciever
@@ -19,6 +20,7 @@ public class GameplayPresenter : IGameplayActionReciever
     private IAllCardDetailPresenter _allCardDetailPresenter;
 
     public IEnumerable<ISelectableView> SelectableViews => _gameplayView.SelectableViews;
+    public ISelectableView BasicSelectableView => _gameplayView.BasicSelectableView;
 
     public GameplayPresenter(
         GameplayView gameplayView,
@@ -29,8 +31,8 @@ public class GameplayPresenter : IGameplayActionReciever
         _gameplayView = gameplayView;
         _gameplayManager = new GameplayManager(gameStatus, gameContextManager);
 
-        _gameplayView.Init(this, _gameplayManager);
-        _allCardDetailPresenter = new AllCardDetailPresenter(_gameplayView, _gameplayManager);
+        _gameplayView.Init(this, _gameplayManager, gameContextManager.LocalizeLibrary);
+        _allCardDetailPresenter = new AllCardDetailPresenter(_gameplayView, _gameplayManager, gameContextManager.LocalizeLibrary);
     }
 
     public async UniTask<GameResult> Run()

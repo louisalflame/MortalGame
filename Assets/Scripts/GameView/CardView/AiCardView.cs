@@ -4,8 +4,10 @@ using UniRx.Triggers;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class AiCardView : MonoBehaviour, IRecyclable
+public class AiCardView : MonoBehaviour, IRecyclable, ISelectableView
 {
+    [SerializeField]
+    private RectTransform _rectTransform;
     [SerializeField]
     private TextMeshProUGUI _title;
     [SerializeField]
@@ -13,7 +15,10 @@ public class AiCardView : MonoBehaviour, IRecyclable
     [SerializeField]
     private TextMeshProUGUI _power;
 
+
     private CompositeDisposable _disposables = new CompositeDisposable();
+
+    public RectTransform RectTransform => _rectTransform;
 
     public void SetCardInfo(CardInfo cardInfo, IGameplayActionReciever reciever)
     {
@@ -25,5 +30,10 @@ public class AiCardView : MonoBehaviour, IRecyclable
     public void Reset()
     {
         _disposables.Clear();
+    }
+
+    public void OnSelect()
+    {
+        throw new System.NotImplementedException();
     }
 }

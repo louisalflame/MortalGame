@@ -6,6 +6,7 @@ public interface ICardPropertyEntity
     CardProperty Property { get; }
     ICardPropertyLifetimeEntity Lifetime { get; }
     ICardPropertyValue Value { get; }
+    
 }
 
 public abstract class CardPropertyEntity : ICardPropertyEntity
