@@ -11,6 +11,8 @@ public class AiCardView : MonoBehaviour, IRecyclable, ISelectableView
     [SerializeField]
     private TextMeshProUGUI _title;
     [SerializeField]
+    private TextMeshProUGUI _info;
+    [SerializeField]
     private TextMeshProUGUI _cost;
     [SerializeField]
     private TextMeshProUGUI _power;
@@ -20,9 +22,11 @@ public class AiCardView : MonoBehaviour, IRecyclable, ISelectableView
 
     public RectTransform RectTransform => _rectTransform;
 
-    public void SetCardInfo(CardInfo cardInfo, IGameplayActionReciever reciever)
+    public void SetCardInfo(CardInfo cardInfo, LocalizeLibrary localizeLibrary)
     {
-        _title.text = cardInfo.Title;
+        var cardLocalizeData = localizeLibrary.Get(LocalizeTitleInfoType.Card, cardInfo.CardDataID);
+        _title.text = cardLocalizeData.Title;
+        _info.text = cardLocalizeData.Info;
         _cost.text = cardInfo.Cost.ToString();
         _power.text = cardInfo.Power.ToString();
     }

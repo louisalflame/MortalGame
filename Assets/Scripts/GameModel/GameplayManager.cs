@@ -166,7 +166,7 @@ public class GameplayManager : IGameplayStatusWatcher
     }
     private void _EnemyExecute()
     {
-        while(_gameStatus.Enemy.SelectedCards.TryDequeueCard(out CardEntity selectedCard))
+        while(_gameStatus.Enemy.SelectedCards.TryDequeueCard(out ICardEntity selectedCard))
         {
             var cardRuntimCost = selectedCard.EvalCost(_contextMgr.Context);
             if (cardRuntimCost <= _gameStatus.Enemy.Character.CurrentEnergy)
@@ -338,7 +338,7 @@ public class GameplayManager : IGameplayStatusWatcher
 
     private void _DrawCard(PlayerEntity player)
     {
-        if (player.CardManager.Deck.PopCard(out CardEntity newCard))
+        if (player.CardManager.Deck.PopCard(out ICardEntity newCard))
         {
             player.CardManager.HandCard.AddCard(newCard);
 

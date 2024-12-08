@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public class GameContextManager : IDisposable
 {
     public readonly CardLibrary CardLibrary;
+    public readonly CardStatusLibrary CardStatusLibrary;
     public readonly BuffLibrary BuffLibrary;
     public readonly LocalizeLibrary LocalizeLibrary;
     
@@ -12,10 +13,12 @@ public class GameContextManager : IDisposable
 
     public GameContextManager(
         CardLibrary cardLibrary,
+        CardStatusLibrary cardStatusLibrary,
         BuffLibrary buffLibrary,
         LocalizeLibrary localizeLibrary)
     {
         CardLibrary = cardLibrary;
+        CardStatusLibrary = cardStatusLibrary;
         BuffLibrary = buffLibrary;
         LocalizeLibrary = localizeLibrary;
         _contextStack.Push(new GameContext());
@@ -44,12 +47,12 @@ public class GameContextManager : IDisposable
         _contextStack.Push(Context.With(slectedPlayer: SelectedPlayer));
         return this;
     }
-    public GameContextManager SetSelectedCard(CardEntity SelectedCard) 
+    public GameContextManager SetSelectedCard(ICardEntity SelectedCard) 
     {
         _contextStack.Push(Context.With(selectedCard: SelectedCard));
         return this;
     }
-    public GameContextManager SetUsingCard(CardEntity UsingCard) 
+    public GameContextManager SetUsingCard(ICardEntity UsingCard) 
     {
         _contextStack.Push(Context.With(usingCard: UsingCard));
         return this;
@@ -86,9 +89,9 @@ public class GameContext
     public PlayerEntity ExecutePlayer;
     public PlayerEntity CardCaster;
     public PlayerEntity SelectedPlayer;
-    public CardEntity SelectedCard;
+    public ICardEntity SelectedCard;
     public CardTiming CardTiming;
-    public CardEntity UsingCard;
+    public ICardEntity UsingCard;
     public ICardEffect UsingCardEffect;
     public PlayerEntity EffectTarget;
     public BuffEntity UsingBuff;
@@ -99,9 +102,9 @@ public class GameContext
         PlayerEntity executePlayer = null,
         PlayerEntity cardCaster = null,
         PlayerEntity slectedPlayer = null,
-        CardEntity selectedCard = null,
+        ICardEntity selectedCard = null,
         CardTiming cardTiming = default,
-        CardEntity usingCard = null,
+        ICardEntity usingCard = null,
         ICardEffect usingCardEffect = null,
         PlayerEntity effectTarget = null,
         BuffEntity usingBuff = null,

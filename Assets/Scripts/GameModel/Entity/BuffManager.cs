@@ -44,6 +44,7 @@ public class BuffManager : IBuffManager
         _buffs.Add(resultBuff);
         return true;
     }
+    
     public bool RemoveBuff(BuffLibrary buffLibrary, GameContext gameContext, string buffId, out BuffEntity resultBuff)
     {
         foreach (var existBuff in _buffs)

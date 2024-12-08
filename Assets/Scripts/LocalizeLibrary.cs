@@ -1,28 +1,37 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum LocalizeType
+public enum LocalizeSimpleType
 {
     UI,
-    PlayerName,
-    CardTitle,
-    CardInfo,
-    CardPropertyTitle,
-    CardPropertyInfo,
+    PlayerName, 
 }
+
+public enum LocalizeTitleInfoType
+{
+    Card,
+    CardStatus,
+    Buff,
+    GameKeyWord
+}
+
 
 public class LocalizeLibrary
 {
-    private Dictionary<LocalizeType, LocalizeData> _localizeDatas;
+    private Dictionary<LocalizeSimpleType, Dictionary<string, string>> _localizeSimpleDatas;
+    private Dictionary<LocalizeTitleInfoType, Dictionary<string, LocalizeTitleInfoData>> _localizeTitleInfoDatas;
 
-    public LocalizeLibrary(Dictionary<LocalizeType, LocalizeData> localizeDatas)
+    public LocalizeLibrary(
+        Dictionary<LocalizeSimpleType, Dictionary<string, string>> localizeDatas, 
+        Dictionary<LocalizeTitleInfoType, Dictionary<string, LocalizeTitleInfoData>> localizeTitleInfoDatas)
     {
-        _localizeDatas = localizeDatas;
+        _localizeSimpleDatas = localizeDatas;
+        _localizeTitleInfoDatas = localizeTitleInfoDatas;
     }
 
-    public string Get(LocalizeType localizeType, string key)
+    public string Get(LocalizeSimpleType localizeType, string key)
     {
-        if (_localizeDatas.TryGetValue(localizeType, out var localizeData))
+        if (_localizeSimpleDatas.TryGetValue(localizeType, out var localizeData))
         {
             if (localizeData.TryGetValue(key, out var value))
             {
@@ -31,5 +40,22 @@ public class LocalizeLibrary
         }
 
         return $"{localizeType}|{key}";
+    }
+
+    public LocalizeTitleInfoData Get(LocalizeTitleInfoType localizeType, string key)
+    {
+        if (_localizeTitleInfoDatas.TryGetValue(localizeType, out var localizeData))
+        {
+            if (localizeData.TryGetValue(key, out var value))
+            {
+                return value;
+            }
+        }
+
+        return new LocalizeTitleInfoData
+        {
+            Title = $"{localizeType}|{key}_Title",
+            Info = $"{localizeType}|{key}_Info",
+        };
     }
 }

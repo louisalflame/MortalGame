@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee34c135d40337a4fa8f5c6f2e8f9fb4, type: 3}
-  m_Name: CardInfoLocalize
+  m_Script: {fileID: 11500000, guid: a522d939ed9ae51418db03789dc8884e, type: 3}
+  m_Name: GameKwyWordLocalize
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -22,21 +22,5 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes:
     - Name: Data
-      Entry: 7
-      Data: 0|LocalizeData, Assembly-CSharp
-    - Name: comparer
-      Entry: 7
-      Data: 1|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
+      Entry: 6
       Data: 

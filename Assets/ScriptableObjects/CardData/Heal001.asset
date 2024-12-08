@@ -95,7 +95,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 1
+      Data: 4
     - Name: $v
       Entry: 7
       Data: 6|ICardEffect[], Assembly-CSharp
@@ -145,9 +145,9 @@ MonoBehaviour:
     - Name: 
       Entry: 7
       Data: 11|AutoDisposePropertyData, Assembly-CSharp
-    - Name: Lifetime
+    - Name: UseCount
       Entry: 7
-      Data: 12|CardPropertyAlwaysData, Assembly-CSharp
+      Data: 12|CardPropertyDefaultUseData, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -159,12 +159,6 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 8
-      Data: 
-    - Name: TitleKey
-      Entry: 1
-      Data: Heal
-    - Name: InfoKey
-      Entry: 1
       Data: 
     - Name: 
       Entry: 8

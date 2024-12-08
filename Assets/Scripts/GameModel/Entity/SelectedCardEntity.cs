@@ -4,25 +4,25 @@ using UnityEngine;
 
 public interface ISelectedCardEntity
 {
-    IReadOnlyCollection<CardEntity> Cards { get; }
-    bool TryEnqueueCard(CardEntity card);
-    bool TryDequeueCard(out CardEntity card);
+    IReadOnlyCollection<ICardEntity> Cards { get; }
+    bool TryEnqueueCard(ICardEntity card);
+    bool TryDequeueCard(out ICardEntity card);
 }
 
 public class SelectedCardEntity : ISelectedCardEntity
 {
-    public IReadOnlyCollection<CardEntity> Cards => _cards;
+    public IReadOnlyCollection<ICardEntity> Cards => _cards;
 
     private int _maxCount;
-    private Queue<CardEntity> _cards;
+    private Queue<ICardEntity> _cards;
 
-    public SelectedCardEntity(int selectedCardMaxCount, IEnumerable<CardEntity> cards)
+    public SelectedCardEntity(int selectedCardMaxCount, IEnumerable<ICardEntity> cards)
     {
         _maxCount = selectedCardMaxCount;
-        _cards = new Queue<CardEntity>(cards); 
+        _cards = new Queue<ICardEntity>(cards); 
     }
  
-    public bool TryEnqueueCard(CardEntity card)
+    public bool TryEnqueueCard(ICardEntity card)
     {
         if (Cards.Count < _maxCount)
         {
@@ -32,7 +32,7 @@ public class SelectedCardEntity : ISelectedCardEntity
         return false;
     }
 
-    public bool TryDequeueCard(out CardEntity card)
+    public bool TryDequeueCard(out ICardEntity card)
     { 
         if (Cards.Count > 0)
         {

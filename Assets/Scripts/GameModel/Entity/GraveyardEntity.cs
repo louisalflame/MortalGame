@@ -3,34 +3,34 @@ using System.Linq;
 
 public interface IGraveyardEntity
 {
-    IReadOnlyCollection<CardEntity> Cards { get; }
-    void AddCard(CardEntity card);
-    void AddCards(IEnumerable<CardEntity> cards);
-    IReadOnlyCollection<CardEntity> PopAllCards();
+    IReadOnlyCollection<ICardEntity> Cards { get; }
+    void AddCard(ICardEntity card);
+    void AddCards(IEnumerable<ICardEntity> cards);
+    IReadOnlyCollection<ICardEntity> PopAllCards();
 }
 public class GraveyardEntity : IGraveyardEntity
 {
-    private List<CardEntity> _cards;
-    public IReadOnlyCollection<CardEntity> Cards => _cards;
+    private List<ICardEntity> _cards;
+    public IReadOnlyCollection<ICardEntity> Cards => _cards;
         
     public GraveyardEntity()
     {
-        _cards = new List<CardEntity>();
+        _cards = new List<ICardEntity>();
     }
 
-    public void AddCard(CardEntity card)
+    public void AddCard(ICardEntity card)
     {
         _cards.Add(card);
     }
-    public void AddCards(IEnumerable<CardEntity> cards)
+    public void AddCards(IEnumerable<ICardEntity> cards)
     {
         _cards.AddRange(cards);
     }
 
-    public IReadOnlyCollection<CardEntity> PopAllCards()
+    public IReadOnlyCollection<ICardEntity> PopAllCards()
     {
         var cards = _cards.ToList();
-        _cards = new List<CardEntity>();
+        _cards = new List<ICardEntity>();
         return cards;
     }
 }

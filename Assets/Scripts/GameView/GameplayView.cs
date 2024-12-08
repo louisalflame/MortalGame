@@ -99,7 +99,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
         _allyCharacterView.Init(statusWatcher);
 
         _enemyInfoView.Init(statusWatcher);
-        _enemySelectedCardView.Init(statusWatcher, reciever);
+        _enemySelectedCardView.Init(statusWatcher, reciever, localizeLibrary);
         _enemyCharacterView.Init(statusWatcher);
 
         _deckCardView.Init(statusWatcher, reciever);

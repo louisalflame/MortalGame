@@ -95,7 +95,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 1
+      Data: 4
     - Name: $v
       Entry: 7
       Data: 6|ICardEffect[], Assembly-CSharp
@@ -153,12 +153,6 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 8
-      Data: 
-    - Name: TitleKey
-      Entry: 1
-      Data: ComboAtk
-    - Name: InfoKey
-      Entry: 1
       Data: 
     - Name: 
       Entry: 8

@@ -27,11 +27,13 @@ public class EnemySelectedCardView : MonoBehaviour
 
     private IGameplayStatusWatcher _statusWatcher;
     private IGameplayActionReciever _reciever;
+    private LocalizeLibrary _localizeLibrary;
 
-    public void Init(IGameplayStatusWatcher statusWatcher, IGameplayActionReciever reciever)
+    public void Init(IGameplayStatusWatcher statusWatcher, IGameplayActionReciever reciever, LocalizeLibrary localizeLibrary)
     {
         _statusWatcher = statusWatcher;
         _reciever = reciever;
+        _localizeLibrary = localizeLibrary;
     }
 
     public void UpdateDeckView(DrawCardEvent drawCardEvent)
@@ -47,7 +49,7 @@ public class EnemySelectedCardView : MonoBehaviour
     {
         var cardView = _cardViewFactory.CreatePrefab();
         cardView.transform.SetParent(_cardViewParent, false);
-        cardView.SetCardInfo(enemySelectCardEvent.SelectedCardInfo, _reciever);
+        cardView.SetCardInfo(enemySelectCardEvent.SelectedCardInfo, _localizeLibrary);
 
         _cardViews.Add(cardView);
         _cardViewDict.Add(enemySelectCardEvent.SelectedCardInfo.Indentity, cardView);

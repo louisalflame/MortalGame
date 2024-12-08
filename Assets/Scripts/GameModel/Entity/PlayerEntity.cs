@@ -66,15 +66,15 @@ public class EnemyEntity : PlayerEntity
         Name = nameKey;
         Character = new CharacterEntity(initialHealth, maxHealth, initialEnergy, maxEnergy);
         CardManager = new PlayerCardManager(handCardMaxCount, enemyCardInstances);
-        SelectedCards = new SelectedCardEntity(selectedCardMaxCount, new List<CardEntity>());
+        SelectedCards = new SelectedCardEntity(selectedCardMaxCount, new List<ICardEntity>());
         TurnStartDrawCardCount = turnStartDrawCardCount;
         EnergyRecoverPoint = energyRecoverPoint;
     }
 
-    public IReadOnlyCollection<CardEntity> GetRecommendCards()
+    public IReadOnlyCollection<ICardEntity> GetRecommendCards()
     {
         // TODO: Implement AI logic
-        var cardList = new List<CardEntity>();
+        var cardList = new List<ICardEntity>();
         if(CardManager.HandCard.Cards.Count > 0) 
             cardList.Add(CardManager.HandCard.Cards.ElementAt(0));
         if(CardManager.HandCard.Cards.Count > 1) 

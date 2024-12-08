@@ -5,9 +5,5 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "LocalizeData", menuName = "Scriptable Objects/Localize Data")]
 public class LocalizeDataScriptable : SerializedScriptableObject
 {
-    public LocalizeData Data;
-}
-
-public class LocalizeData : Dictionary<string, string>
-{
+    public Dictionary<string, string> Data;
 }

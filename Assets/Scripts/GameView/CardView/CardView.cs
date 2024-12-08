@@ -19,6 +19,9 @@ public class CardView : MonoBehaviour, IRecyclable, ISelectableView
     private TextMeshProUGUI _title;
     [BoxGroup("Content")]
     [SerializeField]
+    private TextMeshProUGUI _info;
+    [BoxGroup("Content")]
+    [SerializeField]
     private TextMeshProUGUI _cost;
     [BoxGroup("Content")]
     [SerializeField]
@@ -41,7 +44,9 @@ public class CardView : MonoBehaviour, IRecyclable, ISelectableView
 
     public void SetCardInfo(CardInfo cardInfo, LocalizeLibrary localizeLibrary)
     {
-        _title.text = localizeLibrary.Get(LocalizeType.CardTitle, cardInfo.Title);
+        var cardLocalizeData = localizeLibrary.Get(LocalizeTitleInfoType.Card, cardInfo.CardDataID);
+        _title.text = cardLocalizeData.Title;
+        _info.text = cardLocalizeData.Info;
         _cost.text = cardInfo.Cost.ToString();
         _power.text = cardInfo.Power.ToString();
     }

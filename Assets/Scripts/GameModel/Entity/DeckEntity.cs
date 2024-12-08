@@ -5,23 +5,23 @@ using UnityEngine;
 
 public interface IDeckEntity
 {
-    IReadOnlyCollection<CardEntity> Cards { get; }
-    bool PopCard(out CardEntity card);
-    void EnqueueCardsThenShuffle(IEnumerable<CardEntity> cards);
+    IReadOnlyCollection<ICardEntity> Cards { get; }
+    bool PopCard(out ICardEntity card);
+    void EnqueueCardsThenShuffle(IEnumerable<ICardEntity> cards);
 }
 public class DeckEntity : IDeckEntity
 {
-    private List<CardEntity> _cards;
-    public IReadOnlyCollection<CardEntity> Cards => _cards;
+    private List<ICardEntity> _cards;
+    public IReadOnlyCollection<ICardEntity> Cards => _cards;
     
     public DeckEntity(IEnumerable<CardInstance> cards)
     {
-        _cards = new List<CardEntity>();
+        _cards = new List<ICardEntity>();
         EnqueueCardsThenShuffle(
             cards.Select(c => CardEntity.Create(c)));
     }
 
-    public bool PopCard(out CardEntity card)
+    public bool PopCard(out ICardEntity card)
     {
         if (Cards.Count == 0)
         {
@@ -32,7 +32,7 @@ public class DeckEntity : IDeckEntity
         _cards = Cards.Skip(1).ToList();
         return true;
     }
-    public void EnqueueCardsThenShuffle(IEnumerable<CardEntity> cards)
+    public void EnqueueCardsThenShuffle(IEnumerable<ICardEntity> cards)
     {
         _cards.AddRange(cards);
         

@@ -22,9 +22,10 @@ public class CardData
     [Range(0, 20)]
     public int Power;
     
-    [TitleGroup("Target")]
+    [BoxGroup("Target")]
     [PropertySpace(SpaceBefore = 0, SpaceAfter = 10)]
     public IMainTargetSelectable MainSelectable;
+    [BoxGroup("Target")]
     public List<ISubTargetSelectable> SubSelectables;
 
     [BoxGroup("Effects")]
@@ -32,8 +33,4 @@ public class CardData
 
     [BoxGroup("Properties")]
     public List<ICardPropertyData> PropertyDatas = new List<ICardPropertyData>();
-
-    [TitleGroup("Localization")]
-    public string TitleKey = string.Empty;
-    public string InfoKey = string.Empty;
 }

@@ -5,5 +5,6 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "LocalizeSetting", menuName = "Scriptable Objects/Localize Setting")]
 public class LocalizeSettingScriptable : SerializedScriptableObject
 {
-    public Dictionary<LocalizeType, LocalizeDataScriptable> AllLocalizeData;
+    public Dictionary<LocalizeSimpleType, LocalizeDataScriptable> AllLocalizeSimpleData;
+    public Dictionary<LocalizeTitleInfoType, LocalizeTitleInfoDataScriptable> AllLocalizeTileInfoData;
 }

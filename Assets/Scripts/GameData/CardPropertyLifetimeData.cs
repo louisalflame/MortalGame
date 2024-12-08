@@ -1,27 +1,24 @@
 using UnityEngine;
 
-public interface ICardPropertyLifetimeData
+public interface ICardPropertyUseCountData
 {
-    ICardPropertyLifetimeEntity CreateEntity();
+    ICardPropertyUseCountEntity CreateEntity();
 }
 
-public class CardPropertyAlwaysData : ICardPropertyLifetimeData
+public class CardPropertyDefaultUseData : ICardPropertyUseCountData
 {
-    public ICardPropertyLifetimeEntity CreateEntity()
+    public ICardPropertyUseCountEntity CreateEntity()
     {
-        return new CardPropertyAlwaysEntity();
+        return new CardPropertyDefaultUseEntity();
     }
 }
 
-public class CardPropertyTurnCountData : ICardPropertyLifetimeData
+public class CardPropertyBattleCountData : ICardPropertyUseCountData
 {
-    public int TurnCount;
+    public int BattleCount;
 
-    public ICardPropertyLifetimeEntity CreateEntity()
+    public ICardPropertyUseCountEntity CreateEntity()
     {
-        return new CardPropertyTurnCountEntity
-        {
-            TurnCount = TurnCount
-        };
+        return new CardPropertyBattleCountEntity(BattleCount);
     }
 }

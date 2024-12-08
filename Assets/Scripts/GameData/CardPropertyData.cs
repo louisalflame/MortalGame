@@ -9,67 +9,67 @@ public interface ICardPropertyData
 
 public class PreservedPropertyData : ICardPropertyData
 {
-    public ICardPropertyLifetimeData Lifetime;
+    public ICardPropertyUseCountData UseCount;
 
     public ICardPropertyEntity CreateEntity()
     {
-        return new PreservedPropertyEntity(Lifetime.CreateEntity());
+        return new PreservedPropertyEntity(UseCount.CreateEntity());
     }
 }
 
 public class InitialPriorityPropertyData : ICardPropertyData
 {
-    public ICardPropertyLifetimeData Lifetime;
+    public ICardPropertyUseCountData UseCount;
 
     public ICardPropertyEntity CreateEntity()
     {
-        return new InitialPriorityPropertyEntity(Lifetime.CreateEntity());
+        return new InitialPriorityPropertyEntity(UseCount.CreateEntity());
     }
 }
 
 public class ConsumablePropertyData : ICardPropertyData
 {
-    public ICardPropertyLifetimeData Lifetime;
+    public ICardPropertyUseCountData UseCount;
 
     public ICardPropertyEntity CreateEntity()
     {
-        return new ConsumablePropertyEntity(Lifetime.CreateEntity());
+        return new ConsumablePropertyEntity(UseCount.CreateEntity());
     }
 }
 
 public class DisposePropertyData : ICardPropertyData
 {
-    public ICardPropertyLifetimeData Lifetime;
+    public ICardPropertyUseCountData UseCount;
 
     public ICardPropertyEntity CreateEntity()
     {
-        return new DisposePropertyEntity(Lifetime.CreateEntity());
+        return new DisposePropertyEntity(UseCount.CreateEntity());
     }
 }
 
 public class AutoDisposePropertyData : ICardPropertyData
 {
-    public ICardPropertyLifetimeData Lifetime;
+    public ICardPropertyUseCountData UseCount;
 
     public ICardPropertyEntity CreateEntity()
     {
-        return new AutoDisposePropertyEntity(Lifetime.CreateEntity());
+        return new AutoDisposePropertyEntity(UseCount.CreateEntity());
     }
 }
 
 public class SealedPropertyData : ICardPropertyData
 {
-    public ICardPropertyLifetimeData Lifetime;
+    public ICardPropertyUseCountData UseCount;
 
     public ICardPropertyEntity CreateEntity()
     {
-        return new SealedPropertyEntity(Lifetime.CreateEntity());
+        return new SealedPropertyEntity(UseCount.CreateEntity());
     }
 }
 
 public static class CardPropertyDataExtensions
 {
-    public static bool HasProperty(this CardEntity card, CardProperty property)
+    public static bool HasProperty(this ICardEntity card, CardProperty property)
     { 
         return card.AllProperties.Any(p => p.Property == property);
     }

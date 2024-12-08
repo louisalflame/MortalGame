@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee34c135d40337a4fa8f5c6f2e8f9fb4, type: 3}
-  m_Name: CardTitleLocalize
+  m_Script: {fileID: 11500000, guid: 25f21c8952cb3954f98aa57b7f441a5d, type: 3}
+  m_Name: AllCardStatus
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -20,23 +20,6 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
-    SerializationNodes:
-    - Name: Data
-      Entry: 7
-      Data: 0|LocalizeData, Assembly-CSharp
-    - Name: comparer
-      Entry: 7
-      Data: 1|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+    SerializationNodes: []
+  AllCardStatusData:
+  - {fileID: 11400000, guid: 18f35a8c78a2c9648a2aca1f8ef8b1d2, type: 2}

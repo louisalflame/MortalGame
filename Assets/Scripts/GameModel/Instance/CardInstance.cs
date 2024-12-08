@@ -6,8 +6,6 @@ public class CardInstance
 {
     public Guid InstanceGuid;
     public string CardDataId;
-    public string TitleKey;
-    public string InfoKey;
 
     public CardRarity Rarity;
     public CardType Type;
@@ -18,9 +16,6 @@ public class CardInstance
 
     public IMainTargetSelectable MainSelectable;
     public List<ISubTargetSelectable> SubSelectables;
-    public ICardEffect[] OnUseEffects;
-    public ICardEffect[] OnHandEffects;
-    public ICardEffect[] OnDeckEffects;
     public IReadOnlyDictionary<CardTiming, ICardEffect[]> Effects;
     public List<ICardPropertyData> PropertyDatas;
 
@@ -29,8 +24,6 @@ public class CardInstance
         return new CardInstance()
         {
             InstanceGuid = Guid.NewGuid(),
-            TitleKey = cardData.TitleKey,
-            InfoKey = cardData.InfoKey,
             Rarity = cardData.Rarity,
             Type = cardData.Type,
             Themes = cardData.Themes.ToArray(),

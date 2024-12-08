@@ -26,7 +26,7 @@ MonoBehaviour:
       Data: 0|CardData, Assembly-CSharp
     - Name: ID
       Entry: 1
-      Data: BuffPoison
+      Data: BuffPoison001
     - Name: Rarity
       Entry: 3
       Data: 1
@@ -95,7 +95,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 1
+      Data: 4
     - Name: $v
       Entry: 7
       Data: 6|ICardEffect[], Assembly-CSharp
@@ -154,9 +154,9 @@ MonoBehaviour:
     - Name: 
       Entry: 7
       Data: 12|DisposePropertyData, Assembly-CSharp
-    - Name: Lifetime
+    - Name: UseCount
       Entry: 7
-      Data: 13|CardPropertyAlwaysData, Assembly-CSharp
+      Data: 13|CardPropertyDefaultUseData, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -168,12 +168,6 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 8
-      Data: 
-    - Name: TitleKey
-      Entry: 1
-      Data: Poison
-    - Name: InfoKey
-      Entry: 1
       Data: 
     - Name: 
       Entry: 8

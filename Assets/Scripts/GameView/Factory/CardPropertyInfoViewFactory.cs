@@ -1,5 +1,5 @@
 using UnityEngine;
 
-public class CardPropertyInfoViewFactory : PrefabFactory<CardPropertyInfoView>
+public class CardStatusInfoViewFactory : PrefabFactory<CardStatusInfoView>
 {
 }

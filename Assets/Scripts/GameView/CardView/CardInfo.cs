@@ -7,8 +7,7 @@ using UnityEngine;
 public class CardInfo
 {
     public Guid Indentity { get; private set; }
-    public string Title { get; private set; }
-    public string Info { get; private set; }
+    public string CardDataID { get; private set; }
     public int OriginCost { get; private set; }
     public int Cost { get; private set; }
     public int OriginPower { get; private set; }
@@ -17,14 +16,12 @@ public class CardInfo
     public MainSelectableInfo MainSelectable;
     public List<SubSelectableInfo> SubSelectables;
 
-    public List<CardPropertyInfo> Properties { get; private set; }
-    public List<CardPropertyInfo> AppendProperties { get; private set; }
+    public List<CardStatusInfo> StatusInfos { get; private set; }
 
-    public CardInfo(CardEntity card, GameContext gameContext)
+    public CardInfo(ICardEntity card, GameContext gameContext)
     {
         Indentity = card.Indentity;
-        Title = card.Title;
-        Info = card.Info;
+        CardDataID = card.CardDataId;
 
         OriginCost = card.Cost;
         Cost = card.EvalCost(gameContext);
@@ -34,8 +31,7 @@ public class CardInfo
         MainSelectable = new MainSelectableInfo(card.MainSelectable.TargetType);
         SubSelectables = card.SubSelectables.Select(s => new SubSelectableInfo(s.TargetType, s.TargetCount)).ToList();
 
-        Properties = card.Properties.Select(p => new CardPropertyInfo(p)).ToList();
-        AppendProperties = card.AppendProperties.Select(p => new CardPropertyInfo(p)).ToList();
+        StatusInfos = card.StatusList.Select(s => new CardStatusInfo(s)).ToList();
     }
 }
 
@@ -63,7 +59,7 @@ public static class CardCollectionInfoUtility
                     pair => pair.index));
     }
 
-    public static CardCollectionInfo ToCardCollectionInfo(this IReadOnlyCollection<CardEntity> cards, GameContext gameContext)
+    public static CardCollectionInfo ToCardCollectionInfo(this IReadOnlyCollection<ICardEntity> cards, GameContext gameContext)
     { 
         return cards
             .Select(c => new CardInfo(c, gameContext))
@@ -71,7 +67,7 @@ public static class CardCollectionInfoUtility
             .ToCardCollectionInfo();
     }
 
-    public static IReadOnlyCollection<CardInfo> ToCardInfos(this IReadOnlyCollection<CardEntity> cards, GameContext gameContext)
+    public static IReadOnlyCollection<CardInfo> ToCardInfos(this IReadOnlyCollection<ICardEntity> cards, GameContext gameContext)
     {
         return cards.Select(c => new CardInfo(c, gameContext)).ToArray();
     }

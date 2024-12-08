@@ -9,4 +9,9 @@ public class CardLibrary
     {
         _cards = new Dictionary<string, CardData>(cards);
     }
+    
+    public CardData GetCardData(string cardId)
+    {
+        return _cards[cardId];
+    }
 }

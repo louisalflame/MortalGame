@@ -24,10 +24,15 @@ public class BattleBuidler
     public GameContextManager ConstructGameContextManager()
     {
         var cardLibrary = new CardLibrary(_context.CardTable);
+        var CardStatusLibrary = new CardStatusLibrary(_context.CardStatusTable);
         var buffLibrary = new BuffLibrary(_context.BuffTable);
-        var localizeLibrary = new LocalizeLibrary(_context.LocalizeSetting);
+        var localizeLibrary = new LocalizeLibrary(_context.LocalizeSimpleSetting, _context.LocalizeTitleInfoSetting);
 
-        return new GameContextManager(cardLibrary, buffLibrary, localizeLibrary);
+        return new GameContextManager(
+            cardLibrary, 
+            CardStatusLibrary,
+            buffLibrary, 
+            localizeLibrary);
     }
 
     private AllyEntity _ParseAlly(AllyInstance allyInstance)

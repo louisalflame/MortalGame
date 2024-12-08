@@ -5,15 +5,18 @@ using UnityEngine;
 public class Context
 {
     public Dictionary<string, CardData> CardTable { get; private set; }
+    public Dictionary<string, CardStatusData> CardStatusTable { get; private set; }
     public Dictionary<string, BuffData> BuffTable { get; private set; }
     public EnemyData[] AllEnemies { get; private set; }
     public AllyInstance Ally{ get; private set; }
-    public Dictionary<LocalizeType, LocalizeData> LocalizeSetting { get; private set; }
+    public Dictionary<LocalizeSimpleType, Dictionary<string, string>> LocalizeSimpleSetting { get; private set; }
+    public Dictionary<LocalizeTitleInfoType, Dictionary<string, LocalizeTitleInfoData>> LocalizeTitleInfoSetting { get; private set; }
 
     public Context(
         ScriptableDataLoader scriptableDataLoader)
     {
         CardTable = scriptableDataLoader.AllCards.ToDictionary(c => c.ID, c => c);
+        CardStatusTable = scriptableDataLoader.AllCardStatus.ToDictionary(c => c.ID, c => c);
         BuffTable = scriptableDataLoader.AllBuffs.ToDictionary(b => b.ID, b => b);
         AllEnemies = scriptableDataLoader.AllEnemies;
 
@@ -29,6 +32,7 @@ public class Context
             HandCardMaxCount = scriptableDataLoader.Ally.PlayerData.HandCardMaxCount,
         };
 
-        LocalizeSetting = scriptableDataLoader.LocalizeSetting;
+        LocalizeSimpleSetting = scriptableDataLoader.LocalizeSimpleSetting;
+        LocalizeTitleInfoSetting = scriptableDataLoader.LocalizeTitleInfoSetting;
     }
 }

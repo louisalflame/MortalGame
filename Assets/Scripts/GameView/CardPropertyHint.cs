@@ -6,7 +6,9 @@ using UnityEngine.UI;
 public class CardPropertyHint : MonoBehaviour
 {
     [SerializeField]
-    private CardPropertyInfoViewFactory _cardPropertyInfoViewFactory;
+    private CardStatusInfoViewFactory _cardStatusInfoViewFactory;
+    [SerializeField]
+    private GameKeyWordInfoViewFactory _gameKeyWordInfoViewFactory;
     [SerializeField]
     private Transform _cardPropertyInfoViewParent;
     [SerializeField]
@@ -15,7 +17,7 @@ public class CardPropertyHint : MonoBehaviour
     private float _offsetX;
 
     private LocalizeLibrary _localizeLibrary;
-    private List<CardPropertyInfoView> _propertyViews = new List<CardPropertyInfoView>();
+    private List<CardStatusInfoView> _propertyViews = new List<CardStatusInfoView>();
 
     public void Init(LocalizeLibrary localizeLibrary)
     {
@@ -25,13 +27,14 @@ public class CardPropertyHint : MonoBehaviour
     public void ShowHint(CardInfo cardInfo, bool smallDirection)
     {
         _UpdateContentAnchorPivotX(smallDirection);
-        foreach(var property in cardInfo.Properties.Concat(cardInfo.AppendProperties))
-        {
-            var cardPropertyInfoView = _cardPropertyInfoViewFactory.CreatePrefab();
-            cardPropertyInfoView.transform.SetParent(_cardPropertyInfoViewParent, false);
-            _propertyViews.Add(cardPropertyInfoView);
 
-            cardPropertyInfoView.SetInfo(property, _localizeLibrary);
+        foreach(var statusInfo in cardInfo.StatusInfos)
+        {
+            var cardStatusInfoView = _cardStatusInfoViewFactory.CreatePrefab();
+            cardStatusInfoView.transform.SetParent(_cardPropertyInfoViewParent, false);
+            _propertyViews.Add(cardStatusInfoView);
+
+            cardStatusInfoView.SetInfo(statusInfo, _localizeLibrary);
         }
     }
 
@@ -39,7 +42,7 @@ public class CardPropertyHint : MonoBehaviour
     {
         foreach (var propertyView in _propertyViews)
         {
-            _cardPropertyInfoViewFactory.RecyclePrefab(propertyView);
+            _cardStatusInfoViewFactory.RecyclePrefab(propertyView);
         }
         _propertyViews.Clear();
     }

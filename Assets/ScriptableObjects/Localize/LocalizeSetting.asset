@@ -18,23 +18,23 @@ MonoBehaviour:
     ReferencedUnityObjects:
     - {fileID: 11400000, guid: 9dc301512892b5d4bb3ff03bd018827b, type: 2}
     - {fileID: 11400000, guid: 327e28965747a4642aec28dfdcbb9d10, type: 2}
-    - {fileID: 11400000, guid: 49ab09e9c10df1a47831475c4bdbae70, type: 2}
     - {fileID: 11400000, guid: 6a515fc4288f8f446b6148bb41b254cb, type: 2}
     - {fileID: 11400000, guid: 8ff388cd96c498b4296d85ad6ddf93c5, type: 2}
-    - {fileID: 11400000, guid: f6f4465d655fa9a468e70e8e04bab50f, type: 2}
+    - {fileID: 11400000, guid: 90b385de93f067d4fa87dffeeacf244d, type: 2}
+    - {fileID: 11400000, guid: a4fa96509f293b6409317cdaa7b782a3, type: 2}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: AllLocalizeData
+    - Name: AllLocalizeSimpleData
       Entry: 7
-      Data: 0|System.Collections.Generic.Dictionary`2[[LocalizeType, Assembly-CSharp],[LocalizeDataScriptable,
+      Data: 0|System.Collections.Generic.Dictionary`2[[LocalizeSimpleType, Assembly-CSharp],[LocalizeDataScriptable,
         Assembly-CSharp]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 1|System.Collections.Generic.EnumEqualityComparer`1[[LocalizeType, Assembly-CSharp]],
-        mscorlib
+      Data: 1|System.Collections.Generic.EnumEqualityComparer`1[[LocalizeSimpleType,
+        Assembly-CSharp]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -46,7 +46,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 6
+      Data: 2
     - Name: 
       Entry: 7
       Data: 
@@ -72,6 +72,56 @@ MonoBehaviour:
       Entry: 8
       Data: 
     - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: AllLocalizeTileInfoData
+      Entry: 7
+      Data: 2|System.Collections.Generic.Dictionary`2[[LocalizeTitleInfoType, Assembly-CSharp],[LocalizeTitleInfoDataScriptable,
+        Assembly-CSharp]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 3|System.Collections.Generic.EnumEqualityComparer`1[[LocalizeTitleInfoType,
+        Assembly-CSharp]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 0
+    - Name: $v
+      Entry: 10
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 1
+    - Name: $v
+      Entry: 10
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
       Entry: 7
       Data: 
     - Name: $k
@@ -79,7 +129,7 @@ MonoBehaviour:
       Data: 2
     - Name: $v
       Entry: 10
-      Data: 2
+      Data: 4
     - Name: 
       Entry: 8
       Data: 
@@ -89,30 +139,6 @@ MonoBehaviour:
     - Name: $k
       Entry: 3
       Data: 3
-    - Name: $v
-      Entry: 10
-      Data: 3
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 4
-    - Name: $v
-      Entry: 10
-      Data: 4
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 5
     - Name: $v
       Entry: 10
       Data: 5

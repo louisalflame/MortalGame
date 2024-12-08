@@ -35,6 +35,9 @@ public enum CardTheme
 public enum CardTiming
 {
     None = 0,
+    BattleBegin,
+    TurnStart,
+    OnDrawCard,
     OnPlayCard,
     TurnEnd,
 }
@@ -53,4 +56,36 @@ public enum CardProperty : int
     Dispose             = 1 << 8,
     AutoDispose         = 1 << 9,
     AppendEffect        = 1 << 10,
+}
+
+public enum GameKeyWord
+{
+    None = 0,
+    Attack,
+    Defense,
+    Speech,
+    Sneak,
+    Special,
+    Item,
+    TangSect,
+    Emei,
+    Songshan,
+    BeggarClan,
+    DianCang,
+    BattleBegin,
+    TurnStart,
+    OnDrawCard,
+    OnPlayCard,
+    TurnEnd,
+    EffectTimes,
+    RecycleTimes,
+    PowerAdjust,
+    CostAdjust,
+    InitialPriority,
+    Preserved,
+    Sealed,
+    Consumable,
+    Dispose,
+    AutoDispose,
+    AppendEffect,
 }
