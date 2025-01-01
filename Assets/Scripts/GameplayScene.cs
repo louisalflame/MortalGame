@@ -19,8 +19,8 @@ public class GameplayScene : MonoBehaviour
 
     public async UniTask Run()
     {
-        var initialState = _battleBuidler.ConstructBattle();
         var gameContextManager = _battleBuidler.ConstructGameContextManager();
+        var initialState = _battleBuidler.ConstructBattle(gameContextManager);
         var gameplayPresenter = new GameplayPresenter(_gameplayView, initialState, gameContextManager);
 
         var result = await gameplayPresenter.Run();

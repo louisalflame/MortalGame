@@ -107,7 +107,9 @@ public class GameplayManager : IGameplayStatusWatcher
             Player = _gameStatus.Ally,
             Enemy = _gameStatus.Enemy
         });
-        var allyGainEnergyResult = _gameStatus.Ally.Character.EnergyManager.RecoverEnergy(_gameStatus.Ally.DispositionManager.RecoverEnergyPoint);
+        
+        var recoverEnergyPoint = _contextMgr.DispositionLibrary.GetRecoverEnergyPoint(_gameStatus.Ally.DispositionManager.CurrentDisposition);
+        var allyGainEnergyResult = _gameStatus.Ally.Character.EnergyManager.RecoverEnergy(recoverEnergyPoint);
         _gameEvents.Add(new RecoverEnergyEvent(_gameStatus.Ally, allyGainEnergyResult));
 
         var enemyGainEnergyResult = _gameStatus.Enemy.Character.EnergyManager.RecoverEnergy(_gameStatus.Enemy.EnergyRecoverPoint);
@@ -121,8 +123,10 @@ public class GameplayManager : IGameplayStatusWatcher
 
     private void _TurnDrawCard()
     {
-        _DrawCards(_gameStatus.Ally, _gameStatus.Ally.DispositionManager.TurnStartDrawCardCount);    
-        _DrawCards(_gameStatus.Enemy, _gameStatus.Enemy.TurnStartDrawCardCount);
+        var allyDrawCount = _contextMgr.DispositionLibrary.GetDrawCardCount(_gameStatus.Ally.DispositionManager.CurrentDisposition);
+        var enemyDrawCount = _gameStatus.Enemy.TurnStartDrawCardCount;
+        _DrawCards(_gameStatus.Ally, allyDrawCount);
+        _DrawCards(_gameStatus.Enemy, enemyDrawCount);
 
         _gameStatus = _gameStatus.With(
             state: GameState.EnemyPrepare

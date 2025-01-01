@@ -18,15 +18,21 @@ public class EnemyInfoView : MonoBehaviour
     
     
     private IGameplayStatusWatcher _statusWatcher;
+    private LocalizeLibrary _localizeLibrary;
 
-    public void Init(IGameplayStatusWatcher statusWatcher)
+    public void Init(
+        IGameplayStatusWatcher statusWatcher,
+        SimpleTitleIInfoHintView simpleHintView,
+        LocalizeLibrary localizeLibrary)
     {
         _statusWatcher = statusWatcher;
+        _localizeLibrary = localizeLibrary;
+        _buffCollectionView.Init(simpleHintView);
     }
 
     public void SetPlayerInfo(EnemyEntity enemy)
     {
-        _nameText.text = enemy.Name;
+        _nameText.text = _localizeLibrary.Get(LocalizeSimpleType.PlayerName, enemy.NameKey);
         _healthBarView.SetHealth(enemy.Character.CurrentHealth, enemy.Character.MaxHealth);
         _healthBarView.SetShield(enemy.Character.CurrentArmor);
         _energyBarView.SetEnergy(enemy.Character.CurrentEnergy, enemy.Character.MaxEnergy);

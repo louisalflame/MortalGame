@@ -12,16 +12,18 @@ public class BuffCollectionView : MonoBehaviour
 
     private List<BuffView> _buffViews = new List<BuffView>();
     private Dictionary<Guid, BuffView> _buffViewDict = new Dictionary<Guid, BuffView>();
+    private SimpleTitleIInfoHintView _simpleHintView;
 
-    public void Init()
+    public void Init(SimpleTitleIInfoHintView simpleHintView)
     {
+        _simpleHintView = simpleHintView;
     }
 
     public void AddBuff(BuffInfo buffInfo)
     {
         var buffView = _buffViewFactory.CreatePrefab();
         buffView.transform.SetParent(_buffViewParent, false);
-        buffView.SetBuffInfo(buffInfo);
+        buffView.SetBuffInfo(buffInfo, _simpleHintView);
 
         _buffViews.Add(buffView);
         _buffViewDict.Add(buffInfo.Identity, buffView);
@@ -39,7 +41,7 @@ public class BuffCollectionView : MonoBehaviour
     {
         if (_buffViewDict.TryGetValue(buffInfo.Identity, out var buffView))
         {
-            buffView.SetBuffInfo(buffInfo);
+            buffView.SetBuffInfo(buffInfo, _simpleHintView);
         }
     }
 }

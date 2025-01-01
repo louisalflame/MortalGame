@@ -6,6 +6,7 @@ public class GameContextManager : IDisposable
     public readonly CardLibrary CardLibrary;
     public readonly CardStatusLibrary CardStatusLibrary;
     public readonly BuffLibrary BuffLibrary;
+    public readonly DispositionLibrary DispositionLibrary;
     public readonly LocalizeLibrary LocalizeLibrary;
     
     private Stack<GameContext> _contextStack = new Stack<GameContext>();
@@ -15,11 +16,13 @@ public class GameContextManager : IDisposable
         CardLibrary cardLibrary,
         CardStatusLibrary cardStatusLibrary,
         BuffLibrary buffLibrary,
+        DispositionLibrary dispositionLibrary,
         LocalizeLibrary localizeLibrary)
     {
         CardLibrary = cardLibrary;
         CardStatusLibrary = cardStatusLibrary;
         BuffLibrary = buffLibrary;
+        DispositionLibrary = dispositionLibrary;
         LocalizeLibrary = localizeLibrary;
         _contextStack.Push(new GameContext());
     }

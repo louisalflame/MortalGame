@@ -57,7 +57,7 @@ MonoBehaviour:
       Data: 10
     - Name: NameKey
       Entry: 1
-      Data: "\u8D99\u6D3B"
+      Data: player
     - Name: 
       Entry: 8
       Data: 

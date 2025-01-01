@@ -31,14 +31,14 @@ public class GameplayPresenter : IGameplayActionReciever
         _gameplayView = gameplayView;
         _gameplayManager = new GameplayManager(gameStatus, gameContextManager);
 
-        _gameplayView.Init(this, _gameplayManager, gameContextManager.LocalizeLibrary);
+        _gameplayView.Init(this, _gameplayManager, gameContextManager.LocalizeLibrary, gameContextManager.DispositionLibrary);
         _allCardDetailPresenter = new AllCardDetailPresenter(_gameplayView, _gameplayManager, gameContextManager.LocalizeLibrary);
     }
 
     public async UniTask<GameResult> Run()
     {
         _gameplayManager.Start();
-        var v = _allCardDetailPresenter.Run();
+        _allCardDetailPresenter.Run();
 
         while(!_gameplayManager.IsEnd)
         {

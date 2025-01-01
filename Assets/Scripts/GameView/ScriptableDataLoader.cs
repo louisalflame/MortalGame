@@ -14,6 +14,9 @@ public class ScriptableDataLoader : MonoBehaviour
 
     [SerializeField]
     private AllPlayerScriptable _allPlayerScriptable;
+    
+    [SerializeField]
+    private DispositionScriptable _dispositionScriptable;
 
     [SerializeField]
     private LocalizeSettingScriptable _localizeSettingScriptable;
@@ -21,6 +24,7 @@ public class ScriptableDataLoader : MonoBehaviour
     public CardData[] AllCards => _allCardScriptable.AllCardData.Select(c => c.Data).ToArray();
     public CardStatusData[] AllCardStatus => _allCardStatusScriptable.AllCardStatusData.Select(c => c.Data).ToArray();
     public BuffData[] AllBuffs => _allBuffScriptable.AllBuffData.Select(b => b.Data).ToArray();
+    public DispositionData[] DispositionSettings => _dispositionScriptable.Datas;
 
     public AllyData Ally => _allPlayerScriptable.AllyObject.Ally;
 

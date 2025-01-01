@@ -7,6 +7,7 @@ public class Context
     public Dictionary<string, CardData> CardTable { get; private set; }
     public Dictionary<string, CardStatusData> CardStatusTable { get; private set; }
     public Dictionary<string, BuffData> BuffTable { get; private set; }
+    public DispositionData[] DispositionSettings { get; private set; }
     public EnemyData[] AllEnemies { get; private set; }
     public AllyInstance Ally{ get; private set; }
     public Dictionary<LocalizeSimpleType, Dictionary<string, string>> LocalizeSimpleSetting { get; private set; }
@@ -18,6 +19,7 @@ public class Context
         CardTable = scriptableDataLoader.AllCards.ToDictionary(c => c.ID, c => c);
         CardStatusTable = scriptableDataLoader.AllCardStatus.ToDictionary(c => c.ID, c => c);
         BuffTable = scriptableDataLoader.AllBuffs.ToDictionary(b => b.ID, b => b);
+        DispositionSettings = scriptableDataLoader.DispositionSettings;
         AllEnemies = scriptableDataLoader.AllEnemies;
 
         // Create player instance

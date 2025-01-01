@@ -12,7 +12,7 @@ public class EnemyCharacterView : BaseCharacterView
 
     public void SummonEnemy(EnemySummonEvent enemySummonEvent)
     {
-        Debug.Log($"Summon Enemy: {enemySummonEvent.Enemy.Name}");
+        Debug.Log($"Summon Enemy: {enemySummonEvent.Enemy.NameKey}");
 
         _Run().Forget();
     }

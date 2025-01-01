@@ -23,17 +23,14 @@ public class BuffEntity
         int level,
         PlayerEntity owner,
         PlayerEntity caster,
-        BuffData buffData) 
+        Dictionary<BuffTiming, IBuffEffect[]> effects) 
     {
         Id = id;
         Identity = identity;
         Level = level;
         Owner = owner;
         Caster = caster;
-
-        Effects = buffData.Effects.ToDictionary(
-            pair => pair.Key,
-            pair => pair.Value.ToArray());
+        Effects = effects;
     }
 
     public BuffInfo ToInfo()

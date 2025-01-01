@@ -27,7 +27,7 @@ public interface IAllCardViewHandler
 
 public interface IAllCardDetailPresenter : IAllCardViewHandler
 {
-    UniTask Run();
+    UniTaskVoid Run();
 }
 
 public class AllCardDetailPresenter : IAllCardDetailPresenter
@@ -51,7 +51,7 @@ public class AllCardDetailPresenter : IAllCardDetailPresenter
         _state = AllCardDetailPanelState.Close;
     }
 
-    public async UniTask Run()
+    public async UniTaskVoid Run()
     {
         while(true)
         {

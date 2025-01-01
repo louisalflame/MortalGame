@@ -6,7 +6,6 @@ using TMPro;
 using UniRx;
 using UniRx.Triggers;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class CardView : MonoBehaviour, IRecyclable, ISelectableView
@@ -108,7 +107,7 @@ public class CardView : MonoBehaviour, IRecyclable, ISelectableView
         transform.SetAsLastSibling();
     }
     public void Drag(Vector2 dragPosition, TargetType targetType, bool isSelecting)
-    {        
+    {
         RectTransform.anchoredPosition = dragPosition;
         _canvasGroup.alpha = 
             isSelecting ? (targetType == TargetType.None ? 1f: 0f) : 0.5f;

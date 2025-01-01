@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class BuffLibrary
@@ -10,8 +11,10 @@ public class BuffLibrary
         _buffs = new Dictionary<string, BuffData>(buffs);
     }
 
-    public BuffData GetBuffData(string buffId)
+    public Dictionary<BuffTiming, IBuffEffect[]>  GetBuffEffects(string buffId)
     {
-        return _buffs[buffId];
+        return _buffs[buffId].Effects.ToDictionary(
+            pair => pair.Key,
+            pair => pair.Value.ToArray());
     }
 }

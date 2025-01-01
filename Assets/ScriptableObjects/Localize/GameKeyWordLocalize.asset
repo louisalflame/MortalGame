@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a522d939ed9ae51418db03789dc8884e, type: 3}
-  m_Name: GameKwyWordLocalize
+  m_Name: GameKeyWordLocalize
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -22,5 +22,22 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes:
     - Name: Data
-      Entry: 6
+      Entry: 7
+      Data: 0|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[LocalizeTitleInfoData,
+        Assembly-CSharp]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 1|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
       Data: 

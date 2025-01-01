@@ -11,31 +11,34 @@ public class BattleBuidler
         _context = context;
     }
 
-    public GameStatus ConstructBattle()
-    { 
-        var initialState = new GameStatus(
-            round: 0,
-            state: GameState.GameStart,
-            player: _ParseAlly(_context.Ally),
-            enemy: _ParseEnemy(_context.AllEnemies[0])
-        ); 
-        return initialState;
-    }
     public GameContextManager ConstructGameContextManager()
     {
         var cardLibrary = new CardLibrary(_context.CardTable);
         var CardStatusLibrary = new CardStatusLibrary(_context.CardStatusTable);
         var buffLibrary = new BuffLibrary(_context.BuffTable);
+        var dispositionLibrary = new DispositionLibrary(_context.DispositionSettings);
         var localizeLibrary = new LocalizeLibrary(_context.LocalizeSimpleSetting, _context.LocalizeTitleInfoSetting);
 
         return new GameContextManager(
             cardLibrary, 
             CardStatusLibrary,
             buffLibrary, 
+            dispositionLibrary,
             localizeLibrary);
     }
 
-    private AllyEntity _ParseAlly(AllyInstance allyInstance)
+    public GameStatus ConstructBattle(GameContextManager gameContextManager)
+    { 
+        var initialState = new GameStatus(
+            round: 0,
+            state: GameState.GameStart,
+            player: _ParseAlly(_context.Ally, gameContextManager),
+            enemy: _ParseEnemy(_context.AllEnemies[0])
+        ); 
+        return initialState;
+    }
+
+    private AllyEntity _ParseAlly(AllyInstance allyInstance, GameContextManager gameContextManager)
     {
         return new AllyEntity(
             nameKey             : allyInstance.NameKey,
@@ -45,6 +48,7 @@ public class BattleBuidler
             maxEnergy           : allyInstance.MaxEnergy,
             handCardMaxCount    : allyInstance.HandCardMaxCount,
             currentDisposition  : allyInstance.CurrentDisposition,
+            maxDisposition      : gameContextManager.DispositionLibrary.MaxDisposition,
             deckInstance        : allyInstance.Deck
         );
     }

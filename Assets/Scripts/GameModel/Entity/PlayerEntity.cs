@@ -5,7 +5,7 @@ using UnityEngine;
 public interface IPlayerEntity
 {
     Faction Faction { get; }
-    string Name { get; }
+    string NameKey { get; }
     CharacterEntity Character { get; }
     IPlayerCardManager CardManager { get; }
 }
@@ -13,7 +13,7 @@ public interface IPlayerEntity
 public abstract class PlayerEntity : IPlayerEntity
 {
     public Faction Faction { get; protected set; }
-    public string Name { get; protected set; }
+    public string NameKey { get; protected set; }
 
     public CharacterEntity Character { get; protected set; }
     public IPlayerCardManager CardManager { get; protected set; }
@@ -34,13 +34,14 @@ public class AllyEntity : PlayerEntity
         int maxEnergy,
         int handCardMaxCount,
         int currentDisposition,
+        int maxDisposition,
         IEnumerable<CardInstance> deckInstance)
     {
         Faction = Faction.Ally;
-        Name = nameKey;
+        NameKey = nameKey;
         Character = new CharacterEntity(currentHealth, maxHealth, currentEnergy, maxEnergy);
         CardManager = new PlayerCardManager(handCardMaxCount, deckInstance);
-        DispositionManager = new DispositionManager(currentDisposition);
+        DispositionManager = new DispositionManager(currentDisposition, maxDisposition);
     }
 }
 
@@ -63,7 +64,7 @@ public class EnemyEntity : PlayerEntity
         int energyRecoverPoint)
     {
         Faction = Faction.Enemy;
-        Name = nameKey;
+        NameKey = nameKey;
         Character = new CharacterEntity(initialHealth, maxHealth, initialEnergy, maxEnergy);
         CardManager = new PlayerCardManager(handCardMaxCount, enemyCardInstances);
         SelectedCards = new SelectedCardEntity(selectedCardMaxCount, new List<ICardEntity>());

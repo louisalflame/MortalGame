@@ -16,7 +16,7 @@ public class AllyCharacterView : BaseCharacterView
 
     public void SummonAlly(AllySummonEvent allySummonEvent)
     {
-        Debug.Log($"Summon Ally: {allySummonEvent.Player.Name}");
+        Debug.Log($"Summon Ally: {allySummonEvent.Player.NameKey}");
 
         _Run().Forget();
     }    

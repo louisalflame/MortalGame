@@ -7,7 +7,11 @@ using UnityEngine;
 
 public interface IGameplayView : IAllCardDetailPanelView
 {
-    void Init(IGameplayActionReciever reciever, IGameplayStatusWatcher statusWatcher, LocalizeLibrary localizeLibrary);
+    void Init(
+        IGameplayActionReciever reciever, 
+        IGameplayStatusWatcher statusWatcher, 
+        LocalizeLibrary localizeLibrary,
+        DispositionLibrary dispositionLibrary);
     void Render(IReadOnlyCollection<IGameEvent> events, IGameplayActionReciever reciever);
 
     IEnumerable<ISelectableView> SelectableViews { get; }
@@ -77,6 +81,9 @@ public class GameplayView : MonoBehaviour, IGameplayView
     [BoxGroup("Popup")]
     [SerializeField]
     private FocusCardDetailView _focusCardDetailView;
+    [BoxGroup("Popup")]
+    [SerializeField]
+    private SimpleTitleIInfoHintView _simpleHintView;
 
     public AllCardDetailPanel DetailPanel => _allCardDetailPanel;
     public SingleCardDetailPopupPanel SinglePopupPanel => _singleCardDetailPopupPanel;
@@ -92,13 +99,17 @@ public class GameplayView : MonoBehaviour, IGameplayView
     }
     public ISelectableView BasicSelectableView => _playGround;
 
-    public void Init(IGameplayActionReciever reciever, IGameplayStatusWatcher statusWatcher, LocalizeLibrary localizeLibrary)
+    public void Init(
+        IGameplayActionReciever reciever, 
+        IGameplayStatusWatcher statusWatcher,
+        LocalizeLibrary localizeLibrary, 
+        DispositionLibrary dispositionLibrary)
     {
-        _allyInfoView.Init(statusWatcher, _topBarInfoView);
+        _allyInfoView.Init(statusWatcher, _topBarInfoView, _simpleHintView, localizeLibrary, dispositionLibrary);
         _allyHandCardView.Init(statusWatcher, reciever, this, localizeLibrary);
         _allyCharacterView.Init(statusWatcher);
 
-        _enemyInfoView.Init(statusWatcher);
+        _enemyInfoView.Init(statusWatcher, _simpleHintView, localizeLibrary);
         _enemySelectedCardView.Init(statusWatcher, reciever, localizeLibrary);
         _enemyCharacterView.Init(statusWatcher);
 

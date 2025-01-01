@@ -66,7 +66,7 @@ MonoBehaviour:
       Data: 3
     - Name: NameKey
       Entry: 1
-      Data: "\u8DEF\u4EBA\u4FE0"
+      Data: e01
     - Name: 
       Entry: 8
       Data: 

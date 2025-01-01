@@ -12,7 +12,8 @@ public enum LocalizeTitleInfoType
     Card,
     CardStatus,
     Buff,
-    GameKeyWord
+    Disposition,
+    GameKeyWord,
 }
 
 

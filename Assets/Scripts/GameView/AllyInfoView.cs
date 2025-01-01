@@ -14,24 +14,37 @@ public class AllyInfoView : MonoBehaviour
     private EnergyBarView _energyBarView;
 
     [SerializeField]
+    private DispositionView _dispositionView;
+
+    [SerializeField]
     private BuffCollectionView _buffCollectionView;
     
     private IGameplayStatusWatcher _statusWatcher;
     private TopBarInfoView _topBarInfoView;
+    private LocalizeLibrary _localizeLibrary;
 
-    public void Init(IGameplayStatusWatcher statusWatcher, TopBarInfoView topBarInfoView)
+    public void Init(
+        IGameplayStatusWatcher statusWatcher, 
+        TopBarInfoView topBarInfoView, 
+        SimpleTitleIInfoHintView simpleHintView,
+        LocalizeLibrary localizeLibrary, 
+        DispositionLibrary dispositionLibrary)
     {
         _statusWatcher = statusWatcher;
         _topBarInfoView = topBarInfoView;
+        _localizeLibrary = localizeLibrary;
+        _dispositionView.Init(localizeLibrary, dispositionLibrary);
+        _buffCollectionView.Init(simpleHintView);
     }
 
     public void SetPlayerInfo(int round, AllyEntity ally)
     {
         _topBarInfoView.UpdateTurnInfo(round);
-        _nameText.text = ally.Name;
+        _nameText.text = _localizeLibrary.Get(LocalizeSimpleType.PlayerName, ally.NameKey);
         _healthBarView.SetHealth(ally.Character.CurrentHealth, ally.Character.MaxHealth);
         _healthBarView.SetShield(ally.Character.CurrentArmor);    
         _energyBarView.SetEnergy(ally.Character.CurrentEnergy, ally.Character.MaxEnergy);
+        _dispositionView.SetDisposition(ally.DispositionManager.CurrentDisposition, ally.DispositionManager.MaxDisposition);
     }
     
     public void UpdateEnergy(ConsumeEnergyEvent consumeEnergyEvent)
@@ -47,6 +60,10 @@ public class AllyInfoView : MonoBehaviour
     {
         _healthBarView.SetHealth(healthEvent.Hp, healthEvent.MaxHp);
         _healthBarView.SetShield(healthEvent.Dp);    
+    }
+
+    public void UpdateDisposition()
+    { 
     }
 
     public void AddBuff(AddBuffEvent addBuffEvent)
