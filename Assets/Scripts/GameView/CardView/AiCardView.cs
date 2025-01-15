@@ -21,6 +21,7 @@ public class AiCardView : MonoBehaviour, IRecyclable, ISelectableView
     private CompositeDisposable _disposables = new CompositeDisposable();
 
     public RectTransform RectTransform => _rectTransform;
+    public TargetType TargetType => TargetType.EnemyCard;
 
     public void SetCardInfo(CardInfo cardInfo, LocalizeLibrary localizeLibrary)
     {
@@ -38,6 +39,8 @@ public class AiCardView : MonoBehaviour, IRecyclable, ISelectableView
 
     public void OnSelect()
     {
-        throw new System.NotImplementedException();
+    }
+    public void OnDeselect()
+    {
     }
 }

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ce3be97fe6785cd4fbfc49b770ec0d97, type: 3}
-  m_Name: Attack001
+  m_Name: DrawCard001
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -26,13 +26,13 @@ MonoBehaviour:
       Data: 0|CardData, Assembly-CSharp
     - Name: ID
       Entry: 1
-      Data: Attack001
+      Data: DrawCard001
     - Name: Rarity
       Entry: 3
       Data: 1
     - Name: Type
       Entry: 3
-      Data: 1
+      Data: 5
     - Name: Themes
       Entry: 7
       Data: 1|CardTheme[], Assembly-CSharp
@@ -53,7 +53,7 @@ MonoBehaviour:
       Data: 2
     - Name: MainSelectable
       Entry: 7
-      Data: 2|EnemySelectable, Assembly-CSharp
+      Data: 2|PlayerSelectable, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -104,22 +104,16 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 7
-      Data: 7|DamageEffect, Assembly-CSharp
+      Data: 7|DrawCardEffect, Assembly-CSharp
     - Name: Targets
       Entry: 7
-      Data: 8|OppositePlayers, Assembly-CSharp
-    - Name: Reference
-      Entry: 7
-      Data: 9|CardCaster, Assembly-CSharp
-    - Name: 
-      Entry: 8
-      Data: 
+      Data: 8|CardCaster, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
     - Name: Value
       Entry: 7
-      Data: 10|ThisCardPower, Assembly-CSharp
+      Data: 9|ThisCardPower, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -143,11 +137,23 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 11|System.Collections.Generic.List`1[[ICardPropertyData, Assembly-CSharp]],
+      Data: 10|System.Collections.Generic.List`1[[ICardPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 11|InitialPriorityPropertyData, Assembly-CSharp
+    - Name: UseCount
+      Entry: 7
+      Data: 12|CardPropertyDefaultUseData, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 

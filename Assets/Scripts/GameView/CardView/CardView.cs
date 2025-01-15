@@ -34,6 +34,7 @@ public class CardView : MonoBehaviour, IRecyclable, ISelectableView
     private CanvasGroup _canvasGroup;
 
     public RectTransform RectTransform => _rectTransform;
+    public TargetType TargetType => TargetType.AllyCard;
 
     private CompositeDisposable _disposables = new CompositeDisposable();
     private Vector3 _localPosition;
@@ -51,6 +52,9 @@ public class CardView : MonoBehaviour, IRecyclable, ISelectableView
     }
 
     public void OnSelect()
+    {
+    }
+    public void OnDeselect()
     {
     }
 
@@ -106,11 +110,11 @@ public class CardView : MonoBehaviour, IRecyclable, ISelectableView
         _canvasGroup.alpha = 1f;
         transform.SetAsLastSibling();
     }
-    public void Drag(Vector2 dragPosition, TargetType targetType, bool isSelecting)
+    public void Drag(Vector2 dragPosition, SelectType selectType, bool isSelecting)
     {
         RectTransform.anchoredPosition = dragPosition;
         _canvasGroup.alpha = 
-            isSelecting ? (targetType == TargetType.None ? 1f: 0f) : 0.5f;
+            isSelecting ? (selectType == SelectType.None ? 1f: 0f) : 0.5f;
     }
     public void EndDrag(Vector2 beginDragPosition, int originSiblingIndex)
     {

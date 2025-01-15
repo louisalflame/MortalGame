@@ -2,22 +2,50 @@ using UnityEngine;
 
 public class MainSelectableInfo
 {
-    public TargetType TargetType { get; private set; }   
+    public SelectType SelectType { get; private set; }   
 
-    public MainSelectableInfo(TargetType targetType)
+    public MainSelectableInfo(SelectType selectType)
     {
-        TargetType = targetType;
+        SelectType = selectType;
     }
 }
 
 public class SubSelectableInfo
 {
-    public TargetType TargetType { get; private set; }   
-    public int TargetCount { get; private set; }
+    public SelectType SelectType { get; private set; }   
+    public int SelectCount { get; private set; }
 
-    public SubSelectableInfo(TargetType targetType, int targetCount)
+    public SubSelectableInfo(SelectType selectType, int selectCount)
     {
-        TargetType = targetType;
-        TargetCount = targetCount;
+        SelectType = selectType;
+        SelectCount = selectCount;
+    }
+}
+
+public static class SelectableInfoUtility
+{
+    public static bool IsSelectable(this SelectType selectType, TargetType targetType)
+    {
+        switch(selectType)
+        {
+            case SelectType.None:
+                return false;
+            case SelectType.Player:
+                return targetType == TargetType.Ally || 
+                       targetType == TargetType.Enemy;
+            case SelectType.Ally:
+                return targetType == TargetType.Ally;
+            case SelectType.Enemy:  
+                return targetType == TargetType.Enemy;
+            case SelectType.Card:
+                return targetType == TargetType.AllyCard || 
+                       targetType == TargetType.EnemyCard;
+            case SelectType.AllyCard:   
+                return targetType == TargetType.AllyCard;
+            case SelectType.EnemyCard:  
+                return targetType == TargetType.EnemyCard;
+            default:    
+                return false;        
+        }
     }
 }

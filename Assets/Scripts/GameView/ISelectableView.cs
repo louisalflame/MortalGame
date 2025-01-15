@@ -4,5 +4,8 @@ public interface ISelectableView
 {
     RectTransform RectTransform { get; }
 
-    void  OnSelect();
+    TargetType TargetType { get; }
+
+    void OnSelect();
+    void OnDeselect();
 }

@@ -12,6 +12,9 @@ public class BuffView : MonoBehaviour, IRecyclable
 
     [SerializeField]
     private TextMeshProUGUI _levelText;
+
+    [SerializeField]
+    private RectTransform _rectTransform;
     
     private CompositeDisposable _disposables = new CompositeDisposable();
 
@@ -24,7 +27,7 @@ public class BuffView : MonoBehaviour, IRecyclable
         _disposables = new CompositeDisposable();
 
         _buffIcon.OnPointerEnterAsObservable()
-            .Subscribe(_ => simpleHintView.ShowBuffInfo(buffInfo)) 
+            .Subscribe(_ => simpleHintView.ShowBuffInfo(buffInfo, _rectTransform)) 
             .AddTo(_disposables);
         _buffIcon.OnPointerExitAsObservable()
             .Subscribe(_ => simpleHintView.Close())
@@ -35,6 +38,10 @@ public class BuffView : MonoBehaviour, IRecyclable
     {
         _buffIcon.sprite = null;
         _levelText.text = string.Empty;
+
+        _disposables.Dispose();
+        // Disposed object can't be reused by same instance.
+        _disposables = new CompositeDisposable();
     }
 }
 

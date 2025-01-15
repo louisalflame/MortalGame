@@ -1,8 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyCharacterView : BaseCharacterView
+public class EnemyCharacterView : BaseCharacterView, ISelectableView
 {
+    [SerializeField]
+    private RectTransform _rectTransform;
+
+    public RectTransform RectTransform => _rectTransform;
+    public TargetType TargetType => TargetType.Enemy;
+
     public void Init(IGameplayStatusWatcher statusWatcher) 
     {
         _statusWatcher = statusWatcher;
@@ -15,5 +21,12 @@ public class EnemyCharacterView : BaseCharacterView
         Debug.Log($"Summon Enemy: {enemySummonEvent.Enemy.NameKey}");
 
         _Run().Forget();
+    }
+
+    public void OnSelect()
+    {
+    }
+    public void OnDeselect()
+    {
     }
 }

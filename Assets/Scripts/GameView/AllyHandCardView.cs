@@ -72,6 +72,7 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
     private KeyValuePair<CardInfo, int> _draggingCardInfo;
     private Vector2 _beginDragPosition;
     private Vector2 _dragOffset;
+    private ISelectableView _currentSelectedView;
 
     public IEnumerable<ISelectableView> SelectableViews => _cardViews;
 
@@ -196,35 +197,46 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
             var localDragPoint = localPoint + _dragOffset;
 
             var draggingInfo = _draggingCardInfo.Key;
-            if (draggingInfo.MainSelectable.TargetType != TargetType.None)
+            if (draggingInfo.MainSelectable.SelectType != SelectType.None)
             {
                 var selectView = _reciever.SelectableViews
                     .Where(view => view != dragView as ISelectableView)
+                    .Where(view => draggingInfo.MainSelectable.SelectType.IsSelectable(view.TargetType))
                     .Where(view => RectTransformUtility.RectangleContainsScreenPoint(view.RectTransform, pointerEventData.position, _canvas.worldCamera))
                     .FirstOrDefault();
+                if (_currentSelectedView != selectView)
+                {
+                    _currentSelectedView?.OnDeselect();
+                    selectView?.OnSelect();
+                    _currentSelectedView = selectView;
+                }
+
                 if (selectView != null)
                 {
+                    var beginDragWorldPos = dragView.transform.parent.TransformPoint(_beginDragPosition);
+                    var beginDragLinePos = _lineRenderer.transform.parent.InverseTransformPoint(beginDragWorldPos);
+                    var selectViewLinePos = _lineRenderer.transform.parent.InverseTransformPoint(selectView.RectTransform.position);
                     _lineRenderer.gameObject.SetActive(true);
-                    var points = _GenerateCurvePoints(_beginDragPosition, selectView.RectTransform.anchoredPosition);
+                    var points = _GenerateCurvePoints(beginDragLinePos, selectViewLinePos);
                     _lineRenderer.positionCount = points.Length;
-                    _lineRenderer.SetPositions(points);
-                    dragView.Drag(localDragPoint, draggingInfo.MainSelectable.TargetType, true);
+                    _lineRenderer.SetPositions(points);                    
+                    dragView.Drag(localDragPoint, draggingInfo.MainSelectable.SelectType, true);
                 }
                 else
                 {
                     _lineRenderer.gameObject.SetActive(false);
-                    dragView.Drag(localDragPoint, draggingInfo.MainSelectable.TargetType, false);  
-                }      
+                    dragView.Drag(localDragPoint, draggingInfo.MainSelectable.SelectType, false);  
+                }
             }
             else
             {
                 if (RectTransformUtility.RectangleContainsScreenPoint(_reciever.BasicSelectableView.RectTransform, pointerEventData.position, _canvas.worldCamera))
                 {
-                    dragView.Drag(localDragPoint, draggingInfo.MainSelectable.TargetType, true);
+                    dragView.Drag(localDragPoint, draggingInfo.MainSelectable.SelectType, true);
                 }
                 else
                 {
-                    dragView.Drag(localDragPoint, draggingInfo.MainSelectable.TargetType, false);
+                    dragView.Drag(localDragPoint, draggingInfo.MainSelectable.SelectType, false);
                 }
             }
         }
@@ -238,10 +250,11 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
             dragView.EndDrag(_beginDragPosition, _draggingCardInfo.Value);
 
             var draggingInfo = _draggingCardInfo.Key;
-            if (draggingInfo.MainSelectable.TargetType != TargetType.None)
+            if (draggingInfo.MainSelectable.SelectType != SelectType.None)
             {
                 var selectView = _reciever.SelectableViews
                     .Where(view => view != dragView as ISelectableView)
+                    .Where(view => draggingInfo.MainSelectable.SelectType.IsSelectable(view.TargetType))
                     .Where(view => RectTransformUtility.RectangleContainsScreenPoint(view.RectTransform, pointerEventData.position, _canvas.worldCamera))
                     .FirstOrDefault();
                 if (selectView != null)

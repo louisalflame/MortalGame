@@ -318,3 +318,4 @@ MonoBehaviour:
   _shieldEventViewFactory: {fileID: 8094941665802486793}
   _eventViewParent: {fileID: 4129516507606567480}
   _minTimeInterval: 0.2
+  _rectTransform: {fileID: 2639733584043373594}

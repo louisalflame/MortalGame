@@ -63,9 +63,22 @@ public enum BuffProperty
     MaxEnergyIncrease,
 }
 
+public enum SelectType
+{
+    None = 0,
+    Player,
+    Ally,
+    Enemy,
+    Card,
+    AllyCard,
+    EnemyCard,
+}
+
 public enum TargetType
 {
     None = 0,
-    Player = 1,
-    Card
+    Ally,
+    Enemy,
+    AllyCard,
+    EnemyCard,
 }

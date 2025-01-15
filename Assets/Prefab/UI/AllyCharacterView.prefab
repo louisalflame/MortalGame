@@ -143,6 +143,7 @@ MonoBehaviour:
   _shieldEventViewFactory: {fileID: 2260883521343064836}
   _eventViewParent: {fileID: 5387161073565757969}
   _minTimeInterval: 0.2
+  _rectTransform: {fileID: 8246624590637752913}
 --- !u!1 &4771275634303068783
 GameObject:
   m_ObjectHideFlags: 0

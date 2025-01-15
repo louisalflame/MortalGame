@@ -3,19 +3,24 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using JetBrains.Annotations;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 public abstract class BaseCharacterView : MonoBehaviour
 {
+    [BoxGroup("EventView")]
     [SerializeField]
     protected DamageEventViewFactory _damageEventViewFactory;
+    [BoxGroup("EventView")]
     [SerializeField]
     protected HealEventViewFactory _healEventViewFactory;
+    [BoxGroup("EventView")]
     [SerializeField]
     protected ShieldEventViewFactory _shieldEventViewFactory;
+    [BoxGroup("EventView")]
     [SerializeField]
     protected Transform _eventViewParent;
-
+    [BoxGroup("EventView")]
     [SerializeField]
     protected float _minTimeInterval;
 

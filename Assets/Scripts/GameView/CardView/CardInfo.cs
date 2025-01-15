@@ -28,8 +28,8 @@ public class CardInfo
         OriginPower = card.Power;
         Power = card.EvalPower(gameContext);
 
-        MainSelectable = new MainSelectableInfo(card.MainSelectable.TargetType);
-        SubSelectables = card.SubSelectables.Select(s => new SubSelectableInfo(s.TargetType, s.TargetCount)).ToList();
+        MainSelectable = new MainSelectableInfo(card.MainSelectable.SelectType);
+        SubSelectables = card.SubSelectables.Select(s => new SubSelectableInfo(s.SelectType, s.TargetCount)).ToList();
 
         StatusInfos = card.StatusList.Select(s => new CardStatusInfo(s)).ToList();
     }

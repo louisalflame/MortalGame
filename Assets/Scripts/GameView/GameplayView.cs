@@ -94,7 +94,9 @@ public class GameplayView : MonoBehaviour, IGameplayView
         get
         {
             return _allyHandCardView.SelectableViews
-                .Concat(_enemySelectedCardView.SelectableViews);
+                .Concat(_enemySelectedCardView.SelectableViews)
+                .Append(_allyCharacterView)
+                .Append(_enemyCharacterView);
         }
     }
     public ISelectableView BasicSelectableView => _playGround;
@@ -119,6 +121,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
 
         _focusCardDetailView.Init(_overlayCanvas, localizeLibrary);
         _singleCardDetailPopupPanel.Init(localizeLibrary);
+        _simpleHintView.Init(localizeLibrary);
     }
 
     public void Render(IReadOnlyCollection<IGameEvent> events, IGameplayActionReciever reciever) 
