@@ -318,7 +318,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2024e215e3369f42af409f104c388be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rectTransform: {fileID: 0}
+  _rectTransform: {fileID: 4692188014508966588}
   _title: {fileID: 5024357527310476518}
   _info: {fileID: 2590099650171419312}
   _cost: {fileID: 1125680508341838194}

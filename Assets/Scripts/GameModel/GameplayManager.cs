@@ -206,6 +206,10 @@ public class GameplayManager : IGameplayStatusWatcher
                 {
                     case UseCardAction useCardAction:
                         _UseCard(player, useCardAction.CardIndentity);
+                        _gameEvents.Add(new PlayerExecuteStartEvent(){
+                            Faction = player.Faction,
+                            HandCardInfo = player.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context)
+                        });
                         break;
                     case TurnSubmitAction turnSubmitAction:
                         if (_gameStatus.State == GameState.PlayerExecute &&

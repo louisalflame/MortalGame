@@ -55,6 +55,7 @@ public class GameplayPresenter : IGameplayActionReciever
     {
         Debug.Log($"-- GameplayPresenter.RecieveEvent:[{gameAction}] --");
         _gameplayManager.EnqueueAction(gameAction);
+        _gameplayView.DisableAllHandCards();
     }
 
     public void ShowDeckDetailPanel()

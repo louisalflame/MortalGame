@@ -13,6 +13,7 @@ public interface IGameplayView : IAllCardDetailPanelView
         LocalizeLibrary localizeLibrary,
         DispositionLibrary dispositionLibrary);
     void Render(IReadOnlyCollection<IGameEvent> events, IGameplayActionReciever reciever);
+    void DisableAllHandCards();
 
     IEnumerable<ISelectableView> SelectableViews { get; }
     ISelectableView BasicSelectableView { get; }
@@ -182,6 +183,11 @@ public class GameplayView : MonoBehaviour, IGameplayView
         }
     }
 
+    public void DisableAllHandCards()
+    {
+        _allyHandCardView.DisableAllHandCards();
+    }
+
     private void _AllySummonEvent(AllySummonEvent allySummonEvent)
     {
         _allyCharacterView.SummonAlly(allySummonEvent);
@@ -252,7 +258,6 @@ public class GameplayView : MonoBehaviour, IGameplayView
     }
     private void _PlayerExecuteEnd(PlayerExecuteEndEvent playerExecuteEndEvent)
     {
-        _allyHandCardView.DisableHandCardsUseCardAction(playerExecuteEndEvent);
     }
     private void _UsedCardView(UsedCardEvent usedCardEvent)
     {

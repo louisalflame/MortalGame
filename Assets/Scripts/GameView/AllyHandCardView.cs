@@ -316,14 +316,11 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
             }
         }
     }
-    public void DisableHandCardsUseCardAction(PlayerExecuteEndEvent playerExecuteEndEvent)
+    public void DisableAllHandCards()
     {
-        foreach(var cardInfo in playerExecuteEndEvent.HandCardInfo.CardInfos.Keys)
+        foreach(var cardView in _cardViewDict.Values)
         {
-            if(_cardViewDict.TryGetValue(cardInfo.Indentity, out var cardView))
-            {
-                cardView.DisableCardAction();
-            }
+            cardView.DisableCardAction();
         }
     }
 
