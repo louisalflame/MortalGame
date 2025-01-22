@@ -12,8 +12,8 @@ public class BuffEntity
 
     public int Level;
 
-    public PlayerEntity Owner;
-    public PlayerEntity Caster;
+    public IPlayerEntity Owner;
+    public IPlayerEntity Caster;
 
     public IReadOnlyDictionary<BuffTiming, IBuffEffect[]> Effects;
 
@@ -21,8 +21,8 @@ public class BuffEntity
         string id,
         Guid identity,
         int level,
-        PlayerEntity owner,
-        PlayerEntity caster,
+        IPlayerEntity owner,
+        IPlayerEntity caster,
         Dictionary<BuffTiming, IBuffEffect[]> effects) 
     {
         Id = id;

@@ -289,6 +289,20 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
         }
     }
 
+    public void RemoveCardView(DiscardCardEvent discardCardEvent)
+    {
+        _cardCollectionInfo = discardCardEvent.HandCardInfo;
+        if(_cardViewDict.TryGetValue(discardCardEvent.DiscardedCardInfo.Indentity, out var cardView))
+        {
+            _cardViews.Remove(cardView);
+            _cardViewDict.Remove(discardCardEvent.DiscardedCardInfo.Indentity);
+            _cardViewFactory.RecyclePrefab(cardView);
+
+            foreach(var view in _cardViews)
+                view.RemoveLocationOffset(discardCardEvent.DiscardedCardInfo.Indentity, _focusDuration);
+            _RearrangeCardViews();
+        }
+    }
     public void RecycleHandCards(RecycleHandCardEvent recycleHandCardEvent)
     {
         foreach(var cardInfo in recycleHandCardEvent.RecycledCardInfos.Concat(recycleHandCardEvent.ExcludedCardInfos))

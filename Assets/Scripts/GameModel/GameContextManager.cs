@@ -35,19 +35,19 @@ public class GameContextManager : IDisposable
         }
     }
 
-    public GameContextManager SetExecutePlayer(PlayerEntity ExecutePlayer) 
+    public GameContextManager SetExecutePlayer(IPlayerEntity ExecutePlayer) 
     {
         _contextStack.Push(Context.With(executePlayer: ExecutePlayer));
         return this;
     }
-    public GameContextManager SetCardCaster(PlayerEntity CardCaster) 
+    public GameContextManager SetCardCaster(IPlayerEntity CardCaster) 
     {
         _contextStack.Push(Context.With(cardCaster: CardCaster));
         return this;
     }
-    public GameContextManager SetSelectedPlayer(PlayerEntity SelectedPlayer) 
+    public GameContextManager SetSelectedPlayer(IPlayerEntity SelectedPlayer) 
     {
-        _contextStack.Push(Context.With(slectedPlayer: SelectedPlayer));
+        _contextStack.Push(Context.With(selectedPlayer: SelectedPlayer));
         return this;
     }
     public GameContextManager SetSelectedCard(ICardEntity SelectedCard) 
@@ -70,9 +70,14 @@ public class GameContextManager : IDisposable
         _contextStack.Push(Context.With(usingCardEffect: UsingCardEffect));
         return this;
     }
-    public GameContextManager SetEffectTarget(PlayerEntity EffectTarget) 
+    public GameContextManager SetEffectTargetPlayer(IPlayerEntity EffectTarget) 
     {
-        _contextStack.Push(Context.With(effectTarget: EffectTarget));
+        _contextStack.Push(Context.With(effectTargetPlayer: EffectTarget));
+        return this;
+    }
+    public GameContextManager SetEffectTargetCard(ICardEntity EffectTarget) 
+    {
+        _contextStack.Push(Context.With(effectTargetCard: EffectTarget));
         return this;
     }
     public GameContextManager SetUsingBuff(BuffEntity UsingBuff) 
@@ -89,27 +94,29 @@ public class GameContextManager : IDisposable
 
 public class GameContext
 {
-    public PlayerEntity ExecutePlayer;
-    public PlayerEntity CardCaster;
-    public PlayerEntity SelectedPlayer;
+    public IPlayerEntity ExecutePlayer;
+    public IPlayerEntity CardCaster;
+    public IPlayerEntity SelectedPlayer;
     public ICardEntity SelectedCard;
     public CardTiming CardTiming;
     public ICardEntity UsingCard;
     public ICardEffect UsingCardEffect;
-    public PlayerEntity EffectTarget;
+    public IPlayerEntity EffectTargetPlayer;
+    public ICardEntity EffectTargetCard;
     public BuffEntity UsingBuff;
     public IBuffEffect UsingBuffEffect;
 
     public GameContext() { }
     public GameContext With(
-        PlayerEntity executePlayer = null,
-        PlayerEntity cardCaster = null,
-        PlayerEntity slectedPlayer = null,
+        IPlayerEntity executePlayer = null,
+        IPlayerEntity cardCaster = null,
+        IPlayerEntity selectedPlayer = null,
         ICardEntity selectedCard = null,
         CardTiming cardTiming = default,
         ICardEntity usingCard = null,
         ICardEffect usingCardEffect = null,
-        PlayerEntity effectTarget = null,
+        IPlayerEntity effectTargetPlayer = null,
+        ICardEntity effectTargetCard = null,
         BuffEntity usingBuff = null,
         IBuffEffect usingBuffEffect = null)
     {
@@ -117,12 +124,13 @@ public class GameContext
         {
             ExecutePlayer = executePlayer ?? ExecutePlayer,
             CardCaster = cardCaster ?? CardCaster,
-            SelectedPlayer = slectedPlayer ?? SelectedPlayer,
+            SelectedPlayer = selectedPlayer ?? SelectedPlayer,
             SelectedCard = selectedCard ?? SelectedCard,
             UsingCard = usingCard ?? UsingCard,
             CardTiming = cardTiming == CardTiming.None ? CardTiming : cardTiming,
             UsingCardEffect = usingCardEffect ?? UsingCardEffect,
-            EffectTarget = effectTarget ?? EffectTarget,
+            EffectTargetPlayer = effectTargetPlayer ?? EffectTargetPlayer,
+            EffectTargetCard = effectTargetCard ?? EffectTargetCard,
             UsingBuff = usingBuff ?? UsingBuff,
             UsingBuffEffect = usingBuffEffect ?? UsingBuffEffect
         };

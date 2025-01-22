@@ -40,7 +40,7 @@ public class AllyEntity : PlayerEntity
         Faction = Faction.Ally;
         NameKey = nameKey;
         Character = new CharacterEntity(currentHealth, maxHealth, currentEnergy, maxEnergy);
-        CardManager = new PlayerCardManager(handCardMaxCount, deckInstance);
+        CardManager = new PlayerCardManager(handCardMaxCount, deckInstance, this);
         DispositionManager = new DispositionManager(currentDisposition, maxDisposition);
     }
 }
@@ -66,7 +66,7 @@ public class EnemyEntity : PlayerEntity
         Faction = Faction.Enemy;
         NameKey = nameKey;
         Character = new CharacterEntity(initialHealth, maxHealth, initialEnergy, maxEnergy);
-        CardManager = new PlayerCardManager(handCardMaxCount, enemyCardInstances);
+        CardManager = new PlayerCardManager(handCardMaxCount, enemyCardInstances, this);
         SelectedCards = new SelectedCardEntity(selectedCardMaxCount, new List<ICardEntity>());
         TurnStartDrawCardCount = turnStartDrawCardCount;
         EnergyRecoverPoint = energyRecoverPoint;

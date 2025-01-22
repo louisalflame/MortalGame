@@ -195,7 +195,7 @@ public class GameplayManager : IGameplayStatusWatcher
             state: GameState.TurnEnd
         );
     }
-    private void _TurnExecute(PlayerEntity player)
+    private void _TurnExecute(IPlayerEntity player)
     {
         using(_contextMgr.SetExecutePlayer(player))
         {
@@ -270,7 +270,7 @@ public class GameplayManager : IGameplayStatusWatcher
         );
     }
 
-    private void _UseCard(PlayerEntity player, Guid CardIndentity)
+    private void _UseCard(IPlayerEntity player, Guid CardIndentity)
     {
         using(_contextMgr.SetCardCaster(player))
         {
@@ -286,18 +286,8 @@ public class GameplayManager : IGameplayStatusWatcher
                         var loseEnergyResult = player.Character.EnergyManager.ConsumeEnergy(cardRuntimCost);
                         _gameEvents.Add(new ConsumeEnergyEvent(player, loseEnergyResult));
 
-                        if (player.CardManager.HandCard.RemoveCard(usedCard)) 
+                        if (_TryDiscardCard(player, usedCard)) 
                         {
-                            if (usedCard.HasProperty(CardProperty.Dispose) ||
-                                usedCard.HasProperty(CardProperty.AutoDispose))
-                            {
-                                player.CardManager.ExclusionZone.AddCard(usedCard);
-                            }
-                            else
-                            {
-                                player.CardManager.Graveyard.AddCard(usedCard);
-                            }
-
                             if(usedCard.Effects.TryGetValue(CardTiming.OnPlayCard, out var onPlayEffects))
                             {
                                 using(_contextMgr.SetCardTiming(CardTiming.OnPlayCard))
@@ -323,7 +313,7 @@ public class GameplayManager : IGameplayStatusWatcher
         }
     }
 
-    private void _DrawCards(PlayerEntity player, int drawCount)
+    private void _DrawCards(IPlayerEntity player, int drawCount)
     {
         for (int i = 0; i < drawCount; i++)
         {
@@ -344,7 +334,7 @@ public class GameplayManager : IGameplayStatusWatcher
         }
     }
 
-    private void _DrawCard(PlayerEntity player)
+    private void _DrawCard(IPlayerEntity player)
     {
         if (player.CardManager.Deck.PopCard(out ICardEntity newCard))
         {
@@ -360,6 +350,26 @@ public class GameplayManager : IGameplayStatusWatcher
         }
     }
 
+    private bool _TryDiscardCard(IPlayerEntity player, ICardEntity targetCard)
+    {
+        if (player.CardManager.HandCard.RemoveCard(targetCard)) 
+        {
+            if (targetCard.HasProperty(CardProperty.Dispose) ||
+                targetCard.HasProperty(CardProperty.AutoDispose))
+            {
+                player.CardManager.ExclusionZone.AddCard(targetCard);
+            }
+            else
+            {
+                player.CardManager.Graveyard.AddCard(targetCard);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
     private void _ApplyCardEffect(ICardEffect cardEffect)
     {
         using(_contextMgr.SetUsingCardEffect(cardEffect))
@@ -371,7 +381,7 @@ public class GameplayManager : IGameplayStatusWatcher
                     var targets = damageEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var target in targets)
                     {
-                        using(_contextMgr.SetEffectTarget(target))
+                        using(_contextMgr.SetEffectTargetPlayer(target))
                         {
                             var damagePoint = damageEffect.Value.Eval(_gameStatus, _contextMgr.Context);
                             var takeDamageResult = target.Character.HealthManager.TakeDamage(damagePoint, _contextMgr.Context);
@@ -385,7 +395,7 @@ public class GameplayManager : IGameplayStatusWatcher
                     var targets = penetrateDamageEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var target in targets)
                     {
-                        using(_contextMgr.SetEffectTarget(target))
+                        using(_contextMgr.SetEffectTargetPlayer(target))
                         {
                             var damagePoint = penetrateDamageEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
@@ -400,7 +410,7 @@ public class GameplayManager : IGameplayStatusWatcher
                     var targets = additionalAttackEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var target in targets)
                     {
-                        using(_contextMgr.SetEffectTarget(target))
+                        using(_contextMgr.SetEffectTargetPlayer(target))
                         {
                             var damagePoint = additionalAttackEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
@@ -415,7 +425,7 @@ public class GameplayManager : IGameplayStatusWatcher
                     var targets = effectiveAttackEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var target in targets)
                     {
-                        using(_contextMgr.SetEffectTarget(target))
+                        using(_contextMgr.SetEffectTargetPlayer(target))
                         {
                             var damagePoint = effectiveAttackEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
@@ -430,7 +440,7 @@ public class GameplayManager : IGameplayStatusWatcher
                     var targets = healEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var target in targets)
                     {
-                        using(_contextMgr.SetEffectTarget(target))
+                        using(_contextMgr.SetEffectTargetPlayer(target))
                         {
                             var healPoint = healEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
@@ -445,7 +455,7 @@ public class GameplayManager : IGameplayStatusWatcher
                     var targets = shieldEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var target in targets)
                     {
-                        using(_contextMgr.SetEffectTarget(target))
+                        using(_contextMgr.SetEffectTargetPlayer(target))
                         {
                             var shieldPoint = shieldEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
@@ -460,7 +470,7 @@ public class GameplayManager : IGameplayStatusWatcher
                     var targets = gainEnergyEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var target in targets)
                     {
-                        using(_contextMgr.SetEffectTarget(target))
+                        using(_contextMgr.SetEffectTargetPlayer(target))
                         {
                             var gainEnergy = gainEnergyEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
@@ -475,7 +485,7 @@ public class GameplayManager : IGameplayStatusWatcher
                     var targets = loseEnegyEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var target in targets)
                     {
-                        using(_contextMgr.SetEffectTarget(target))
+                        using(_contextMgr.SetEffectTargetPlayer(target))
                         {
                             var loseEnergy = loseEnegyEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
@@ -492,11 +502,35 @@ public class GameplayManager : IGameplayStatusWatcher
                     var targets = drawCardEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var target in targets)
                     {
-                        using(_contextMgr.SetEffectTarget(target))
+                        using(_contextMgr.SetEffectTargetPlayer(target))
                         {
                             var drawCount = drawCardEffect.Value.Eval(_gameStatus, _contextMgr.Context);
                             _DrawCards(target, drawCount);
                         }
+                    }
+                    break;
+                }
+                case DiscardCardEffect discardCardEffect:
+                {
+                    var cards = discardCardEffect.TargetCards.Eval(_gameStatus, _contextMgr.Context);
+                    foreach(var card in cards)
+                    {
+                        card.Owner.MatchSome(cardOwner =>
+                        {
+                            using(_contextMgr.SetEffectTargetPlayer(cardOwner))
+                            using(_contextMgr.SetEffectTargetCard(card))
+                            {
+                                if(_TryDiscardCard(cardOwner, card))
+                                {
+                                    _gameEvents.Add(new DiscardCardEvent(){
+                                        Faction = cardOwner.Faction,
+                                        DiscardedCardInfo = new CardInfo(card, _contextMgr.Context),
+                                        HandCardInfo = cardOwner.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context),
+                                        GraveyardInfo = cardOwner.CardManager.Graveyard.Cards.ToCardCollectionInfo(_contextMgr.Context)
+                                    });
+                                }
+                            }
+                        });
                     }
                     break;
                 }
@@ -506,7 +540,7 @@ public class GameplayManager : IGameplayStatusWatcher
                     var targets = addBuffEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var target in targets)
                     {
-                        using(_contextMgr.SetEffectTarget(target))
+                        using(_contextMgr.SetEffectTargetPlayer(target))
                         {
                             var level = addBuffEffect.Level.Eval(_gameStatus, _contextMgr.Context);
                             if (target.Character.BuffManager.AddBuff(
@@ -531,7 +565,7 @@ public class GameplayManager : IGameplayStatusWatcher
                     var targets = removeBuffEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var target in targets)
                     {
-                        using(_contextMgr.SetEffectTarget(target))
+                        using(_contextMgr.SetEffectTargetPlayer(target))
                         {
                             if(target.Character.BuffManager.RemoveBuff(
                                 _contextMgr.BuffLibrary, 
@@ -578,7 +612,7 @@ public class GameplayManager : IGameplayStatusWatcher
                     var targets = effectiveDamageBuffEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var target in targets)
                     {
-                        using(_contextMgr.SetEffectTarget(target))
+                        using(_contextMgr.SetEffectTargetPlayer(target))
                         {
                             var damagePoint = effectiveDamageBuffEffect.Value.Eval(_gameStatus, _contextMgr.Context);
                             var takeDamageResult = target.Character.HealthManager.TakeEffectiveDamage(damagePoint, _contextMgr.Context);

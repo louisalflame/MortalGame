@@ -46,6 +46,13 @@ public class DrawCardEvent : IGameEvent
     public CardCollectionInfo DeckInfo;
     public CardCollectionInfo HandCardInfo;
 }
+public class DiscardCardEvent : IGameEvent
+{
+    public Faction Faction;
+    public CardInfo DiscardedCardInfo;
+    public CardCollectionInfo HandCardInfo;
+    public CardCollectionInfo GraveyardInfo;
+}
 public class EnemySelectCardEvent : IGameEvent
 {
     public CardInfo SelectedCardInfo;
@@ -81,7 +88,7 @@ public abstract class EnergyEvent : IGameEvent
     public int DeltaEnergy;
     public int MaxEnergy;
 
-    public EnergyEvent(PlayerEntity player, int deltaEnergy)
+    public EnergyEvent(IPlayerEntity player, int deltaEnergy)
     {
         Faction = player.Faction;
         Energy = player.Character.CurrentEnergy;
@@ -91,19 +98,19 @@ public abstract class EnergyEvent : IGameEvent
 }
 public class RecoverEnergyEvent : EnergyEvent
 {
-    public RecoverEnergyEvent(PlayerEntity player, GainEnergyResult gainEnergyResult) : base(player, gainEnergyResult.DeltaEp) { }
+    public RecoverEnergyEvent(IPlayerEntity player, GainEnergyResult gainEnergyResult) : base(player, gainEnergyResult.DeltaEp) { }
 }
 public class ConsumeEnergyEvent : EnergyEvent
 {
-    public ConsumeEnergyEvent(PlayerEntity player, LoseEnergyResult loseEnergyResult) : base(player, loseEnergyResult.DeltaEp) { }
+    public ConsumeEnergyEvent(IPlayerEntity player, LoseEnergyResult loseEnergyResult) : base(player, loseEnergyResult.DeltaEp) { }
 }
 public class GainEnergyEvent : EnergyEvent
 {
-    public GainEnergyEvent(PlayerEntity player, GainEnergyResult gainEnergyResult) : base(player, gainEnergyResult.DeltaEp) { }
+    public GainEnergyEvent(IPlayerEntity player, GainEnergyResult gainEnergyResult) : base(player, gainEnergyResult.DeltaEp) { }
 }
 public class LoseEnergyEvent : EnergyEvent
 {
-    public LoseEnergyEvent(PlayerEntity player, LoseEnergyResult loseEnergyResult) : base(player, loseEnergyResult.DeltaEp) { }
+    public LoseEnergyEvent(IPlayerEntity player, LoseEnergyResult loseEnergyResult) : base(player, loseEnergyResult.DeltaEp) { }
 }
 
 public abstract class HealthEvent : IGameEvent
@@ -113,7 +120,7 @@ public abstract class HealthEvent : IGameEvent
     public int Dp;
     public int MaxHp;
 
-    public HealthEvent(PlayerEntity player)
+    public HealthEvent(IPlayerEntity player)
     {
         Faction = player.Faction;
         Hp = player.Character.CurrentHealth;
@@ -128,7 +135,7 @@ public class DamageEvent : HealthEvent
     public int DeltaShield;
     public int DamagePoint;
 
-    public DamageEvent(PlayerEntity player, TakeDamageResult takeDamageResult) : base(player)
+    public DamageEvent(IPlayerEntity player, TakeDamageResult takeDamageResult) : base(player)
     {
         Type = takeDamageResult.Type;
         DeltaHp = takeDamageResult.DeltaHp;
@@ -142,7 +149,7 @@ public class GetHealEvent : HealthEvent
     public int DeltaHp;
     public int HealPoint;
 
-    public GetHealEvent(PlayerEntity player, GetHealResult getHealResult) : base(player)
+    public GetHealEvent(IPlayerEntity player, GetHealResult getHealResult) : base(player)
     {
         DeltaHp = getHealResult.DeltaHp;
         HealPoint = getHealResult.HealPoint;
@@ -153,7 +160,7 @@ public class GetShieldEvent : HealthEvent
     public int DeltaShield;
     public int ShieldPoint;
 
-    public GetShieldEvent(PlayerEntity player, GetShieldResult getShieldResult) : base(player)
+    public GetShieldEvent(IPlayerEntity player, GetShieldResult getShieldResult) : base(player)
     {
         DeltaShield = getShieldResult.DeltaDp;
         ShieldPoint = getShieldResult.ShieldPoint;
@@ -165,7 +172,7 @@ public class AddBuffEvent : IGameEvent
     public Faction Faction;
     public BuffInfo Buff;
 
-    public AddBuffEvent(PlayerEntity player, BuffInfo buff)
+    public AddBuffEvent(IPlayerEntity player, BuffInfo buff)
     {
         Faction = player.Faction;
         Buff = buff;
@@ -176,7 +183,7 @@ public class UpdateBuffEvent : IGameEvent
     public Faction Faction;
     public BuffInfo Buff;
 
-    public UpdateBuffEvent(PlayerEntity player, BuffInfo buff)
+    public UpdateBuffEvent(IPlayerEntity player, BuffInfo buff)
     {
         Faction = player.Faction;
         Buff = buff;
@@ -187,7 +194,7 @@ public class RemoveBuffEvent : IGameEvent
     public Faction Faction;
     public BuffInfo Buff;
 
-    public RemoveBuffEvent(PlayerEntity player, BuffInfo buff)
+    public RemoveBuffEvent(IPlayerEntity player, BuffInfo buff)
     {
         Faction = player.Faction;
         Buff = buff;

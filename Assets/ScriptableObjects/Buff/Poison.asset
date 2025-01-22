@@ -67,13 +67,19 @@ MonoBehaviour:
       Data: 4|EffectiveDamageBuffEffect, Assembly-CSharp
     - Name: Targets
       Entry: 7
-      Data: 5|ThisBuffOwner, Assembly-CSharp
+      Data: 5|SinglePlayerCollection, Assembly-CSharp
+    - Name: Target
+      Entry: 7
+      Data: 6|ThisBuffOwner, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 8
       Data: 
     - Name: Value
       Entry: 7
-      Data: 6|ThisBuffLevel, Assembly-CSharp
+      Data: 7|ThisBuffLevel, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -97,7 +103,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 7|System.Collections.Generic.List`1[[BuffPropertyData, Assembly-CSharp]],
+      Data: 8|System.Collections.Generic.List`1[[BuffPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12

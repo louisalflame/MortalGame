@@ -7,6 +7,6 @@ public interface IBuffEffect
 
 public class EffectiveDamageBuffEffect : IBuffEffect
 {
-    public ITargetPlayerValue Targets;
+    public ITargetPlayerCollectionValue Targets;
     public IIntegerValue Value;
 }

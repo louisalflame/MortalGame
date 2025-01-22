@@ -14,11 +14,11 @@ public class DeckEntity : IDeckEntity
     private List<ICardEntity> _cards;
     public IReadOnlyCollection<ICardEntity> Cards => _cards;
     
-    public DeckEntity(IEnumerable<CardInstance> cards)
+    public DeckEntity(IEnumerable<CardInstance> cards, IPlayerEntity owner)
     {
         _cards = new List<ICardEntity>();
         EnqueueCardsThenShuffle(
-            cards.Select(c => CardEntity.Create(c)));
+            cards.Select(c => CardEntity.Create(c, owner)));
     }
 
     public bool PopCard(out ICardEntity card)

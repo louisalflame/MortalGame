@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Optional;
 
 public interface ICardEntity
 {
@@ -22,6 +23,8 @@ public interface ICardEntity
     IEnumerable<CardStatusEntity> StatusList { get; }
 
     IEnumerable<ICardPropertyEntity> AllProperties { get; }
+
+    Option<IPlayerEntity> Owner { get; }
 
     int EvalCost(GameContext gameContext);
     int EvalPower(GameContext gameContext);
@@ -45,6 +48,8 @@ public class CardEntity : ICardEntity
     private List<ICardPropertyEntity> _properties;
     private List<CardStatusEntity> _statusList;
 
+    private Option<IPlayerEntity> _owner;
+
     public Guid Indentity => _indentity;
     public Guid OriginCardInstanceGuid => _originCardInstanceGuid;
     public string CardDataId => _cardDataId;
@@ -62,6 +67,7 @@ public class CardEntity : ICardEntity
     public IEnumerable<ICardPropertyEntity> AllProperties => 
         Properties.Concat(StatusList.SelectMany(s => s.Properties));
 
+    public Option<IPlayerEntity> Owner => _owner;
     public bool IsDummy => this == DummyCard;
     public static ICardEntity DummyCard = new CardEntity(
         indentity: Guid.Empty,
@@ -76,7 +82,8 @@ public class CardEntity : ICardEntity
         subSelectables: new List<ISubTargetSelectable>(),
         effects: new Dictionary<CardTiming, List<ICardEffect>>(),
         properties: new List<ICardPropertyEntity>(),
-        statusList: new List<CardStatusEntity>()
+        statusList: new List<CardStatusEntity>(),
+        owner: PlayerEntity.DummyPlayer
     );
     
     private CardEntity(
@@ -92,7 +99,8 @@ public class CardEntity : ICardEntity
         IEnumerable<ISubTargetSelectable> subSelectables,
         Dictionary<CardTiming, List<ICardEffect>> effects,
         IEnumerable<ICardPropertyEntity> properties,
-        IEnumerable<CardStatusEntity> statusList
+        IEnumerable<CardStatusEntity> statusList,
+        IPlayerEntity owner
     )
     {
         _indentity = indentity;
@@ -111,9 +119,10 @@ public class CardEntity : ICardEntity
         );
         _properties = properties.ToList();
         _statusList = statusList.ToList();
+        _owner = owner.Some();
     }
 
-    public static CardEntity Create(CardInstance cardInstance)
+    public static CardEntity Create(CardInstance cardInstance, IPlayerEntity owner)
     {
         return new CardEntity(
             indentity: Guid.NewGuid(),
@@ -131,7 +140,8 @@ public class CardEntity : ICardEntity
                     pair => pair.Value.ToList()
                 ),
             properties: cardInstance.PropertyDatas.Select(p => p.CreateEntity()),
-            statusList: new List<CardStatusEntity>()
+            statusList: new List<CardStatusEntity>(),
+            owner: owner
         );
     }
 

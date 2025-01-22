@@ -38,7 +38,7 @@ public class BuffManager : IBuffManager
             buffId, 
             Guid.NewGuid(), 
             level, 
-            gameContext.EffectTarget,
+            gameContext.EffectTargetPlayer,
             gameContext.CardCaster,
             buffEffects);
         _buffs.Add(resultBuff);

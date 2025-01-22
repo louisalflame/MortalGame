@@ -23,9 +23,10 @@ public class PlayerCardManager : IPlayerCardManager
 
     public PlayerCardManager(
         int handCardMaxCount,
-        IEnumerable<CardInstance> cardInstances)
+        IEnumerable<CardInstance> cardInstances,
+        IPlayerEntity owner)
     {
-        Deck = new DeckEntity(cardInstances);
+        Deck = new DeckEntity(cardInstances, owner);
         HandCard = new HandCardEntity(handCardMaxCount);
         Graveyard = new GraveyardEntity();
         ExclusionZone = new ExclusionZoneEntity();

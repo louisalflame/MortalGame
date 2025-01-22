@@ -70,9 +70,19 @@ public class EnemySelectedCardView : MonoBehaviour
             _RearrangeCardViews();
         }
     }
+    public void RemoveCardView(DiscardCardEvent discardCardEvent)
+    {
+        if(_cardViewDict.TryGetValue(discardCardEvent.DiscardedCardInfo.Indentity, out var cardView))
+        {
+            _cardViews.Remove(cardView);
+            _cardViewDict.Remove(discardCardEvent.DiscardedCardInfo.Indentity);
+            _cardViewFactory.RecyclePrefab(cardView);
+
+            _RearrangeCardViews();
+        }
+    }
     public void RemoveCardView(EnemyUnselectedCardEvent enemyUnselectedCardEvent)
     {
-Debug.Log($"==> enemyselect create cardview: {enemyUnselectedCardEvent.SelectedCardInfo.Indentity}");
         if(_cardViewDict.TryGetValue(enemyUnselectedCardEvent.SelectedCardInfo.Indentity, out var cardView))
         {
             _cardViews.Remove(cardView);
