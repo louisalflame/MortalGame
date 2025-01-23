@@ -286,7 +286,7 @@ public class GameplayManager : IGameplayStatusWatcher
                         var loseEnergyResult = player.Character.EnergyManager.ConsumeEnergy(cardRuntimCost);
                         _gameEvents.Add(new ConsumeEnergyEvent(player, loseEnergyResult));
 
-                        if (_TryDiscardCard(player, usedCard)) 
+                        if (player.CardManager.HandCard.RemoveCard(usedCard)) 
                         {
                             if(usedCard.Effects.TryGetValue(CardTiming.OnPlayCard, out var onPlayEffects))
                             {
@@ -298,7 +298,17 @@ public class GameplayManager : IGameplayStatusWatcher
                                     }
                                 }
                             }
-
+                        
+                            if (usedCard.HasProperty(CardProperty.Dispose) ||
+                                usedCard.HasProperty(CardProperty.AutoDispose))
+                            {
+                                player.CardManager.ExclusionZone.AddCard(usedCard);
+                            }
+                            else
+                            {
+                                player.CardManager.Graveyard.AddCard(usedCard);
+                            }
+                            
                             var usedCardInfo = new CardInfo(usedCard, _contextMgr.Context);
                             _gameEvents.Add(new UsedCardEvent() {
                                 Faction = player.Faction,
@@ -366,7 +376,6 @@ public class GameplayManager : IGameplayStatusWatcher
 
             return true;
         }
-
         return false;
     }
 
