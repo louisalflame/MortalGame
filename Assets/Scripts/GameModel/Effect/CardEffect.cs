@@ -64,20 +64,7 @@ public class DrawCardEffect : ICardEffect
 [Serializable]
 public class DiscardCardEffect : ICardEffect
 {
-    public ITargetPlayerCollectionValue sTargets;
     public ITargetCardCollectionValue TargetCards;
-}
-[Serializable]
-public class ConsumeCardEffect : ICardEffect
-{
-}
-[Serializable]
-public class EternalConsumeCardEffect : ICardEffect
-{
-}
-[Serializable]
-public class SealCardEffect : ICardEffect
-{
 }
 [Serializable]
 public class CloneTempCardEffect : ICardEffect

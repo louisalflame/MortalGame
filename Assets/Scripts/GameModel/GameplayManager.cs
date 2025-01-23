@@ -367,6 +367,10 @@ public class GameplayManager : IGameplayStatusWatcher
             if (targetCard.HasProperty(CardProperty.Dispose) ||
                 targetCard.HasProperty(CardProperty.AutoDispose))
             {
+                player.CardManager.DisposeZone.AddCard(targetCard);
+            }
+            else if (targetCard.HasProperty(CardProperty.Consumable))
+            {
                 player.CardManager.ExclusionZone.AddCard(targetCard);
             }
             else

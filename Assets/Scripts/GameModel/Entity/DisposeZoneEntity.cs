@@ -1,20 +1,20 @@
 using System.Collections.Generic;
 using System.Linq;
 
-// Cards in the exclusion zone are removed from the Deck, but return next Battle.
-public interface IExclusionZoneEntity
+// Cards in the dispose zone are removed from the Deck forever in this game.
+public interface IDisposeZoneEntity
 {
     IReadOnlyCollection<ICardEntity> Cards { get; }
     void AddCard(ICardEntity card);
     void AddCards(IEnumerable<ICardEntity> cards);
 }
 
-public class ExclusionZoneEntity : IExclusionZoneEntity
+public class DisposeZoneEntity : IDisposeZoneEntity
 {
     private List<ICardEntity> _cards;
     public IReadOnlyCollection<ICardEntity> Cards => _cards;
         
-    public ExclusionZoneEntity()
+    public DisposeZoneEntity()
     {
         _cards = new List<ICardEntity>();
     }

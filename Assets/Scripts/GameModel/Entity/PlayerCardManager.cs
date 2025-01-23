@@ -8,6 +8,7 @@ public interface IPlayerCardManager
     IHandCardEntity HandCard { get; }
     IGraveyardEntity Graveyard { get; }
     IExclusionZoneEntity ExclusionZone { get; }
+    IDisposeZoneEntity DisposeZone { get; }
 
     IEnumerable<IGameEvent> ClearHandOnTurnEnd(GameContextManager contextManager);
     
@@ -20,6 +21,7 @@ public class PlayerCardManager : IPlayerCardManager
     public IDeckEntity Deck { get; }
     public IGraveyardEntity Graveyard { get; }
     public IExclusionZoneEntity ExclusionZone { get; }
+    public IDisposeZoneEntity DisposeZone { get; }
 
     public PlayerCardManager(
         int handCardMaxCount,
@@ -30,6 +32,7 @@ public class PlayerCardManager : IPlayerCardManager
         HandCard = new HandCardEntity(handCardMaxCount);
         Graveyard = new GraveyardEntity();
         ExclusionZone = new ExclusionZoneEntity();
+        DisposeZone = new DisposeZoneEntity();
     }
 
     public IEnumerable<IGameEvent> ClearHandOnTurnEnd(GameContextManager contextManager)
