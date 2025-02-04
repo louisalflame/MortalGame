@@ -533,13 +533,89 @@ public class GameplayManager : IGameplayStatusWatcher
                             using(_contextMgr.SetEffectTargetPlayer(cardOwner))
                             using(_contextMgr.SetEffectTargetCard(card))
                             {
-                                if(_TryDiscardCard(cardOwner, card))
+                                if (cardOwner.CardManager.HandCard.RemoveCard(card)) 
                                 {
+                                    if (card.HasProperty(CardProperty.Dispose) ||
+                                        card.HasProperty(CardProperty.AutoDispose))
+                                    {
+                                        cardOwner.CardManager.DisposeZone.AddCard(card);
+                                    }
+                                    else if (card.HasProperty(CardProperty.Consumable))
+                                    {
+                                        cardOwner.CardManager.ExclusionZone.AddCard(card);
+                                    }
+                                    else
+                                    {
+                                        cardOwner.CardManager.Graveyard.AddCard(card);
+                                    }
+                                    
                                     _gameEvents.Add(new DiscardCardEvent(){
                                         Faction = cardOwner.Faction,
                                         DiscardedCardInfo = new CardInfo(card, _contextMgr.Context),
                                         HandCardInfo = cardOwner.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context),
-                                        GraveyardInfo = cardOwner.CardManager.Graveyard.Cards.ToCardCollectionInfo(_contextMgr.Context)
+                                        GraveyardInfo = cardOwner.CardManager.Graveyard.Cards.ToCardCollectionInfo(_contextMgr.Context),
+                                        ExclusionZoneInfo = cardOwner.CardManager.ExclusionZone.Cards.ToCardCollectionInfo(_contextMgr.Context),
+                                        DisposeZoneInfo = cardOwner.CardManager.DisposeZone.Cards.ToCardCollectionInfo(_contextMgr.Context)
+                                    });
+                                }
+                            }
+                        });
+                    }
+                    break;
+                }
+                case ConsumeCardEffect consumeCardEffect:
+                {
+                    var cards = consumeCardEffect.TargetCards.Eval(_gameStatus, _contextMgr.Context);
+                    foreach(var card in cards)
+                    {
+                        card.Owner.MatchSome(cardOwner =>
+                        {
+                            using(_contextMgr.SetEffectTargetPlayer(cardOwner))
+                            using(_contextMgr.SetEffectTargetCard(card))
+                            {
+                                if (cardOwner.CardManager.HandCard.RemoveCard(card)) 
+                                {
+                                    if (card.HasProperty(CardProperty.Dispose) ||
+                                        card.HasProperty(CardProperty.AutoDispose))
+                                    {
+                                        cardOwner.CardManager.DisposeZone.AddCard(card);
+                                    }
+                                    else
+                                    {
+                                        cardOwner.CardManager.ExclusionZone.AddCard(card);
+                                    }
+                                    
+                                    _gameEvents.Add(new ConsumeCardEvent(){
+                                        Faction = cardOwner.Faction,
+                                        ConsumedCardInfo = new CardInfo(card, _contextMgr.Context),
+                                        HandCardInfo = cardOwner.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context),
+                                        ExclusionZoneInfo = cardOwner.CardManager.ExclusionZone.Cards.ToCardCollectionInfo(_contextMgr.Context),
+                                    });
+                                }
+                            }
+                        });
+                    }
+                    break;
+                }
+                case DisposeCardEffect disposeCardEffect:
+                {
+                    var cards = disposeCardEffect.TargetCards.Eval(_gameStatus, _contextMgr.Context);
+                    foreach(var card in cards)
+                    {
+                        card.Owner.MatchSome(cardOwner =>
+                        {
+                            using(_contextMgr.SetEffectTargetPlayer(cardOwner))
+                            using(_contextMgr.SetEffectTargetCard(card))
+                            {
+                                if (cardOwner.CardManager.HandCard.RemoveCard(card)) 
+                                {
+                                    cardOwner.CardManager.DisposeZone.AddCard(card);
+                                    
+                                    _gameEvents.Add(new DisposeCardEvent(){
+                                        Faction = cardOwner.Faction,
+                                        DisposedCardInfo = new CardInfo(card, _contextMgr.Context),
+                                        HandCardInfo = cardOwner.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context),
+                                        DisposeZoneInfo = cardOwner.CardManager.DisposeZone.Cards.ToCardCollectionInfo(_contextMgr.Context),
                                     });
                                 }
                             }

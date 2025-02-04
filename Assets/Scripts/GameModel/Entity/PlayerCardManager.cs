@@ -51,6 +51,8 @@ public class PlayerCardManager : IPlayerCardManager
             ExcludedCardInfos = excludeCards.Select(c => new CardInfo(c, contextManager.Context)).ToArray(),
             HandCardInfo = HandCard.Cards.ToCardCollectionInfo(contextManager.Context),
             GraveyardInfo = Graveyard.Cards.ToCardCollectionInfo(contextManager.Context),
+            ExclusionZoneInfo = ExclusionZone.Cards.ToCardCollectionInfo(contextManager.Context),
+            DisposeZoneInfo = DisposeZone.Cards.ToCardCollectionInfo(contextManager.Context),
         });
 
         return events;

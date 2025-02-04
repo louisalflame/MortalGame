@@ -67,12 +67,30 @@ public class DiscardCardEffect : ICardEffect
     public ITargetCardCollectionValue TargetCards;
 }
 [Serializable]
-public class CloneTempCardEffect : ICardEffect
+public class ConsumeCardEffect : ICardEffect
 {
+    public ITargetCardCollectionValue TargetCards;
 }
 [Serializable]
-public class ReserveCardEffect : ICardEffect
+public class DisposeCardEffect : ICardEffect
 {
+    public ITargetCardCollectionValue TargetCards;
+}
+[Serializable]
+public class CreateCardEffect : ICardEffect
+{
+    public CardDataScriptable CardData;
+}
+[Serializable]
+public class CloneCardEffect : ICardEffect
+{
+    public ITargetCardCollectionValue TargetCards;
+    public CardProperty[] AppendProperties;
+}
+[Serializable]
+public class AppendCardPropertyEffect : ICardEffect
+{
+    public CardProperty[] Properties;
 }
 
 [Serializable]

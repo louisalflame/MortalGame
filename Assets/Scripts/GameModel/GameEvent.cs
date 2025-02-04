@@ -38,6 +38,8 @@ public class RecycleHandCardEvent : IGameEvent
     public IReadOnlyCollection<CardInfo> ExcludedCardInfos;
     public CardCollectionInfo HandCardInfo;
     public CardCollectionInfo GraveyardInfo;
+    public CardCollectionInfo ExclusionZoneInfo;
+    public CardCollectionInfo DisposeZoneInfo;
 }
 public class DrawCardEvent : IGameEvent
 {
@@ -52,6 +54,23 @@ public class DiscardCardEvent : IGameEvent
     public CardInfo DiscardedCardInfo;
     public CardCollectionInfo HandCardInfo;
     public CardCollectionInfo GraveyardInfo;
+    public CardCollectionInfo ExclusionZoneInfo;
+    public CardCollectionInfo DisposeZoneInfo;
+}
+public class ConsumeCardEvent : IGameEvent
+{
+    public Faction Faction;
+    public CardInfo ConsumedCardInfo;
+    public CardCollectionInfo HandCardInfo;
+    public CardCollectionInfo ExclusionZoneInfo;
+    public CardCollectionInfo DisposeZoneInfo;
+}
+public class DisposeCardEvent : IGameEvent
+{
+    public Faction Faction;
+    public CardInfo DisposedCardInfo;
+    public CardCollectionInfo HandCardInfo;
+    public CardCollectionInfo DisposeZoneInfo;
 }
 public class EnemySelectCardEvent : IGameEvent
 {

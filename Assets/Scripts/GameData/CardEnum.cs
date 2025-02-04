@@ -52,7 +52,9 @@ public enum CardProperty : int
     InitialPriority     = 1 << 4,
     Preserved           = 1 << 5,
     Sealed              = 1 << 6,
+    // Consumable means the card will be removed from the battle but added again next battle.
     Consumable          = 1 << 7,
+    // Dispose means the card will be removed from the game forever.
     Dispose             = 1 << 8,
     AutoDispose         = 1 << 9,
     AppendEffect        = 1 << 10,

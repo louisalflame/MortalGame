@@ -124,7 +124,7 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
             {
                 if(_cardViewDict.TryGetValue(identity, out var cardView))
                 {
-                    var offset = new Vector3(_focusOtherOffsetX, 0, 0);
+                    var offset = new Vector3(-_focusOtherOffsetX, 0, 0);
                     cardView.AddLocationOffset(focusIdentity, offset, _focusDuration);
                 }
             }
@@ -132,7 +132,7 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
             {
                 if(_cardViewDict.TryGetValue(identity, out var cardView))
                 {
-                    var offset = new Vector3(-_focusOtherOffsetX, 0, 0);
+                    var offset = new Vector3(_focusOtherOffsetX, 0, 0);
                     cardView.AddLocationOffset(focusIdentity, offset, _focusDuration);
                 }
             }
@@ -350,7 +350,7 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
         for(var i = 0; i < cardCount; i++)
         {
             var cardView = _cardViews[i];
-            float angle = 90+ (i - centerIndex) * angleStep; 
+            float angle = 90 + (centerIndex - i) * angleStep; 
 
             var x = _arcRadiusX * Mathf.Cos(angle * Mathf.Deg2Rad);
             var y = _arcRadiusY * Mathf.Sin(angle * Mathf.Deg2Rad);
