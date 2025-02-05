@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public interface IGameplayStatusWatcher
@@ -624,6 +625,54 @@ public class GameplayManager : IGameplayStatusWatcher
                     break;
                 }
 
+                case CreateCardEffect createCardEffect:
+                {
+                    //TODO
+                    break;
+                }
+                case CloneCardEffect cloneCardEffect:
+                {
+                    var cards = cloneCardEffect.TargetCards.Eval(_gameStatus, _contextMgr.Context);
+                    foreach(var card in cards)
+                    {
+                        card.Owner.MatchSome(cardOwner => 
+                        {
+                            using(_contextMgr.SetEffectTargetPlayer(cardOwner))
+                            using(_contextMgr.SetEffectTargetCard(card))
+                            {
+                                //TODO create cardstatus into clone card
+                                var cloneCard = card.Clone(cardOwner);
+
+                                switch(cloneCardEffect.CloneDestination)
+                                {
+                                    case CardCollectionType.Deck:
+                                        _contextMgr.Context.CardCaster.CardManager.Deck.EnqueueCardsThenShuffle(new[] { cloneCard });
+                                        break;
+                                    case CardCollectionType.HandCard:
+                                        _contextMgr.Context.CardCaster.CardManager.HandCard.AddCard(cloneCard);
+                                        break;
+                                    case CardCollectionType.Graveyard:
+                                        _contextMgr.Context.CardCaster.CardManager.Graveyard.AddCard(cloneCard);
+                                        break;
+                                    case CardCollectionType.ExclusionZone:
+                                        _contextMgr.Context.CardCaster.CardManager.ExclusionZone.AddCard(cloneCard);
+                                        break;
+                                    default:
+                                    case CardCollectionType.DisposeZone:
+                                        break;
+                                }
+                            }
+                        });
+                    }
+                    break;
+                }
+                case AppendCardStatusEffect appendCardStatusEffect:
+                {
+                    //TODO
+                    break;
+                }
+
+                // === BUFF EFFECT ===
                 case AddBuffEffect addBuffEffect:
                 {
                     var targets = addBuffEffect.Targets.Eval(_gameStatus, _contextMgr.Context);

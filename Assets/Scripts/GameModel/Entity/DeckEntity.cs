@@ -32,6 +32,7 @@ public class DeckEntity : IDeckEntity
         _cards = Cards.Skip(1).ToList();
         return true;
     }
+
     public void EnqueueCardsThenShuffle(IEnumerable<ICardEntity> cards)
     {
         _cards.AddRange(cards);

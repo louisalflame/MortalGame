@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -15,4 +16,13 @@ public class CardStatusData
 
     [TitleGroup("LifeTime")]
     public ICardStatusLifeTimeData LifeTimeData;
+}
+
+
+[Serializable]
+public class AddCardStatusData
+{
+    public string CardStatusId;
+    public IIntegerValue Power;
+    public IIntegerValue Times;
 }

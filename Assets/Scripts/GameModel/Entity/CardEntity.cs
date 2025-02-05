@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Optional;
+using Unity.VisualScripting;
 
 public interface ICardEntity
 {
     Guid Indentity { get; }
-    Guid OriginCardInstanceGuid { get; }
+    Option<Guid> OriginCardInstanceGuid { get; }
     string CardDataId { get; }
 
     CardType Type { get; }
@@ -30,12 +31,14 @@ public interface ICardEntity
     int EvalPower(GameContext gameContext);
 
     bool TryUpdateCardsOnTiming(GameContextManager contextManager, CardTiming timing, out IGameEvent gameEvent);
+
+    CardEntity Clone(IPlayerEntity cloneOwner);
 }
 
 public class CardEntity : ICardEntity
 {
     private Guid _indentity;
-    private Guid _originCardInstanceGuid;
+    private Option<Guid> _originCardInstanceGuid;
     private string _cardDataId;
     private CardType _type;
     private CardRarity _rarity;
@@ -51,7 +54,7 @@ public class CardEntity : ICardEntity
     private Option<IPlayerEntity> _owner;
 
     public Guid Indentity => _indentity;
-    public Guid OriginCardInstanceGuid => _originCardInstanceGuid;
+    public Option<Guid> OriginCardInstanceGuid => _originCardInstanceGuid;
     public string CardDataId => _cardDataId;
     public CardType Type => _type;
     public CardRarity Rarity => _rarity;
@@ -71,7 +74,7 @@ public class CardEntity : ICardEntity
     public bool IsDummy => this == DummyCard;
     public static ICardEntity DummyCard = new CardEntity(
         indentity: Guid.Empty,
-        originCardInstanceGuid: Guid.Empty,
+        originCardInstanceGuid: Option.None<Guid>(),
         cardDataId: string.Empty,
         type: CardType.None,
         rarity: CardRarity.None,
@@ -88,7 +91,7 @@ public class CardEntity : ICardEntity
     
     private CardEntity(
         Guid indentity,
-        Guid originCardInstanceGuid,
+        Option<Guid> originCardInstanceGuid,
         string cardDataId,
         CardType type,
         CardRarity rarity,
@@ -126,7 +129,7 @@ public class CardEntity : ICardEntity
     {
         return new CardEntity(
             indentity: Guid.NewGuid(),
-            originCardInstanceGuid: cardInstance.InstanceGuid,
+            originCardInstanceGuid: cardInstance.InstanceGuid.Some(),
             cardDataId: cardInstance.CardDataId,
             type: cardInstance.Type,
             rarity: cardInstance.Rarity,
@@ -142,6 +145,29 @@ public class CardEntity : ICardEntity
             properties: cardInstance.PropertyDatas.Select(p => p.CreateEntity()),
             statusList: new List<CardStatusEntity>(),
             owner: owner
+        );
+    }
+
+    public CardEntity Clone(IPlayerEntity cloneOwner)
+    {
+        return new CardEntity(
+            indentity: Guid.NewGuid(),
+            originCardInstanceGuid: Option.None<Guid>(),
+            cardDataId: _cardDataId,
+            type: _type,
+            rarity: _rarity,
+            themes: _themes,
+            cost: _cost,
+            power: _power,
+            mainSelectable: _mainSelectable,
+            subSelectables: _subSelectables,
+            effects: _effects.ToDictionary(
+                    pair => pair.Key,
+                    pair => pair.Value.ToList()
+                ),
+            properties: _properties.ToList(),
+            statusList: new List<CardStatusEntity>(),
+            owner: cloneOwner
         );
     }
 

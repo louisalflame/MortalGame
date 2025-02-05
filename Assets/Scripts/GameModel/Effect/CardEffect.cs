@@ -85,12 +85,14 @@ public class CreateCardEffect : ICardEffect
 public class CloneCardEffect : ICardEffect
 {
     public ITargetCardCollectionValue TargetCards;
-    public CardProperty[] AppendProperties;
+    public AddCardStatusData[] AddCardStatusDatas;
+    public CardCollectionType CloneDestination;
 }
 [Serializable]
-public class AppendCardPropertyEffect : ICardEffect
+public class AppendCardStatusEffect : ICardEffect
 {
-    public CardProperty[] Properties;
+    public ITargetCardCollectionValue TargetCards;
+    public AddCardStatusData[] AddCardStatusDatas;
 }
 
 [Serializable]

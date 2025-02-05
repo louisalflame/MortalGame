@@ -5,11 +5,11 @@ using UnityEngine;
 public enum CardType
 {
     None = 0,
-    Attack,
-    Defense,
-    Speech,
-    Sneak,
-    Special,
+    Attack,     // 捅人
+    Defense,    // 備揍     
+    Speech,     // 嘴攻
+    Sneak,      // 暗器
+    Special,    // 絕招
     Item
 }
 
@@ -58,6 +58,16 @@ public enum CardProperty : int
     Dispose             = 1 << 8,
     AutoDispose         = 1 << 9,
     AppendEffect        = 1 << 10,
+}
+
+public enum CardCollectionType
+{
+    None = 0,
+    Deck,
+    HandCard,
+    Graveyard,
+    ExclusionZone,
+    DisposeZone,
 }
 
 public enum GameKeyWord
