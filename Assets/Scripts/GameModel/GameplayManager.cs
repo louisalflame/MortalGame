@@ -176,9 +176,7 @@ public class GameplayManager : IGameplayStatusWatcher
             var cardRuntimCost = selectedCard.EvalCost(_contextMgr.Context);
             if (cardRuntimCost <= _gameStatus.Enemy.Character.CurrentEnergy)
             {
-                _gameActions.Enqueue(new UseCardAction(){
-                    CardIndentity = selectedCard.Indentity
-                });
+                _gameActions.Enqueue(new UseCardAction(selectedCard.Indentity));
                 _TurnExecute(_gameStatus.Enemy);
             }
             else
@@ -206,11 +204,14 @@ public class GameplayManager : IGameplayStatusWatcher
                 switch(action)
                 {
                     case UseCardAction useCardAction:
-                        _UseCard(player, useCardAction.CardIndentity);
-                        _gameEvents.Add(new PlayerExecuteStartEvent(){
-                            Faction = player.Faction,
-                            HandCardInfo = player.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context)
-                        });
+                        using(_SetUseCardSelectTarget(useCardAction))
+                        {
+                            _UseCard(player, useCardAction.CardIndentity);
+                            _gameEvents.Add(new PlayerExecuteStartEvent(){
+                                Faction = player.Faction,
+                                HandCardInfo = player.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context)
+                            });
+                        }
                         break;
                     case TurnSubmitAction turnSubmitAction:
                         if (_gameStatus.State == GameState.PlayerExecute &&
@@ -271,6 +272,43 @@ public class GameplayManager : IGameplayStatusWatcher
         );
     }
 
+    private GameContextManager _SetUseCardSelectTarget(UseCardAction useCardAction)
+    {
+        Debug.Log($"SetUseCardSelectTarget targettype:{useCardAction.TargetType}");
+        switch(useCardAction.TargetType)
+        { 
+            case TargetType.Ally:
+                return _contextMgr.SetSelectedPlayer(_gameStatus.Ally);
+            case TargetType.Enemy:
+                return _contextMgr.SetSelectedPlayer(_gameStatus.Enemy);
+            case TargetType.AllyCard:
+                return useCardAction.SelectedTarget.Match(
+                    targetCardIndentity => {
+                        var targetCard = _gameStatus.Ally.CardManager.HandCard.Cards.FirstOrDefault(c => c.Indentity == targetCardIndentity);
+                        if (targetCard != null)
+                        {
+                            Debug.Log($"SetSelectedCard targetCard:{targetCard.CardDataId}");
+                            return _contextMgr.SetSelectedCard(targetCard);
+                        }
+                        return _contextMgr.SetClone();
+                    },
+                    () => _contextMgr.SetClone());
+            case TargetType.EnemyCard:
+                return useCardAction.SelectedTarget.Match(
+                    targetCardIndentity => {
+                        var targetCard = _gameStatus.Enemy.CardManager.HandCard.Cards.FirstOrDefault(c => c.Indentity == targetCardIndentity);
+                        if (targetCard != null)
+                        {
+                            return _contextMgr.SetSelectedCard(targetCard);
+                        }
+                        return _contextMgr.SetClone();
+                    },
+                    () => _contextMgr.SetClone());
+            default:
+            case TargetType.None:
+                return _contextMgr.SetClone();      
+        }
+    }
     private void _UseCard(IPlayerEntity player, Guid CardIndentity)
     {
         using(_contextMgr.SetCardCaster(player))
@@ -279,6 +317,7 @@ public class GameplayManager : IGameplayStatusWatcher
             if (usedCard != null &&
                 !usedCard.HasProperty(CardProperty.Sealed))
             {
+                Debug.Log($"SetUsingCard card:{usedCard.CardDataId}");
                 using(_contextMgr.SetUsingCard(usedCard))
                 {
                     var cardRuntimCost = usedCard.EvalCost(_contextMgr.Context);
@@ -635,34 +674,47 @@ public class GameplayManager : IGameplayStatusWatcher
                     var cards = cloneCardEffect.TargetCards.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var card in cards)
                     {
-                        card.Owner.MatchSome(cardOwner => 
-                        {
-                            using(_contextMgr.SetEffectTargetPlayer(cardOwner))
-                            using(_contextMgr.SetEffectTargetCard(card))
-                            {
-                                //TODO create cardstatus into clone card
-                                var cloneCard = card.Clone(cardOwner);
+                        Debug.Log($"CloneCardEffect card:{card.CardDataId}");
 
-                                switch(cloneCardEffect.CloneDestination)
-                                {
-                                    case CardCollectionType.Deck:
-                                        _contextMgr.Context.CardCaster.CardManager.Deck.EnqueueCardsThenShuffle(new[] { cloneCard });
-                                        break;
-                                    case CardCollectionType.HandCard:
-                                        _contextMgr.Context.CardCaster.CardManager.HandCard.AddCard(cloneCard);
-                                        break;
-                                    case CardCollectionType.Graveyard:
-                                        _contextMgr.Context.CardCaster.CardManager.Graveyard.AddCard(cloneCard);
-                                        break;
-                                    case CardCollectionType.ExclusionZone:
-                                        _contextMgr.Context.CardCaster.CardManager.ExclusionZone.AddCard(cloneCard);
-                                        break;
-                                    default:
-                                    case CardCollectionType.DisposeZone:
-                                        break;
-                                }
+                        using(_contextMgr.SetEffectTargetPlayer(_contextMgr.Context.CardCaster))
+                        using(_contextMgr.SetEffectTargetCard(card))
+                        {
+                            //TODO create cardstatus into clone card
+                            var cloneCard = card.Clone(_contextMgr.Context.CardCaster);
+
+                            CardCollectionInfo cardCollectionInfo = null;
+                            switch(cloneCardEffect.CloneDestination)
+                            {
+                                case CardCollectionType.Deck:
+                                    _contextMgr.Context.CardCaster.CardManager.Deck.EnqueueCardsThenShuffle(new[] { cloneCard });
+                                    cardCollectionInfo = _contextMgr.Context.CardCaster.CardManager.Deck.Cards.ToCardCollectionInfo(_contextMgr.Context);
+                                    break;
+                                case CardCollectionType.HandCard:
+                                    _contextMgr.Context.CardCaster.CardManager.HandCard.AddCard(cloneCard);
+                                    cardCollectionInfo = _contextMgr.Context.CardCaster.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context);
+                                    break;
+                                case CardCollectionType.Graveyard:
+                                    _contextMgr.Context.CardCaster.CardManager.Graveyard.AddCard(cloneCard);
+                                    cardCollectionInfo = _contextMgr.Context.CardCaster.CardManager.Graveyard.Cards.ToCardCollectionInfo(_contextMgr.Context);
+                                    break;
+                                case CardCollectionType.ExclusionZone:
+                                    _contextMgr.Context.CardCaster.CardManager.ExclusionZone.AddCard(cloneCard);
+                                    cardCollectionInfo = _contextMgr.Context.CardCaster.CardManager.ExclusionZone.Cards.ToCardCollectionInfo(_contextMgr.Context);
+                                    break;
+                                default:
+                                case CardCollectionType.DisposeZone:
+                                    _contextMgr.Context.CardCaster.CardManager.DisposeZone.AddCard(cloneCard);
+                                    cardCollectionInfo = _contextMgr.Context.CardCaster.CardManager.DisposeZone.Cards.ToCardCollectionInfo(_contextMgr.Context);
+                                    break;
                             }
-                        });
+                            
+                            _gameEvents.Add(new CloneCardEvent(){
+                                Faction = _contextMgr.Context.CardCaster.Faction,
+                                ClonedCardInfo = new CardInfo(cloneCard, _contextMgr.Context),
+                                CardCollectionType = cloneCardEffect.CloneDestination,
+                                CardCollectionInfo = cardCollectionInfo,
+                            });
+                        }
                     }
                     break;
                 }

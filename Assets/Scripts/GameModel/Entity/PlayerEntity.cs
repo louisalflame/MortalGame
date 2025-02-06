@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Optional;
 using UnityEngine;
 
 public interface IPlayerEntity
@@ -12,6 +14,8 @@ public interface IPlayerEntity
 
 public abstract class PlayerEntity : IPlayerEntity
 {
+    public Guid Identity { get; protected set; }
+    public Option<Guid> OriginPlayerInstanceGuid { get; protected set; }
     public Faction Faction { get; protected set; }
     public string NameKey { get; protected set; }
 
@@ -27,6 +31,7 @@ public class AllyEntity : PlayerEntity
     public IDispositionManager DispositionManager;
 
     public AllyEntity(
+        Guid originPlayerInstanceGuid,
         string nameKey,
         int currentHealth,
         int maxHealth,
@@ -37,6 +42,8 @@ public class AllyEntity : PlayerEntity
         int maxDisposition,
         IEnumerable<CardInstance> deckInstance)
     {
+        Identity = Guid.NewGuid();
+        OriginPlayerInstanceGuid = originPlayerInstanceGuid.Some();
         Faction = Faction.Ally;
         NameKey = nameKey;
         Character = new CharacterEntity(currentHealth, maxHealth, currentEnergy, maxEnergy);
@@ -63,6 +70,8 @@ public class EnemyEntity : PlayerEntity
         int turnStartDrawCardCount,
         int energyRecoverPoint)
     {
+        Identity = Guid.NewGuid();
+        OriginPlayerInstanceGuid = Option.None<Guid>(); 
         Faction = Faction.Enemy;
         NameKey = nameKey;
         Character = new CharacterEntity(initialHealth, maxHealth, initialEnergy, maxEnergy);

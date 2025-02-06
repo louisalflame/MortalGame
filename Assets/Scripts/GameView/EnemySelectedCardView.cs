@@ -52,7 +52,7 @@ public class EnemySelectedCardView : MonoBehaviour
         cardView.SetCardInfo(enemySelectCardEvent.SelectedCardInfo, _localizeLibrary);
 
         _cardViews.Add(cardView);
-        _cardViewDict.Add(enemySelectCardEvent.SelectedCardInfo.Indentity, cardView);
+        _cardViewDict.Add(enemySelectCardEvent.SelectedCardInfo.Identity, cardView);
         if(_cardViews.Count > 0)
         {
             _RearrangeCardViews();
@@ -61,10 +61,10 @@ public class EnemySelectedCardView : MonoBehaviour
 
     public void RemoveCardView(UsedCardEvent usedCardEvent)
     {
-        if(_cardViewDict.TryGetValue(usedCardEvent.UsedCardInfo.Indentity, out var cardView))
+        if(_cardViewDict.TryGetValue(usedCardEvent.UsedCardInfo.Identity, out var cardView))
         {
             _cardViews.Remove(cardView);
-            _cardViewDict.Remove(usedCardEvent.UsedCardInfo.Indentity);
+            _cardViewDict.Remove(usedCardEvent.UsedCardInfo.Identity);
             _cardViewFactory.RecyclePrefab(cardView);
 
             _RearrangeCardViews();
@@ -72,10 +72,10 @@ public class EnemySelectedCardView : MonoBehaviour
     }
     public void RemoveCardView(DiscardCardEvent discardCardEvent)
     {
-        if(_cardViewDict.TryGetValue(discardCardEvent.DiscardedCardInfo.Indentity, out var cardView))
+        if(_cardViewDict.TryGetValue(discardCardEvent.DiscardedCardInfo.Identity, out var cardView))
         {
             _cardViews.Remove(cardView);
-            _cardViewDict.Remove(discardCardEvent.DiscardedCardInfo.Indentity);
+            _cardViewDict.Remove(discardCardEvent.DiscardedCardInfo.Identity);
             _cardViewFactory.RecyclePrefab(cardView);
 
             _RearrangeCardViews();
@@ -83,10 +83,10 @@ public class EnemySelectedCardView : MonoBehaviour
     }
     public void RemoveCardView(EnemyUnselectedCardEvent enemyUnselectedCardEvent)
     {
-        if(_cardViewDict.TryGetValue(enemyUnselectedCardEvent.SelectedCardInfo.Indentity, out var cardView))
+        if(_cardViewDict.TryGetValue(enemyUnselectedCardEvent.SelectedCardInfo.Identity, out var cardView))
         {
             _cardViews.Remove(cardView);
-            _cardViewDict.Remove(enemyUnselectedCardEvent.SelectedCardInfo.Indentity);
+            _cardViewDict.Remove(enemyUnselectedCardEvent.SelectedCardInfo.Identity);
             _cardViewFactory.RecyclePrefab(cardView);
 
             _RearrangeCardViews();
@@ -96,11 +96,11 @@ public class EnemySelectedCardView : MonoBehaviour
     {
         foreach(var cardInfo in recycleHandCardEvent.RecycledCardInfos)
         {
-Debug.Log($"==> enemyselect create cardview: {cardInfo.Indentity}");
-            if(_cardViewDict.TryGetValue(cardInfo.Indentity, out var cardView))
+Debug.Log($"==> enemyselect create cardview: {cardInfo.Identity}");
+            if(_cardViewDict.TryGetValue(cardInfo.Identity, out var cardView))
             {
                 _cardViews.Remove(cardView);
-                _cardViewDict.Remove(cardInfo.Indentity);
+                _cardViewDict.Remove(cardInfo.Identity);
                 _cardViewFactory.RecyclePrefab(cardView);
             }
         }

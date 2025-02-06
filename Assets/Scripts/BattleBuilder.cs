@@ -41,15 +41,16 @@ public class BattleBuidler
     private AllyEntity _ParseAlly(AllyInstance allyInstance, GameContextManager gameContextManager)
     {
         return new AllyEntity(
-            nameKey             : allyInstance.NameKey,
-            currentHealth       : allyInstance.CurrentHealth,
-            maxHealth           : allyInstance.MaxHealth,
-            currentEnergy       : allyInstance.CurrentEnergy,
-            maxEnergy           : allyInstance.MaxEnergy,
-            handCardMaxCount    : allyInstance.HandCardMaxCount,
-            currentDisposition  : allyInstance.CurrentDisposition,
-            maxDisposition      : gameContextManager.DispositionLibrary.MaxDisposition,
-            deckInstance        : allyInstance.Deck
+            originPlayerInstanceGuid    : allyInstance.Identity,
+            nameKey                     : allyInstance.NameKey,
+            currentHealth               : allyInstance.CurrentHealth,
+            maxHealth                   : allyInstance.MaxHealth,
+            currentEnergy               : allyInstance.CurrentEnergy,
+            maxEnergy                   : allyInstance.MaxEnergy,
+            handCardMaxCount            : allyInstance.HandCardMaxCount,
+            currentDisposition          : allyInstance.CurrentDisposition,
+            maxDisposition              : gameContextManager.DispositionLibrary.MaxDisposition,
+            deckInstance                : allyInstance.Deck
         );
     }
 

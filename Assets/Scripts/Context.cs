@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -24,6 +25,7 @@ public class Context
 
         // Create player instance
         Ally = new AllyInstance{
+            Identity = Guid.NewGuid(),
             NameKey = scriptableDataLoader.Ally.PlayerData.NameKey,
             CurrentDisposition = scriptableDataLoader.Ally.InitialDisposition,
             CurrentHealth = scriptableDataLoader.Ally.PlayerData.MaxHealth,

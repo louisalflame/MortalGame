@@ -141,17 +141,24 @@ public class GameplayView : MonoBehaviour, IGameplayView
                 case RoundStartEvent roundStartEvent:
                     _UpdateRoundAndPlayer(roundStartEvent);
                     break;
+                case RecycleGraveyardEvent recycleGraveyardEvent:
+                    _RecycleGraveyardEvent(recycleGraveyardEvent);
+                    break;
+                case RecycleHandCardEvent recycleHandCardEvent:
+                    _RecycleHandCardEvent(recycleHandCardEvent);
+                    break;
                 case DrawCardEvent drawCardEvent:
                     _DrawCardView(drawCardEvent, reciever);
                     break;
                 case DiscardCardEvent discardCardEvent:
                     _DiscardCardView(discardCardEvent);
                     break;
-                case RecycleGraveyardEvent recycleGraveyardEvent:
-                    _RecycleGraveyardEvent(recycleGraveyardEvent);
+                case ConsumeCardEvent consumeCardEvent:
                     break;
-                case RecycleHandCardEvent recycleHandCardEvent:
-                    _RecycleHandCardEvent(recycleHandCardEvent);
+                case DisposeCardEvent disposeCardEvent:
+                    break;
+                case CloneCardEvent cloneCardEvent:
+                    _CloneCardView(cloneCardEvent);
                     break;
                 case EnemySelectCardEvent enemySelectCardEvent:
                     _SelectCardView(enemySelectCardEvent);
@@ -211,7 +218,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
         switch (drawCardEvent.Faction)
         {
             case Faction.Ally:
-                _allyHandCardView.CreateCardView(drawCardEvent);
+                _allyHandCardView.CreateCardView(drawCardEvent.NewCardInfo, drawCardEvent.HandCardInfo);
                 _deckCardView.UpdateDeckView(drawCardEvent);
                 break;
             case Faction.Enemy:
@@ -230,6 +237,37 @@ public class GameplayView : MonoBehaviour, IGameplayView
                 break;
             case Faction.Enemy:
                 _enemySelectedCardView.RemoveCardView(discardCardEvent);
+                break;
+        }
+    }
+
+    private void _CloneCardView(CloneCardEvent cloneCardEvent)
+    {
+        switch (cloneCardEvent.Faction)
+        {
+            case Faction.Ally:
+                switch(cloneCardEvent.CardCollectionType)
+                {
+                    case CardCollectionType.HandCard:
+                        _allyHandCardView.CreateCardView(cloneCardEvent.ClonedCardInfo, cloneCardEvent.CardCollectionInfo);
+                        break;
+                    case CardCollectionType.Graveyard:
+                    case CardCollectionType.Deck:
+                    case CardCollectionType.ExclusionZone:
+                    case CardCollectionType.DisposeZone:
+                        break;
+                }
+                break;
+            case Faction.Enemy:
+                switch(cloneCardEvent.CardCollectionType)
+                {
+                    case CardCollectionType.HandCard:
+                    case CardCollectionType.Graveyard:
+                    case CardCollectionType.Deck:
+                    case CardCollectionType.ExclusionZone:
+                    case CardCollectionType.DisposeZone:
+                        break;
+                }
                 break;
         }
     }

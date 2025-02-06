@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
@@ -12,6 +13,9 @@ public class AllyCharacterView : BaseCharacterView, ISelectableView
 
     public RectTransform RectTransform => _rectTransform;
     public TargetType TargetType => TargetType.Ally;
+    public Guid TargetIdentity => _playerIdentity;
+
+    private Guid _playerIdentity;
 
     public void Init(IGameplayStatusWatcher statusWatcher) 
     {
@@ -23,6 +27,7 @@ public class AllyCharacterView : BaseCharacterView, ISelectableView
     public void SummonAlly(AllySummonEvent allySummonEvent)
     {
         Debug.Log($"Summon Ally: {allySummonEvent.Player.NameKey}");
+        _playerIdentity = allySummonEvent.Player.Identity;
 
         _Run().Forget();
     }

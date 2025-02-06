@@ -119,7 +119,7 @@ public class AllCardDetailPresenter : IAllCardDetailPresenter
     {
         if(_state == AllCardDetailPanelState.Idle)
         {
-            _selectedCardInfo = _cardInfos.FirstOrDefault(x => x.Indentity == cardIdentity);
+            _selectedCardInfo = _cardInfos.FirstOrDefault(x => x.Identity == cardIdentity);
             _state = AllCardDetailPanelState.SinglePopup;
         }
     }

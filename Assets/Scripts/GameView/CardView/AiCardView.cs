@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UniRx;
 using UniRx.Triggers;
@@ -22,10 +23,14 @@ public class AiCardView : MonoBehaviour, IRecyclable, ISelectableView
 
     public RectTransform RectTransform => _rectTransform;
     public TargetType TargetType => TargetType.EnemyCard;
+    public Guid TargetIdentity => _cardIdentity;
+
+    private Guid _cardIdentity;
 
     public void SetCardInfo(CardInfo cardInfo, LocalizeLibrary localizeLibrary)
     {
         var cardLocalizeData = localizeLibrary.Get(LocalizeTitleInfoType.Card, cardInfo.CardDataID);
+        _cardIdentity = cardInfo.Identity;
         _title.text = cardLocalizeData.Title;
         _info.text = cardLocalizeData.Info;
         _cost.text = cardInfo.Cost.ToString();
@@ -35,6 +40,7 @@ public class AiCardView : MonoBehaviour, IRecyclable, ISelectableView
     public void Reset()
     {
         _disposables.Clear();
+        _cardIdentity = Guid.Empty;
     }
 
     public void OnSelect()

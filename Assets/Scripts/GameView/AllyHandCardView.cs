@@ -8,7 +8,6 @@ using UnityEngine.EventSystems;
 
 public interface IHandCardViewHandler
 {
-    void UseCard(Guid cardIdentity);
     void FocusStart(Guid cardIdentity);
     void FocusStop(Guid cardIdentity);
     void BeginDrag(Guid cardIdentity, PointerEventData pointerEventData);
@@ -88,22 +87,18 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
         _localizeLibrary = localizeLibrary;
     }
 
-    public void CreateCardView(DrawCardEvent drawCardEvent)
+    public void CreateCardView(CardInfo newCardInfo, CardCollectionInfo handCardInfo)
     {
-        _cardCollectionInfo = drawCardEvent.HandCardInfo;
+        _cardCollectionInfo = handCardInfo;
         var cardView = _cardViewFactory.CreatePrefab();
         cardView.transform.SetParent(_cardViewParent, false);
-        cardView.SetCardInfo(drawCardEvent.NewCardInfo, _localizeLibrary);
+        cardView.SetCardInfo(newCardInfo, _localizeLibrary);
         _cardViews.Add(cardView);
-        _cardViewDict.Add(drawCardEvent.NewCardInfo.Indentity, cardView);
+        _cardViewDict.Add(newCardInfo.Identity, cardView);
 
         _RearrangeCardViews();
     }
 
-    public void UseCard(Guid cardIdentity)
-    {
-        _reciever.RecieveEvent(new UseCardAction{ CardIndentity = cardIdentity });
-    }   
     public void FocusStart(Guid focusIdentity)
     {
         if (_draggingCardInfo.Key == null &&
@@ -111,14 +106,14 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
             _cardViewDict.TryGetValue(focusIdentity, out var focusView))
         {
             _focusingCardInfo = _cardCollectionInfo.CardInfos
-                .FirstOrDefault(kvp => kvp.Key.Indentity == focusIdentity);
+                .FirstOrDefault(kvp => kvp.Key.Identity == focusIdentity);
             
             var smaller = _cardCollectionInfo.CardInfos
                 .Where(kvp => kvp.Value < _focusingCardInfo.Value)
-                .Select(kvp => kvp.Key.Indentity);
+                .Select(kvp => kvp.Key.Identity);
             var larger = _cardCollectionInfo.CardInfos
                 .Where(kvp => kvp.Value > _focusingCardInfo.Value)
-                .Select(kvp => kvp.Key.Indentity);
+                .Select(kvp => kvp.Key.Identity);
             
             foreach(var identity in smaller)
             {
@@ -166,7 +161,7 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
         {
             // Clear focus content
             if (_focusingCardInfo.Key != null && 
-                _cardViewDict.TryGetValue(_focusingCardInfo.Key.Indentity, out var focusView))
+                _cardViewDict.TryGetValue(_focusingCardInfo.Key.Identity, out var focusView))
             {
                 focusView.HideHandCardFocusContent();
                 _focusCardDetailView.HideFocus();
@@ -178,7 +173,7 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
             }
 
             _draggingCardInfo = _cardCollectionInfo.CardInfos
-                .FirstOrDefault(kvp => kvp.Key.Indentity == dragIdentity);
+                .FirstOrDefault(kvp => kvp.Key.Identity == dragIdentity);
 
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 _canvas.transform as RectTransform, pointerEventData.position, _canvas.worldCamera, out Vector2 localPoint);    
@@ -259,14 +254,15 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
                     .FirstOrDefault();
                 if (selectView != null)
                 {
-                    _reciever.RecieveEvent(new UseCardAction{ CardIndentity = dragIdentity });
+                    _reciever.RecieveEvent(new UseCardAction(
+                        dragIdentity, selectView.TargetType, selectView.TargetIdentity));
                 }
             }
             else
             {
                 if (RectTransformUtility.RectangleContainsScreenPoint(_reciever.BasicSelectableView.RectTransform, pointerEventData.position, _canvas.worldCamera))
                 {
-                    _reciever.RecieveEvent(new UseCardAction{ CardIndentity = dragIdentity });
+                    _reciever.RecieveEvent(new UseCardAction(dragIdentity));
                 }
             }
 
@@ -277,14 +273,14 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
     public void RemoveCardView(UsedCardEvent usedCardEvent)
     {
         _cardCollectionInfo = usedCardEvent.HandCardInfo;
-        if(_cardViewDict.TryGetValue(usedCardEvent.UsedCardInfo.Indentity, out var cardView))
+        if(_cardViewDict.TryGetValue(usedCardEvent.UsedCardInfo.Identity, out var cardView))
         {
             _cardViews.Remove(cardView);
-            _cardViewDict.Remove(usedCardEvent.UsedCardInfo.Indentity);
+            _cardViewDict.Remove(usedCardEvent.UsedCardInfo.Identity);
             _cardViewFactory.RecyclePrefab(cardView);
 
             foreach(var view in _cardViews)
-                view.RemoveLocationOffset(usedCardEvent.UsedCardInfo.Indentity, _focusDuration);
+                view.RemoveLocationOffset(usedCardEvent.UsedCardInfo.Identity, _focusDuration);
             _RearrangeCardViews();
         }
     }
@@ -292,14 +288,14 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
     public void RemoveCardView(DiscardCardEvent discardCardEvent)
     {
         _cardCollectionInfo = discardCardEvent.HandCardInfo;
-        if(_cardViewDict.TryGetValue(discardCardEvent.DiscardedCardInfo.Indentity, out var cardView))
+        if(_cardViewDict.TryGetValue(discardCardEvent.DiscardedCardInfo.Identity, out var cardView))
         {
             _cardViews.Remove(cardView);
-            _cardViewDict.Remove(discardCardEvent.DiscardedCardInfo.Indentity);
+            _cardViewDict.Remove(discardCardEvent.DiscardedCardInfo.Identity);
             _cardViewFactory.RecyclePrefab(cardView);
 
             foreach(var view in _cardViews)
-                view.RemoveLocationOffset(discardCardEvent.DiscardedCardInfo.Indentity, _focusDuration);
+                view.RemoveLocationOffset(discardCardEvent.DiscardedCardInfo.Identity, _focusDuration);
             _RearrangeCardViews();
         }
     }
@@ -307,13 +303,13 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
     {
         foreach(var cardInfo in recycleHandCardEvent.RecycledCardInfos.Concat(recycleHandCardEvent.ExcludedCardInfos))
         {
-            if(_cardViewDict.TryGetValue(cardInfo.Indentity, out var cardView))
+            if(_cardViewDict.TryGetValue(cardInfo.Identity, out var cardView))
             {
                 _cardViews.Remove(cardView);
-                _cardViewDict.Remove(cardInfo.Indentity);
+                _cardViewDict.Remove(cardInfo.Identity);
                 _cardViewFactory.RecyclePrefab(cardView);
                 foreach(var view in _cardViews)
-                    view.RemoveLocationOffset(cardInfo.Indentity, _focusDuration);
+                    view.RemoveLocationOffset(cardInfo.Identity, _focusDuration);
             }
         }
 
@@ -324,7 +320,7 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
     {
         foreach(var cardInfo in playerExecuteStartEvent.HandCardInfo.CardInfos.Keys)
         {
-            if(_cardViewDict.TryGetValue(cardInfo.Indentity, out var cardView))
+            if(_cardViewDict.TryGetValue(cardInfo.Identity, out var cardView))
             {
                 cardView.EnableHandCardAction(cardInfo, this);
             }

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4cb1530a4c49fb54ca4e5676814f8ced, type: 3}
-  m_Name: Deck001
+  m_Name: EnemyDeck001
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -23,9 +23,7 @@ MonoBehaviour:
     SerializationNodes: []
   Cards:
   - {fileID: 11400000, guid: 5c0c1617da064a0428bf6db750729c6f, type: 2}
-  - {fileID: 11400000, guid: ab36055cd6034fb4ab5dec71732056e5, type: 2}
-  - {fileID: 11400000, guid: c6298a0c48f70374095ec85ab880b827, type: 2}
   - {fileID: 11400000, guid: 2227edc8a00b9df46958164e8c8afb9c, type: 2}
-  - {fileID: 11400000, guid: ed073673a67b998469e60751780c5e8d, type: 2}
-  - {fileID: 11400000, guid: 5c0c1617da064a0428bf6db750729c6f, type: 2}
-  - {fileID: 11400000, guid: 68a544a972c5c0645b45c9f7eece452c, type: 2}
+  - {fileID: 11400000, guid: ab36055cd6034fb4ab5dec71732056e5, type: 2}
+  - {fileID: 11400000, guid: 78f1bcbd4b42859449bc22f2b6285a0d, type: 2}
+  - {fileID: 11400000, guid: c6298a0c48f70374095ec85ab880b827, type: 2}

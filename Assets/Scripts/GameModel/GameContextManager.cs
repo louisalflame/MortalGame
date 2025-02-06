@@ -35,6 +35,11 @@ public class GameContextManager : IDisposable
         }
     }
 
+    public GameContextManager SetClone() 
+    {
+        _contextStack.Push(Context.With());
+        return this;
+    }
     public GameContextManager SetExecutePlayer(IPlayerEntity ExecutePlayer) 
     {
         _contextStack.Push(Context.With(executePlayer: ExecutePlayer));

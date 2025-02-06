@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class CardInfo
 {
-    public Guid Indentity { get; private set; }
+    public Guid Identity { get; private set; }
     public string CardDataID { get; private set; }
     public int OriginCost { get; private set; }
     public int Cost { get; private set; }
@@ -20,7 +20,7 @@ public class CardInfo
 
     public CardInfo(ICardEntity card, GameContext gameContext)
     {
-        Indentity = card.Indentity;
+        Identity = card.Indentity;
         CardDataID = card.CardDataId;
 
         OriginCost = card.Cost;

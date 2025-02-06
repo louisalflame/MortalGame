@@ -72,6 +72,15 @@ public class DisposeCardEvent : IGameEvent
     public CardCollectionInfo HandCardInfo;
     public CardCollectionInfo DisposeZoneInfo;
 }
+
+public class CloneCardEvent : IGameEvent
+{
+    public Faction Faction;
+    public CardInfo ClonedCardInfo;
+    public CardCollectionType CardCollectionType;
+    public CardCollectionInfo CardCollectionInfo;
+}
+
 public class EnemySelectCardEvent : IGameEvent
 {
     public CardInfo SelectedCardInfo;

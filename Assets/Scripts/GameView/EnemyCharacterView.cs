@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,9 @@ public class EnemyCharacterView : BaseCharacterView, ISelectableView
 
     public RectTransform RectTransform => _rectTransform;
     public TargetType TargetType => TargetType.Enemy;
+    public Guid TargetIdentity => _playerIdentity;
+
+    private Guid _playerIdentity;
 
     public void Init(IGameplayStatusWatcher statusWatcher) 
     {
@@ -19,6 +23,7 @@ public class EnemyCharacterView : BaseCharacterView, ISelectableView
     public void SummonEnemy(EnemySummonEvent enemySummonEvent)
     {
         Debug.Log($"Summon Enemy: {enemySummonEvent.Enemy.NameKey}");
+        _playerIdentity = enemySummonEvent.Enemy.Identity;
 
         _Run().Forget();
     }

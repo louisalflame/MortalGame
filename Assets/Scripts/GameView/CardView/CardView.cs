@@ -35,6 +35,7 @@ public class CardView : MonoBehaviour, IRecyclable, ISelectableView
 
     public RectTransform RectTransform => _rectTransform;
     public TargetType TargetType => TargetType.AllyCard;
+    public Guid TargetIdentity => _cardIdentity;
 
     private CompositeDisposable _disposables = new CompositeDisposable();
     private Vector3 _localPosition;
@@ -42,9 +43,12 @@ public class CardView : MonoBehaviour, IRecyclable, ISelectableView
     private Dictionary<Guid, List<Vector3>> _offsets = new Dictionary<Guid, List<Vector3>>();
     private Tween _currentMoveTween;
 
+    private Guid _cardIdentity;
+
     public void SetCardInfo(CardInfo cardInfo, LocalizeLibrary localizeLibrary)
     {
         var cardLocalizeData = localizeLibrary.Get(LocalizeTitleInfoType.Card, cardInfo.CardDataID);
+        _cardIdentity = cardInfo.Identity;
         _title.text = cardLocalizeData.Title;
         _info.text = cardLocalizeData.Info;
         _cost.text = cardInfo.Cost.ToString();
@@ -63,27 +67,27 @@ public class CardView : MonoBehaviour, IRecyclable, ISelectableView
         _button.interactable = true;
         
         _button.OnPointerEnterAsObservable()
-            .Subscribe(_ => handler.FocusStart(cardInfo.Indentity)) 
+            .Subscribe(_ => handler.FocusStart(cardInfo.Identity)) 
             .AddTo(_disposables);
         _button.OnPointerExitAsObservable()
-            .Subscribe(_ => handler.FocusStop(cardInfo.Indentity)) 
+            .Subscribe(_ => handler.FocusStop(cardInfo.Identity)) 
             .AddTo(_disposables);
         
         _button.OnBeginDragAsObservable()
-            .Subscribe(pointerEventData => handler.BeginDrag(cardInfo.Indentity, pointerEventData))
+            .Subscribe(pointerEventData => handler.BeginDrag(cardInfo.Identity, pointerEventData))
             .AddTo(_disposables);
         _button.OnDragAsObservable()
-            .Subscribe(pointerEventData => handler.Drag(cardInfo.Indentity, pointerEventData))
+            .Subscribe(pointerEventData => handler.Drag(cardInfo.Identity, pointerEventData))
             .AddTo(_disposables);
         _button.OnEndDragAsObservable()
-            .Subscribe(pointerEventData => handler.EndDrag(cardInfo.Indentity, pointerEventData))
+            .Subscribe(pointerEventData => handler.EndDrag(cardInfo.Identity, pointerEventData))
             .AddTo(_disposables);
     }
     public void EnableSimpleCardAction(CardInfo cardInfo, IAllCardViewHandler handler)
     {
         _button.interactable = true;
         _button.OnClickAsObservable()
-            .Subscribe(_ => handler.ReadCard(cardInfo.Indentity))
+            .Subscribe(_ => handler.ReadCard(cardInfo.Identity))
             .AddTo(_disposables);
     }
     public void DisableCardAction()
@@ -126,6 +130,7 @@ public class CardView : MonoBehaviour, IRecyclable, ISelectableView
 
     public void Reset()
     {
+        _cardIdentity = Guid.Empty;
         _canvasGroup.alpha = 1f;
         _offsets.Clear();
         _localPosition = Vector3.zero;
