@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.TextCore.Text;
 
 public class BattleBuidler
 {
@@ -40,11 +41,15 @@ public class BattleBuidler
 
     private AllyEntity _ParseAlly(AllyInstance allyInstance, GameContextManager gameContextManager)
     {
+        var character = new CharacterEntity(
+            nameKey         : allyInstance.NameKey,
+            currentHealth   : allyInstance.CurrentHealth,
+            maxHealth       : allyInstance.MaxHealth          
+        );
+
         return new AllyEntity(
-            originPlayerInstanceGuid    : allyInstance.Identity,
-            nameKey                     : allyInstance.NameKey,
-            currentHealth               : allyInstance.CurrentHealth,
-            maxHealth                   : allyInstance.MaxHealth,
+            originPlayerInstanceGuid    : allyInstance.Identity,            
+            characters                  : new CharacterEntity[] { character },
             currentEnergy               : allyInstance.CurrentEnergy,
             maxEnergy                   : allyInstance.MaxEnergy,
             handCardMaxCount            : allyInstance.HandCardMaxCount,
@@ -58,11 +63,15 @@ public class BattleBuidler
     {
         var enemyCardInstances = enemyData.PlayerData.Deck.Cards.Select(c => CardInstance.Create(c.Data)).ToList(); 
 
+        var character = new CharacterEntity(
+            nameKey         : enemyData.PlayerData.NameKey,
+            currentHealth   : enemyData.PlayerData.InitialHealth,
+            maxHealth       : enemyData.PlayerData.MaxHealth            
+        );
+
         return new EnemyEntity(
-            nameKey                 : enemyData.PlayerData.NameKey,
-            initialHealth           : enemyData.PlayerData.InitialHealth,
-            maxHealth               : enemyData.PlayerData.MaxHealth,
-            initialEnergy           : enemyData.PlayerData.InitialEnergy,
+            characters              : new CharacterEntity[] { character },
+            currentEnergy           : enemyData.PlayerData.InitialEnergy,
             maxEnergy               : enemyData.PlayerData.MaxEnergy,
             handCardMaxCount        : enemyData.PlayerData.HandCardMaxCount,
             enemyCardInstances      : enemyCardInstances,

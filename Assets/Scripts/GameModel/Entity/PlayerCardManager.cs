@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Optional;
 using UnityEngine;
 
 public interface IPlayerCardManager
@@ -13,6 +15,8 @@ public interface IPlayerCardManager
     IEnumerable<IGameEvent> ClearHandOnTurnEnd(GameContextManager contextManager);
     
     IEnumerable<IGameEvent> UpdateCardsOnTiming(GameContextManager contextManager, CardTiming timing);
+
+    Option<ICardEntity> GetCard(Guid cardIdentity);
 }
 
 public class PlayerCardManager : IPlayerCardManager
@@ -71,5 +75,14 @@ public class PlayerCardManager : IPlayerCardManager
         }
 
         return events;
+    }
+
+    public Option<ICardEntity> GetCard(Guid cardIdentity)
+    {
+        return HandCard.GetCard(cardIdentity)
+            .Else(() => Deck.GetCard(cardIdentity))
+            .Else(() => Graveyard.GetCard(cardIdentity))
+            .Else(() => ExclusionZone.GetCard(cardIdentity))
+            .Else(() => DisposeZone.GetCard(cardIdentity));
     }
 }

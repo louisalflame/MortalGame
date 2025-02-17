@@ -40,10 +40,10 @@ public class AllyInfoView : MonoBehaviour
     public void SetPlayerInfo(int round, AllyEntity ally)
     {
         _topBarInfoView.UpdateTurnInfo(round);
-        _nameText.text = _localizeLibrary.Get(LocalizeSimpleType.PlayerName, ally.NameKey);
-        _healthBarView.SetHealth(ally.Character.CurrentHealth, ally.Character.MaxHealth);
-        _healthBarView.SetShield(ally.Character.CurrentArmor);    
-        _energyBarView.SetEnergy(ally.Character.CurrentEnergy, ally.Character.MaxEnergy);
+        _nameText.text = _localizeLibrary.Get(LocalizeSimpleType.PlayerName, ally.MainCharacter.NameKey);
+        _healthBarView.SetHealth(ally.MainCharacter.CurrentHealth, ally.MainCharacter.MaxHealth);
+        _healthBarView.SetShield(ally.MainCharacter.CurrentArmor);    
+        _energyBarView.SetEnergy(ally.CurrentEnergy, ally.MaxEnergy);
         _dispositionView.SetDisposition(ally.DispositionManager.CurrentDisposition, ally.DispositionManager.MaxDisposition);
     }
     

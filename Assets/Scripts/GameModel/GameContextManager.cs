@@ -40,59 +40,64 @@ public class GameContextManager : IDisposable
         _contextStack.Push(Context.With());
         return this;
     }
-    public GameContextManager SetExecutePlayer(IPlayerEntity ExecutePlayer) 
+    public GameContextManager SetExecutePlayer(IPlayerEntity executePlayer) 
     {
-        _contextStack.Push(Context.With(executePlayer: ExecutePlayer));
+        _contextStack.Push(Context.With(executePlayer: executePlayer));
         return this;
     }
-    public GameContextManager SetCardCaster(IPlayerEntity CardCaster) 
+    public GameContextManager SetCardCaster(IPlayerEntity cardCaster) 
     {
-        _contextStack.Push(Context.With(cardCaster: CardCaster));
+        _contextStack.Push(Context.With(cardCaster: cardCaster));
         return this;
     }
-    public GameContextManager SetSelectedPlayer(IPlayerEntity SelectedPlayer) 
+    public GameContextManager SetSelectedPlayer(IPlayerEntity selectedPlayer) 
     {
-        _contextStack.Push(Context.With(selectedPlayer: SelectedPlayer));
+        _contextStack.Push(Context.With(selectedPlayer: selectedPlayer));
         return this;
     }
-    public GameContextManager SetSelectedCard(ICardEntity SelectedCard) 
+    public GameContextManager SetSelectedCharacter(ICharacterEntity selectedCharacter) 
     {
-        _contextStack.Push(Context.With(selectedCard: SelectedCard));
+        _contextStack.Push(Context.With(selectedCharacter: selectedCharacter));
         return this;
     }
-    public GameContextManager SetUsingCard(ICardEntity UsingCard) 
+    public GameContextManager SetSelectedCard(ICardEntity selectedCard) 
     {
-        _contextStack.Push(Context.With(usingCard: UsingCard));
+        _contextStack.Push(Context.With(selectedCard: selectedCard));
         return this;
     }
-    public GameContextManager SetCardTiming(CardTiming CardTiming) 
+    public GameContextManager SetUsingCard(ICardEntity usingCard) 
     {
-        _contextStack.Push(Context.With(cardTiming: CardTiming));
+        _contextStack.Push(Context.With(usingCard: usingCard));
         return this;
     }
-    public GameContextManager SetUsingCardEffect(ICardEffect UsingCardEffect) 
+    public GameContextManager SetCardTiming(CardTiming cardTiming) 
     {
-        _contextStack.Push(Context.With(usingCardEffect: UsingCardEffect));
+        _contextStack.Push(Context.With(cardTiming: cardTiming));
         return this;
     }
-    public GameContextManager SetEffectTargetPlayer(IPlayerEntity EffectTarget) 
+    public GameContextManager SetUsingCardEffect(ICardEffect usingCardEffect) 
     {
-        _contextStack.Push(Context.With(effectTargetPlayer: EffectTarget));
+        _contextStack.Push(Context.With(usingCardEffect: usingCardEffect));
         return this;
     }
-    public GameContextManager SetEffectTargetCard(ICardEntity EffectTarget) 
+    public GameContextManager SetEffectTargetPlayer(IPlayerEntity effectTarget) 
     {
-        _contextStack.Push(Context.With(effectTargetCard: EffectTarget));
+        _contextStack.Push(Context.With(effectTargetPlayer: effectTarget));
         return this;
     }
-    public GameContextManager SetUsingBuff(BuffEntity UsingBuff) 
+    public GameContextManager SetEffectTargetCard(ICardEntity effectTarget) 
     {
-        _contextStack.Push(Context.With(usingBuff: UsingBuff));
+        _contextStack.Push(Context.With(effectTargetCard: effectTarget));
         return this;
     }
-    public GameContextManager SetUsingBuffEffect(IBuffEffect UsingBuffEffect) 
+    public GameContextManager SetUsingBuff(BuffEntity usingBuff) 
     {
-        _contextStack.Push(Context.With(usingBuffEffect: UsingBuffEffect));
+        _contextStack.Push(Context.With(usingBuff: usingBuff));
+        return this;
+    }
+    public GameContextManager SetUsingBuffEffect(IBuffEffect usingBuffEffect) 
+    {
+        _contextStack.Push(Context.With(usingBuffEffect: usingBuffEffect));
         return this;
     }
 }
@@ -102,6 +107,7 @@ public class GameContext
     public IPlayerEntity ExecutePlayer;
     public IPlayerEntity CardCaster;
     public IPlayerEntity SelectedPlayer;
+    public ICharacterEntity SelectedCharacter;
     public ICardEntity SelectedCard;
     public CardTiming CardTiming;
     public ICardEntity UsingCard;
@@ -116,6 +122,7 @@ public class GameContext
         IPlayerEntity executePlayer = null,
         IPlayerEntity cardCaster = null,
         IPlayerEntity selectedPlayer = null,
+        ICharacterEntity selectedCharacter = null,
         ICardEntity selectedCard = null,
         CardTiming cardTiming = default,
         ICardEntity usingCard = null,
@@ -130,6 +137,7 @@ public class GameContext
             ExecutePlayer = executePlayer ?? ExecutePlayer,
             CardCaster = cardCaster ?? CardCaster,
             SelectedPlayer = selectedPlayer ?? SelectedPlayer,
+            SelectedCharacter = selectedCharacter ?? SelectedCharacter,
             SelectedCard = selectedCard ?? SelectedCard,
             UsingCard = usingCard ?? UsingCard,
             CardTiming = cardTiming == CardTiming.None ? CardTiming : cardTiming,

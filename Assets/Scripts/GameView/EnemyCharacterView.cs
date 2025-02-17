@@ -8,7 +8,7 @@ public class EnemyCharacterView : BaseCharacterView, ISelectableView
     private RectTransform _rectTransform;
 
     public RectTransform RectTransform => _rectTransform;
-    public TargetType TargetType => TargetType.Enemy;
+    public TargetType TargetType => TargetType.Character;
     public Guid TargetIdentity => _playerIdentity;
 
     private Guid _playerIdentity;
@@ -22,8 +22,8 @@ public class EnemyCharacterView : BaseCharacterView, ISelectableView
 
     public void SummonEnemy(EnemySummonEvent enemySummonEvent)
     {
-        Debug.Log($"Summon Enemy: {enemySummonEvent.Enemy.NameKey}");
-        _playerIdentity = enemySummonEvent.Enemy.Identity;
+        Debug.Log($"Summon Enemy: {enemySummonEvent.Enemy.MainCharacter.NameKey}");
+        _playerIdentity = enemySummonEvent.Enemy.MainCharacter.Identity;
 
         _Run().Forget();
     }

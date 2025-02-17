@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -119,9 +120,9 @@ public abstract class EnergyEvent : IGameEvent
     public EnergyEvent(IPlayerEntity player, int deltaEnergy)
     {
         Faction = player.Faction;
-        Energy = player.Character.CurrentEnergy;
+        Energy = player.CurrentEnergy;
         DeltaEnergy = deltaEnergy;
-        MaxEnergy = player.Character.MaxEnergy;
+        MaxEnergy = player.MaxEnergy;
     }
 }
 public class RecoverEnergyEvent : EnergyEvent
@@ -144,6 +145,7 @@ public class LoseEnergyEvent : EnergyEvent
 public abstract class HealthEvent : IGameEvent
 {
     public Faction Faction;
+    public Guid CharacterIdentity;
     public int Hp;
     public int Dp;
     public int MaxHp;
@@ -151,9 +153,9 @@ public abstract class HealthEvent : IGameEvent
     public HealthEvent(IPlayerEntity player)
     {
         Faction = player.Faction;
-        Hp = player.Character.CurrentHealth;
-        Dp = player.Character.CurrentArmor;
-        MaxHp = player.Character.MaxHealth;
+        Hp = player.MainCharacter.CurrentHealth;
+        Dp = player.MainCharacter.CurrentArmor;
+        MaxHp = player.MainCharacter.MaxHealth;
     }
 }
 public class DamageEvent : HealthEvent

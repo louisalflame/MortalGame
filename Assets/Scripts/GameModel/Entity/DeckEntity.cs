@@ -1,11 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Optional;
 using UnityEngine;
 
 public interface IDeckEntity
 {
     IReadOnlyCollection<ICardEntity> Cards { get; }
+    Option<ICardEntity> GetCard(Guid cardIdentity);
     bool PopCard(out ICardEntity card);
     void EnqueueCardsThenShuffle(IEnumerable<ICardEntity> cards);
 }
@@ -19,6 +22,12 @@ public class DeckEntity : IDeckEntity
         _cards = new List<ICardEntity>();
         EnqueueCardsThenShuffle(
             cards.Select(c => CardEntity.Create(c, owner)));
+    }
+
+    public Option<ICardEntity> GetCard(Guid cardIdentity)
+    {
+        var card = Cards.FirstOrDefault(c => c.Identity == cardIdentity);
+        return card.SomeNotNull();
     }
 
     public bool PopCard(out ICardEntity card)
@@ -40,7 +49,7 @@ public class DeckEntity : IDeckEntity
         for (int i = 0; i < _cards.Count; i++)
         {
             var temp = _cards[i];
-            var randomIndex = Random.Range(0, _cards.Count);
+            var randomIndex = UnityEngine.Random.Range(0, _cards.Count);
             _cards[i] = _cards[randomIndex];
             _cards[randomIndex] = temp;
         }

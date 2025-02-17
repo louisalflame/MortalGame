@@ -66,9 +66,9 @@ public enum BuffProperty
 public enum SelectType
 {
     None = 0,
-    Player,
-    Ally,
-    Enemy,
+    Character,
+    AllyCharacter,
+    EnemyCharacter,
     Card,
     AllyCard,
     EnemyCard,
@@ -77,8 +77,6 @@ public enum SelectType
 public enum TargetType
 {
     None = 0,
-    Ally,
-    Enemy,
-    AllyCard,
-    EnemyCard,
+    Character,
+    Card,
 }

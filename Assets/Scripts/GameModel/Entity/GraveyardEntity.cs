@@ -1,9 +1,12 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Optional;
 
 public interface IGraveyardEntity
 {
     IReadOnlyCollection<ICardEntity> Cards { get; }
+    Option<ICardEntity> GetCard(Guid cardIdentity);
     void AddCard(ICardEntity card);
     void AddCards(IEnumerable<ICardEntity> cards);
     IReadOnlyCollection<ICardEntity> PopAllCards();
@@ -16,6 +19,12 @@ public class GraveyardEntity : IGraveyardEntity
     public GraveyardEntity()
     {
         _cards = new List<ICardEntity>();
+    }
+
+    public Option<ICardEntity> GetCard(Guid cardIdentity)
+    {
+        var card = Cards.FirstOrDefault(c => c.Identity == cardIdentity);
+        return card.SomeNotNull();
     }
 
     public void AddCard(ICardEntity card)

@@ -7,23 +7,51 @@ using UnityEngine;
 public interface IPlayerEntity
 {
     Faction Faction { get; }
-    string NameKey { get; }
-    CharacterEntity Character { get; }
+    IReadOnlyCollection<CharacterEntity> Characters { get; }
     IPlayerCardManager CardManager { get; }
+    int CurrentEnergy { get; }
+    int MaxEnergy { get; }
+
+    IEnergyManager EnergyManager { get; }
+    IBuffManager BuffManager { get; }
+    ICharacterEntity MainCharacter { get; }
 }
 
 public abstract class PlayerEntity : IPlayerEntity
 {
-    public Guid Identity { get; protected set; }
-    public Option<Guid> OriginPlayerInstanceGuid { get; protected set; }
-    public Faction Faction { get; protected set; }
-    public string NameKey { get; protected set; }
+    private readonly Faction _faction;
+    private readonly IEnergyManager _energyManager;
+    private readonly IBuffManager _buffManager;
+    protected Option<Guid> _originPlayerInstanceGuid;
+    protected IPlayerCardManager _cardManager;
+    protected IReadOnlyCollection<CharacterEntity> _characters;
+    
+    public Faction Faction => _faction;
+    public IEnergyManager EnergyManager => _energyManager;
+    public IBuffManager BuffManager => _buffManager;
+    public int CurrentEnergy => EnergyManager.Energy;
+    public int MaxEnergy => EnergyManager.MaxEnergy;
+    public Option<Guid> OriginPlayerInstanceGuid => _originPlayerInstanceGuid;
+    public IReadOnlyCollection<CharacterEntity> Characters => _characters;
+    public IPlayerCardManager CardManager => _cardManager;
 
-    public CharacterEntity Character { get; protected set; }
-    public IPlayerCardManager CardManager { get; protected set; }
+
+    // TODO: Implement main character with skills/assistant character
+    public ICharacterEntity MainCharacter => Characters.First();
 
     public bool IsDummy => this == DummyPlayer;
     public static PlayerEntity DummyPlayer = new DummyPlayer();
+
+    public PlayerEntity(
+        Faction faction,
+        int currentEnergy,
+        int maxEnergy
+    )
+    {
+        _faction = faction;
+        _energyManager = new EnergyManager(currentEnergy, maxEnergy);
+        _buffManager = new BuffManager();
+    }
 }
 
 public class AllyEntity : PlayerEntity
@@ -32,22 +60,22 @@ public class AllyEntity : PlayerEntity
 
     public AllyEntity(
         Guid originPlayerInstanceGuid,
-        string nameKey,
-        int currentHealth,
-        int maxHealth,
+        CharacterEntity[] characters,
         int currentEnergy,
         int maxEnergy,
         int handCardMaxCount,
         int currentDisposition,
         int maxDisposition,
-        IEnumerable<CardInstance> deckInstance)
+        IEnumerable<CardInstance> deckInstance) : 
+        base(
+            Faction.Ally, 
+            currentEnergy,
+            maxEnergy
+        )
     {
-        Identity = Guid.NewGuid();
-        OriginPlayerInstanceGuid = originPlayerInstanceGuid.Some();
-        Faction = Faction.Ally;
-        NameKey = nameKey;
-        Character = new CharacterEntity(currentHealth, maxHealth, currentEnergy, maxEnergy);
-        CardManager = new PlayerCardManager(handCardMaxCount, deckInstance, this);
+        _originPlayerInstanceGuid = originPlayerInstanceGuid.Some();
+        _characters = characters;
+        _cardManager = new PlayerCardManager(handCardMaxCount, deckInstance, this);
         DispositionManager = new DispositionManager(currentDisposition, maxDisposition);
     }
 }
@@ -59,23 +87,23 @@ public class EnemyEntity : PlayerEntity
     public int TurnStartDrawCardCount;
 
     public EnemyEntity(
-        string nameKey,
-        int initialHealth,
-        int maxHealth,
-        int initialEnergy,
+        CharacterEntity[] characters,
+        int currentEnergy,
         int maxEnergy,
         int handCardMaxCount,
         IEnumerable<CardInstance> enemyCardInstances,
         int selectedCardMaxCount,
         int turnStartDrawCardCount,
-        int energyRecoverPoint)
+        int energyRecoverPoint) : 
+        base(
+            Faction.Enemy,
+            currentEnergy, 
+            maxEnergy
+        )
     {
-        Identity = Guid.NewGuid();
-        OriginPlayerInstanceGuid = Option.None<Guid>(); 
-        Faction = Faction.Enemy;
-        NameKey = nameKey;
-        Character = new CharacterEntity(initialHealth, maxHealth, initialEnergy, maxEnergy);
-        CardManager = new PlayerCardManager(handCardMaxCount, enemyCardInstances, this);
+        _originPlayerInstanceGuid = Option.None<Guid>();
+        _characters = characters;
+        _cardManager = new PlayerCardManager(handCardMaxCount, enemyCardInstances, this);
         SelectedCards = new SelectedCardEntity(selectedCardMaxCount, new List<ICardEntity>());
         TurnStartDrawCardCount = turnStartDrawCardCount;
         EnergyRecoverPoint = energyRecoverPoint;
@@ -95,8 +123,6 @@ public class EnemyEntity : PlayerEntity
 
 public class DummyPlayer : PlayerEntity
 {
-    public DummyPlayer()
-    {
-        Faction = Faction.None;
-    }
+    public DummyPlayer() : base(Faction.None, 0, 0)
+    { }
 }

@@ -1,35 +1,39 @@
+using System;
 using UnityEngine;
 
 public interface ICharacterEntity
 {
+    public Guid Identity { get; }
+    public string NameKey { get; }
+    public IHealthManager HealthManager { get; }
+
     int CurrentHealth { get; }
     int MaxHealth { get; }
     int CurrentArmor { get; }
-    int CurrentEnergy { get; }
-    int MaxEnergy { get; }
 }
 
 public class CharacterEntity : ICharacterEntity
 {
-    public IHealthManager HealthManager;
-    public IEnergyManager EnergyManager;
-    public IBuffManager BuffManager;
+    private readonly Guid _identity;
+    private readonly string _nameKey;
+    private readonly IHealthManager _healthManager;
+    //TODO : CharacterBuffManager, instead of playerBuffManager
 
+    public Guid Identity => _identity;
+    public string NameKey => _nameKey;
+    public IHealthManager HealthManager => _healthManager;
     public int CurrentHealth => HealthManager.Hp;
     public int MaxHealth => HealthManager.MaxHp;
     public int CurrentArmor => HealthManager.Dp;
-    public int CurrentEnergy => EnergyManager.Energy;
-    public int MaxEnergy => EnergyManager.MaxEnergy;
 
     public CharacterEntity(
+        string nameKey,
         int currentHealth,
-        int maxHealth,
-        int currentEnergy,
-        int maxEnergy)
+        int maxHealth)
     {
-        HealthManager = new HealthManager(currentHealth, maxHealth);
-        EnergyManager = new EnergyManager(currentEnergy, maxEnergy);
-        BuffManager = new BuffManager();
+        _identity = Guid.NewGuid();
+        _nameKey = nameKey;
+        _healthManager = new HealthManager(currentHealth, maxHealth);
     }
 }
 

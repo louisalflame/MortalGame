@@ -34,7 +34,7 @@ public class CardView : MonoBehaviour, IRecyclable, ISelectableView
     private CanvasGroup _canvasGroup;
 
     public RectTransform RectTransform => _rectTransform;
-    public TargetType TargetType => TargetType.AllyCard;
+    public TargetType TargetType => TargetType.Card;
     public Guid TargetIdentity => _cardIdentity;
 
     private CompositeDisposable _disposables = new CompositeDisposable();

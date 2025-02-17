@@ -20,7 +20,7 @@ public class CardInfo
 
     public CardInfo(ICardEntity card, GameContext gameContext)
     {
-        Identity = card.Indentity;
+        Identity = card.Identity;
         CardDataID = card.CardDataId;
 
         OriginCost = card.Cost;

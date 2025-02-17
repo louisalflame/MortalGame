@@ -110,10 +110,10 @@ public class GameplayManager : IGameplayStatusWatcher
         });
         
         var recoverEnergyPoint = _contextMgr.DispositionLibrary.GetRecoverEnergyPoint(_gameStatus.Ally.DispositionManager.CurrentDisposition);
-        var allyGainEnergyResult = _gameStatus.Ally.Character.EnergyManager.RecoverEnergy(recoverEnergyPoint);
+        var allyGainEnergyResult = _gameStatus.Ally.EnergyManager.RecoverEnergy(recoverEnergyPoint);
         _gameEvents.Add(new RecoverEnergyEvent(_gameStatus.Ally, allyGainEnergyResult));
 
-        var enemyGainEnergyResult = _gameStatus.Enemy.Character.EnergyManager.RecoverEnergy(_gameStatus.Enemy.EnergyRecoverPoint);
+        var enemyGainEnergyResult = _gameStatus.Enemy.EnergyManager.RecoverEnergy(_gameStatus.Enemy.EnergyRecoverPoint);
         _gameEvents.Add(new RecoverEnergyEvent(_gameStatus.Enemy, enemyGainEnergyResult));
 
         _gameStatus = _gameStatus.With(
@@ -174,9 +174,9 @@ public class GameplayManager : IGameplayStatusWatcher
         while(_gameStatus.Enemy.SelectedCards.TryDequeueCard(out ICardEntity selectedCard))
         {
             var cardRuntimCost = selectedCard.EvalCost(_contextMgr.Context);
-            if (cardRuntimCost <= _gameStatus.Enemy.Character.CurrentEnergy)
+            if (cardRuntimCost <= _gameStatus.Enemy.CurrentEnergy)
             {
-                _gameActions.Enqueue(new UseCardAction(selectedCard.Indentity));
+                _gameActions.Enqueue(new UseCardAction(selectedCard.Identity));
                 _TurnExecute(_gameStatus.Enemy);
             }
             else
@@ -277,31 +277,26 @@ public class GameplayManager : IGameplayStatusWatcher
         Debug.Log($"SetUseCardSelectTarget targettype:{useCardAction.TargetType}");
         switch(useCardAction.TargetType)
         { 
-            case TargetType.Ally:
-                return _contextMgr.SetSelectedPlayer(_gameStatus.Ally);
-            case TargetType.Enemy:
-                return _contextMgr.SetSelectedPlayer(_gameStatus.Enemy);
-            case TargetType.AllyCard:
+            case TargetType.Character:
                 return useCardAction.SelectedTarget.Match(
-                    targetCardIndentity => {
-                        var targetCard = _gameStatus.Ally.CardManager.HandCard.Cards.FirstOrDefault(c => c.Indentity == targetCardIndentity);
-                        if (targetCard != null)
-                        {
-                            Debug.Log($"SetSelectedCard targetCard:{targetCard.CardDataId}");
-                            return _contextMgr.SetSelectedCard(targetCard);
-                        }
-                        return _contextMgr.SetClone();
+                    targetIdentity => {
+                        var targetCharacterOption = _gameStatus.CharacterManager.GetCharacter(targetIdentity);
+                        return targetCharacterOption.Match(
+                            targetCharacter => {
+                                return _contextMgr.SetSelectedCharacter(targetCharacter); 
+                            },
+                            () => { return _contextMgr.SetClone(); }
+                        );
                     },
                     () => _contextMgr.SetClone());
-            case TargetType.EnemyCard:
+            case TargetType.Card:
                 return useCardAction.SelectedTarget.Match(
                     targetCardIndentity => {
-                        var targetCard = _gameStatus.Enemy.CardManager.HandCard.Cards.FirstOrDefault(c => c.Indentity == targetCardIndentity);
-                        if (targetCard != null)
-                        {
-                            return _contextMgr.SetSelectedCard(targetCard);
-                        }
-                        return _contextMgr.SetClone();
+                        var targetCardOption = _gameStatus.Ally.CardManager.GetCard(targetCardIndentity);
+                        return targetCardOption.Match(
+                            targetCard => { return _contextMgr.SetSelectedCard(targetCard); },
+                            ()         => { return _contextMgr.SetClone(); }
+                        );
                     },
                     () => _contextMgr.SetClone());
             default:
@@ -313,7 +308,7 @@ public class GameplayManager : IGameplayStatusWatcher
     {
         using(_contextMgr.SetCardCaster(player))
         {
-            var usedCard = player.CardManager.HandCard.Cards.FirstOrDefault(c => c.Indentity == CardIndentity);
+            var usedCard = player.CardManager.HandCard.Cards.FirstOrDefault(c => c.Identity == CardIndentity);
             if (usedCard != null &&
                 !usedCard.HasProperty(CardProperty.Sealed))
             {
@@ -321,9 +316,9 @@ public class GameplayManager : IGameplayStatusWatcher
                 using(_contextMgr.SetUsingCard(usedCard))
                 {
                     var cardRuntimCost = usedCard.EvalCost(_contextMgr.Context);
-                    if (cardRuntimCost <= player.Character.CurrentEnergy)
+                    if (cardRuntimCost <= player.CurrentEnergy)
                     {
-                        var loseEnergyResult = player.Character.EnergyManager.ConsumeEnergy(cardRuntimCost);
+                        var loseEnergyResult = player.EnergyManager.ConsumeEnergy(cardRuntimCost);
                         _gameEvents.Add(new ConsumeEnergyEvent(player, loseEnergyResult));
 
                         if (player.CardManager.HandCard.RemoveCard(usedCard)) 
@@ -400,29 +395,6 @@ public class GameplayManager : IGameplayStatusWatcher
         }
     }
 
-    private bool _TryDiscardCard(IPlayerEntity player, ICardEntity targetCard)
-    {
-        if (player.CardManager.HandCard.RemoveCard(targetCard)) 
-        {
-            if (targetCard.HasProperty(CardProperty.Dispose) ||
-                targetCard.HasProperty(CardProperty.AutoDispose))
-            {
-                player.CardManager.DisposeZone.AddCard(targetCard);
-            }
-            else if (targetCard.HasProperty(CardProperty.Consumable))
-            {
-                player.CardManager.ExclusionZone.AddCard(targetCard);
-            }
-            else
-            {
-                player.CardManager.Graveyard.AddCard(targetCard);
-            }
-
-            return true;
-        }
-        return false;
-    }
-
     private void _ApplyCardEffect(ICardEffect cardEffect)
     {
         using(_contextMgr.SetUsingCardEffect(cardEffect))
@@ -437,7 +409,7 @@ public class GameplayManager : IGameplayStatusWatcher
                         using(_contextMgr.SetEffectTargetPlayer(target))
                         {
                             var damagePoint = damageEffect.Value.Eval(_gameStatus, _contextMgr.Context);
-                            var takeDamageResult = target.Character.HealthManager.TakeDamage(damagePoint, _contextMgr.Context);
+                            var takeDamageResult = target.MainCharacter.HealthManager.TakeDamage(damagePoint, _contextMgr.Context);
                             _gameEvents.Add(new DamageEvent(target, takeDamageResult));
                         }
                     }
@@ -452,7 +424,7 @@ public class GameplayManager : IGameplayStatusWatcher
                         {
                             var damagePoint = penetrateDamageEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
-                            var takeDamageResult = target.Character.HealthManager.TakePenetrateDamage(damagePoint, _contextMgr.Context);
+                            var takeDamageResult = target.MainCharacter.HealthManager.TakePenetrateDamage(damagePoint, _contextMgr.Context);
                             _gameEvents.Add(new DamageEvent(target, takeDamageResult));
                         }
                     }
@@ -467,7 +439,7 @@ public class GameplayManager : IGameplayStatusWatcher
                         {
                             var damagePoint = additionalAttackEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
-                            var takeDamageResult = target.Character.HealthManager.TakeAdditionalDamage(damagePoint, _contextMgr.Context);
+                            var takeDamageResult = target.MainCharacter.HealthManager.TakeAdditionalDamage(damagePoint, _contextMgr.Context);
                             _gameEvents.Add(new DamageEvent(target, takeDamageResult));
                         }
                     }
@@ -482,7 +454,7 @@ public class GameplayManager : IGameplayStatusWatcher
                         {
                             var damagePoint = effectiveAttackEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
-                            var takeDamageResult = target.Character.HealthManager.TakeEffectiveDamage(damagePoint, _contextMgr.Context);
+                            var takeDamageResult = target.MainCharacter.HealthManager.TakeEffectiveDamage(damagePoint, _contextMgr.Context);
                             _gameEvents.Add(new DamageEvent(target, takeDamageResult));
                         }
                     }
@@ -497,7 +469,7 @@ public class GameplayManager : IGameplayStatusWatcher
                         {
                             var healPoint = healEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
-                            var getHealResult = target.Character.HealthManager.GetHeal(healPoint, _contextMgr.Context);
+                            var getHealResult = target.MainCharacter.HealthManager.GetHeal(healPoint, _contextMgr.Context);
                             _gameEvents.Add(new GetHealEvent(target, getHealResult));
                         }
                     }
@@ -512,7 +484,7 @@ public class GameplayManager : IGameplayStatusWatcher
                         {
                             var shieldPoint = shieldEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
-                            var getShieldResult = target.Character.HealthManager.GetShield(shieldPoint, _contextMgr.Context);
+                            var getShieldResult = target.MainCharacter.HealthManager.GetShield(shieldPoint, _contextMgr.Context);
                             _gameEvents.Add(new GetShieldEvent(target, getShieldResult));
                         }
                     }
@@ -527,7 +499,7 @@ public class GameplayManager : IGameplayStatusWatcher
                         {
                             var gainEnergy = gainEnergyEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
-                            var gainEnergyResult = target.Character.EnergyManager.GainEnergy(gainEnergy);
+                            var gainEnergyResult = target.EnergyManager.GainEnergy(gainEnergy);
                             _gameEvents.Add(new GainEnergyEvent(target, gainEnergyResult));
                         }
                     }
@@ -542,7 +514,7 @@ public class GameplayManager : IGameplayStatusWatcher
                         {
                             var loseEnergy = loseEnegyEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
-                            var loseEnergyResult = target.Character.EnergyManager.LoseEnergy(loseEnergy);
+                            var loseEnergyResult = target.EnergyManager.LoseEnergy(loseEnergy);
                             _gameEvents.Add(new LoseEnergyEvent(target, loseEnergyResult));
                         }
                     }
@@ -613,6 +585,8 @@ public class GameplayManager : IGameplayStatusWatcher
                             using(_contextMgr.SetEffectTargetPlayer(cardOwner))
                             using(_contextMgr.SetEffectTargetCard(card))
                             {
+                                // TODO: also check consume deck/graveyard/exclusionzone
+                                // should manage function inside CardManager
                                 if (cardOwner.CardManager.HandCard.RemoveCard(card)) 
                                 {
                                     if (card.HasProperty(CardProperty.Dispose) ||
@@ -733,7 +707,7 @@ public class GameplayManager : IGameplayStatusWatcher
                         using(_contextMgr.SetEffectTargetPlayer(target))
                         {
                             var level = addBuffEffect.Level.Eval(_gameStatus, _contextMgr.Context);
-                            if (target.Character.BuffManager.AddBuff(
+                            if (target.BuffManager.AddBuff(
                                 _contextMgr.BuffLibrary, 
                                 _contextMgr.Context, 
                                 addBuffEffect.BuffId, 
@@ -757,7 +731,7 @@ public class GameplayManager : IGameplayStatusWatcher
                     {
                         using(_contextMgr.SetEffectTargetPlayer(target))
                         {
-                            if(target.Character.BuffManager.RemoveBuff(
+                            if(target.BuffManager.RemoveBuff(
                                 _contextMgr.BuffLibrary, 
                                 _contextMgr.Context, 
                                 removeBuffEffect.BuffId,
@@ -775,7 +749,7 @@ public class GameplayManager : IGameplayStatusWatcher
 
     private void _TriggerBuffs(PlayerEntity player, BuffTiming buffTiming)
     {
-        var buffs = player.Character.BuffManager.Buffs;
+        var buffs = player.BuffManager.Buffs;
         foreach(var buff in buffs)
         {
             using(_contextMgr.SetUsingBuff(buff))
@@ -805,7 +779,7 @@ public class GameplayManager : IGameplayStatusWatcher
                         using(_contextMgr.SetEffectTargetPlayer(target))
                         {
                             var damagePoint = effectiveDamageBuffEffect.Value.Eval(_gameStatus, _contextMgr.Context);
-                            var takeDamageResult = target.Character.HealthManager.TakeEffectiveDamage(damagePoint, _contextMgr.Context);
+                            var takeDamageResult = target.MainCharacter.HealthManager.TakeEffectiveDamage(damagePoint, _contextMgr.Context);
                             _gameEvents.Add(new DamageEvent(target, takeDamageResult));
                         }
                     }

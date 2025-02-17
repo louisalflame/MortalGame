@@ -12,7 +12,7 @@ public class AllyCharacterView : BaseCharacterView, ISelectableView
     private RectTransform _rectTransform;
 
     public RectTransform RectTransform => _rectTransform;
-    public TargetType TargetType => TargetType.Ally;
+    public TargetType TargetType => TargetType.Character;
     public Guid TargetIdentity => _playerIdentity;
 
     private Guid _playerIdentity;
@@ -26,8 +26,8 @@ public class AllyCharacterView : BaseCharacterView, ISelectableView
 
     public void SummonAlly(AllySummonEvent allySummonEvent)
     {
-        Debug.Log($"Summon Ally: {allySummonEvent.Player.NameKey}");
-        _playerIdentity = allySummonEvent.Player.Identity;
+        Debug.Log($"Summon Ally: {allySummonEvent.Player.MainCharacter.NameKey}");
+        _playerIdentity = allySummonEvent.Player.MainCharacter.Identity;
 
         _Run().Forget();
     }

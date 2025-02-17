@@ -6,7 +6,7 @@ using Unity.VisualScripting;
 
 public interface ICardEntity
 {
-    Guid Indentity { get; }
+    Guid Identity { get; }
     Option<Guid> OriginCardInstanceGuid { get; }
     string CardDataId { get; }
 
@@ -53,7 +53,7 @@ public class CardEntity : ICardEntity
 
     private Option<IPlayerEntity> _owner;
 
-    public Guid Indentity => _indentity;
+    public Guid Identity => _indentity;
     public Option<Guid> OriginCardInstanceGuid => _originCardInstanceGuid;
     public string CardDataId => _cardDataId;
     public CardType Type => _type;

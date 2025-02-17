@@ -23,6 +23,7 @@ public class GameStatus
     public GameState State { get; private set; }
     public AllyEntity Ally { get; private set; }
     public EnemyEntity Enemy { get; private set; }
+    public ICharacterManager CharacterManager { get; private set; }
 
     public GameStatus(
         int round,
@@ -34,6 +35,9 @@ public class GameStatus
         State = state;
         Ally = player;
         Enemy = enemy;
+        CharacterManager = new CharacterManager();
+        CharacterManager.AddCharacters(player.Characters);
+        CharacterManager.AddCharacters(enemy.Characters);
     }
 
     public GameStatus With(

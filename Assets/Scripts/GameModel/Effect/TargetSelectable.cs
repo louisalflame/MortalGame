@@ -19,17 +19,17 @@ public class NoneSelectable : IMainTargetSelectable
 
 public class PlayerSelectable : IMainTargetSelectable
 {
-    public SelectType SelectType => SelectType.Player;
+    public SelectType SelectType => SelectType.Character;
 }
 
 public class AllySelectable : IMainTargetSelectable
 {
-    public SelectType SelectType => SelectType.Ally;
+    public SelectType SelectType => SelectType.AllyCharacter;
 }
 
 public class EnemySelectable : IMainTargetSelectable
 {
-    public SelectType SelectType => SelectType.Enemy;
+    public SelectType SelectType => SelectType.EnemyCharacter;
 }
 
 public class CardSelectable : IMainTargetSelectable 
