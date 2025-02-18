@@ -4,7 +4,7 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class BuffEntity
+public class PlayerBuffEntity
 {
     public string Id;
     
@@ -15,15 +15,15 @@ public class BuffEntity
     public IPlayerEntity Owner;
     public IPlayerEntity Caster;
 
-    public IReadOnlyDictionary<BuffTiming, IBuffEffect[]> Effects;
+    public IReadOnlyDictionary<BuffTiming, IPlayerBuffEffect[]> Effects;
 
-    public BuffEntity(
+    public PlayerBuffEntity(
         string id,
         Guid identity,
         int level,
         IPlayerEntity owner,
         IPlayerEntity caster,
-        Dictionary<BuffTiming, IBuffEffect[]> effects) 
+        Dictionary<BuffTiming, IPlayerBuffEffect[]> effects) 
     {
         Id = id;
         Identity = identity;
@@ -33,9 +33,9 @@ public class BuffEntity
         Effects = effects;
     }
 
-    public BuffInfo ToInfo()
+    public PlayerBuffInfo ToInfo()
     {
-        return new BuffInfo() {
+        return new PlayerBuffInfo() {
             Id = Id,
             Identity = Identity,
             Level = Level

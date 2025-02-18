@@ -42,14 +42,14 @@ public enum BuffTiming
     OnTurnEnd,
 }
 
-public enum BuffPropertyDuration
+public enum PlayerBuffPropertyDuration
 {
     None = 0,
     ThisTurn,
     ThisBattle,
     ThisGame
 }
-public enum BuffProperty
+public enum PlayerBuffProperty
 {
     None = 0,
     AttackIncrease,

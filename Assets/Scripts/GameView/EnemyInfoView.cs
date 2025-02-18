@@ -14,7 +14,7 @@ public class EnemyInfoView : MonoBehaviour
     private EnergyBarView _energyBarView;
 
     [SerializeField]
-    private BuffCollectionView _buffCollectionView;
+    private PlayerBuffCollectionView _buffCollectionView;
     
     
     private IGameplayStatusWatcher _statusWatcher;

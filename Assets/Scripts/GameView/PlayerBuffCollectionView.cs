@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BuffCollectionView : MonoBehaviour
+public class PlayerBuffCollectionView : MonoBehaviour
 {
     [SerializeField]
     private BuffViewFactory _buffViewFactory;
@@ -10,8 +10,8 @@ public class BuffCollectionView : MonoBehaviour
     [SerializeField]
     private Transform _buffViewParent;
 
-    private List<BuffView> _buffViews = new List<BuffView>();
-    private Dictionary<Guid, BuffView> _buffViewDict = new Dictionary<Guid, BuffView>();
+    private List<PlayerBuffView> _buffViews = new List<PlayerBuffView>();
+    private Dictionary<Guid, PlayerBuffView> _buffViewDict = new Dictionary<Guid, PlayerBuffView>();
     private SimpleTitleIInfoHintView _simpleHintView;
 
     public void Init(SimpleTitleIInfoHintView simpleHintView)
@@ -19,7 +19,7 @@ public class BuffCollectionView : MonoBehaviour
         _simpleHintView = simpleHintView;
     }
 
-    public void AddBuff(BuffInfo buffInfo)
+    public void AddBuff(PlayerBuffInfo buffInfo)
     {
         var buffView = _buffViewFactory.CreatePrefab();
         buffView.transform.SetParent(_buffViewParent, false);
@@ -28,7 +28,7 @@ public class BuffCollectionView : MonoBehaviour
         _buffViews.Add(buffView);
         _buffViewDict.Add(buffInfo.Identity, buffView);
     }
-    public void RemoveBuff(BuffInfo buffInfo)
+    public void RemoveBuff(PlayerBuffInfo buffInfo)
     {
         if (_buffViewDict.TryGetValue(buffInfo.Identity, out var buffView))
         {
@@ -37,7 +37,7 @@ public class BuffCollectionView : MonoBehaviour
             _buffViewFactory.RecyclePrefab(buffView);
         }
     }
-    public void UpdateBuff(BuffInfo buffInfo)
+    public void UpdateBuff(PlayerBuffInfo buffInfo)
     {
         if (_buffViewDict.TryGetValue(buffInfo.Identity, out var buffView))
         {

@@ -150,12 +150,12 @@ public abstract class HealthEvent : IGameEvent
     public int Dp;
     public int MaxHp;
 
-    public HealthEvent(IPlayerEntity player)
+    public HealthEvent(ICharacterEntity character)
     {
-        Faction = player.Faction;
-        Hp = player.MainCharacter.CurrentHealth;
-        Dp = player.MainCharacter.CurrentArmor;
-        MaxHp = player.MainCharacter.MaxHealth;
+        Faction = character.Owner.Faction;
+        Hp = character.CurrentHealth;
+        Dp = character.CurrentArmor;
+        MaxHp = character.MaxHealth;
     }
 }
 public class DamageEvent : HealthEvent
@@ -165,7 +165,7 @@ public class DamageEvent : HealthEvent
     public int DeltaShield;
     public int DamagePoint;
 
-    public DamageEvent(IPlayerEntity player, TakeDamageResult takeDamageResult) : base(player)
+    public DamageEvent(ICharacterEntity character, TakeDamageResult takeDamageResult) : base(character)
     {
         Type = takeDamageResult.Type;
         DeltaHp = takeDamageResult.DeltaHp;
@@ -179,7 +179,7 @@ public class GetHealEvent : HealthEvent
     public int DeltaHp;
     public int HealPoint;
 
-    public GetHealEvent(IPlayerEntity player, GetHealResult getHealResult) : base(player)
+    public GetHealEvent(ICharacterEntity character, GetHealResult getHealResult) : base(character)
     {
         DeltaHp = getHealResult.DeltaHp;
         HealPoint = getHealResult.HealPoint;
@@ -190,7 +190,7 @@ public class GetShieldEvent : HealthEvent
     public int DeltaShield;
     public int ShieldPoint;
 
-    public GetShieldEvent(IPlayerEntity player, GetShieldResult getShieldResult) : base(player)
+    public GetShieldEvent(ICharacterEntity character, GetShieldResult getShieldResult) : base(character)
     {
         DeltaShield = getShieldResult.DeltaDp;
         ShieldPoint = getShieldResult.ShieldPoint;
@@ -200,9 +200,9 @@ public class GetShieldEvent : HealthEvent
 public class AddBuffEvent : IGameEvent
 {
     public Faction Faction;
-    public BuffInfo Buff;
+    public PlayerBuffInfo Buff;
 
-    public AddBuffEvent(IPlayerEntity player, BuffInfo buff)
+    public AddBuffEvent(IPlayerEntity player, PlayerBuffInfo buff)
     {
         Faction = player.Faction;
         Buff = buff;
@@ -211,9 +211,9 @@ public class AddBuffEvent : IGameEvent
 public class UpdateBuffEvent : IGameEvent
 {
     public Faction Faction;
-    public BuffInfo Buff;
+    public PlayerBuffInfo Buff;
 
-    public UpdateBuffEvent(IPlayerEntity player, BuffInfo buff)
+    public UpdateBuffEvent(IPlayerEntity player, PlayerBuffInfo buff)
     {
         Faction = player.Faction;
         Buff = buff;
@@ -222,9 +222,9 @@ public class UpdateBuffEvent : IGameEvent
 public class RemoveBuffEvent : IGameEvent
 {
     public Faction Faction;
-    public BuffInfo Buff;
+    public PlayerBuffInfo Buff;
 
-    public RemoveBuffEvent(IPlayerEntity player, BuffInfo buff)
+    public RemoveBuffEvent(IPlayerEntity player, PlayerBuffInfo buff)
     {
         Faction = player.Faction;
         Buff = buff;

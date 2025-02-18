@@ -7,7 +7,7 @@ public class Context
 {
     public Dictionary<string, CardData> CardTable { get; private set; }
     public Dictionary<string, CardStatusData> CardStatusTable { get; private set; }
-    public Dictionary<string, BuffData> BuffTable { get; private set; }
+    public Dictionary<string, PlayerBuffData> BuffTable { get; private set; }
     public DispositionData[] DispositionSettings { get; private set; }
     public EnemyData[] AllEnemies { get; private set; }
     public AllyInstance Ally{ get; private set; }

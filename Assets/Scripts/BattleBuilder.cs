@@ -16,7 +16,7 @@ public class BattleBuidler
     {
         var cardLibrary = new CardLibrary(_context.CardTable);
         var CardStatusLibrary = new CardStatusLibrary(_context.CardStatusTable);
-        var buffLibrary = new BuffLibrary(_context.BuffTable);
+        var buffLibrary = new PlayerBuffLibrary(_context.BuffTable);
         var dispositionLibrary = new DispositionLibrary(_context.DispositionSettings);
         var localizeLibrary = new LocalizeLibrary(_context.LocalizeSimpleSetting, _context.LocalizeTitleInfoSetting);
 
@@ -41,15 +41,16 @@ public class BattleBuidler
 
     private AllyEntity _ParseAlly(AllyInstance allyInstance, GameContextManager gameContextManager)
     {
-        var character = new CharacterEntity(
-            nameKey         : allyInstance.NameKey,
-            currentHealth   : allyInstance.CurrentHealth,
-            maxHealth       : allyInstance.MaxHealth          
-        );
+        var characterRecord = new CharacterParameter
+        {
+            NameKey         = allyInstance.NameKey,
+            CurrentHealth   = allyInstance.CurrentHealth,
+            MaxHealth       = allyInstance.MaxHealth
+        };
 
         return new AllyEntity(
-            originPlayerInstanceGuid    : allyInstance.Identity,            
-            characters                  : new CharacterEntity[] { character },
+            originPlayerInstanceGuid    : allyInstance.Identity,
+            characterParams             : new [] { characterRecord },
             currentEnergy               : allyInstance.CurrentEnergy,
             maxEnergy                   : allyInstance.MaxEnergy,
             handCardMaxCount            : allyInstance.HandCardMaxCount,
@@ -62,15 +63,15 @@ public class BattleBuidler
     private EnemyEntity _ParseEnemy(EnemyData enemyData)
     {
         var enemyCardInstances = enemyData.PlayerData.Deck.Cards.Select(c => CardInstance.Create(c.Data)).ToList(); 
-
-        var character = new CharacterEntity(
-            nameKey         : enemyData.PlayerData.NameKey,
-            currentHealth   : enemyData.PlayerData.InitialHealth,
-            maxHealth       : enemyData.PlayerData.MaxHealth            
-        );
+        var characterRecord = new CharacterParameter
+        {
+            NameKey         = enemyData.PlayerData.NameKey,
+            CurrentHealth   = enemyData.PlayerData.InitialHealth,
+            MaxHealth       = enemyData.PlayerData.MaxHealth
+        };
 
         return new EnemyEntity(
-            characters              : new CharacterEntity[] { character },
+            characterParams         : new [] { characterRecord },
             currentEnergy           : enemyData.PlayerData.InitialEnergy,
             maxEnergy               : enemyData.PlayerData.MaxEnergy,
             handCardMaxCount        : enemyData.PlayerData.HandCardMaxCount,

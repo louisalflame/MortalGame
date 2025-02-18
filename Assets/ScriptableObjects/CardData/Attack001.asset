@@ -53,7 +53,7 @@ MonoBehaviour:
       Data: 2
     - Name: MainSelectable
       Entry: 7
-      Data: 2|EnemySelectable, Assembly-CSharp
+      Data: 2|CharacterEnemySelectable, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -107,13 +107,19 @@ MonoBehaviour:
       Data: 7|DamageEffect, Assembly-CSharp
     - Name: Targets
       Entry: 7
-      Data: 8|OppositePlayers, Assembly-CSharp
-    - Name: Reference
-      Entry: 7
-      Data: 9|SinglePlayerCollection, Assembly-CSharp
+      Data: 8|SingleCharacterCollection, Assembly-CSharp
     - Name: Target
       Entry: 7
-      Data: 10|ThisExecutePlayer, Assembly-CSharp
+      Data: 9|MainCharacterOfPlayer, Assembly-CSharp
+    - Name: Player
+      Entry: 7
+      Data: 10|OppositePlayer, Assembly-CSharp
+    - Name: Reference
+      Entry: 7
+      Data: 11|ThisExecutePlayer, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -125,7 +131,7 @@ MonoBehaviour:
       Data: 
     - Name: Value
       Entry: 7
-      Data: 11|ThisCardPower, Assembly-CSharp
+      Data: 12|ThisCardPower, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -149,7 +155,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 12|System.Collections.Generic.List`1[[ICardPropertyData, Assembly-CSharp]],
+      Data: 13|System.Collections.Generic.List`1[[ICardPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12

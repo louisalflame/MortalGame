@@ -17,7 +17,7 @@ public class AllyInfoView : MonoBehaviour
     private DispositionView _dispositionView;
 
     [SerializeField]
-    private BuffCollectionView _buffCollectionView;
+    private PlayerBuffCollectionView _buffCollectionView;
     
     private IGameplayStatusWatcher _statusWatcher;
     private TopBarInfoView _topBarInfoView;

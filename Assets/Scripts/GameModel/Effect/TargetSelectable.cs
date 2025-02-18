@@ -17,17 +17,17 @@ public class NoneSelectable : IMainTargetSelectable
     public SelectType SelectType => SelectType.None;
 }
 
-public class PlayerSelectable : IMainTargetSelectable
+public class CharacterSelectable : IMainTargetSelectable
 {
     public SelectType SelectType => SelectType.Character;
 }
 
-public class AllySelectable : IMainTargetSelectable
+public class CharacterAllySelectable : IMainTargetSelectable
 {
     public SelectType SelectType => SelectType.AllyCharacter;
 }
 
-public class EnemySelectable : IMainTargetSelectable
+public class CharacterEnemySelectable : IMainTargetSelectable
 {
     public SelectType SelectType => SelectType.EnemyCharacter;
 }
@@ -37,12 +37,12 @@ public class CardSelectable : IMainTargetSelectable
     public SelectType SelectType => SelectType.Card;
 }
 
-public class AllyCardSelectable : IMainTargetSelectable
+public class CardAllySelectable : IMainTargetSelectable
 {
     public SelectType SelectType => SelectType.AllyCard;
 }
 
-public class EnemyCardSelectable : IMainTargetSelectable
+public class CardEnemySelectable : IMainTargetSelectable
 {
     public SelectType SelectType => SelectType.EnemyCard;
 }

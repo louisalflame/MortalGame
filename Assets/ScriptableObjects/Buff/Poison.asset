@@ -23,7 +23,7 @@ MonoBehaviour:
     SerializationNodes:
     - Name: Data
       Entry: 7
-      Data: 0|BuffData, Assembly-CSharp
+      Data: 0|PlayerBuffData, Assembly-CSharp
     - Name: ID
       Entry: 1
       Data: Poison
@@ -32,7 +32,7 @@ MonoBehaviour:
       Data: 999
     - Name: Effects
       Entry: 7
-      Data: 1|System.Collections.Generic.Dictionary`2[[BuffTiming, Assembly-CSharp],[IBuffEffect[],
+      Data: 1|System.Collections.Generic.Dictionary`2[[BuffTiming, Assembly-CSharp],[IPlayerBuffEffect[],
         Assembly-CSharp]], mscorlib
     - Name: comparer
       Entry: 7
@@ -58,7 +58,7 @@ MonoBehaviour:
       Data: 2
     - Name: $v
       Entry: 7
-      Data: 3|IBuffEffect[], Assembly-CSharp
+      Data: 3|IPlayerBuffEffect[], Assembly-CSharp
     - Name: 
       Entry: 12
       Data: 1
@@ -67,10 +67,16 @@ MonoBehaviour:
       Data: 4|EffectiveDamageBuffEffect, Assembly-CSharp
     - Name: Targets
       Entry: 7
-      Data: 5|SinglePlayerCollection, Assembly-CSharp
+      Data: 5|SingleCharacterCollection, Assembly-CSharp
     - Name: Target
       Entry: 7
-      Data: 6|ThisBuffOwner, Assembly-CSharp
+      Data: 6|MainCharacterOfPlayer, Assembly-CSharp
+    - Name: Player
+      Entry: 7
+      Data: 7|UsingBuffOwner, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -79,7 +85,7 @@ MonoBehaviour:
       Data: 
     - Name: Value
       Entry: 7
-      Data: 7|ThisBuffLevel, Assembly-CSharp
+      Data: 8|ThisBuffLevel, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -103,7 +109,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 8|System.Collections.Generic.List`1[[BuffPropertyData, Assembly-CSharp]],
+      Data: 9|System.Collections.Generic.List`1[[PlayerBuffPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12

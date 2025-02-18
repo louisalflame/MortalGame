@@ -25,6 +25,20 @@ public class ThisExecutePlayer : ITargetPlayerValue
     }
 }
 [Serializable]
+public class OppositePlayer : ITargetPlayerValue
+{    
+    public ITargetPlayerValue Reference;
+
+    public IPlayerEntity Eval(GameStatus gameStatus, GameContext context)
+    {
+        var reference = Reference.Eval(gameStatus, context);
+        return
+            reference.Faction == Faction.Ally ? gameStatus.Enemy : 
+            reference.Faction == Faction.Enemy ? gameStatus.Ally : 
+            PlayerEntity.DummyPlayer;
+    }
+}
+[Serializable]
 public class CardCaster : ITargetPlayerValue
 {
     public IPlayerEntity Eval(GameStatus gameStatus, GameContext context)
@@ -33,21 +47,15 @@ public class CardCaster : ITargetPlayerValue
     }
 }
 [Serializable]
-public class ThisBuffOwner : ITargetPlayerValue
+public class UsingBuffOwner : ITargetPlayerValue
 {
+    // TODO: refactor to OwnerOfBuff with reference to IBuffTarget
     public IPlayerEntity Eval(GameStatus gameStatus, GameContext context)
     {
         return context.UsingBuff.Owner;
     }
 }
-[Serializable]
-public class ThisBuffCaster : ITargetPlayerValue
-{
-    public IPlayerEntity Eval(GameStatus gameStatus, GameContext context)
-    {
-        return context.UsingBuff.Caster;
-    }
-}
+
 
 public interface ITargetPlayerCollectionValue
 {
@@ -69,21 +77,5 @@ public class SinglePlayerCollection : ITargetPlayerCollectionValue
     public IReadOnlyCollection<IPlayerEntity> Eval(GameStatus gameStatus, GameContext context)
     {
         return new [] { Target.Eval(gameStatus, context) };
-    }
-}
-[Serializable]
-public class OppositePlayers : ITargetPlayerCollectionValue
-{
-    public ITargetPlayerCollectionValue Reference;
-
-    public IReadOnlyCollection<IPlayerEntity> Eval(GameStatus gameStatus, GameContext context)
-    {
-        var references = Reference.Eval(gameStatus, context);
-        return references
-            .Select<IPlayerEntity, IPlayerEntity>(
-                reference => reference == gameStatus.Ally ? 
-                    gameStatus.Enemy : 
-                    gameStatus.Ally)
-            .ToArray();
     }
 }

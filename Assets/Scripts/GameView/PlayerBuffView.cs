@@ -5,7 +5,7 @@ using UniRx.Triggers;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BuffView : MonoBehaviour, IRecyclable
+public class PlayerBuffView : MonoBehaviour, IRecyclable
 {
     [SerializeField]
     private Image _buffIcon;
@@ -18,7 +18,7 @@ public class BuffView : MonoBehaviour, IRecyclable
     
     private CompositeDisposable _disposables = new CompositeDisposable();
 
-    public void SetBuffInfo(BuffInfo buffInfo, SimpleTitleIInfoHintView simpleHintView)
+    public void SetBuffInfo(PlayerBuffInfo buffInfo, SimpleTitleIInfoHintView simpleHintView)
     {
         _levelText.text = buffInfo.Level.ToString();
         
@@ -43,11 +43,4 @@ public class BuffView : MonoBehaviour, IRecyclable
         // Disposed object can't be reused by same instance.
         _disposables = new CompositeDisposable();
     }
-}
-
-public class BuffInfo
-{
-    public string Id;
-    public Guid Identity;
-    public int Level;
 }

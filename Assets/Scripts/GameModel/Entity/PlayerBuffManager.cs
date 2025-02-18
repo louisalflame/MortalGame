@@ -2,26 +2,26 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IBuffManager
+public interface IPlayerBuffManager
 {
-    IReadOnlyCollection<BuffEntity> Buffs { get; }
-    bool AddBuff(BuffLibrary buffLibrary, GameContext gameContext, string buffId, int level, out BuffEntity resultBuff);
-    bool RemoveBuff(BuffLibrary buffLibrary, GameContext gameContext, string buffId, out BuffEntity resultBuff);
+    IReadOnlyCollection<PlayerBuffEntity> Buffs { get; }
+    bool AddBuff(PlayerBuffLibrary buffLibrary, GameContext gameContext, string buffId, int level, out PlayerBuffEntity resultBuff);
+    bool RemoveBuff(PlayerBuffLibrary buffLibrary, GameContext gameContext, string buffId, out PlayerBuffEntity resultBuff);
 }
 
-public class BuffManager : IBuffManager
+public class PlayerBuffManager : IPlayerBuffManager
 {
     private GameContextManager _gameContextManager;
-    private List<BuffEntity> _buffs;
+    private List<PlayerBuffEntity> _buffs;
 
-    public IReadOnlyCollection<BuffEntity> Buffs => _buffs;
+    public IReadOnlyCollection<PlayerBuffEntity> Buffs => _buffs;
 
-    public BuffManager()
+    public PlayerBuffManager()
     {
-        _buffs = new List<BuffEntity>();
+        _buffs = new List<PlayerBuffEntity>();
     }
 
-    public bool AddBuff(BuffLibrary buffLibrary, GameContext gameContext, string buffId, int level, out BuffEntity resultBuff)
+    public bool AddBuff(PlayerBuffLibrary buffLibrary, GameContext gameContext, string buffId, int level, out PlayerBuffEntity resultBuff)
     {
         foreach (var existBuff in _buffs)
         {
@@ -34,7 +34,7 @@ public class BuffManager : IBuffManager
         }
 
         var buffEffects = buffLibrary.GetBuffEffects(buffId);
-        resultBuff = new BuffEntity(
+        resultBuff = new PlayerBuffEntity(
             buffId, 
             Guid.NewGuid(), 
             level, 
@@ -45,7 +45,7 @@ public class BuffManager : IBuffManager
         return true;
     }
     
-    public bool RemoveBuff(BuffLibrary buffLibrary, GameContext gameContext, string buffId, out BuffEntity resultBuff)
+    public bool RemoveBuff(PlayerBuffLibrary buffLibrary, GameContext gameContext, string buffId, out PlayerBuffEntity resultBuff)
     {
         foreach (var existBuff in _buffs)
         {

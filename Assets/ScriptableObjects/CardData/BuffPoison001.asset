@@ -107,11 +107,11 @@ MonoBehaviour:
       Data: 7|AddBuffEffect, Assembly-CSharp
     - Name: Targets
       Entry: 7
-      Data: 8|OppositePlayers, Assembly-CSharp
-    - Name: Reference
-      Entry: 7
-      Data: 9|SinglePlayerCollection, Assembly-CSharp
+      Data: 8|SinglePlayerCollection, Assembly-CSharp
     - Name: Target
+      Entry: 7
+      Data: 9|OppositePlayer, Assembly-CSharp
+    - Name: Reference
       Entry: 7
       Data: 10|ThisExecutePlayer, Assembly-CSharp
     - Name: 

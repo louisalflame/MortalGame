@@ -20,7 +20,7 @@ public class SimpleTitleIInfoHintView : MonoBehaviour
         _localizeLibrary = localizeLibrary;
     }
 
-    public void ShowBuffInfo(BuffInfo buffInfo, RectTransform targetRect)
+    public void ShowBuffInfo(PlayerBuffInfo buffInfo, RectTransform targetRect)
     {
         gameObject.SetActive(true);
 

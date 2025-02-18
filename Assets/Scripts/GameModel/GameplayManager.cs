@@ -406,10 +406,10 @@ public class GameplayManager : IGameplayStatusWatcher
                     var targets = damageEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var target in targets)
                     {
-                        using(_contextMgr.SetEffectTargetPlayer(target))
+                        using(_contextMgr.SetEffectTargetCharacter(target))
                         {
                             var damagePoint = damageEffect.Value.Eval(_gameStatus, _contextMgr.Context);
-                            var takeDamageResult = target.MainCharacter.HealthManager.TakeDamage(damagePoint, _contextMgr.Context);
+                            var takeDamageResult = target.HealthManager.TakeDamage(damagePoint, _contextMgr.Context);
                             _gameEvents.Add(new DamageEvent(target, takeDamageResult));
                         }
                     }
@@ -420,11 +420,11 @@ public class GameplayManager : IGameplayStatusWatcher
                     var targets = penetrateDamageEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var target in targets)
                     {
-                        using(_contextMgr.SetEffectTargetPlayer(target))
+                        using(_contextMgr.SetEffectTargetCharacter(target))
                         {
                             var damagePoint = penetrateDamageEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
-                            var takeDamageResult = target.MainCharacter.HealthManager.TakePenetrateDamage(damagePoint, _contextMgr.Context);
+                            var takeDamageResult = target.HealthManager.TakePenetrateDamage(damagePoint, _contextMgr.Context);
                             _gameEvents.Add(new DamageEvent(target, takeDamageResult));
                         }
                     }
@@ -435,11 +435,11 @@ public class GameplayManager : IGameplayStatusWatcher
                     var targets = additionalAttackEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var target in targets)
                     {
-                        using(_contextMgr.SetEffectTargetPlayer(target))
+                        using(_contextMgr.SetEffectTargetCharacter(target))
                         {
                             var damagePoint = additionalAttackEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
-                            var takeDamageResult = target.MainCharacter.HealthManager.TakeAdditionalDamage(damagePoint, _contextMgr.Context);
+                            var takeDamageResult = target.HealthManager.TakeAdditionalDamage(damagePoint, _contextMgr.Context);
                             _gameEvents.Add(new DamageEvent(target, takeDamageResult));
                         }
                     }
@@ -450,11 +450,11 @@ public class GameplayManager : IGameplayStatusWatcher
                     var targets = effectiveAttackEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var target in targets)
                     {
-                        using(_contextMgr.SetEffectTargetPlayer(target))
+                        using(_contextMgr.SetEffectTargetCharacter(target))
                         {
                             var damagePoint = effectiveAttackEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
-                            var takeDamageResult = target.MainCharacter.HealthManager.TakeEffectiveDamage(damagePoint, _contextMgr.Context);
+                            var takeDamageResult = target.HealthManager.TakeEffectiveDamage(damagePoint, _contextMgr.Context);
                             _gameEvents.Add(new DamageEvent(target, takeDamageResult));
                         }
                     }
@@ -465,11 +465,11 @@ public class GameplayManager : IGameplayStatusWatcher
                     var targets = healEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var target in targets)
                     {
-                        using(_contextMgr.SetEffectTargetPlayer(target))
+                        using(_contextMgr.SetEffectTargetCharacter(target))
                         {
                             var healPoint = healEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
-                            var getHealResult = target.MainCharacter.HealthManager.GetHeal(healPoint, _contextMgr.Context);
+                            var getHealResult = target.HealthManager.GetHeal(healPoint, _contextMgr.Context);
                             _gameEvents.Add(new GetHealEvent(target, getHealResult));
                         }
                     }
@@ -480,11 +480,11 @@ public class GameplayManager : IGameplayStatusWatcher
                     var targets = shieldEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var target in targets)
                     {
-                        using(_contextMgr.SetEffectTargetPlayer(target))
+                        using(_contextMgr.SetEffectTargetCharacter(target))
                         {
                             var shieldPoint = shieldEffect.Value.Eval(_gameStatus, _contextMgr.Context);
 
-                            var getShieldResult = target.MainCharacter.HealthManager.GetShield(shieldPoint, _contextMgr.Context);
+                            var getShieldResult = target.HealthManager.GetShield(shieldPoint, _contextMgr.Context);
                             _gameEvents.Add(new GetShieldEvent(target, getShieldResult));
                         }
                     }
@@ -516,6 +516,52 @@ public class GameplayManager : IGameplayStatusWatcher
 
                             var loseEnergyResult = target.EnergyManager.LoseEnergy(loseEnergy);
                             _gameEvents.Add(new LoseEnergyEvent(target, loseEnergyResult));
+                        }
+                    }
+                    break;
+                }
+
+                // === BUFF EFFECT ===
+                case AddBuffEffect addBuffEffect:
+                {
+                    var targets = addBuffEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
+                    foreach(var target in targets)
+                    {
+                        using(_contextMgr.SetEffectTargetPlayer(target))
+                        {
+                            var level = addBuffEffect.Level.Eval(_gameStatus, _contextMgr.Context);
+                            if (target.BuffManager.AddBuff(
+                                _contextMgr.BuffLibrary, 
+                                _contextMgr.Context, 
+                                addBuffEffect.BuffId, 
+                                level,
+                                out PlayerBuffEntity resultBuff))
+                            {
+                                _gameEvents.Add(new AddBuffEvent(target, resultBuff.ToInfo()));
+                            }
+                            else
+                            {
+                                _gameEvents.Add(new UpdateBuffEvent(target, resultBuff.ToInfo()));
+                            }
+                        }
+                    }
+                    break;
+                }
+                case RemoveBuffEffect removeBuffEffect:
+                {
+                    var targets = removeBuffEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
+                    foreach(var target in targets)
+                    {
+                        using(_contextMgr.SetEffectTargetPlayer(target))
+                        {
+                            if(target.BuffManager.RemoveBuff(
+                                _contextMgr.BuffLibrary, 
+                                _contextMgr.Context, 
+                                removeBuffEffect.BuffId,
+                                out PlayerBuffEntity resultBuff))
+                            {
+                                _gameEvents.Add(new RemoveBuffEvent(target, resultBuff.ToInfo()));
+                            }
                         }
                     }
                     break;
@@ -697,52 +743,6 @@ public class GameplayManager : IGameplayStatusWatcher
                     //TODO
                     break;
                 }
-
-                // === BUFF EFFECT ===
-                case AddBuffEffect addBuffEffect:
-                {
-                    var targets = addBuffEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
-                    foreach(var target in targets)
-                    {
-                        using(_contextMgr.SetEffectTargetPlayer(target))
-                        {
-                            var level = addBuffEffect.Level.Eval(_gameStatus, _contextMgr.Context);
-                            if (target.BuffManager.AddBuff(
-                                _contextMgr.BuffLibrary, 
-                                _contextMgr.Context, 
-                                addBuffEffect.BuffId, 
-                                level,
-                                out BuffEntity resultBuff))
-                            {
-                                _gameEvents.Add(new AddBuffEvent(target, resultBuff.ToInfo()));
-                            }
-                            else
-                            {
-                                _gameEvents.Add(new UpdateBuffEvent(target, resultBuff.ToInfo()));
-                            }
-                        }
-                    }
-                    break;
-                }
-                case RemoveBuffEffect removeBuffEffect:
-                {
-                    var targets = removeBuffEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
-                    foreach(var target in targets)
-                    {
-                        using(_contextMgr.SetEffectTargetPlayer(target))
-                        {
-                            if(target.BuffManager.RemoveBuff(
-                                _contextMgr.BuffLibrary, 
-                                _contextMgr.Context, 
-                                removeBuffEffect.BuffId,
-                                out BuffEntity resultBuff))
-                            {
-                                _gameEvents.Add(new RemoveBuffEvent(target, resultBuff.ToInfo()));
-                            }
-                        }
-                    }
-                    break;
-                }
             }
         }
     }
@@ -752,9 +752,9 @@ public class GameplayManager : IGameplayStatusWatcher
         var buffs = player.BuffManager.Buffs;
         foreach(var buff in buffs)
         {
-            using(_contextMgr.SetUsingBuff(buff))
+            using(_contextMgr.SetUsingPlayerBuff(buff))
             {
-        Debug.Log($"_TriggerBuffs buff:{buff} buffTiming:{buffTiming}");
+                Debug.Log($"_TriggerBuffs buff:{buff} buffTiming:{buffTiming}");
                 if (buff.Effects.TryGetValue(buffTiming, out var buffEffects))
                 {
                     foreach(var effect in buffEffects)
@@ -765,9 +765,11 @@ public class GameplayManager : IGameplayStatusWatcher
             }
         }
     }
-    private void _ApplyBuffEffect(IBuffEffect buffEffect)
+
+    // TODO: applu character buff <-> player buff
+    private void _ApplyBuffEffect(IPlayerBuffEffect buffEffect)
     {
-        using(_contextMgr.SetUsingBuffEffect(buffEffect))
+        using(_contextMgr.SetUsingPlayerBuffEffect(buffEffect))
         {
             switch(_contextMgr.Context.UsingBuffEffect)
             {
@@ -776,10 +778,10 @@ public class GameplayManager : IGameplayStatusWatcher
                     var targets = effectiveDamageBuffEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var target in targets)
                     {
-                        using(_contextMgr.SetEffectTargetPlayer(target))
+                        using(_contextMgr.SetEffectTargetCharacter(target))
                         {
                             var damagePoint = effectiveDamageBuffEffect.Value.Eval(_gameStatus, _contextMgr.Context);
-                            var takeDamageResult = target.MainCharacter.HealthManager.TakeEffectiveDamage(damagePoint, _contextMgr.Context);
+                            var takeDamageResult = target.HealthManager.TakeEffectiveDamage(damagePoint, _contextMgr.Context);
                             _gameEvents.Add(new DamageEvent(target, takeDamageResult));
                         }
                     }

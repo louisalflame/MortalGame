@@ -13,7 +13,7 @@ public interface IPlayerEntity
     int MaxEnergy { get; }
 
     IEnergyManager EnergyManager { get; }
-    IBuffManager BuffManager { get; }
+    IPlayerBuffManager BuffManager { get; }
     ICharacterEntity MainCharacter { get; }
 }
 
@@ -21,14 +21,14 @@ public abstract class PlayerEntity : IPlayerEntity
 {
     private readonly Faction _faction;
     private readonly IEnergyManager _energyManager;
-    private readonly IBuffManager _buffManager;
+    private readonly IPlayerBuffManager _buffManager;
     protected Option<Guid> _originPlayerInstanceGuid;
     protected IPlayerCardManager _cardManager;
     protected IReadOnlyCollection<CharacterEntity> _characters;
     
     public Faction Faction => _faction;
     public IEnergyManager EnergyManager => _energyManager;
-    public IBuffManager BuffManager => _buffManager;
+    public IPlayerBuffManager BuffManager => _buffManager;
     public int CurrentEnergy => EnergyManager.Energy;
     public int MaxEnergy => EnergyManager.MaxEnergy;
     public Option<Guid> OriginPlayerInstanceGuid => _originPlayerInstanceGuid;
@@ -40,7 +40,7 @@ public abstract class PlayerEntity : IPlayerEntity
     public ICharacterEntity MainCharacter => Characters.First();
 
     public bool IsDummy => this == DummyPlayer;
-    public static PlayerEntity DummyPlayer = new DummyPlayer();
+    public static IPlayerEntity DummyPlayer = new DummyPlayer();
 
     public PlayerEntity(
         Faction faction,
@@ -50,7 +50,7 @@ public abstract class PlayerEntity : IPlayerEntity
     {
         _faction = faction;
         _energyManager = new EnergyManager(currentEnergy, maxEnergy);
-        _buffManager = new BuffManager();
+        _buffManager = new PlayerBuffManager();
     }
 }
 
@@ -60,7 +60,7 @@ public class AllyEntity : PlayerEntity
 
     public AllyEntity(
         Guid originPlayerInstanceGuid,
-        CharacterEntity[] characters,
+        CharacterParameter[] characterParams,
         int currentEnergy,
         int maxEnergy,
         int handCardMaxCount,
@@ -74,7 +74,9 @@ public class AllyEntity : PlayerEntity
         )
     {
         _originPlayerInstanceGuid = originPlayerInstanceGuid.Some();
-        _characters = characters;
+        _characters = characterParams
+            .Select(param => CharacterEntity.Create(param, this))
+            .ToList();
         _cardManager = new PlayerCardManager(handCardMaxCount, deckInstance, this);
         DispositionManager = new DispositionManager(currentDisposition, maxDisposition);
     }
@@ -87,7 +89,7 @@ public class EnemyEntity : PlayerEntity
     public int TurnStartDrawCardCount;
 
     public EnemyEntity(
-        CharacterEntity[] characters,
+        CharacterParameter[] characterParams,
         int currentEnergy,
         int maxEnergy,
         int handCardMaxCount,
@@ -102,7 +104,9 @@ public class EnemyEntity : PlayerEntity
         )
     {
         _originPlayerInstanceGuid = Option.None<Guid>();
-        _characters = characters;
+        _characters = characterParams
+            .Select(param => CharacterEntity.Create(param, this))
+            .ToList();
         _cardManager = new PlayerCardManager(handCardMaxCount, enemyCardInstances, this);
         SelectedCards = new SelectedCardEntity(selectedCardMaxCount, new List<ICardEntity>());
         TurnStartDrawCardCount = turnStartDrawCardCount;
