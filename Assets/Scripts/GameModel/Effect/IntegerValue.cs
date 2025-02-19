@@ -39,6 +39,6 @@ public class ThisBuffLevel : IIntegerValue
 {
     public int Eval(GameStatus gameStatus, GameContext gameContext)
     {
-        return gameContext.UsingBuff.Level;
+        return gameContext.TriggeredBuff.Level;
     }
 }

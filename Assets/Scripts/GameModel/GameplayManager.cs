@@ -535,7 +535,7 @@ public class GameplayManager : IGameplayStatusWatcher
                                 _contextMgr.Context, 
                                 addBuffEffect.BuffId, 
                                 level,
-                                out PlayerBuffEntity resultBuff))
+                                out IPlayerBuffEntity resultBuff))
                             {
                                 _gameEvents.Add(new AddBuffEvent(target, resultBuff.ToInfo()));
                             }
@@ -558,7 +558,7 @@ public class GameplayManager : IGameplayStatusWatcher
                                 _contextMgr.BuffLibrary, 
                                 _contextMgr.Context, 
                                 removeBuffEffect.BuffId,
-                                out PlayerBuffEntity resultBuff))
+                                out IPlayerBuffEntity resultBuff))
                             {
                                 _gameEvents.Add(new RemoveBuffEvent(target, resultBuff.ToInfo()));
                             }
@@ -591,25 +591,11 @@ public class GameplayManager : IGameplayStatusWatcher
                             using(_contextMgr.SetEffectTargetPlayer(cardOwner))
                             using(_contextMgr.SetEffectTargetCard(card))
                             {
-                                if (cardOwner.CardManager.HandCard.RemoveCard(card)) 
+                                if (cardOwner.CardManager.TryDiscardCard(card.Identity, out var discardedCard)) 
                                 {
-                                    if (card.HasProperty(CardProperty.Dispose) ||
-                                        card.HasProperty(CardProperty.AutoDispose))
-                                    {
-                                        cardOwner.CardManager.DisposeZone.AddCard(card);
-                                    }
-                                    else if (card.HasProperty(CardProperty.Consumable))
-                                    {
-                                        cardOwner.CardManager.ExclusionZone.AddCard(card);
-                                    }
-                                    else
-                                    {
-                                        cardOwner.CardManager.Graveyard.AddCard(card);
-                                    }
-                                    
                                     _gameEvents.Add(new DiscardCardEvent(){
                                         Faction = cardOwner.Faction,
-                                        DiscardedCardInfo = new CardInfo(card, _contextMgr.Context),
+                                        DiscardedCardInfo = new CardInfo(discardedCard, _contextMgr.Context),
                                         HandCardInfo = cardOwner.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context),
                                         GraveyardInfo = cardOwner.CardManager.Graveyard.Cards.ToCardCollectionInfo(_contextMgr.Context),
                                         ExclusionZoneInfo = cardOwner.CardManager.ExclusionZone.Cards.ToCardCollectionInfo(_contextMgr.Context),
@@ -631,23 +617,11 @@ public class GameplayManager : IGameplayStatusWatcher
                             using(_contextMgr.SetEffectTargetPlayer(cardOwner))
                             using(_contextMgr.SetEffectTargetCard(card))
                             {
-                                // TODO: also check consume deck/graveyard/exclusionzone
-                                // should manage function inside CardManager
-                                if (cardOwner.CardManager.HandCard.RemoveCard(card)) 
-                                {
-                                    if (card.HasProperty(CardProperty.Dispose) ||
-                                        card.HasProperty(CardProperty.AutoDispose))
-                                    {
-                                        cardOwner.CardManager.DisposeZone.AddCard(card);
-                                    }
-                                    else
-                                    {
-                                        cardOwner.CardManager.ExclusionZone.AddCard(card);
-                                    }
-                                    
+                                if (cardOwner.CardManager.TryConsumeCard(card.Identity, out var consumedCard)) 
+                                {                                    
                                     _gameEvents.Add(new ConsumeCardEvent(){
                                         Faction = cardOwner.Faction,
-                                        ConsumedCardInfo = new CardInfo(card, _contextMgr.Context),
+                                        ConsumedCardInfo = new CardInfo(consumedCard, _contextMgr.Context),
                                         HandCardInfo = cardOwner.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context),
                                         ExclusionZoneInfo = cardOwner.CardManager.ExclusionZone.Cards.ToCardCollectionInfo(_contextMgr.Context),
                                     });
@@ -667,13 +641,11 @@ public class GameplayManager : IGameplayStatusWatcher
                             using(_contextMgr.SetEffectTargetPlayer(cardOwner))
                             using(_contextMgr.SetEffectTargetCard(card))
                             {
-                                if (cardOwner.CardManager.HandCard.RemoveCard(card)) 
-                                {
-                                    cardOwner.CardManager.DisposeZone.AddCard(card);
-                                    
+                                if (cardOwner.CardManager.TryDisposeCard(card.Identity, out var disposedCard)) 
+                                {                                    
                                     _gameEvents.Add(new DisposeCardEvent(){
                                         Faction = cardOwner.Faction,
-                                        DisposedCardInfo = new CardInfo(card, _contextMgr.Context),
+                                        DisposedCardInfo = new CardInfo(disposedCard, _contextMgr.Context),
                                         HandCardInfo = cardOwner.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context),
                                         DisposeZoneInfo = cardOwner.CardManager.DisposeZone.Cards.ToCardCollectionInfo(_contextMgr.Context),
                                     });
@@ -699,8 +671,12 @@ public class GameplayManager : IGameplayStatusWatcher
                         using(_contextMgr.SetEffectTargetPlayer(_contextMgr.Context.CardCaster))
                         using(_contextMgr.SetEffectTargetCard(card))
                         {
-                            //TODO create cardstatus into clone card
-                            var cloneCard = card.Clone(_contextMgr.Context.CardCaster);
+                            var addCardStatuses = cloneCardEffect.AddCardStatusDatas
+                                .Select(addData => {
+                                    var cardStatusData = _contextMgr.CardStatusLibrary.GetCardStatusData(addData.CardStatusId);
+                                    return CardStatusEntity.CreateEntity(cardStatusData);
+                                });
+                            var cloneCard = card.Clone(_contextMgr.Context.CardCaster, addCardStatuses);
 
                             CardCollectionInfo cardCollectionInfo = null;
                             switch(cloneCardEffect.CloneDestination)
@@ -752,7 +728,7 @@ public class GameplayManager : IGameplayStatusWatcher
         var buffs = player.BuffManager.Buffs;
         foreach(var buff in buffs)
         {
-            using(_contextMgr.SetUsingPlayerBuff(buff))
+            using(_contextMgr.SetTriggeredPlayerBuff(buff))
             {
                 Debug.Log($"_TriggerBuffs buff:{buff} buffTiming:{buffTiming}");
                 if (buff.Effects.TryGetValue(buffTiming, out var buffEffects))
@@ -769,9 +745,9 @@ public class GameplayManager : IGameplayStatusWatcher
     // TODO: applu character buff <-> player buff
     private void _ApplyBuffEffect(IPlayerBuffEffect buffEffect)
     {
-        using(_contextMgr.SetUsingPlayerBuffEffect(buffEffect))
+        using(_contextMgr.SetTriggeredPlayerBuffEffect(buffEffect))
         {
-            switch(_contextMgr.Context.UsingBuffEffect)
+            switch(_contextMgr.Context.TriggeredBuffEffect)
             {
                 case EffectiveDamageBuffEffect effectiveDamageBuffEffect:
                 {

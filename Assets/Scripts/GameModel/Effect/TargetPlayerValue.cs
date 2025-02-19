@@ -47,12 +47,14 @@ public class CardCaster : ITargetPlayerValue
     }
 }
 [Serializable]
-public class UsingBuffOwner : ITargetPlayerValue
+public class OwnerOfPlayerBuff : ITargetPlayerValue
 {
-    // TODO: refactor to OwnerOfBuff with reference to IBuffTarget
+    public ITargetPlayerBuffValue PlayerBuff;
+
     public IPlayerEntity Eval(GameStatus gameStatus, GameContext context)
     {
-        return context.UsingBuff.Owner;
+        var playerBuff = PlayerBuff.Eval(gameStatus, context);
+        return playerBuff.Owner;
     }
 }
 

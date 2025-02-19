@@ -12,7 +12,7 @@ public interface ICardStatusEntity
     void UpdateTiming(GameContextManager contextManager, CardTiming timing);
 }
 
-public abstract class CardStatusEntity : ICardStatusEntity
+public class CardStatusEntity : ICardStatusEntity
 {
     public string CardStatusDataID { get; private set; }
 
@@ -22,20 +22,28 @@ public abstract class CardStatusEntity : ICardStatusEntity
 
     public ICardStatusLifeTimeEntity LifeTime { get; private set; }
 
-    public CardStatusEntity(
+    private CardStatusEntity(
         string cardStatusDataID,
-        IReadOnlyDictionary<CardTiming, List<ICardEffect>> effects,
-        IReadOnlyCollection<ICardPropertyEntity> properties,
+        Dictionary<CardTiming, List<ICardEffect>> effects,
+        List<ICardPropertyEntity> properties,
         ICardStatusLifeTimeEntity lifeTime)
     {
         CardStatusDataID = cardStatusDataID;
-
-        Effects = effects.ToDictionary(
-            pair => pair.Key,
-            pair => pair.Value.ToList()
-        );
-        Properties = properties.ToList();
+        Effects = effects;
+        Properties = properties;
         LifeTime = lifeTime;
+    }
+
+    public static CardStatusEntity CreateEntity(CardStatusData data)
+    {
+        return new CardStatusEntity(
+            data.ID,
+            data.Effects.ToDictionary(
+                pair => pair.Key,
+                pair => pair.Value.ToList()),
+            data.PropertyDatas.Select(p => p.CreateEntity()).ToList(),
+            data.LifeTimeData.CreateEntity()
+        );
     }
 
     public void UpdateTiming(GameContextManager contextManager, CardTiming timing)

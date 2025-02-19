@@ -5,29 +5,17 @@ using System.Linq;
 using Optional;
 using UnityEngine;
 
-public interface IDeckEntity
+public interface IDeckEntity : ICardColletionZone
 {
-    IReadOnlyCollection<ICardEntity> Cards { get; }
-    Option<ICardEntity> GetCard(Guid cardIdentity);
     bool PopCard(out ICardEntity card);
     void EnqueueCardsThenShuffle(IEnumerable<ICardEntity> cards);
 }
-public class DeckEntity : IDeckEntity
-{
-    private List<ICardEntity> _cards;
-    public IReadOnlyCollection<ICardEntity> Cards => _cards;
-    
-    public DeckEntity(IEnumerable<CardInstance> cards, IPlayerEntity owner)
+public class DeckEntity : CardColletionZone, IDeckEntity
+{    
+    public DeckEntity(IEnumerable<CardInstance> cards, IPlayerEntity owner) : base()
     {
-        _cards = new List<ICardEntity>();
         EnqueueCardsThenShuffle(
             cards.Select(c => CardEntity.Create(c, owner)));
-    }
-
-    public Option<ICardEntity> GetCard(Guid cardIdentity)
-    {
-        var card = Cards.FirstOrDefault(c => c.Identity == cardIdentity);
-        return card.SomeNotNull();
     }
 
     public bool PopCard(out ICardEntity card)

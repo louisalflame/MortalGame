@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8ac2a4fc9a196c14aae99eace03b0275, type: 3}
-  m_Name: Poison
+  m_Name: ComboAttack
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -26,10 +26,10 @@ MonoBehaviour:
       Data: 0|PlayerBuffData, Assembly-CSharp
     - Name: ID
       Entry: 1
-      Data: Poison
+      Data: ComboAttack
     - Name: MaxLevel
       Entry: 3
-      Data: 999
+      Data: 99
     - Name: Effects
       Entry: 7
       Data: 1|System.Collections.Generic.Dictionary`2[[BuffTiming, Assembly-CSharp],[IPlayerBuffEffect[],
@@ -49,64 +49,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 2
-    - Name: $v
-      Entry: 7
-      Data: 3|IPlayerBuffEffect[], Assembly-CSharp
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 4|EffectiveDamageBuffEffect, Assembly-CSharp
-    - Name: Targets
-      Entry: 7
-      Data: 5|SingleCharacterCollection, Assembly-CSharp
-    - Name: Target
-      Entry: 7
-      Data: 6|MainCharacterOfPlayer, Assembly-CSharp
-    - Name: Player
-      Entry: 7
-      Data: 7|OwnerOfPlayerBuff, Assembly-CSharp
-    - Name: PlayerBuff
-      Entry: 7
-      Data: 8|TriggeredBuff, Assembly-CSharp
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: Value
-      Entry: 7
-      Data: 9|ThisBuffLevel, Assembly-CSharp
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+      Data: 0
     - Name: 
       Entry: 13
       Data: 
@@ -115,7 +58,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 10|System.Collections.Generic.List`1[[PlayerBuffPropertyData, Assembly-CSharp]],
+      Data: 3|System.Collections.Generic.List`1[[PlayerBuffPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12

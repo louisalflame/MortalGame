@@ -4,30 +4,30 @@ using UnityEngine;
 
 public interface IPlayerBuffManager
 {
-    IReadOnlyCollection<PlayerBuffEntity> Buffs { get; }
-    bool AddBuff(PlayerBuffLibrary buffLibrary, GameContext gameContext, string buffId, int level, out PlayerBuffEntity resultBuff);
-    bool RemoveBuff(PlayerBuffLibrary buffLibrary, GameContext gameContext, string buffId, out PlayerBuffEntity resultBuff);
+    IReadOnlyCollection<IPlayerBuffEntity> Buffs { get; }
+    bool AddBuff(PlayerBuffLibrary buffLibrary, GameContext gameContext, string buffId, int level, out IPlayerBuffEntity resultBuff);
+    bool RemoveBuff(PlayerBuffLibrary buffLibrary, GameContext gameContext, string buffId, out IPlayerBuffEntity resultBuff);
 }
 
 public class PlayerBuffManager : IPlayerBuffManager
 {
     private GameContextManager _gameContextManager;
-    private List<PlayerBuffEntity> _buffs;
+    private List<IPlayerBuffEntity> _buffs;
 
-    public IReadOnlyCollection<PlayerBuffEntity> Buffs => _buffs;
+    public IReadOnlyCollection<IPlayerBuffEntity> Buffs => _buffs;
 
     public PlayerBuffManager()
     {
-        _buffs = new List<PlayerBuffEntity>();
+        _buffs = new List<IPlayerBuffEntity>();
     }
 
-    public bool AddBuff(PlayerBuffLibrary buffLibrary, GameContext gameContext, string buffId, int level, out PlayerBuffEntity resultBuff)
+    public bool AddBuff(PlayerBuffLibrary buffLibrary, GameContext gameContext, string buffId, int level, out IPlayerBuffEntity resultBuff)
     {
         foreach (var existBuff in _buffs)
         {
             if (existBuff.Id == buffId)
             {
-                existBuff.Level += level;
+                existBuff.AddLevel(level);
                 resultBuff = existBuff;
                 return false;
             }
@@ -45,7 +45,7 @@ public class PlayerBuffManager : IPlayerBuffManager
         return true;
     }
     
-    public bool RemoveBuff(PlayerBuffLibrary buffLibrary, GameContext gameContext, string buffId, out PlayerBuffEntity resultBuff)
+    public bool RemoveBuff(PlayerBuffLibrary buffLibrary, GameContext gameContext, string buffId, out IPlayerBuffEntity resultBuff)
     {
         foreach (var existBuff in _buffs)
         {

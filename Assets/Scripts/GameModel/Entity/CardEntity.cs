@@ -21,7 +21,7 @@ public interface ICardEntity
 
     Dictionary<CardTiming, List<ICardEffect>> Effects { get; }
     IEnumerable<ICardPropertyEntity> Properties { get; }
-    IEnumerable<CardStatusEntity> StatusList { get; }
+    IEnumerable<ICardStatusEntity> StatusList { get; }
 
     IEnumerable<ICardPropertyEntity> AllProperties { get; }
 
@@ -32,7 +32,7 @@ public interface ICardEntity
 
     bool TryUpdateCardsOnTiming(GameContextManager contextManager, CardTiming timing, out IGameEvent gameEvent);
 
-    CardEntity Clone(IPlayerEntity cloneOwner);
+    ICardEntity Clone(IPlayerEntity cloneOwner, IEnumerable<ICardStatusEntity> cardStatuses);
 }
 
 public class CardEntity : ICardEntity
@@ -49,7 +49,7 @@ public class CardEntity : ICardEntity
     private List<ISubTargetSelectable> _subSelectables;
     private Dictionary<CardTiming, List<ICardEffect>> _effects;
     private List<ICardPropertyEntity> _properties;
-    private List<CardStatusEntity> _statusList;
+    private List<ICardStatusEntity> _statusList;
 
     private Option<IPlayerEntity> _owner;
 
@@ -65,7 +65,7 @@ public class CardEntity : ICardEntity
     public IEnumerable<ISubTargetSelectable> SubSelectables => _subSelectables;
     public Dictionary<CardTiming, List<ICardEffect>> Effects => _effects;
     public IEnumerable<ICardPropertyEntity> Properties => _properties;
-    public IEnumerable<CardStatusEntity> StatusList => _statusList;
+    public IEnumerable<ICardStatusEntity> StatusList => _statusList;
 
     public IEnumerable<ICardPropertyEntity> AllProperties => 
         Properties.Concat(StatusList.SelectMany(s => s.Properties));
@@ -102,7 +102,7 @@ public class CardEntity : ICardEntity
         IEnumerable<ISubTargetSelectable> subSelectables,
         Dictionary<CardTiming, List<ICardEffect>> effects,
         IEnumerable<ICardPropertyEntity> properties,
-        IEnumerable<CardStatusEntity> statusList,
+        IEnumerable<ICardStatusEntity> statusList,
         IPlayerEntity owner
     )
     {
@@ -125,7 +125,7 @@ public class CardEntity : ICardEntity
         _owner = owner.Some();
     }
 
-    public static CardEntity Create(CardInstance cardInstance, IPlayerEntity owner)
+    public static ICardEntity Create(CardInstance cardInstance, IPlayerEntity owner)
     {
         return new CardEntity(
             indentity: Guid.NewGuid(),
@@ -148,7 +148,7 @@ public class CardEntity : ICardEntity
         );
     }
 
-    public CardEntity Clone(IPlayerEntity cloneOwner)
+    public ICardEntity Clone(IPlayerEntity cloneOwner, IEnumerable<ICardStatusEntity> cardStatuses)
     {
         return new CardEntity(
             indentity: Guid.NewGuid(),
@@ -162,11 +162,10 @@ public class CardEntity : ICardEntity
             mainSelectable: _mainSelectable,
             subSelectables: _subSelectables,
             effects: _effects.ToDictionary(
-                    pair => pair.Key,
-                    pair => pair.Value.ToList()
-                ),
+                pair => pair.Key,
+                pair => pair.Value.ToList()),
             properties: _properties.ToList(),
-            statusList: new List<CardStatusEntity>(),
+            statusList: cardStatuses.ToList(),
             owner: cloneOwner
         );
     }

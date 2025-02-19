@@ -95,14 +95,14 @@ public class GameContextManager : IDisposable
         _contextStack.Push(Context.With(effectTargetCard: effectTarget));
         return this;
     }
-    public GameContextManager SetUsingPlayerBuff(PlayerBuffEntity usingBuff) 
+    public GameContextManager SetTriggeredPlayerBuff(IPlayerBuffEntity triggeredBuff) 
     {
-        _contextStack.Push(Context.With(usingBuff: usingBuff));
+        _contextStack.Push(Context.With(triggeredBuff: triggeredBuff));
         return this;
     }
-    public GameContextManager SetUsingPlayerBuffEffect(IPlayerBuffEffect usingBuffEffect) 
+    public GameContextManager SetTriggeredPlayerBuffEffect(IPlayerBuffEffect triggeredBuffEffect) 
     {
-        _contextStack.Push(Context.With(usingBuffEffect: usingBuffEffect));
+        _contextStack.Push(Context.With(triggeredBuffEffect: triggeredBuffEffect));
         return this;
     }
 }
@@ -120,8 +120,8 @@ public class GameContext
     public IPlayerEntity        EffectTargetPlayer;
     public ICharacterEntity     EffectTargetCharacter;
     public ICardEntity          EffectTargetCard;
-    public PlayerBuffEntity           UsingBuff;
-    public IPlayerBuffEffect          UsingBuffEffect;
+    public IPlayerBuffEntity    TriggeredBuff;
+    public IPlayerBuffEffect    TriggeredBuffEffect;
 
     public GameContext() { }
     public GameContext With(
@@ -136,8 +136,8 @@ public class GameContext
         IPlayerEntity       effectTargetPlayer = null,
         ICharacterEntity    effectTargetCharacter = null,
         ICardEntity         effectTargetCard = null,
-        PlayerBuffEntity          usingBuff = null,
-        IPlayerBuffEffect         usingBuffEffect = null)
+        IPlayerBuffEntity   triggeredBuff = null,
+        IPlayerBuffEffect   triggeredBuffEffect = null)
     {
         return new GameContext() 
         {
@@ -152,8 +152,8 @@ public class GameContext
             EffectTargetPlayer      = effectTargetPlayer ?? EffectTargetPlayer,
             EffectTargetCharacter   = effectTargetCharacter ?? EffectTargetCharacter,
             EffectTargetCard        = effectTargetCard ?? EffectTargetCard,
-            UsingBuff               = usingBuff ?? UsingBuff,
-            UsingBuffEffect         = usingBuffEffect ?? UsingBuffEffect
+            TriggeredBuff           = triggeredBuff ?? TriggeredBuff,
+            TriggeredBuffEffect     = triggeredBuffEffect ?? TriggeredBuffEffect
         };
     }
 }
