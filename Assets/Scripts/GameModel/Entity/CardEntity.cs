@@ -25,7 +25,7 @@ public interface ICardEntity
 
     IEnumerable<ICardPropertyEntity> AllProperties { get; }
 
-    Option<IPlayerEntity> Owner { get; }
+    IPlayerEntity Owner { get; }
 
     int EvalCost(GameContext gameContext);
     int EvalPower(GameContext gameContext);
@@ -33,6 +33,7 @@ public interface ICardEntity
     bool TryUpdateCardsOnTiming(GameContextManager contextManager, CardTiming timing, out IGameEvent gameEvent);
 
     ICardEntity Clone(IPlayerEntity cloneOwner, IEnumerable<ICardStatusEntity> cardStatuses);
+    void AddNewStatus(ICardStatusEntity status);
 }
 
 public class CardEntity : ICardEntity
@@ -50,8 +51,7 @@ public class CardEntity : ICardEntity
     private Dictionary<CardTiming, List<ICardEffect>> _effects;
     private List<ICardPropertyEntity> _properties;
     private List<ICardStatusEntity> _statusList;
-
-    private Option<IPlayerEntity> _owner;
+    private IPlayerEntity _owner;
 
     public Guid Identity => _indentity;
     public Option<Guid> OriginCardInstanceGuid => _originCardInstanceGuid;
@@ -66,12 +66,11 @@ public class CardEntity : ICardEntity
     public Dictionary<CardTiming, List<ICardEffect>> Effects => _effects;
     public IEnumerable<ICardPropertyEntity> Properties => _properties;
     public IEnumerable<ICardStatusEntity> StatusList => _statusList;
-
     public IEnumerable<ICardPropertyEntity> AllProperties => 
         Properties.Concat(StatusList.SelectMany(s => s.Properties));
-
-    public Option<IPlayerEntity> Owner => _owner;
+    public IPlayerEntity Owner => _owner;
     public bool IsDummy => this == DummyCard;
+
     public static ICardEntity DummyCard = new CardEntity(
         indentity: Guid.Empty,
         originCardInstanceGuid: Option.None<Guid>(),
@@ -122,10 +121,10 @@ public class CardEntity : ICardEntity
         );
         _properties = properties.ToList();
         _statusList = statusList.ToList();
-        _owner = owner.Some();
+        _owner = owner;
     }
 
-    public static ICardEntity Create(CardInstance cardInstance, IPlayerEntity owner)
+    public static ICardEntity CreateFromInstance(CardInstance cardInstance, IPlayerEntity owner)
     {
         return new CardEntity(
             indentity: Guid.NewGuid(),
@@ -143,6 +142,29 @@ public class CardEntity : ICardEntity
                     pair => pair.Value.ToList()
                 ),
             properties: cardInstance.PropertyDatas.Select(p => p.CreateEntity()),
+            statusList: new List<CardStatusEntity>(),
+            owner: owner
+        );
+    }
+
+    public static ICardEntity CreateFromData(CardData cardData, IPlayerEntity owner, IEnumerable<ICardStatusEntity> cardStatuses)
+    {
+        return new CardEntity(
+            indentity: Guid.NewGuid(),
+            originCardInstanceGuid: Option.None<Guid>(),
+            cardDataId: cardData.ID,
+            type: cardData.Type,
+            rarity: cardData.Rarity,
+            themes: cardData.Themes,
+            cost: cardData.Cost,
+            power: cardData.Power,
+            mainSelectable: cardData.MainSelectable,
+            subSelectables: cardData.SubSelectables,
+            effects: cardData.Effects.ToDictionary(
+                    pair => pair.Key,
+                    pair => pair.Value.ToList()
+                ),
+            properties: cardData.PropertyDatas.Select(p => p.CreateEntity()),
             statusList: new List<CardStatusEntity>(),
             owner: owner
         );
@@ -168,6 +190,11 @@ public class CardEntity : ICardEntity
             statusList: cardStatuses.ToList(),
             owner: cloneOwner
         );
+    }
+
+    public void AddNewStatus(ICardStatusEntity status)
+    {
+        _statusList.Add(status);
     }
 
     public int EvalCost(GameContext gameContext)

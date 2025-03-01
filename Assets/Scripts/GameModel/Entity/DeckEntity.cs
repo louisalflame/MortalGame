@@ -15,7 +15,7 @@ public class DeckEntity : CardColletionZone, IDeckEntity
     public DeckEntity(IEnumerable<CardInstance> cards, IPlayerEntity owner) : base()
     {
         EnqueueCardsThenShuffle(
-            cards.Select(c => CardEntity.Create(c, owner)));
+            cards.Select(c => CardEntity.CreateFromInstance(c, owner)));
     }
 
     public bool PopCard(out ICardEntity card)

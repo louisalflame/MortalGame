@@ -249,7 +249,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
                 switch(cloneCardEvent.CardCollectionType)
                 {
                     case CardCollectionType.HandCard:
-                        _allyHandCardView.CreateCardView(cloneCardEvent.ClonedCardInfo, cloneCardEvent.CardCollectionInfo);
+                        _allyHandCardView.CreateCardView(cloneCardEvent.CardInfo, cloneCardEvent.HandCardInfo);
                         break;
                     case CardCollectionType.Graveyard:
                     case CardCollectionType.Deck:

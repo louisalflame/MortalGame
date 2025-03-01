@@ -103,7 +103,10 @@ public class DisposeCardEffect : ICardEffect
 [Serializable]
 public class CreateCardEffect : ICardEffect
 {
-    public CardDataScriptable CardData;
+    public ITargetPlayerValue Target;
+    public CardDataScriptable[] CardDatas;
+    public AddCardStatusData[] AddCardStatusDatas;
+    public CardCollectionType CreateDestination;
 }
 [Serializable]
 public class CloneCardEffect : ICardEffect

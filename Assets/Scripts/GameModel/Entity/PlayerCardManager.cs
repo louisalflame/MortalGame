@@ -12,6 +12,7 @@ public interface IPlayerCardManager
     IGraveyardEntity Graveyard { get; }
     IExclusionZoneEntity ExclusionZone { get; }
     IDisposeZoneEntity DisposeZone { get; }
+    ICardColletionZone GetCardCollectionZone(CardCollectionType type);
 
     IEnumerable<IGameEvent> ClearHandOnTurnEnd(GameContextManager contextManager);
     
@@ -21,6 +22,7 @@ public interface IPlayerCardManager
     bool TryDiscardCard(Guid cardIdentity, out ICardEntity card);
     bool TryConsumeCard(Guid cardIdentity, out ICardEntity card);
     bool TryDisposeCard(Guid cardIdentity, out ICardEntity card);
+    void AddNewCard(ICardEntity card, CardCollectionType cloneDestination, GameContextManager contextManager);
 }
 
 public class PlayerCardManager : IPlayerCardManager
@@ -41,6 +43,24 @@ public class PlayerCardManager : IPlayerCardManager
         Graveyard = new GraveyardEntity();
         ExclusionZone = new ExclusionZoneEntity();
         DisposeZone = new DisposeZoneEntity();
+    }
+
+    public ICardColletionZone GetCardCollectionZone(CardCollectionType type)
+    {
+        switch(type)
+        {
+            case CardCollectionType.Deck:
+                return Deck;
+            case CardCollectionType.HandCard:
+                return HandCard;
+            case CardCollectionType.Graveyard:
+                return Graveyard;
+            case CardCollectionType.ExclusionZone:
+                return ExclusionZone;
+            default:
+            case CardCollectionType.DisposeZone:
+                return DisposeZone;
+        }
     }
 
     public IEnumerable<IGameEvent> ClearHandOnTurnEnd(GameContextManager contextManager)
@@ -207,5 +227,28 @@ public class PlayerCardManager : IPlayerCardManager
         }
 
         return false;
+    }
+    
+    public void AddNewCard(ICardEntity newCard, CardCollectionType cloneDestination, GameContextManager contextMgr)
+    {
+        switch(cloneDestination)
+        {
+            case CardCollectionType.Deck:
+                Deck.EnqueueCardsThenShuffle(new[] { newCard });
+                break;
+            case CardCollectionType.HandCard:
+                HandCard.AddCard(newCard);
+                break;
+            case CardCollectionType.Graveyard:
+                Graveyard.AddCard(newCard);
+                break;
+            case CardCollectionType.ExclusionZone:
+                ExclusionZone.AddCard(newCard);
+                break;
+            default:
+            case CardCollectionType.DisposeZone:
+                DisposeZone.AddCard(newCard);
+                break;
+        }
     }
 }

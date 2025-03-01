@@ -288,14 +288,14 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
     public void RemoveCardView(DiscardCardEvent discardCardEvent)
     {
         _cardCollectionInfo = discardCardEvent.HandCardInfo;
-        if(_cardViewDict.TryGetValue(discardCardEvent.DiscardedCardInfo.Identity, out var cardView))
+        if(_cardViewDict.TryGetValue(discardCardEvent.CardInfo.Identity, out var cardView))
         {
             _cardViews.Remove(cardView);
-            _cardViewDict.Remove(discardCardEvent.DiscardedCardInfo.Identity);
+            _cardViewDict.Remove(discardCardEvent.CardInfo.Identity);
             _cardViewFactory.RecyclePrefab(cardView);
 
             foreach(var view in _cardViews)
-                view.RemoveLocationOffset(discardCardEvent.DiscardedCardInfo.Identity, _focusDuration);
+                view.RemoveLocationOffset(discardCardEvent.CardInfo.Identity, _focusDuration);
             _RearrangeCardViews();
         }
     }

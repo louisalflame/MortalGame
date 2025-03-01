@@ -586,24 +586,14 @@ public class GameplayManager : IGameplayStatusWatcher
                     var cards = discardCardEffect.TargetCards.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var card in cards)
                     {
-                        card.Owner.MatchSome(cardOwner =>
+                        using(_contextMgr.SetEffectTargetPlayer(card.Owner))
+                        using(_contextMgr.SetEffectTargetCard(card))
                         {
-                            using(_contextMgr.SetEffectTargetPlayer(cardOwner))
-                            using(_contextMgr.SetEffectTargetCard(card))
+                            if (card.Owner.CardManager.TryDiscardCard(card.Identity, out var discardedCard)) 
                             {
-                                if (cardOwner.CardManager.TryDiscardCard(card.Identity, out var discardedCard)) 
-                                {
-                                    _gameEvents.Add(new DiscardCardEvent(){
-                                        Faction = cardOwner.Faction,
-                                        DiscardedCardInfo = new CardInfo(discardedCard, _contextMgr.Context),
-                                        HandCardInfo = cardOwner.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context),
-                                        GraveyardInfo = cardOwner.CardManager.Graveyard.Cards.ToCardCollectionInfo(_contextMgr.Context),
-                                        ExclusionZoneInfo = cardOwner.CardManager.ExclusionZone.Cards.ToCardCollectionInfo(_contextMgr.Context),
-                                        DisposeZoneInfo = cardOwner.CardManager.DisposeZone.Cards.ToCardCollectionInfo(_contextMgr.Context)
-                                    });
-                                }
+                                _gameEvents.Add(new DiscardCardEvent(discardedCard, _contextMgr));
                             }
-                        });
+                        }
                     }
                     break;
                 }
@@ -612,22 +602,14 @@ public class GameplayManager : IGameplayStatusWatcher
                     var cards = consumeCardEffect.TargetCards.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var card in cards)
                     {
-                        card.Owner.MatchSome(cardOwner =>
+                        using(_contextMgr.SetEffectTargetPlayer(card.Owner))
+                        using(_contextMgr.SetEffectTargetCard(card))
                         {
-                            using(_contextMgr.SetEffectTargetPlayer(cardOwner))
-                            using(_contextMgr.SetEffectTargetCard(card))
-                            {
-                                if (cardOwner.CardManager.TryConsumeCard(card.Identity, out var consumedCard)) 
-                                {                                    
-                                    _gameEvents.Add(new ConsumeCardEvent(){
-                                        Faction = cardOwner.Faction,
-                                        ConsumedCardInfo = new CardInfo(consumedCard, _contextMgr.Context),
-                                        HandCardInfo = cardOwner.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context),
-                                        ExclusionZoneInfo = cardOwner.CardManager.ExclusionZone.Cards.ToCardCollectionInfo(_contextMgr.Context),
-                                    });
-                                }
+                            if (card.Owner.CardManager.TryConsumeCard(card.Identity, out var consumedCard)) 
+                            {                                    
+                                _gameEvents.Add(new ConsumeCardEvent(consumedCard, _contextMgr));
                             }
-                        });
+                        }
                     }
                     break;
                 }
@@ -636,39 +618,44 @@ public class GameplayManager : IGameplayStatusWatcher
                     var cards = disposeCardEffect.TargetCards.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var card in cards)
                     {
-                        card.Owner.MatchSome(cardOwner =>
+                        using(_contextMgr.SetEffectTargetPlayer(card.Owner))
+                        using(_contextMgr.SetEffectTargetCard(card))
                         {
-                            using(_contextMgr.SetEffectTargetPlayer(cardOwner))
-                            using(_contextMgr.SetEffectTargetCard(card))
-                            {
-                                if (cardOwner.CardManager.TryDisposeCard(card.Identity, out var disposedCard)) 
-                                {                                    
-                                    _gameEvents.Add(new DisposeCardEvent(){
-                                        Faction = cardOwner.Faction,
-                                        DisposedCardInfo = new CardInfo(disposedCard, _contextMgr.Context),
-                                        HandCardInfo = cardOwner.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context),
-                                        DisposeZoneInfo = cardOwner.CardManager.DisposeZone.Cards.ToCardCollectionInfo(_contextMgr.Context),
-                                    });
-                                }
+                            if (card.Owner.CardManager.TryDisposeCard(card.Identity, out var disposedCard)) 
+                            {                                    
+                                _gameEvents.Add(new DisposeCardEvent(disposedCard, _contextMgr));
                             }
-                        });
+                        }
                     }
                     break;
                 }
 
                 case CreateCardEffect createCardEffect:
                 {
-                    //TODO
-                    break;
+                    var target = createCardEffect.Target.Eval(_gameStatus, _contextMgr.Context);
+                    using(_contextMgr.SetEffectTargetPlayer(target))
+                    {
+                        foreach(var cardData in createCardEffect.CardDatas)
+                        {
+                            var addCardStatuses = createCardEffect.AddCardStatusDatas
+                                .Select(addData => {
+                                    var cardStatusData = _contextMgr.CardStatusLibrary.GetCardStatusData(addData.CardStatusId);
+                                    return CardStatusEntity.CreateEntity(cardStatusData);
+                                });
+                            var cardEntity = CardEntity.CreateFromData(cardData.Data, target, addCardStatuses);
+                            target.CardManager.AddNewCard(cardEntity, createCardEffect.CreateDestination, _contextMgr);
+
+                            _gameEvents.Add(new CreateCardEvent(cardEntity, createCardEffect.CreateDestination, _contextMgr));
+                        }
+                        break;                        
+                    }
                 }
                 case CloneCardEffect cloneCardEffect:
                 {
                     var cards = cloneCardEffect.TargetCards.Eval(_gameStatus, _contextMgr.Context);
                     foreach(var card in cards)
                     {
-                        Debug.Log($"CloneCardEffect card:{card.CardDataId}");
-
-                        using(_contextMgr.SetEffectTargetPlayer(_contextMgr.Context.CardCaster))
+                        using(_contextMgr.SetEffectTargetPlayer(card.Owner))
                         using(_contextMgr.SetEffectTargetCard(card))
                         {
                             var addCardStatuses = cloneCardEffect.AddCardStatusDatas
@@ -676,47 +663,36 @@ public class GameplayManager : IGameplayStatusWatcher
                                     var cardStatusData = _contextMgr.CardStatusLibrary.GetCardStatusData(addData.CardStatusId);
                                     return CardStatusEntity.CreateEntity(cardStatusData);
                                 });
-                            var cloneCard = card.Clone(_contextMgr.Context.CardCaster, addCardStatuses);
-
-                            CardCollectionInfo cardCollectionInfo = null;
-                            switch(cloneCardEffect.CloneDestination)
-                            {
-                                case CardCollectionType.Deck:
-                                    _contextMgr.Context.CardCaster.CardManager.Deck.EnqueueCardsThenShuffle(new[] { cloneCard });
-                                    cardCollectionInfo = _contextMgr.Context.CardCaster.CardManager.Deck.Cards.ToCardCollectionInfo(_contextMgr.Context);
-                                    break;
-                                case CardCollectionType.HandCard:
-                                    _contextMgr.Context.CardCaster.CardManager.HandCard.AddCard(cloneCard);
-                                    cardCollectionInfo = _contextMgr.Context.CardCaster.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context);
-                                    break;
-                                case CardCollectionType.Graveyard:
-                                    _contextMgr.Context.CardCaster.CardManager.Graveyard.AddCard(cloneCard);
-                                    cardCollectionInfo = _contextMgr.Context.CardCaster.CardManager.Graveyard.Cards.ToCardCollectionInfo(_contextMgr.Context);
-                                    break;
-                                case CardCollectionType.ExclusionZone:
-                                    _contextMgr.Context.CardCaster.CardManager.ExclusionZone.AddCard(cloneCard);
-                                    cardCollectionInfo = _contextMgr.Context.CardCaster.CardManager.ExclusionZone.Cards.ToCardCollectionInfo(_contextMgr.Context);
-                                    break;
-                                default:
-                                case CardCollectionType.DisposeZone:
-                                    _contextMgr.Context.CardCaster.CardManager.DisposeZone.AddCard(cloneCard);
-                                    cardCollectionInfo = _contextMgr.Context.CardCaster.CardManager.DisposeZone.Cards.ToCardCollectionInfo(_contextMgr.Context);
-                                    break;
-                            }
+                            var cloneCard = card.Clone(card.Owner, addCardStatuses);
+                            card.Owner.CardManager.AddNewCard(cloneCard, cloneCardEffect.CloneDestination, _contextMgr);
                             
-                            _gameEvents.Add(new CloneCardEvent(){
-                                Faction = _contextMgr.Context.CardCaster.Faction,
-                                ClonedCardInfo = new CardInfo(cloneCard, _contextMgr.Context),
-                                CardCollectionType = cloneCardEffect.CloneDestination,
-                                CardCollectionInfo = cardCollectionInfo,
-                            });
+                            _gameEvents.Add(new CloneCardEvent(cloneCard, cloneCardEffect.CloneDestination, _contextMgr));
                         }
                     }
                     break;
                 }
                 case AppendCardStatusEffect appendCardStatusEffect:
                 {
-                    //TODO
+                    var cards = appendCardStatusEffect.TargetCards.Eval(_gameStatus, _contextMgr.Context);
+                    foreach(var card in cards)
+                    {
+                        using(_contextMgr.SetEffectTargetPlayer(card.Owner))
+                        using(_contextMgr.SetEffectTargetCard(card))
+                        {
+                            var addCardStatuses = appendCardStatusEffect.AddCardStatusDatas
+                                .Select(addData => {
+                                    var cardStatusData = _contextMgr.CardStatusLibrary.GetCardStatusData(addData.CardStatusId);
+                                    return CardStatusEntity.CreateEntity(cardStatusData);
+                                });
+                            
+                            foreach(var addCardStatus in addCardStatuses)
+                            {
+                                card.AddNewStatus(addCardStatus);
+                            }
+                            
+                            _gameEvents.Add(new AppendCardStatusEvent(card, _contextMgr));
+                        }
+                    }
                     break;
                 }
             }

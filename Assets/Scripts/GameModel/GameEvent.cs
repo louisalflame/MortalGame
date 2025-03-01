@@ -49,37 +49,71 @@ public class DrawCardEvent : IGameEvent
     public CardCollectionInfo DeckInfo;
     public CardCollectionInfo HandCardInfo;
 }
-public class DiscardCardEvent : IGameEvent
+
+public abstract class CardEvent : IGameEvent
 {
     public Faction Faction;
-    public CardInfo DiscardedCardInfo;
+    public CardInfo CardInfo;
     public CardCollectionInfo HandCardInfo;
     public CardCollectionInfo GraveyardInfo;
     public CardCollectionInfo ExclusionZoneInfo;
     public CardCollectionInfo DisposeZoneInfo;
-}
-public class ConsumeCardEvent : IGameEvent
-{
-    public Faction Faction;
-    public CardInfo ConsumedCardInfo;
-    public CardCollectionInfo HandCardInfo;
-    public CardCollectionInfo ExclusionZoneInfo;
-    public CardCollectionInfo DisposeZoneInfo;
-}
-public class DisposeCardEvent : IGameEvent
-{
-    public Faction Faction;
-    public CardInfo DisposedCardInfo;
-    public CardCollectionInfo HandCardInfo;
-    public CardCollectionInfo DisposeZoneInfo;
-}
 
-public class CloneCardEvent : IGameEvent
+    public CardEvent(ICardEntity card, GameContextManager contextMgr)
+    {
+        Faction = card.Owner.Faction;
+        CardInfo = new CardInfo(card, contextMgr.Context);
+        HandCardInfo = card.Owner.CardManager.HandCard.Cards.ToCardCollectionInfo(contextMgr.Context);
+        GraveyardInfo = card.Owner.CardManager.Graveyard.Cards.ToCardCollectionInfo(contextMgr.Context);
+        ExclusionZoneInfo = card.Owner.CardManager.ExclusionZone.Cards.ToCardCollectionInfo(contextMgr.Context);
+        DisposeZoneInfo = card.Owner.CardManager.DisposeZone.Cards.ToCardCollectionInfo(contextMgr.Context);
+    }
+}
+public class DiscardCardEvent : CardEvent
+{
+    public DiscardCardEvent(ICardEntity card, GameContextManager contextMgr) :
+        base(card, contextMgr) { }
+}
+public class ConsumeCardEvent : CardEvent
+{
+    public ConsumeCardEvent(ICardEntity card, GameContextManager contextMgr) :
+        base(card, contextMgr) { }
+}
+public class DisposeCardEvent : CardEvent
+{
+    public DisposeCardEvent(ICardEntity card, GameContextManager contextMgr) :
+        base(card, contextMgr) { }
+}
+public class CreateCardEvent : CardEvent
+{
+    public CardCollectionType CardCollectionType;
+
+    public CreateCardEvent(ICardEntity card, CardCollectionType cardCollectionType, GameContextManager contextMgr) :
+        base(card, contextMgr) 
+    {
+        CardCollectionType = cardCollectionType;
+    }
+}
+public class CloneCardEvent : CardEvent
+{
+    public CardCollectionType CardCollectionType;
+    
+    public CloneCardEvent(ICardEntity card, CardCollectionType cardCollectionType, GameContextManager contextMgr) :
+        base(card, contextMgr)
+    {
+        CardCollectionType = cardCollectionType;
+    }
+}
+public class AppendCardStatusEvent : IGameEvent
 {
     public Faction Faction;
-    public CardInfo ClonedCardInfo;
-    public CardCollectionType CardCollectionType;
-    public CardCollectionInfo CardCollectionInfo;
+    public CardInfo CardInfo;
+
+    public AppendCardStatusEvent(ICardEntity card, GameContextManager contextMgr)
+    {
+        Faction = card.Owner.Faction;
+        CardInfo = new CardInfo(card, contextMgr.Context);
+    }
 }
 
 public class EnemySelectCardEvent : IGameEvent

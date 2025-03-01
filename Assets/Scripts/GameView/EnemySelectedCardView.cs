@@ -72,10 +72,10 @@ public class EnemySelectedCardView : MonoBehaviour
     }
     public void RemoveCardView(DiscardCardEvent discardCardEvent)
     {
-        if(_cardViewDict.TryGetValue(discardCardEvent.DiscardedCardInfo.Identity, out var cardView))
+        if(_cardViewDict.TryGetValue(discardCardEvent.CardInfo.Identity, out var cardView))
         {
             _cardViews.Remove(cardView);
-            _cardViewDict.Remove(discardCardEvent.DiscardedCardInfo.Identity);
+            _cardViewDict.Remove(discardCardEvent.CardInfo.Identity);
             _cardViewFactory.RecyclePrefab(cardView);
 
             _RearrangeCardViews();
