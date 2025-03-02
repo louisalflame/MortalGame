@@ -19,39 +19,38 @@ public enum GameState
 
 public class GameStatus
 {
-    public int Round { get; private set; }
+    public int TurnCount { get; private set; }
     public GameState State { get; private set; }
     public AllyEntity Ally { get; private set; }
     public EnemyEntity Enemy { get; private set; }
     public ICharacterManager CharacterManager { get; private set; }
+    public TurnStatus TurnStatus { get; private set; }
 
     public GameStatus(
-        int round,
+        int turnCount,
         GameState state,
         AllyEntity player,
         EnemyEntity enemy) 
     {
-        Round = round;
+        TurnCount = turnCount;
         State = state;
         Ally = player;
         Enemy = enemy;
         CharacterManager = new CharacterManager();
         CharacterManager.AddCharacters(player.Characters);
         CharacterManager.AddCharacters(enemy.Characters);
+        TurnStatus = new TurnStatus();
+    } 
+
+    public void SetState(GameState state)
+    {
+        State = state;
     }
 
-    public GameStatus With(
-        int round = -1,
-        GameState state = GameState.None,
-        AllyEntity player = null,
-        EnemyEntity enemy = null)
+    public void SetNewTurn()
     {
-        return new GameStatus(
-            round: round == -1 ? Round : round,
-            state: state == GameState.None ? State : state,
-            player: player ?? Ally,
-            enemy: enemy ?? Enemy
-        );
+        TurnCount++;
+        TurnStatus = new TurnStatus();
     }
 }
 

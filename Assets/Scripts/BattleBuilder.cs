@@ -31,7 +31,7 @@ public class BattleBuidler
     public GameStatus ConstructBattle(GameContextManager gameContextManager)
     { 
         var initialState = new GameStatus(
-            round: 0,
+            turnCount: 0,
             state: GameState.GameStart,
             player: _ParseAlly(_context.Ally, gameContextManager),
             enemy: _ParseEnemy(_context.AllEnemies[0])

@@ -31,7 +31,8 @@ public class GameContextManager : IDisposable
     {
         if (_contextStack.Count > 1) 
         {
-            _contextStack.Pop();
+            var context = _contextStack.Pop();
+            context.Dispose();
         }
     }
 
@@ -107,7 +108,7 @@ public class GameContextManager : IDisposable
     }
 }
 
-public class GameContext
+public class GameContext : IDisposable
 {
     public IPlayerEntity        ExecutePlayer;
     public IPlayerEntity        CardCaster;
@@ -155,5 +156,21 @@ public class GameContext
             TriggeredBuff           = triggeredBuff ?? TriggeredBuff,
             TriggeredBuffEffect     = triggeredBuffEffect ?? TriggeredBuffEffect
         };
+    }
+
+    public void Dispose() 
+    {
+        ExecutePlayer = null;
+        CardCaster = null;
+        SelectedPlayer = null;
+        SelectedCharacter = null;
+        SelectedCard = null;
+        UsingCard = null;
+        UsingCardEffect = null;
+        EffectTargetPlayer = null;
+        EffectTargetCharacter = null;
+        EffectTargetCard = null;
+        TriggeredBuff = null;
+        TriggeredBuffEffect = null; 
     }
 }
