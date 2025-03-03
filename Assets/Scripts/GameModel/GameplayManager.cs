@@ -163,7 +163,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
     {
         _gameEvents.Add(new PlayerExecuteStartEvent() {
             Faction = _gameStatus.Ally.Faction,
-            HandCardInfo = _gameStatus.Ally.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context)
+            HandCardInfo = _gameStatus.Ally.CardManager.HandCard.ToCardCollectionInfo(_contextMgr.Context)
         });
 
         _gameStatus.SetState(GameState.PlayerExecute);
@@ -208,7 +208,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                             _UseCard(player, useCardAction.CardIndentity);
                             _gameEvents.Add(new PlayerExecuteStartEvent(){
                                 Faction = player.Faction,
-                                HandCardInfo = player.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context)
+                                HandCardInfo = player.CardManager.HandCard.ToCardCollectionInfo(_contextMgr.Context)
                             });
                         }
                         break;
@@ -228,7 +228,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
     {
         _gameEvents.Add(new PlayerExecuteEndEvent(){
             Faction = _gameStatus.Ally.Faction,
-            HandCardInfo = _gameStatus.Ally.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context)
+            HandCardInfo = _gameStatus.Ally.CardManager.HandCard.ToCardCollectionInfo(_contextMgr.Context)
         });
         
         _TriggerBuffs(_gameStatus.Ally, BuffTiming.OnExecuteEnd);
@@ -342,8 +342,8 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                             useCardEvents.Add(new UsedCardEvent() {
                                 Faction = player.Faction,
                                 UsedCardInfo = usedCardInfo,
-                                HandCardInfo = player.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context),
-                                GraveyardInfo = player.CardManager.Graveyard.Cards.ToCardCollectionInfo(_contextMgr.Context)
+                                HandCardInfo = player.CardManager.HandCard.ToCardCollectionInfo(_contextMgr.Context),
+                                GraveyardInfo = player.CardManager.Graveyard.ToCardCollectionInfo(_contextMgr.Context)
                             });
                         }
                     }
@@ -370,8 +370,8 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 player.CardManager.Deck.EnqueueCardsThenShuffle(graveyardCards);
                 _gameEvents.Add(new RecycleGraveyardEvent() {
                     Faction = player.Faction,
-                    DeckInfo = player.CardManager.Deck.Cards.ToCardCollectionInfo(_contextMgr.Context),
-                    GraveyardInfo = player.CardManager.Graveyard.Cards.ToCardCollectionInfo(_contextMgr.Context)
+                    DeckInfo = player.CardManager.Deck.ToCardCollectionInfo(_contextMgr.Context),
+                    GraveyardInfo = player.CardManager.Graveyard.ToCardCollectionInfo(_contextMgr.Context)
                 });
             }
 
@@ -395,8 +395,8 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
             IGameEvent drawCardEvent = new DrawCardEvent(){
                 Faction = player.Faction,
                 NewCardInfo = newCardInfo,
-                HandCardInfo = player.CardManager.HandCard.Cards.ToCardCollectionInfo(_contextMgr.Context),
-                DeckInfo = player.CardManager.Deck.Cards.ToCardCollectionInfo(_contextMgr.Context)
+                HandCardInfo = player.CardManager.HandCard.ToCardCollectionInfo(_contextMgr.Context),
+                DeckInfo = player.CardManager.Deck.ToCardCollectionInfo(_contextMgr.Context)
             };
             return drawCardEvent.Some();
         }
@@ -599,9 +599,10 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                         using(_contextMgr.SetEffectTargetPlayer(card.Owner))
                         using(_contextMgr.SetEffectTargetCard(card))
                         {
-                            if (card.Owner.CardManager.TryDiscardCard(card.Identity, out var discardedCard)) 
+                            if (card.Owner.CardManager.TryDiscardCard(
+                                card.Identity, out var discardedCard, out var start, out var destination)) 
                             {
-                                cardEffectEvents.Add(new DiscardCardEvent(discardedCard, _contextMgr));
+                                cardEffectEvents.Add(new DiscardCardEvent(discardedCard, _contextMgr, start, destination));
                             }
                         }
                     }
@@ -615,9 +616,9 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                         using(_contextMgr.SetEffectTargetPlayer(card.Owner))
                         using(_contextMgr.SetEffectTargetCard(card))
                         {
-                            if (card.Owner.CardManager.TryConsumeCard(card.Identity, out var consumedCard)) 
+                            if (card.Owner.CardManager.TryConsumeCard(card.Identity, out var consumedCard, out var start, out var destination)) 
                             {                                    
-                                cardEffectEvents.Add(new ConsumeCardEvent(consumedCard, _contextMgr));
+                                cardEffectEvents.Add(new ConsumeCardEvent(consumedCard, _contextMgr, start, destination));
                             }
                         }
                     }
@@ -631,9 +632,9 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                         using(_contextMgr.SetEffectTargetPlayer(card.Owner))
                         using(_contextMgr.SetEffectTargetCard(card))
                         {
-                            if (card.Owner.CardManager.TryDisposeCard(card.Identity, out var disposedCard)) 
+                            if (card.Owner.CardManager.TryDisposeCard(card.Identity, out var disposedCard, out var start, out var destination)) 
                             {                                    
-                                cardEffectEvents.Add(new DisposeCardEvent(disposedCard, _contextMgr));
+                                cardEffectEvents.Add(new DisposeCardEvent(disposedCard, _contextMgr, start, destination));
                             }
                         }
                     }
@@ -654,7 +655,8 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                             var cardEntity = CardEntity.CreateFromData(cardData.Data, target, addCardStatuses);
                             target.CardManager.AddNewCard(cardEntity, createCardEffect.CreateDestination, _contextMgr);
 
-                            cardEffectEvents.Add(new CreateCardEvent(cardEntity, createCardEffect.CreateDestination, _contextMgr));
+                            var destination = target.CardManager.GetCardCollectionZone( createCardEffect.CreateDestination);
+                            cardEffectEvents.Add(new CreateCardEvent(cardEntity, _contextMgr, destination));
                         }
                         break;                        
                     }
@@ -675,7 +677,8 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                             var cloneCard = card.Clone(card.Owner, addCardStatuses);
                             card.Owner.CardManager.AddNewCard(cloneCard, cloneCardEffect.CloneDestination, _contextMgr);
                             
-                            cardEffectEvents.Add(new CloneCardEvent(cloneCard, cloneCardEffect.CloneDestination, _contextMgr));
+                            var destination = card.Owner.CardManager.GetCardCollectionZone(cloneCardEffect.CloneDestination);
+                            cardEffectEvents.Add(new CloneCardEvent(cloneCard, _contextMgr, destination));
                         }
                     }
                     break;

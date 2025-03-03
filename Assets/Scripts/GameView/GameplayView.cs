@@ -154,8 +154,10 @@ public class GameplayView : MonoBehaviour, IGameplayView
                     _DiscardCardView(discardCardEvent);
                     break;
                 case ConsumeCardEvent consumeCardEvent:
+                    _ConsumeCardView(consumeCardEvent);
                     break;
                 case DisposeCardEvent disposeCardEvent:
+                    
                     break;
                 case CloneCardEvent cloneCardEvent:
                     _CloneCardView(cloneCardEvent);
@@ -232,11 +234,70 @@ public class GameplayView : MonoBehaviour, IGameplayView
         switch (discardCardEvent.Faction)
         {
             case Faction.Ally:
-                _allyHandCardView.RemoveCardView(discardCardEvent);
-                _graveyardCardView.UpdateDeckView(discardCardEvent);
+                switch(discardCardEvent.StartZoneInfo.Type)
+                {
+                    case CardCollectionType.HandCard:
+                        _allyHandCardView.RemoveCardView(discardCardEvent);
+                        break;
+                }
+                switch(discardCardEvent.DestinationZoneInfo.Type)
+                {
+                    case CardCollectionType.Graveyard:
+                        _graveyardCardView.UpdateDeckView(discardCardEvent);
+                        break;
+                }
                 break;
             case Faction.Enemy:
-                _enemySelectedCardView.RemoveCardView(discardCardEvent);
+                switch(discardCardEvent.StartZoneInfo.Type)
+                {
+                    case CardCollectionType.HandCard:
+                        _enemySelectedCardView.RemoveCardView(discardCardEvent);
+                        break;
+                }
+                break;
+        }
+    }
+    private void _ConsumeCardView(ConsumeCardEvent consumeCardEvent)
+    {
+        switch (consumeCardEvent.Faction)
+        {
+            case Faction.Ally:
+                switch(consumeCardEvent.StartZoneInfo.Type)
+                {
+                    case CardCollectionType.HandCard:
+                        _allyHandCardView.RemoveCardView(consumeCardEvent);
+                        break;
+                }
+                break;
+            case Faction.Enemy:
+                switch(consumeCardEvent.StartZoneInfo.Type)
+                {
+                    case CardCollectionType.HandCard:
+                        _enemySelectedCardView.RemoveCardView(consumeCardEvent);
+                        break;
+                }
+                break;
+        }
+    }
+    private void _DisposeCardView(DisposeCardEvent disposeCardEvent)
+    {
+        switch (disposeCardEvent.Faction)
+        {
+            case Faction.Ally:
+                switch(disposeCardEvent.StartZoneInfo.Type)
+                {
+                    case CardCollectionType.HandCard:
+                        _allyHandCardView.RemoveCardView(disposeCardEvent);
+                        break;
+                }
+                break;
+            case Faction.Enemy:
+                switch(disposeCardEvent.StartZoneInfo.Type)
+                {
+                    case CardCollectionType.HandCard:
+                        _enemySelectedCardView.RemoveCardView(disposeCardEvent);
+                        break;
+                }
                 break;
         }
     }
@@ -246,26 +307,18 @@ public class GameplayView : MonoBehaviour, IGameplayView
         switch (cloneCardEvent.Faction)
         {
             case Faction.Ally:
-                switch(cloneCardEvent.CardCollectionType)
+                switch(cloneCardEvent.DestinationZoneInfo.Type)
                 {
                     case CardCollectionType.HandCard:
-                        _allyHandCardView.CreateCardView(cloneCardEvent.CardInfo, cloneCardEvent.HandCardInfo);
-                        break;
-                    case CardCollectionType.Graveyard:
-                    case CardCollectionType.Deck:
-                    case CardCollectionType.ExclusionZone:
-                    case CardCollectionType.DisposeZone:
+                        _allyHandCardView.CreateCardView(cloneCardEvent.CardInfo, cloneCardEvent.DestinationZoneInfo);
                         break;
                 }
                 break;
             case Faction.Enemy:
-                switch(cloneCardEvent.CardCollectionType)
+                switch(cloneCardEvent.DestinationZoneInfo.Type)
                 {
                     case CardCollectionType.HandCard:
-                    case CardCollectionType.Graveyard:
-                    case CardCollectionType.Deck:
-                    case CardCollectionType.ExclusionZone:
-                    case CardCollectionType.DisposeZone:
+                        _enemySelectedCardView.CreateCardView(cloneCardEvent);
                         break;
                 }
                 break;

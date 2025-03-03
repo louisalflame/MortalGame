@@ -53,7 +53,7 @@ MonoBehaviour:
       Data: 3
     - Name: MainSelectable
       Entry: 7
-      Data: 2|CardAllySelectable, Assembly-CSharp
+      Data: 2|CharacterAllySelectable, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 

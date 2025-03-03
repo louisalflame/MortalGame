@@ -15,7 +15,7 @@ public class HandCardEntity : CardColletionZone, IHandCardEntity
 
     public int MaxCount => _maxCount;
 
-    public HandCardEntity(int maxCount) : base()
+    public HandCardEntity(int maxCount) : base(CardCollectionType.HandCard)
     {
         _maxCount = maxCount;
     }

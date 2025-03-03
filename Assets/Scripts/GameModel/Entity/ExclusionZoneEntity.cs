@@ -10,7 +10,7 @@ public interface IExclusionZoneEntity : ICardColletionZone
 
 public class ExclusionZoneEntity : CardColletionZone, IExclusionZoneEntity
 {        
-    public ExclusionZoneEntity() : base()
+    public ExclusionZoneEntity() : base(CardCollectionType.ExclusionZone)
     {
         
     }

@@ -50,59 +50,58 @@ public class DrawCardEvent : IGameEvent
     public CardCollectionInfo HandCardInfo;
 }
 
-public abstract class CardEvent : IGameEvent
+public abstract class MoveCardEvent : IGameEvent
 {
     public Faction Faction;
     public CardInfo CardInfo;
-    public CardCollectionInfo HandCardInfo;
-    public CardCollectionInfo GraveyardInfo;
-    public CardCollectionInfo ExclusionZoneInfo;
-    public CardCollectionInfo DisposeZoneInfo;
+    public CardCollectionInfo StartZoneInfo;
+    public CardCollectionInfo DestinationZoneInfo;
 
-    public CardEvent(ICardEntity card, GameContextManager contextMgr)
+    public MoveCardEvent(ICardEntity card, GameContextManager contextMgr, ICardColletionZone start, ICardColletionZone destination)
     {
         Faction = card.Owner.Faction;
         CardInfo = new CardInfo(card, contextMgr.Context);
-        HandCardInfo = card.Owner.CardManager.HandCard.Cards.ToCardCollectionInfo(contextMgr.Context);
-        GraveyardInfo = card.Owner.CardManager.Graveyard.Cards.ToCardCollectionInfo(contextMgr.Context);
-        ExclusionZoneInfo = card.Owner.CardManager.ExclusionZone.Cards.ToCardCollectionInfo(contextMgr.Context);
-        DisposeZoneInfo = card.Owner.CardManager.DisposeZone.Cards.ToCardCollectionInfo(contextMgr.Context);
+        StartZoneInfo = start.ToCardCollectionInfo(contextMgr.Context);
+        DestinationZoneInfo = destination.ToCardCollectionInfo(contextMgr.Context);
     }
 }
-public class DiscardCardEvent : CardEvent
+public abstract class AddCardEvent : IGameEvent
 {
-    public DiscardCardEvent(ICardEntity card, GameContextManager contextMgr) :
-        base(card, contextMgr) { }
-}
-public class ConsumeCardEvent : CardEvent
-{
-    public ConsumeCardEvent(ICardEntity card, GameContextManager contextMgr) :
-        base(card, contextMgr) { }
-}
-public class DisposeCardEvent : CardEvent
-{
-    public DisposeCardEvent(ICardEntity card, GameContextManager contextMgr) :
-        base(card, contextMgr) { }
-}
-public class CreateCardEvent : CardEvent
-{
-    public CardCollectionType CardCollectionType;
+    public Faction Faction;
+    public CardInfo CardInfo;
+    public CardCollectionInfo DestinationZoneInfo;
 
-    public CreateCardEvent(ICardEntity card, CardCollectionType cardCollectionType, GameContextManager contextMgr) :
-        base(card, contextMgr) 
+    public AddCardEvent(ICardEntity card, GameContextManager contextMgr, ICardColletionZone destination)
     {
-        CardCollectionType = cardCollectionType;
+        Faction = card.Owner.Faction;
+        CardInfo = new CardInfo(card, contextMgr.Context);
+        DestinationZoneInfo = destination.ToCardCollectionInfo(contextMgr.Context);
     }
 }
-public class CloneCardEvent : CardEvent
+public class DiscardCardEvent : MoveCardEvent
 {
-    public CardCollectionType CardCollectionType;
-    
-    public CloneCardEvent(ICardEntity card, CardCollectionType cardCollectionType, GameContextManager contextMgr) :
-        base(card, contextMgr)
-    {
-        CardCollectionType = cardCollectionType;
-    }
+    public DiscardCardEvent(ICardEntity card, GameContextManager contextMgr, ICardColletionZone start, ICardColletionZone destination) :
+        base(card, contextMgr, start, destination) { }
+}
+public class ConsumeCardEvent : MoveCardEvent
+{
+    public ConsumeCardEvent(ICardEntity card, GameContextManager contextMgr, ICardColletionZone start, ICardColletionZone destination) :
+        base(card, contextMgr, start, destination) { }
+}
+public class DisposeCardEvent : MoveCardEvent
+{
+    public DisposeCardEvent(ICardEntity card, GameContextManager contextMgr, ICardColletionZone start, ICardColletionZone destination) :
+        base(card, contextMgr, start, destination) { }
+}
+public class CreateCardEvent : AddCardEvent
+{
+    public CreateCardEvent(ICardEntity card, GameContextManager contextMgr, ICardColletionZone destination) :
+        base(card, contextMgr, destination) { }
+}
+public class CloneCardEvent : AddCardEvent
+{    
+    public CloneCardEvent(ICardEntity card, GameContextManager contextMgr, ICardColletionZone destination) :
+        base(card, contextMgr, destination) { }
 }
 public class AppendCardStatusEvent : IGameEvent
 {

@@ -53,7 +53,7 @@ MonoBehaviour:
       Data: 1
     - Name: MainSelectable
       Entry: 7
-      Data: 2|CardSelectable, Assembly-CSharp
+      Data: 2|CardEnemySelectable, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 

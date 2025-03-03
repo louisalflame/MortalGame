@@ -19,9 +19,9 @@ public interface IPlayerCardManager
     IEnumerable<IGameEvent> UpdateCardsOnTiming(GameContextManager contextManager, CardTiming timing);
 
     Option<ICardEntity> GetCard(Guid cardIdentity);
-    bool TryDiscardCard(Guid cardIdentity, out ICardEntity card);
-    bool TryConsumeCard(Guid cardIdentity, out ICardEntity card);
-    bool TryDisposeCard(Guid cardIdentity, out ICardEntity card);
+    bool TryDiscardCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
+    bool TryConsumeCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
+    bool TryDisposeCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
     void AddNewCard(ICardEntity card, CardCollectionType cloneDestination, GameContextManager contextManager);
 }
 
@@ -57,9 +57,10 @@ public class PlayerCardManager : IPlayerCardManager
                 return Graveyard;
             case CardCollectionType.ExclusionZone:
                 return ExclusionZone;
-            default:
             case CardCollectionType.DisposeZone:
                 return DisposeZone;
+            default:
+                return CardColletionZone.Dummy;
         }
     }
 
@@ -77,10 +78,10 @@ public class PlayerCardManager : IPlayerCardManager
             Faction = contextManager.Context.ExecutePlayer.Faction,
             RecycledCardInfos = recycleCards.Select(c => new CardInfo(c, contextManager.Context)).ToArray(),
             ExcludedCardInfos = excludeCards.Select(c => new CardInfo(c, contextManager.Context)).ToArray(),
-            HandCardInfo = HandCard.Cards.ToCardCollectionInfo(contextManager.Context),
-            GraveyardInfo = Graveyard.Cards.ToCardCollectionInfo(contextManager.Context),
-            ExclusionZoneInfo = ExclusionZone.Cards.ToCardCollectionInfo(contextManager.Context),
-            DisposeZoneInfo = DisposeZone.Cards.ToCardCollectionInfo(contextManager.Context),
+            HandCardInfo = HandCard.ToCardCollectionInfo(contextManager.Context),
+            GraveyardInfo = Graveyard.ToCardCollectionInfo(contextManager.Context),
+            ExclusionZoneInfo = ExclusionZone.ToCardCollectionInfo(contextManager.Context),
+            DisposeZoneInfo = DisposeZone.ToCardCollectionInfo(contextManager.Context),
         });
 
         return events;
@@ -129,103 +130,132 @@ public class PlayerCardManager : IPlayerCardManager
         }        
     }
 
-    public bool TryDiscardCard(Guid cardIdentity, out ICardEntity card)
+    public bool TryDiscardCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination)
     {
-        ICardColletionZone GetDiscardDestinationZone(ICardEntity card)
+        CardCollectionType GetDiscardDestinationZone(ICardEntity card)
         {
             if(card.IsConsumable())
-                return ExclusionZone;
+                return CardCollectionType.ExclusionZone;
             else if(card.IsDisposable())
-                return DisposeZone;
+                return CardCollectionType.DisposeZone;
             else
-                return Graveyard;
+                return CardCollectionType.Graveyard;
         }
 
         card = null;
         if (HandCard.TryGetCard(cardIdentity, out var handCard))
         {
             card = handCard;
-            HandCard.RemoveCard(handCard);
-            GetDiscardDestinationZone(handCard).AddCard(handCard);
+            start = HandCard;
+            destination = GetCardCollectionZone(GetDiscardDestinationZone(handCard));
+
+            start.RemoveCard(handCard);
+            destination.AddCard(handCard);
             return true;
         }
         else if (Deck.TryGetCard(cardIdentity, out var deckCard))
         {
             card = deckCard;
-            Deck.RemoveCard(deckCard);
-            GetDiscardDestinationZone(deckCard).AddCard(deckCard);
+            start = Deck;
+            destination = GetCardCollectionZone(GetDiscardDestinationZone(deckCard));
+
+            start.RemoveCard(deckCard);
+            destination.AddCard(deckCard);
             return true;
         }
 
+        start = CardColletionZone.Dummy;
+        destination = CardColletionZone.Dummy;
         return false;
     }
-    public bool TryConsumeCard(Guid cardIdentity, out ICardEntity card)
+    public bool TryConsumeCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination)
     {
-        ICardColletionZone GetConsumeDestinationZone(ICardEntity card)
+        CardCollectionType GetConsumeDestinationZone(ICardEntity card)
         {
             if(card.IsDisposable())
-                return DisposeZone;
+                return CardCollectionType.DisposeZone;
             else
-                return ExclusionZone;
+                return CardCollectionType.ExclusionZone;
         }
 
         card = null;
         if (HandCard.TryGetCard(cardIdentity, out var handCard))
         {
             card = handCard;
-            HandCard.RemoveCard(handCard);
-            GetConsumeDestinationZone(handCard).AddCard(handCard);
+            start = HandCard;
+            destination = GetCardCollectionZone(GetConsumeDestinationZone(handCard));
+
+            start.RemoveCard(handCard);
+            destination.AddCard(handCard);
             return true;
         }
         else if (Deck.TryGetCard(cardIdentity, out var deckCard))
         {
             card = deckCard;
-            Deck.RemoveCard(deckCard);
-            GetConsumeDestinationZone(deckCard).AddCard(deckCard);
+            start = Deck;
+            destination = GetCardCollectionZone(GetConsumeDestinationZone(deckCard));
+
+            start.RemoveCard(handCard);
+            destination.AddCard(handCard);
             return true;
         }
         else if (Graveyard.TryGetCard(cardIdentity, out var graveyardCard))
         {
             card = graveyardCard;
-            Graveyard.RemoveCard(graveyardCard);
-            GetConsumeDestinationZone(graveyardCard).AddCard(graveyardCard);
+            start = Graveyard;
+            destination = GetCardCollectionZone(GetConsumeDestinationZone(graveyardCard));
+
+            start.RemoveCard(handCard);
+            destination.AddCard(handCard);
             return true;
         }
 
+        start = CardColletionZone.Dummy;
+        destination = CardColletionZone.Dummy;
         return false;
     }
-    public bool TryDisposeCard(Guid cardIdentity, out ICardEntity card)
+    public bool TryDisposeCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination)
     {
+        destination = DisposeZone;
         card = null;
         if (HandCard.TryGetCard(cardIdentity, out var handCard))
         {
             card = handCard;
-            HandCard.RemoveCard(handCard);
-            DisposeZone.AddCard(handCard);
+            start = HandCard;
+
+            start.RemoveCard(handCard);
+            destination.AddCard(handCard);
             return true;
         }
         else if (Deck.TryGetCard(cardIdentity, out var deckCard))
         {
             card = deckCard;
-            Deck.RemoveCard(deckCard);
-            DisposeZone.AddCard(deckCard);
+            start = Deck;
+
+            start.RemoveCard(handCard);
+            destination.AddCard(handCard);
             return true;
         }
         else if (Graveyard.TryGetCard(cardIdentity, out var graveyardCard))
         {
             card = graveyardCard;
-            Graveyard.RemoveCard(graveyardCard);
-            DisposeZone.AddCard(graveyardCard);
+            start = Graveyard;
+
+            start.RemoveCard(handCard);
+            destination.AddCard(handCard);
             return true;
         }
         else if (ExclusionZone.TryGetCard(cardIdentity, out var exclusionCard))
         {
             card = exclusionCard;
-            ExclusionZone.RemoveCard(exclusionCard);
-            DisposeZone.AddCard(exclusionCard);
+            start = ExclusionZone;
+
+            start.RemoveCard(handCard);
+            destination.AddCard(handCard);
             return true;
         }
 
+        start = CardColletionZone.Dummy;
         return false;
     }
     
@@ -245,9 +275,10 @@ public class PlayerCardManager : IPlayerCardManager
             case CardCollectionType.ExclusionZone:
                 ExclusionZone.AddCard(newCard);
                 break;
-            default:
             case CardCollectionType.DisposeZone:
                 DisposeZone.AddCard(newCard);
+                break;
+            default:
                 break;
         }
     }

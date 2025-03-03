@@ -29,7 +29,7 @@ public class GraveyardCardView : MonoBehaviour
     }
     public void UpdateDeckView(DiscardCardEvent discardCardEvent)
     {
-        _graveyardCountText.text = discardCardEvent.GraveyardInfo.Count.ToString();
+        _graveyardCountText.text = discardCardEvent.DestinationZoneInfo.Count.ToString();
     }
     public void UpdateDeckView(RecycleHandCardEvent recycleHandCardEvent)
     {

@@ -58,6 +58,19 @@ public class EnemySelectedCardView : MonoBehaviour
             _RearrangeCardViews();
         }
     }
+    public void CreateCardView(CloneCardEvent cloneCardEvent)
+    {
+        var cardView = _cardViewFactory.CreatePrefab();
+        cardView.transform.SetParent(_cardViewParent, false);
+        cardView.SetCardInfo(cloneCardEvent.CardInfo, _localizeLibrary);
+
+        _cardViews.Add(cardView);
+        _cardViewDict.Add(cloneCardEvent.CardInfo.Identity, cardView);
+        if(_cardViews.Count > 0)
+        {
+            _RearrangeCardViews();
+        }
+    }
 
     public void RemoveCardView(UsedCardEvent usedCardEvent)
     {
@@ -81,6 +94,29 @@ public class EnemySelectedCardView : MonoBehaviour
             _RearrangeCardViews();
         }
     }
+    public void RemoveCardView(ConsumeCardEvent consumeCardEvent)
+    {
+        if(_cardViewDict.TryGetValue(consumeCardEvent.CardInfo.Identity, out var cardView))
+        {
+            _cardViews.Remove(cardView);
+            _cardViewDict.Remove(consumeCardEvent.CardInfo.Identity);
+            _cardViewFactory.RecyclePrefab(cardView);
+
+            _RearrangeCardViews();
+        }
+    }
+    public void RemoveCardView(DisposeCardEvent disposeCardEvent)
+    {
+        if(_cardViewDict.TryGetValue(disposeCardEvent.CardInfo.Identity, out var cardView))
+        {
+            _cardViews.Remove(cardView);
+            _cardViewDict.Remove(disposeCardEvent.CardInfo.Identity);
+            _cardViewFactory.RecyclePrefab(cardView);
+
+            _RearrangeCardViews();
+        }
+    }
+
     public void RemoveCardView(EnemyUnselectedCardEvent enemyUnselectedCardEvent)
     {
         if(_cardViewDict.TryGetValue(enemyUnselectedCardEvent.SelectedCardInfo.Identity, out var cardView))

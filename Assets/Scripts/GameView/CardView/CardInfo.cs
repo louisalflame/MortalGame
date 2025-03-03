@@ -37,21 +37,26 @@ public class CardInfo
 
 public class CardCollectionInfo
 {
+    public CardCollectionType Type { get; private set; }
     public IReadOnlyDictionary<CardInfo, int> CardInfos { get; private set; }
 
     public int Count => CardInfos.Count;
 
-    public CardCollectionInfo(IReadOnlyDictionary<CardInfo, int> cardInfos)
+    public CardCollectionInfo( 
+        CardCollectionType type,
+        IReadOnlyDictionary<CardInfo, int> cardInfos)
     {
+        Type = type;
         CardInfos = cardInfos;
     }
 }
 
 public static class CardCollectionInfoUtility
 {
-    public static CardCollectionInfo ToCardCollectionInfo(this IReadOnlyCollection<CardInfo> cardInfos)
+    public static CardCollectionInfo ToCardCollectionInfo(this IReadOnlyCollection<CardInfo> cardInfos, CardCollectionType type)
     {
         return new CardCollectionInfo(
+            type,
             cardInfos
                 .Select((info, index) => (info, index))
                 .ToDictionary(
@@ -59,12 +64,12 @@ public static class CardCollectionInfoUtility
                     pair => pair.index));
     }
 
-    public static CardCollectionInfo ToCardCollectionInfo(this IReadOnlyCollection<ICardEntity> cards, GameContext gameContext)
+    public static CardCollectionInfo ToCardCollectionInfo(this ICardColletionZone cardCollectionZone, GameContext gameContext)
     { 
-        return cards
+        return cardCollectionZone.Cards
             .Select(c => new CardInfo(c, gameContext))
             .ToArray()
-            .ToCardCollectionInfo();
+            .ToCardCollectionInfo(cardCollectionZone.Type);
     }
 
     public static IReadOnlyCollection<CardInfo> ToCardInfos(this IReadOnlyCollection<ICardEntity> cards, GameContext gameContext)

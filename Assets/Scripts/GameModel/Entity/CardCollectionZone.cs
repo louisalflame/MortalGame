@@ -7,6 +7,7 @@ using UnityEngine;
 
 public interface ICardColletionZone
 {
+    CardCollectionType Type { get; }
     IReadOnlyCollection<ICardEntity> Cards { get; }
     bool TryGetCard(Guid cardIdentity, out ICardEntity card);
     void AddCard(ICardEntity card);
@@ -16,11 +17,16 @@ public interface ICardColletionZone
 
 public abstract class CardColletionZone : ICardColletionZone
 {
+    private CardCollectionType _type;
     protected List<ICardEntity> _cards;
     public IReadOnlyCollection<ICardEntity> Cards => _cards;
+    public CardCollectionType Type => _type;
+
+    public static ICardColletionZone Dummy => new DummyCardCollectionZone();
     
-    public CardColletionZone()
+    public CardColletionZone(CardCollectionType type)
     {
+        _type = type;
         _cards = new List<ICardEntity>();
     }
 
@@ -42,5 +48,12 @@ public abstract class CardColletionZone : ICardColletionZone
     {
         var isRemoved = _cards.Remove(card);
         return isRemoved;
+    }
+}
+
+public class DummyCardCollectionZone : CardColletionZone
+{
+    public DummyCardCollectionZone() : base(CardCollectionType.None)
+    {
     }
 }

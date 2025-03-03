@@ -10,7 +10,7 @@ public interface IDisposeZoneEntity : ICardColletionZone
 
 public class DisposeZoneEntity : CardColletionZone, IDisposeZoneEntity
 {        
-    public DisposeZoneEntity() : base()
+    public DisposeZoneEntity() : base(CardCollectionType.DisposeZone)
     {
     }
 }

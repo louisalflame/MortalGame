@@ -9,7 +9,7 @@ public interface IGraveyardEntity : ICardColletionZone
 }
 public class GraveyardEntity : CardColletionZone, IGraveyardEntity
 {        
-    public GraveyardEntity() : base()
+    public GraveyardEntity() : base(CardCollectionType.Graveyard)
     {
     }
 

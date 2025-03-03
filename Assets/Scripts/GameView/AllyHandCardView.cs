@@ -287,7 +287,7 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
 
     public void RemoveCardView(DiscardCardEvent discardCardEvent)
     {
-        _cardCollectionInfo = discardCardEvent.HandCardInfo;
+        _cardCollectionInfo = discardCardEvent.StartZoneInfo;
         if(_cardViewDict.TryGetValue(discardCardEvent.CardInfo.Identity, out var cardView))
         {
             _cardViews.Remove(cardView);
@@ -299,6 +299,36 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
             _RearrangeCardViews();
         }
     }
+    public void RemoveCardView(ConsumeCardEvent consumeCardEvent)
+    {
+        _cardCollectionInfo = consumeCardEvent.StartZoneInfo;
+        if(_cardViewDict.TryGetValue(consumeCardEvent.CardInfo.Identity, out var cardView))
+        {
+            _cardViews.Remove(cardView);
+            _cardViewDict.Remove(consumeCardEvent.CardInfo.Identity);
+            _cardViewFactory.RecyclePrefab(cardView);
+
+            foreach(var view in _cardViews)
+                view.RemoveLocationOffset(consumeCardEvent.CardInfo.Identity, _focusDuration);
+            _RearrangeCardViews();
+        }
+    }
+    public void RemoveCardView(DisposeCardEvent disposeCardEvent)
+    {
+        _cardCollectionInfo = disposeCardEvent.StartZoneInfo;
+        if(_cardViewDict.TryGetValue(disposeCardEvent.CardInfo.Identity, out var cardView))
+        {
+            _cardViews.Remove(cardView);
+            _cardViewDict.Remove(disposeCardEvent.CardInfo.Identity);
+            _cardViewFactory.RecyclePrefab(cardView);
+
+            foreach(var view in _cardViews)
+                view.RemoveLocationOffset(disposeCardEvent.CardInfo.Identity, _focusDuration);
+            _RearrangeCardViews();
+        }
+    }
+
+
     public void RecycleHandCards(RecycleHandCardEvent recycleHandCardEvent)
     {
         foreach(var cardInfo in recycleHandCardEvent.RecycledCardInfos.Concat(recycleHandCardEvent.ExcludedCardInfos))

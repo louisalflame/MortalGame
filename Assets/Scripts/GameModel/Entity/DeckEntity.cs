@@ -12,7 +12,7 @@ public interface IDeckEntity : ICardColletionZone
 }
 public class DeckEntity : CardColletionZone, IDeckEntity
 {    
-    public DeckEntity(IEnumerable<CardInstance> cards, IPlayerEntity owner) : base()
+    public DeckEntity(IEnumerable<CardInstance> cards, IPlayerEntity owner) : base(CardCollectionType.Deck)
     {
         EnqueueCardsThenShuffle(
             cards.Select(c => CardEntity.CreateFromInstance(c, owner)));
