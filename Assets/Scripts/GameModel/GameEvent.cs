@@ -191,7 +191,7 @@ public abstract class HealthEvent : IGameEvent
         MaxHp = character.MaxHealth;
     }
 }
-public class DamageEvent : HealthEvent
+public abstract class DamageEvent : HealthEvent
 {
     public DamageType Type;
     public int DeltaHp;
@@ -205,6 +205,22 @@ public class DamageEvent : HealthEvent
         DeltaShield = takeDamageResult.DeltaDp;
         DamagePoint = takeDamageResult.DamagePoint;
     }
+}
+public class NormalDamageEvent : DamageEvent
+{
+    public NormalDamageEvent(ICharacterEntity character, TakeDamageResult takeDamageResult) : base(character, takeDamageResult) { }
+}
+public class PenetrateDamageEvent : DamageEvent
+{
+    public PenetrateDamageEvent(ICharacterEntity character, TakeDamageResult takeDamageResult) : base(character, takeDamageResult) { }
+}
+public class AdditionalAttackEvent : DamageEvent
+{
+    public AdditionalAttackEvent(ICharacterEntity character, TakeDamageResult takeDamageResult) : base(character, takeDamageResult) { }
+}
+public class EffectiveAttackEvent : DamageEvent
+{
+    public EffectiveAttackEvent(ICharacterEntity character, TakeDamageResult takeDamageResult) : base(character, takeDamageResult) { }
 }
 
 public class GetHealEvent : HealthEvent
