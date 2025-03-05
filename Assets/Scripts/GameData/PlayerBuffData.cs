@@ -14,12 +14,8 @@ public class PlayerBuffData
     public Dictionary<BuffTiming, IPlayerBuffEffect[]> Effects = new Dictionary<BuffTiming, IPlayerBuffEffect[]>();
 
     [BoxGroup("Properties")]
-    public List<PlayerBuffPropertyData> PropertyDatas = new List<PlayerBuffPropertyData>();
-}
+    public List<PlayerBuffPropertyValue> PropertyDatas = new List<PlayerBuffPropertyValue>();
 
-public class PlayerBuffPropertyData
-{
-    public PlayerBuffProperty Property;
-    public PlayerBuffPropertyDuration Duration;
-    public IIntegerValue Value;
+    [BoxGroup("LifeTime")]
+    public IPlayerBuffLifeTimeData LifeTimeData;
 }

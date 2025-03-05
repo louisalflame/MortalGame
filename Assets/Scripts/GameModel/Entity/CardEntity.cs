@@ -27,10 +27,10 @@ public interface ICardEntity
 
     IPlayerEntity Owner { get; }
 
-    int EvalCost(GameContext gameContext);
-    int EvalPower(GameContext gameContext);
+    int EvalCost(IGameplayStatusWatcher gameWatcher);
+    int EvalPower(IGameplayStatusWatcher gameWatcher);
 
-    bool TryUpdateCardsOnTiming(GameContextManager contextManager, CardTiming timing, out IGameEvent gameEvent);
+    bool TryUpdateCardsOnTiming(IGameplayStatusWatcher gameWatcher, CardTiming timing, out IGameEvent gameEvent);
 
     ICardEntity Clone(IPlayerEntity cloneOwner, IEnumerable<ICardStatusEntity> cardStatuses);
     void AddNewStatus(ICardStatusEntity status);
@@ -197,33 +197,33 @@ public class CardEntity : ICardEntity
         _statusList.Add(status);
     }
 
-    public int EvalCost(GameContext gameContext)
+    public int EvalCost(IGameplayStatusWatcher gameWatcher)
     {
         var cost = Cost;
         foreach(var property in AllProperties.Where(p => p.Property == CardProperty.CostAdjust))
         {
-            cost = property.Value.Eval(cost);
+            cost += property.Eval(gameWatcher);
         } 
 
         return cost;
     }
 
-    public int EvalPower(GameContext gameContext)
+    public int EvalPower(IGameplayStatusWatcher gameWatcher)
     {
         var power = Power;
         foreach(var property in AllProperties.Where(p => p.Property == CardProperty.PowerAdjust))
         {
-            power = property.Value.Eval(power);
+            power += property.Eval(gameWatcher);
         } 
 
         return power;
     }
 
-    public bool TryUpdateCardsOnTiming(GameContextManager contextManager, CardTiming timing, out IGameEvent gameEvent)
+    public bool TryUpdateCardsOnTiming(IGameplayStatusWatcher gameWatcher, CardTiming timing, out IGameEvent gameEvent)
     {
-        foreach(var property in AllProperties)
+        foreach(var cardStatus in StatusList)
         {
-            property.UseCount.UpdateTiming(contextManager, timing);
+            cardStatus.UpdateTiming(gameWatcher, timing);
         }
         
         // TODO: return event of property expired

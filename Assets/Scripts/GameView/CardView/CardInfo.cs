@@ -18,15 +18,15 @@ public class CardInfo
 
     public List<CardStatusInfo> StatusInfos { get; private set; }
 
-    public CardInfo(ICardEntity card, GameContext gameContext)
+    public CardInfo(ICardEntity card, IGameplayStatusWatcher gameWatcher)
     {
         Identity = card.Identity;
         CardDataID = card.CardDataId;
 
         OriginCost = card.Cost;
-        Cost = card.EvalCost(gameContext);
+        Cost = card.EvalCost(gameWatcher);
         OriginPower = card.Power;
-        Power = card.EvalPower(gameContext);
+        Power = card.EvalPower(gameWatcher);
 
         MainSelectable = new MainSelectableInfo(card.MainSelectable.SelectType);
         SubSelectables = card.SubSelectables.Select(s => new SubSelectableInfo(s.SelectType, s.TargetCount)).ToList();
@@ -64,16 +64,18 @@ public static class CardCollectionInfoUtility
                     pair => pair.index));
     }
 
-    public static CardCollectionInfo ToCardCollectionInfo(this ICardColletionZone cardCollectionZone, GameContext gameContext)
+    public static CardCollectionInfo ToCardCollectionInfo(
+        this ICardColletionZone cardCollectionZone, IGameplayStatusWatcher gameWatcher)
     { 
         return cardCollectionZone.Cards
-            .Select(c => new CardInfo(c, gameContext))
+            .Select(c => new CardInfo(c, gameWatcher))
             .ToArray()
             .ToCardCollectionInfo(cardCollectionZone.Type);
     }
 
-    public static IReadOnlyCollection<CardInfo> ToCardInfos(this IReadOnlyCollection<ICardEntity> cards, GameContext gameContext)
+    public static IReadOnlyCollection<CardInfo> ToCardInfos(
+        this IReadOnlyCollection<ICardEntity> cards, IGameplayStatusWatcher gameWatcher)
     {
-        return cards.Select(c => new CardInfo(c, gameContext)).ToArray();
+        return cards.Select(c => new CardInfo(c, gameWatcher)).ToArray();
     }
 }

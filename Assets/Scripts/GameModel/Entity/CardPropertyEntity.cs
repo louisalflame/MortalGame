@@ -4,53 +4,43 @@ using UnityEngine;
 public interface ICardPropertyEntity
 {
     CardProperty Property { get; }
-    ICardPropertyUseCountEntity UseCount { get; }
-    ICardPropertyValue Value { get; }
     
-    void UpdateTiming(GameContextManager contextManager, CardTiming timing);
+    int Eval(IGameplayStatusWatcher gameWatcher);
+    void UpdateTiming(IGameplayStatusWatcher gameWatcher, CardTiming timing);
 }
 
 public abstract class CardPropertyEntity : ICardPropertyEntity
 {
     public abstract CardProperty Property { get; }
-    public ICardPropertyUseCountEntity UseCount { get; protected set; }
-    public ICardPropertyValue Value { get; protected set; }
 
-    public CardPropertyEntity(ICardPropertyUseCountEntity lifetime, ICardPropertyValue value)
+    public virtual int Eval(IGameplayStatusWatcher gameWatcher)
     {
-        UseCount = lifetime;
-        Value = value;
+        return 0;
     }
 
-    public virtual void UpdateTiming(GameContextManager contextManager, CardTiming timing)
-    {
-        UseCount.UpdateTiming(contextManager, timing);
-    }
+    public virtual void UpdateTiming(IGameplayStatusWatcher gameWatcher, CardTiming timing)
+    { }
 }
 
 public class PreservedPropertyEntity : CardPropertyEntity
 {
     public override CardProperty Property => CardProperty.Preserved;
 
-    public PreservedPropertyEntity(ICardPropertyUseCountEntity lifetime) : base(lifetime, new NoneValue())
-    {
-    }
+    public PreservedPropertyEntity() { }
 }
 
 public class InitialPriorityPropertyEntity : CardPropertyEntity
 {
     public override CardProperty Property => CardProperty.InitialPriority;
 
-    public InitialPriorityPropertyEntity(ICardPropertyUseCountEntity lifetime) : base(lifetime, new NoneValue())
-    {
-    }
+    public InitialPriorityPropertyEntity() { }
 }   
 
 public class ConsumablePropertyEntity : CardPropertyEntity
 {
     public override CardProperty Property => CardProperty.Consumable;
 
-    public ConsumablePropertyEntity(ICardPropertyUseCountEntity lifetime) : base(lifetime, new NoneValue())
+    public ConsumablePropertyEntity()
     {
     }
 }
@@ -58,7 +48,7 @@ public class ConsumablePropertyEntity : CardPropertyEntity
 public class DisposePropertyEntity : CardPropertyEntity
 {
     public override CardProperty Property => CardProperty.Dispose;
-    public DisposePropertyEntity(ICardPropertyUseCountEntity lifetime) : base(lifetime, new NoneValue())
+    public DisposePropertyEntity()
     {
     }
 }
@@ -67,7 +57,7 @@ public class AutoDisposePropertyEntity : CardPropertyEntity
 {
     public override CardProperty Property => CardProperty.AutoDispose;
 
-    public AutoDisposePropertyEntity(ICardPropertyUseCountEntity lifetime) : base(lifetime, new NoneValue())
+    public AutoDisposePropertyEntity()
     {
     }
 }
@@ -76,7 +66,7 @@ public class SealedPropertyEntity : CardPropertyEntity
 {
     public override CardProperty Property => CardProperty.Sealed;
 
-    public SealedPropertyEntity(ICardPropertyUseCountEntity lifetime) : base(lifetime, new NoneValue())
+    public SealedPropertyEntity()
     {
     }
 }

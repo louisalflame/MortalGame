@@ -86,7 +86,7 @@ public class AllCardDetailPresenter : IAllCardDetailPresenter
         _state = AllCardDetailPanelState.ShowDeck;
 
         _cardInfos = _statusWatcher.GameStatus.Ally.CardManager.Deck.Cards
-            .ToCardInfos(_statusWatcher.GameContext);
+            .ToCardInfos(_statusWatcher);
         _detailPanel.ShowCardInfoCollections(this, _cardInfos);
     }
     public void ShowGraveyardDetail()
@@ -96,7 +96,7 @@ public class AllCardDetailPresenter : IAllCardDetailPresenter
         _state = AllCardDetailPanelState.ShowGraveyard;
 
         _cardInfos = _statusWatcher.GameStatus.Ally.CardManager.Graveyard.Cards
-            .ToCardInfos(_statusWatcher.GameContext);
+            .ToCardInfos(_statusWatcher);
         _detailPanel.ShowCardInfoCollections(this, _cardInfos);
     }
     public void ShowHandCardDetail()
@@ -106,7 +106,7 @@ public class AllCardDetailPresenter : IAllCardDetailPresenter
         _state = AllCardDetailPanelState.ShowHandCard;
 
         _cardInfos = _statusWatcher.GameStatus.Ally.CardManager.HandCard.Cards
-            .ToCardInfos(_statusWatcher.GameContext);
+            .ToCardInfos(_statusWatcher);
         _detailPanel.ShowCardInfoCollections(this, _cardInfos);
     }
     public void Close()

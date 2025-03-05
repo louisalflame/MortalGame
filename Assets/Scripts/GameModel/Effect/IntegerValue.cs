@@ -2,24 +2,24 @@ using System;
 
 public interface IIntegerValue
 {
-    int Eval(GameStatus gameStatus, GameContext gameContext);
+    int Eval(IGameplayStatusWatcher gameWatcher);
 }
 
 [Serializable]
 public class ThisCardPower : IIntegerValue
 {   
-    public int Eval(GameStatus gameStatus, GameContext gameContext)
+    public int Eval(IGameplayStatusWatcher gameWatcher)
     {
-        return gameContext.UsingCard.EvalPower(gameContext);
+        return gameWatcher.GameContext.UsingCard.EvalPower(gameWatcher);
     }
 }
 
 [Serializable]
 public class ThisCardCost : IIntegerValue
 {
-    public int Eval(GameStatus gameStatus, GameContext gameContext)
+    public int Eval(IGameplayStatusWatcher gameWatcher)
     {
-        return gameContext.UsingCard.EvalCost(gameContext);
+        return gameWatcher.GameContext.UsingCard.EvalCost(gameWatcher);
     }
 }
 
@@ -28,7 +28,7 @@ public class ConstInteger : IIntegerValue
 {
     public int Value;
 
-    public int Eval(GameStatus gameStatus, GameContext gameContext)
+    public int Eval(IGameplayStatusWatcher gameWatcher)
     {
         return Value;
     }
@@ -37,8 +37,8 @@ public class ConstInteger : IIntegerValue
 [Serializable]
 public class ThisBuffLevel : IIntegerValue
 {
-    public int Eval(GameStatus gameStatus, GameContext gameContext)
+    public int Eval(IGameplayStatusWatcher gameWatcher)
     {
-        return gameContext.TriggeredBuff.Level;
+        return gameWatcher.GameContext.TriggeredBuff.Level;
     }
 }

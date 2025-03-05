@@ -9,61 +9,49 @@ public interface ICardPropertyData
 
 public class PreservedPropertyData : ICardPropertyData
 {
-    public ICardPropertyUseCountData UseCount;
-
     public ICardPropertyEntity CreateEntity()
     {
-        return new PreservedPropertyEntity(UseCount.CreateEntity());
+        return new PreservedPropertyEntity();
     }
 }
 
 public class InitialPriorityPropertyData : ICardPropertyData
 {
-    public ICardPropertyUseCountData UseCount;
-
     public ICardPropertyEntity CreateEntity()
     {
-        return new InitialPriorityPropertyEntity(UseCount.CreateEntity());
+        return new InitialPriorityPropertyEntity();
     }
 }
 
 public class ConsumablePropertyData : ICardPropertyData
 {
-    public ICardPropertyUseCountData UseCount;
-
     public ICardPropertyEntity CreateEntity()
     {
-        return new ConsumablePropertyEntity(UseCount.CreateEntity());
+        return new ConsumablePropertyEntity();
     }
 }
 
 public class DisposePropertyData : ICardPropertyData
 {
-    public ICardPropertyUseCountData UseCount;
-
     public ICardPropertyEntity CreateEntity()
     {
-        return new DisposePropertyEntity(UseCount.CreateEntity());
+        return new DisposePropertyEntity();
     }
 }
 
 public class AutoDisposePropertyData : ICardPropertyData
 {
-    public ICardPropertyUseCountData UseCount;
-
     public ICardPropertyEntity CreateEntity()
     {
-        return new AutoDisposePropertyEntity(UseCount.CreateEntity());
+        return new AutoDisposePropertyEntity();
     }
 }
 
 public class SealedPropertyData : ICardPropertyData
 {
-    public ICardPropertyUseCountData UseCount;
-
     public ICardPropertyEntity CreateEntity()
     {
-        return new SealedPropertyEntity(UseCount.CreateEntity());
+        return new SealedPropertyEntity();
     }
 }
 

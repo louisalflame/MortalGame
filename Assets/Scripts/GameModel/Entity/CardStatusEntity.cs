@@ -7,9 +7,9 @@ public interface ICardStatusEntity
     string CardStatusDataID { get; }
     Dictionary<CardTiming, List<ICardEffect>> Effects { get; }
     List<ICardPropertyEntity> Properties { get; }
-    ICardStatusLifeTimeEntity LifeTime { get; }
-
-    void UpdateTiming(GameContextManager contextManager, CardTiming timing);
+    
+    bool IsExpired();
+    void UpdateTiming(IGameplayStatusWatcher gameWatcher, CardTiming timing);
 }
 
 public class CardStatusEntity : ICardStatusEntity
@@ -46,13 +46,18 @@ public class CardStatusEntity : ICardStatusEntity
         );
     }
 
-    public void UpdateTiming(GameContextManager contextManager, CardTiming timing)
+    public bool IsExpired()
     {
-        foreach (var property in Properties)
+        return LifeTime.IsExpired();
+    }
+
+    public void UpdateTiming(IGameplayStatusWatcher gameWatcher, CardTiming timing)
+    {
+        foreach(var property in Properties)
         {
-            property.UpdateTiming(contextManager, timing);
+            property.UpdateTiming(gameWatcher, timing);
         }
 
-        LifeTime.UpdateTiming(contextManager, timing);
+        LifeTime.UpdateTiming(gameWatcher, timing);
     }
 }

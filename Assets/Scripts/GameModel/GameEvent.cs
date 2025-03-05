@@ -57,12 +57,12 @@ public abstract class MoveCardEvent : IGameEvent
     public CardCollectionInfo StartZoneInfo;
     public CardCollectionInfo DestinationZoneInfo;
 
-    public MoveCardEvent(ICardEntity card, GameContextManager contextMgr, ICardColletionZone start, ICardColletionZone destination)
+    public MoveCardEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher, ICardColletionZone start, ICardColletionZone destination)
     {
         Faction = card.Owner.Faction;
-        CardInfo = new CardInfo(card, contextMgr.Context);
-        StartZoneInfo = start.ToCardCollectionInfo(contextMgr.Context);
-        DestinationZoneInfo = destination.ToCardCollectionInfo(contextMgr.Context);
+        CardInfo = new CardInfo(card, gameWatcher);
+        StartZoneInfo = start.ToCardCollectionInfo(gameWatcher);
+        DestinationZoneInfo = destination.ToCardCollectionInfo(gameWatcher);
     }
 }
 public abstract class AddCardEvent : IGameEvent
@@ -71,47 +71,47 @@ public abstract class AddCardEvent : IGameEvent
     public CardInfo CardInfo;
     public CardCollectionInfo DestinationZoneInfo;
 
-    public AddCardEvent(ICardEntity card, GameContextManager contextMgr, ICardColletionZone destination)
+    public AddCardEvent(ICardEntity card,IGameplayStatusWatcher gameWatcher, ICardColletionZone destination)
     {
         Faction = card.Owner.Faction;
-        CardInfo = new CardInfo(card, contextMgr.Context);
-        DestinationZoneInfo = destination.ToCardCollectionInfo(contextMgr.Context);
+        CardInfo = new CardInfo(card, gameWatcher);
+        DestinationZoneInfo = destination.ToCardCollectionInfo(gameWatcher);
     }
 }
 public class DiscardCardEvent : MoveCardEvent
 {
-    public DiscardCardEvent(ICardEntity card, GameContextManager contextMgr, ICardColletionZone start, ICardColletionZone destination) :
-        base(card, contextMgr, start, destination) { }
+    public DiscardCardEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher, ICardColletionZone start, ICardColletionZone destination) :
+        base(card, gameWatcher, start, destination) { }
 }
 public class ConsumeCardEvent : MoveCardEvent
 {
-    public ConsumeCardEvent(ICardEntity card, GameContextManager contextMgr, ICardColletionZone start, ICardColletionZone destination) :
-        base(card, contextMgr, start, destination) { }
+    public ConsumeCardEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher, ICardColletionZone start, ICardColletionZone destination) :
+        base(card, gameWatcher, start, destination) { }
 }
 public class DisposeCardEvent : MoveCardEvent
 {
-    public DisposeCardEvent(ICardEntity card, GameContextManager contextMgr, ICardColletionZone start, ICardColletionZone destination) :
-        base(card, contextMgr, start, destination) { }
+    public DisposeCardEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher, ICardColletionZone start, ICardColletionZone destination) :
+        base(card, gameWatcher, start, destination) { }
 }
 public class CreateCardEvent : AddCardEvent
 {
-    public CreateCardEvent(ICardEntity card, GameContextManager contextMgr, ICardColletionZone destination) :
-        base(card, contextMgr, destination) { }
+    public CreateCardEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher, ICardColletionZone destination) :
+        base(card, gameWatcher, destination) { }
 }
 public class CloneCardEvent : AddCardEvent
 {    
-    public CloneCardEvent(ICardEntity card, GameContextManager contextMgr, ICardColletionZone destination) :
-        base(card, contextMgr, destination) { }
+    public CloneCardEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher, ICardColletionZone destination) :
+        base(card, gameWatcher, destination) { }
 }
 public class AppendCardStatusEvent : IGameEvent
 {
     public Faction Faction;
     public CardInfo CardInfo;
 
-    public AppendCardStatusEvent(ICardEntity card, GameContextManager contextMgr)
+    public AppendCardStatusEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher)
     {
         Faction = card.Owner.Faction;
-        CardInfo = new CardInfo(card, contextMgr.Context);
+        CardInfo = new CardInfo(card, gameWatcher);
     }
 }
 

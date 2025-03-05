@@ -14,15 +14,15 @@ public interface IPlayerCardManager
     IDisposeZoneEntity DisposeZone { get; }
     ICardColletionZone GetCardCollectionZone(CardCollectionType type);
 
-    IEnumerable<IGameEvent> ClearHandOnTurnEnd(GameContextManager contextManager);
+    IEnumerable<IGameEvent> ClearHandOnTurnEnd(IGameplayStatusWatcher gameWatcher);
     
-    IEnumerable<IGameEvent> UpdateCardsOnTiming(GameContextManager contextManager, CardTiming timing);
+    IEnumerable<IGameEvent> UpdateCardsOnTiming(IGameplayStatusWatcher gameWatcher, CardTiming timing);
 
     Option<ICardEntity> GetCard(Guid cardIdentity);
     bool TryDiscardCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
     bool TryConsumeCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
     bool TryDisposeCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
-    void AddNewCard(ICardEntity card, CardCollectionType cloneDestination, GameContextManager contextManager);
+    void AddNewCard(ICardEntity card, CardCollectionType cloneDestination);
 }
 
 public class PlayerCardManager : IPlayerCardManager
@@ -64,7 +64,7 @@ public class PlayerCardManager : IPlayerCardManager
         }
     }
 
-    public IEnumerable<IGameEvent> ClearHandOnTurnEnd(GameContextManager contextManager)
+    public IEnumerable<IGameEvent> ClearHandOnTurnEnd(IGameplayStatusWatcher gameWatcher)
     {
         var events = new List<IGameEvent>();
 
@@ -75,25 +75,26 @@ public class PlayerCardManager : IPlayerCardManager
         var recycleCards = nonePreservedCards.Except(excludeCards);
         Graveyard.AddCards(recycleCards);
         events.Add(new RecycleHandCardEvent(){
-            Faction = contextManager.Context.ExecutePlayer.Faction,
-            RecycledCardInfos = recycleCards.Select(c => new CardInfo(c, contextManager.Context)).ToArray(),
-            ExcludedCardInfos = excludeCards.Select(c => new CardInfo(c, contextManager.Context)).ToArray(),
-            HandCardInfo = HandCard.ToCardCollectionInfo(contextManager.Context),
-            GraveyardInfo = Graveyard.ToCardCollectionInfo(contextManager.Context),
-            ExclusionZoneInfo = ExclusionZone.ToCardCollectionInfo(contextManager.Context),
-            DisposeZoneInfo = DisposeZone.ToCardCollectionInfo(contextManager.Context),
+            Faction = gameWatcher.GameContext.ExecutePlayer.Faction,
+            RecycledCardInfos = recycleCards.Select(c => new CardInfo(c, gameWatcher)).ToArray(),
+            ExcludedCardInfos = excludeCards.Select(c => new CardInfo(c, gameWatcher)).ToArray(),
+            HandCardInfo = HandCard.ToCardCollectionInfo(gameWatcher),
+            GraveyardInfo = Graveyard.ToCardCollectionInfo(gameWatcher),
+            ExclusionZoneInfo = ExclusionZone.ToCardCollectionInfo(gameWatcher),
+            DisposeZoneInfo = DisposeZone.ToCardCollectionInfo(gameWatcher),
         });
 
         return events;
     }
 
-    public IEnumerable<IGameEvent> UpdateCardsOnTiming(GameContextManager contextManager, CardTiming timing)
+    public IEnumerable<IGameEvent> UpdateCardsOnTiming(IGameplayStatusWatcher gameWatcher, CardTiming timing)
     {
         var events = new List<IGameEvent>();
 
         foreach(var card in HandCard.Cards)
         {
-            if(card.TryUpdateCardsOnTiming(contextManager, timing, out var cardEvent))
+            // TODO : collect reactions
+            if(card.TryUpdateCardsOnTiming(gameWatcher, timing, out var cardEvent))
             {
                 events.Add(cardEvent);
             }
@@ -259,7 +260,7 @@ public class PlayerCardManager : IPlayerCardManager
         return false;
     }
     
-    public void AddNewCard(ICardEntity newCard, CardCollectionType cloneDestination, GameContextManager contextMgr)
+    public void AddNewCard(ICardEntity newCard, CardCollectionType cloneDestination)
     {
         switch(cloneDestination)
         {
