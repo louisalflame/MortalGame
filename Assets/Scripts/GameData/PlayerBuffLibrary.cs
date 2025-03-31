@@ -11,10 +11,10 @@ public class PlayerBuffLibrary
         _buffs = new Dictionary<string, PlayerBuffData>(buffs);
     }
 
-    public Dictionary<BuffTiming, IPlayerBuffEffect[]>  GetBuffEffects(string buffId)
+    public Dictionary<GameTiming, IPlayerBuffEffect[]>  GetBuffEffects(string buffId)
     {
-        return _buffs[buffId].Effects.ToDictionary(
-            pair => pair.Key,
-            pair => pair.Value.ToArray());
+        return _buffs[buffId].BuffEffects.ToDictionary(
+            pair => pair.Timing,
+            pair => pair.Effects.ToArray());
     }
 }

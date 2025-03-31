@@ -239,14 +239,14 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
             HandCardInfo = _gameStatus.Ally.CardManager.HandCard.ToCardCollectionInfo(this)
         });
         
-        _TriggerBuffs(_gameStatus.Ally, BuffTiming.OnExecuteEnd);
+        _TriggerBuffs(_gameStatus.Ally, GameTiming.ExecuteEnd);
 
         _gameStatus.SetState(GameState.Enemy_Execute);
         _gameActions.Clear();
     }   
     private void _FinishEnemyExecuteTurn()
     {
-        _TriggerBuffs(_gameStatus.Enemy, BuffTiming.OnExecuteEnd);
+        _TriggerBuffs(_gameStatus.Enemy, GameTiming.ExecuteEnd);
 
         _gameStatus.SetState(GameState.TurnEnd);
         _gameActions.Clear();
@@ -259,7 +259,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
             _gameEvents.AddRange(
                 _gameStatus.Ally.CardManager.ClearHandOnTurnEnd(this));
             _gameEvents.AddRange(
-                _gameStatus.Ally.CardManager.UpdateCardsOnTiming(this, CardTiming.TurnEnd));
+                _gameStatus.Ally.CardManager.UpdateCardsOnTiming(this, GameTiming.TurnEnd));
         }
 
         using(_contextMgr.SetExecutePlayer(_gameStatus.Enemy))
@@ -267,7 +267,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
             _gameEvents.AddRange(
                 _gameStatus.Enemy.CardManager.ClearHandOnTurnEnd(this));
             _gameEvents.AddRange(
-                _gameStatus.Enemy.CardManager.UpdateCardsOnTiming(this, CardTiming.TurnEnd));
+                _gameStatus.Enemy.CardManager.UpdateCardsOnTiming(this, GameTiming.TurnEnd));
         }
 
         _gameStatus.SetState(GameState.TurnStart);
@@ -326,9 +326,9 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
 
                         if (player.CardManager.HandCard.RemoveCard(usedCard)) 
                         {
-                            if(usedCard.Effects.TryGetValue(CardTiming.OnPlayCard, out var onPlayEffects))
+                            if(usedCard.Effects.TryGetValue(GameTiming.PlayCard, out var onPlayEffects))
                             {
-                                using(_contextMgr.SetCardTiming(CardTiming.OnPlayCard))
+                                using(_contextMgr.SetCardTiming(GameTiming.PlayCard))
                                 {
                                     foreach(var effect in onPlayEffects)
                                     {
@@ -767,15 +767,15 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
         return (cardEffectEvents, reactionEffects);
     }
 
-    private void _TriggerBuffs(PlayerEntity player, BuffTiming buffTiming)
+    private void _TriggerBuffs(PlayerEntity player, GameTiming timing)
     {
         var buffs = player.BuffManager.Buffs;
         foreach(var buff in buffs)
         {
             using(_contextMgr.SetTriggeredPlayerBuff(buff))
             {
-                Debug.Log($"_TriggerBuffs buff:{buff} buffTiming:{buffTiming}");
-                if (buff.Effects.TryGetValue(buffTiming, out var buffEffects))
+                Debug.Log($"_TriggerBuffs buff:{buff} Timing:{timing}");
+                if (buff.Effects.TryGetValue(timing, out var buffEffects))
                 {
                     foreach(var effect in buffEffects)
                     {

@@ -32,16 +32,6 @@ public enum CardTheme
     DianCang    // 點蒼
 }
 
-public enum CardTiming
-{
-    None = 0,
-    BattleBegin,
-    TurnStart,
-    OnDrawCard,
-    OnPlayCard,
-    TurnEnd,
-}
-
 public enum CardProperty : int
 {
     None                = 0,

@@ -7,4 +7,12 @@ using UnityEngine;
 public class CardDataScriptable : SerializedScriptableObject
 {
     public CardData Data;
+
+    #if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (Data == null) return;
+        Data.OnValidate();
+    }
+    #endif
 }

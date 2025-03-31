@@ -34,14 +34,6 @@ public enum EnergyLoseType
 
 }
 
-public enum BuffTiming
-{
-    None = 0,
-    OnTurnStart,
-    OnExecuteEnd,
-    OnTurnEnd,
-}
-
 public enum PlayerBuffPropertyDuration
 {
     None = 0,
@@ -79,4 +71,16 @@ public enum TargetType
     None = 0,
     Character,
     Card,
+}
+
+public enum GameTiming
+{
+    None = 0,
+    BattleBegin,
+    TurnStart,
+    TurnEnd,
+    ExecuteStart,
+    ExecuteEnd,
+    DrawCard,
+    PlayCard,
 }

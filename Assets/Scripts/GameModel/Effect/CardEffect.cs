@@ -1,5 +1,6 @@
 using System;
- 
+using Sirenix.OdinInspector;
+
 public interface ICardEffect
 {
     
@@ -66,6 +67,8 @@ public class LoseEnegyEffect : ICardEffect
 public class AddBuffEffect : ICardEffect
 {
     public ITargetPlayerCollectionValue Targets;
+
+    [ValueDropdown("@DropdownHelper.BuffNames")]
     public string BuffId;
     public IIntegerValue Level;
 }

@@ -150,22 +150,83 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: CardEffects
+      Entry: 7
+      Data: 12|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[CardData+CardEffect,
+        Assembly-CSharp]], Unity.Plastic.Antlr3.Runtime
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 13|CardData+CardEffect, Assembly-CSharp
+    - Name: Timing
+      Entry: 3
+      Data: 7
+    - Name: Effects
+      Entry: 7
+      Data: 14|ICardEffect[], Assembly-CSharp
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 15|AddBuffEffect, Assembly-CSharp
+    - Name: Targets
+      Entry: 7
+      Data: 16|SinglePlayerCollection, Assembly-CSharp
+    - Name: Target
+      Entry: 7
+      Data: 17|OppositePlayer, Assembly-CSharp
+    - Name: Reference
+      Entry: 7
+      Data: 18|ThisExecutePlayer, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: BuffId
+      Entry: 1
+      Data: Poison
+    - Name: Level
+      Entry: 7
+      Data: 19|ThisCardPower, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 12|System.Collections.Generic.List`1[[ICardPropertyData, Assembly-CSharp]],
+      Data: 20|System.Collections.Generic.List`1[[ICardPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 13|DisposePropertyData, Assembly-CSharp
-    - Name: UseCount
-      Entry: 7
-      Data: 14|CardPropertyDefaultUseData, Assembly-CSharp
-    - Name: 
-      Entry: 8
-      Data: 
+      Data: 21|DisposePropertyData, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 

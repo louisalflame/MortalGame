@@ -11,7 +11,7 @@ public interface IPlayerBuffEntity
     int Level { get; }
     IPlayerEntity Owner { get; }
     IPlayerEntity Caster { get; }
-    IReadOnlyDictionary<BuffTiming, IPlayerBuffEffect[]> Effects { get; }
+    IReadOnlyDictionary<GameTiming, IPlayerBuffEffect[]> Effects { get; }
 
     void AddLevel(int level);
     PlayerBuffInfo ToInfo();
@@ -24,14 +24,14 @@ public class PlayerBuffEntity : IPlayerBuffEntity
     private int _level;
     private IPlayerEntity _owner;
     private IPlayerEntity _caster;
-    private Dictionary<BuffTiming, IPlayerBuffEffect[]> _effects;
+    private Dictionary<GameTiming, IPlayerBuffEffect[]> _effects;
 
     public string Id => _id;
     public Guid Identity => _identity;
     public int Level => _level;
     public IPlayerEntity Owner => _owner;
     public IPlayerEntity Caster => _caster;
-    public IReadOnlyDictionary<BuffTiming, IPlayerBuffEffect[]> Effects => _effects;
+    public IReadOnlyDictionary<GameTiming, IPlayerBuffEffect[]> Effects => _effects;
 
     public bool IsDummy => this == DummyBuff;
     public static IPlayerBuffEntity DummyBuff = new DummyPlayerBuff();
@@ -42,7 +42,7 @@ public class PlayerBuffEntity : IPlayerBuffEntity
         int level,
         IPlayerEntity owner,
         IPlayerEntity caster,
-        Dictionary<BuffTiming, IPlayerBuffEffect[]> effects) 
+        Dictionary<GameTiming, IPlayerBuffEffect[]> effects) 
     {
         _id = id;
         _identity = identity;
@@ -75,7 +75,7 @@ public class DummyPlayerBuff : PlayerBuffEntity
         1,
         PlayerEntity.DummyPlayer,
         PlayerEntity.DummyPlayer,
-        new Dictionary<BuffTiming, IPlayerBuffEffect[]>())
+        new Dictionary<GameTiming, IPlayerBuffEffect[]>())
     {
     }
 }

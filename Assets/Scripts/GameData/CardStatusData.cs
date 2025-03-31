@@ -9,7 +9,7 @@ public class CardStatusData
     public string ID;
 
     [TitleGroup("Effects")]
-    public Dictionary<CardTiming, ICardEffect[]> Effects = new Dictionary<CardTiming, ICardEffect[]>();
+    public Dictionary<GameTiming, ICardEffect[]> Effects = new Dictionary<GameTiming, ICardEffect[]>();
 
     [TitleGroup("Properties")]
     public List<ICardPropertyData> PropertyDatas;

@@ -6,7 +6,7 @@ public interface ICardPropertyEntity
     CardProperty Property { get; }
     
     int Eval(IGameplayStatusWatcher gameWatcher);
-    void UpdateTiming(IGameplayStatusWatcher gameWatcher, CardTiming timing);
+    void UpdateTiming(IGameplayStatusWatcher gameWatcher, GameTiming timing);
 }
 
 public abstract class CardPropertyEntity : ICardPropertyEntity
@@ -18,7 +18,7 @@ public abstract class CardPropertyEntity : ICardPropertyEntity
         return 0;
     }
 
-    public virtual void UpdateTiming(IGameplayStatusWatcher gameWatcher, CardTiming timing)
+    public virtual void UpdateTiming(IGameplayStatusWatcher gameWatcher, GameTiming timing)
     { }
 }
 

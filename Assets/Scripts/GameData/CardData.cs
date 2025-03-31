@@ -1,10 +1,32 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 public class CardData
 {
+    [Serializable]
+    public class CardEffect
+    {
+        [TableColumnWidth(150, false)]
+        [ValueDropdown("_GetAllowedValues")]
+        public GameTiming Timing;
+
+        public ICardEffect[] Effects;
+
+        private static IEnumerable _GetAllowedValues()
+        {
+            return new[] { 
+                GameTiming.None,
+                GameTiming.TurnStart,
+                GameTiming.TurnEnd,
+                GameTiming.DrawCard,
+                GameTiming.PlayCard
+            };
+        }
+    }
+
     [BoxGroup("Identification")]
     public string ID;
 
@@ -27,10 +49,27 @@ public class CardData
     public IMainTargetSelectable MainSelectable;
     [BoxGroup("Target")]
     public List<ISubTargetSelectable> SubSelectables;
-
-    [BoxGroup("Effects")]
-    public Dictionary<CardTiming, ICardEffect[]> Effects = new Dictionary<CardTiming, ICardEffect[]>();
+ 
+    [TableList]
+    public List<CardEffect> CardEffects = new List<CardEffect>();
 
     [BoxGroup("Properties")]
     public List<ICardPropertyData> PropertyDatas = new List<ICardPropertyData>();
+
+    public void OnValidate()
+    {
+        if (CardEffects == null) return;
+        
+        var keys = new HashSet<GameTiming>();
+        CardEffects.RemoveAll(pair => 
+        {
+            if (keys.Contains(pair.Timing))
+            {
+                return true;
+            }
+
+            keys.Add(pair.Timing);
+            return false;
+        });
+    }
 }

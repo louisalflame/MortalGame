@@ -16,7 +16,7 @@ public class CardInstance
 
     public IMainTargetSelectable MainSelectable;
     public List<ISubTargetSelectable> SubSelectables;
-    public IReadOnlyDictionary<CardTiming, ICardEffect[]> Effects;
+    public IReadOnlyDictionary<GameTiming, ICardEffect[]> Effects;
     public List<ICardPropertyData> PropertyDatas;
 
     public static CardInstance Create(CardData cardData)
@@ -31,9 +31,9 @@ public class CardInstance
             Power = cardData.Power,
             MainSelectable = cardData.MainSelectable,
             SubSelectables = cardData.SubSelectables.ToList(),
-            Effects = cardData.Effects.ToDictionary(
-                pair => pair.Key,
-                pair => pair.Value.ToArray()
+            Effects = cardData.CardEffects.ToDictionary(
+                pair => pair.Timing,
+                pair => pair.Effects.ToArray()
             ),
             PropertyDatas = cardData.PropertyDatas.ToList(),
             CardDataId = cardData.ID,

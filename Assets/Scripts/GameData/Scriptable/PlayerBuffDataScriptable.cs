@@ -5,4 +5,12 @@ using UnityEngine;
 public class PlayerBuffDataScriptable : SerializedScriptableObject
 {
     public PlayerBuffData Data;
+    
+    #if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (Data == null) return;
+        Data.OnValidate();
+    }
+    #endif
 }

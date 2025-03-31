@@ -5,18 +5,18 @@ using UnityEngine;
 public interface ICardStatusEntity
 {
     string CardStatusDataID { get; }
-    Dictionary<CardTiming, List<ICardEffect>> Effects { get; }
+    Dictionary<GameTiming, List<ICardEffect>> Effects { get; }
     List<ICardPropertyEntity> Properties { get; }
     
     bool IsExpired();
-    void UpdateTiming(IGameplayStatusWatcher gameWatcher, CardTiming timing);
+    void UpdateTiming(IGameplayStatusWatcher gameWatcher, GameTiming timing);
 }
 
 public class CardStatusEntity : ICardStatusEntity
 {
     public string CardStatusDataID { get; private set; }
 
-    public Dictionary<CardTiming, List<ICardEffect>> Effects { get; private set; }
+    public Dictionary<GameTiming, List<ICardEffect>> Effects { get; private set; }
 
     public List<ICardPropertyEntity> Properties { get; private set; }
 
@@ -24,7 +24,7 @@ public class CardStatusEntity : ICardStatusEntity
 
     private CardStatusEntity(
         string cardStatusDataID,
-        Dictionary<CardTiming, List<ICardEffect>> effects,
+        Dictionary<GameTiming, List<ICardEffect>> effects,
         List<ICardPropertyEntity> properties,
         ICardStatusLifeTimeEntity lifeTime)
     {
@@ -51,7 +51,7 @@ public class CardStatusEntity : ICardStatusEntity
         return LifeTime.IsExpired();
     }
 
-    public void UpdateTiming(IGameplayStatusWatcher gameWatcher, CardTiming timing)
+    public void UpdateTiming(IGameplayStatusWatcher gameWatcher, GameTiming timing)
     {
         foreach(var property in Properties)
         {

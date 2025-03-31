@@ -19,7 +19,7 @@ public interface ICardEntity
     IMainTargetSelectable MainSelectable { get; }
     IEnumerable<ISubTargetSelectable> SubSelectables { get; }
 
-    Dictionary<CardTiming, List<ICardEffect>> Effects { get; }
+    Dictionary<GameTiming, List<ICardEffect>> Effects { get; }
     IEnumerable<ICardPropertyEntity> Properties { get; }
     IEnumerable<ICardStatusEntity> StatusList { get; }
 
@@ -30,7 +30,7 @@ public interface ICardEntity
     int EvalCost(IGameplayStatusWatcher gameWatcher);
     int EvalPower(IGameplayStatusWatcher gameWatcher);
 
-    bool TryUpdateCardsOnTiming(IGameplayStatusWatcher gameWatcher, CardTiming timing, out IGameEvent gameEvent);
+    bool TryUpdateCardsOnTiming(IGameplayStatusWatcher gameWatcher, GameTiming timing, out IGameEvent gameEvent);
 
     ICardEntity Clone(IPlayerEntity cloneOwner, IEnumerable<ICardStatusEntity> cardStatuses);
     void AddNewStatus(ICardStatusEntity status);
@@ -48,7 +48,7 @@ public class CardEntity : ICardEntity
     private int _power;    
     private IMainTargetSelectable _mainSelectable;
     private List<ISubTargetSelectable> _subSelectables;
-    private Dictionary<CardTiming, List<ICardEffect>> _effects;
+    private Dictionary<GameTiming, List<ICardEffect>> _effects;
     private List<ICardPropertyEntity> _properties;
     private List<ICardStatusEntity> _statusList;
     private IPlayerEntity _owner;
@@ -63,7 +63,7 @@ public class CardEntity : ICardEntity
     public int Power => _power;
     public IMainTargetSelectable MainSelectable => _mainSelectable;
     public IEnumerable<ISubTargetSelectable> SubSelectables => _subSelectables;
-    public Dictionary<CardTiming, List<ICardEffect>> Effects => _effects;
+    public Dictionary<GameTiming, List<ICardEffect>> Effects => _effects;
     public IEnumerable<ICardPropertyEntity> Properties => _properties;
     public IEnumerable<ICardStatusEntity> StatusList => _statusList;
     public IEnumerable<ICardPropertyEntity> AllProperties => 
@@ -82,7 +82,7 @@ public class CardEntity : ICardEntity
         power: 0,
         mainSelectable: new NoneSelectable(),
         subSelectables: new List<ISubTargetSelectable>(),
-        effects: new Dictionary<CardTiming, List<ICardEffect>>(),
+        effects: new Dictionary<GameTiming, List<ICardEffect>>(),
         properties: new List<ICardPropertyEntity>(),
         statusList: new List<CardStatusEntity>(),
         owner: PlayerEntity.DummyPlayer
@@ -99,7 +99,7 @@ public class CardEntity : ICardEntity
         int power,
         IMainTargetSelectable mainSelectable,
         IEnumerable<ISubTargetSelectable> subSelectables,
-        Dictionary<CardTiming, List<ICardEffect>> effects,
+        Dictionary<GameTiming, List<ICardEffect>> effects,
         IEnumerable<ICardPropertyEntity> properties,
         IEnumerable<ICardStatusEntity> statusList,
         IPlayerEntity owner
@@ -160,9 +160,9 @@ public class CardEntity : ICardEntity
             power: cardData.Power,
             mainSelectable: cardData.MainSelectable,
             subSelectables: cardData.SubSelectables,
-            effects: cardData.Effects.ToDictionary(
-                    pair => pair.Key,
-                    pair => pair.Value.ToList()
+            effects: cardData.CardEffects.ToDictionary(
+                    pair => pair.Timing,
+                    pair => pair.Effects.ToList()
                 ),
             properties: cardData.PropertyDatas.Select(p => p.CreateEntity()),
             statusList: new List<CardStatusEntity>(),
@@ -219,7 +219,7 @@ public class CardEntity : ICardEntity
         return power;
     }
 
-    public bool TryUpdateCardsOnTiming(IGameplayStatusWatcher gameWatcher, CardTiming timing, out IGameEvent gameEvent)
+    public bool TryUpdateCardsOnTiming(IGameplayStatusWatcher gameWatcher, GameTiming timing, out IGameEvent gameEvent)
     {
         foreach(var cardStatus in StatusList)
         {

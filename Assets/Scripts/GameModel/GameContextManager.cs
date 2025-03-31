@@ -71,9 +71,9 @@ public class GameContextManager : IDisposable
         _contextStack.Push(Context.With(usingCard: usingCard));
         return this;
     }
-    public GameContextManager SetCardTiming(CardTiming cardTiming) 
+    public GameContextManager SetCardTiming(GameTiming gameTiming) 
     {
-        _contextStack.Push(Context.With(cardTiming: cardTiming));
+        _contextStack.Push(Context.With(gameTiming: gameTiming));
         return this;
     }
     public GameContextManager SetUsingCardEffect(ICardEffect usingCardEffect) 
@@ -115,7 +115,7 @@ public class GameContext : IDisposable
     public IPlayerEntity        SelectedPlayer;
     public ICharacterEntity     SelectedCharacter;
     public ICardEntity          SelectedCard;
-    public CardTiming           CardTiming;
+    public GameTiming           GameTiming;
     public ICardEntity          UsingCard;
     public ICardEffect          UsingCardEffect;
     public IPlayerEntity        EffectTargetPlayer;
@@ -131,7 +131,7 @@ public class GameContext : IDisposable
         IPlayerEntity       selectedPlayer = null,
         ICharacterEntity    selectedCharacter = null,
         ICardEntity         selectedCard = null,
-        CardTiming          cardTiming = default,
+        GameTiming          gameTiming = default,
         ICardEntity         usingCard = null,
         ICardEffect         usingCardEffect = null,
         IPlayerEntity       effectTargetPlayer = null,
@@ -148,7 +148,7 @@ public class GameContext : IDisposable
             SelectedCharacter       = selectedCharacter ?? SelectedCharacter,
             SelectedCard            = selectedCard ?? SelectedCard,
             UsingCard               = usingCard ?? UsingCard,
-            CardTiming              = cardTiming == CardTiming.None ? CardTiming : cardTiming,
+            GameTiming              = gameTiming == GameTiming.None ? GameTiming : gameTiming,
             UsingCardEffect         = usingCardEffect ?? UsingCardEffect,
             EffectTargetPlayer      = effectTargetPlayer ?? EffectTargetPlayer,
             EffectTargetCharacter   = effectTargetCharacter ?? EffectTargetCharacter,
