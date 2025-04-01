@@ -34,8 +34,11 @@ public class PlayerBuffData
     public int MaxLevel;
  
     [BoxGroup("Effects")]
+    public List<IReactionSession> Sessions = new List<IReactionSession>();
+    
+    [BoxGroup("Effects")]
     [TableList]
-    public List<BuffEffect> BuffEffects = new List<BuffEffect>();
+    public List<BuffEffect> BuffEffects = new List<BuffEffect>();  
 
     [BoxGroup("Properties")]
     public List<PlayerBuffPropertyValue> PropertyDatas = new List<PlayerBuffPropertyValue>();

@@ -5,10 +5,8 @@ public interface IReactionEffect
     
 }
 
-public class ReactionEffect : IReactionEffect
+public class EffectiveDamageEffect : IReactionEffect
 {
-    public ReactionEffect()
-    {
-        
-    }
+    public ITargetCharacterCollectionValue Targets;
+    public IIntegerValue Value;
 }
