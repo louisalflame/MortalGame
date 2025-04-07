@@ -13,7 +13,8 @@ public class PlayerBuffData
         [ValueDropdown("_GetAllowedValues")]
         public GameTiming Timing;
 
-        public IPlayerBuffEffect[] Effects;
+        [ShowInInspector]
+        public ConditionalEffect[] ConditionEffects = new ConditionalEffect[0];
 
         private static IEnumerable _GetAllowedValues()
         {
@@ -33,15 +34,18 @@ public class PlayerBuffData
     [TitleGroup("BasicData")]
     public int MaxLevel;
  
+    [ShowInInspector]
     [BoxGroup("Effects")]
-    public List<IReactionSession> Sessions = new List<IReactionSession>();
+    public List<IReactionSessionData> Sessions = new();
     
+    [ShowInInspector]
     [BoxGroup("Effects")]
     [TableList]
-    public List<BuffEffect> BuffEffects = new List<BuffEffect>();  
+    public List<BuffEffect> BuffEffects = new();  
 
+    [ShowInInspector]
     [BoxGroup("Properties")]
-    public List<PlayerBuffPropertyValue> PropertyDatas = new List<PlayerBuffPropertyValue>();
+    public List<PlayerBuffPropertyValue> PropertyDatas = new();
 
     [BoxGroup("LifeTime")]
     public IPlayerBuffLifeTimeData LifeTimeData;

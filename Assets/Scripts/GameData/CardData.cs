@@ -13,7 +13,9 @@ public class CardData
         [ValueDropdown("_GetAllowedValues")]
         public GameTiming Timing;
 
-        public ICardEffect[] Effects;
+        [ShowInInspector]
+        // TODO: conditional cardeffect
+        public ICardEffect[] Effects = new ICardEffect[0];
 
         private static IEnumerable _GetAllowedValues()
         {
@@ -47,14 +49,17 @@ public class CardData
     [BoxGroup("Target")]
     [PropertySpace(SpaceBefore = 0, SpaceAfter = 10)]
     public IMainTargetSelectable MainSelectable;
+    [ShowInInspector]
     [BoxGroup("Target")]
-    public List<ISubTargetSelectable> SubSelectables;
+    public List<ISubTargetSelectable> SubSelectables = new();
  
+    [ShowInInspector]
     [TableList]
-    public List<CardEffect> CardEffects = new List<CardEffect>();
+    public List<CardEffect> CardEffects = new();
 
+    [ShowInInspector]
     [BoxGroup("Properties")]
-    public List<ICardPropertyData> PropertyDatas = new List<ICardPropertyData>();
+    public List<ICardPropertyData> PropertyDatas = new();
 
     public void OnValidate()
     {

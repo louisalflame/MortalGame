@@ -33,14 +33,12 @@ public class PlayerBuffManager : IPlayerBuffManager
             }
         }
 
-        var buffEffects = buffLibrary.GetBuffEffects(buffId);
         resultBuff = new PlayerBuffEntity(
             buffId, 
             Guid.NewGuid(), 
             level, 
             gameContext.EffectTargetPlayer,
-            gameContext.CardCaster,
-            buffEffects);
+            gameContext.CardCaster);
         _buffs.Add(resultBuff);
         return true;
     }

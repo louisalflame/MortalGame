@@ -6,12 +6,12 @@ using UnityEngine;
 
 public interface ITargetPlayerValue
 {
-    IPlayerEntity Eval(GameStatus gameStatus, GameContext context);
+    IPlayerEntity Eval(IGameplayStatusWatcher gameWatcher);
 }
 [Serializable]
 public class NonePlayer : ITargetPlayerValue
 {
-    public IPlayerEntity Eval(GameStatus gameStatus, GameContext context)
+    public IPlayerEntity Eval(IGameplayStatusWatcher gameWatcher)
     {
         return PlayerEntity.DummyPlayer;
     }
@@ -19,9 +19,9 @@ public class NonePlayer : ITargetPlayerValue
 [Serializable]
 public class ThisExecutePlayer : ITargetPlayerValue
 {
-    public IPlayerEntity Eval(GameStatus gameStatus, GameContext context)
+    public IPlayerEntity Eval(IGameplayStatusWatcher gameWatcher)
     {
-        return context.ExecutePlayer;
+        return gameWatcher.GameContext.ExecutePlayer;
     }
 }
 [Serializable]
@@ -29,21 +29,21 @@ public class OppositePlayer : ITargetPlayerValue
 {    
     public ITargetPlayerValue Reference;
 
-    public IPlayerEntity Eval(GameStatus gameStatus, GameContext context)
+    public IPlayerEntity Eval(IGameplayStatusWatcher gameWatcher)
     {
-        var reference = Reference.Eval(gameStatus, context);
+        var reference = Reference.Eval(gameWatcher);
         return
-            reference.Faction == Faction.Ally ? gameStatus.Enemy : 
-            reference.Faction == Faction.Enemy ? gameStatus.Ally : 
+            reference.Faction == Faction.Ally ? gameWatcher.GameStatus.Enemy : 
+            reference.Faction == Faction.Enemy ? gameWatcher.GameStatus.Ally : 
             PlayerEntity.DummyPlayer;
     }
 }
 [Serializable]
 public class CardCaster : ITargetPlayerValue
 {
-    public IPlayerEntity Eval(GameStatus gameStatus, GameContext context)
+    public IPlayerEntity Eval(IGameplayStatusWatcher gameWatcher)
     {
-        return context.CardCaster;
+        return gameWatcher.GameContext.CardCaster;
     }
 }
 [Serializable]
@@ -51,9 +51,9 @@ public class OwnerOfPlayerBuff : ITargetPlayerValue
 {
     public ITargetPlayerBuffValue PlayerBuff;
 
-    public IPlayerEntity Eval(GameStatus gameStatus, GameContext context)
+    public IPlayerEntity Eval(IGameplayStatusWatcher gameWatcher)
     {
-        var playerBuff = PlayerBuff.Eval(gameStatus, context);
+        var playerBuff = PlayerBuff.Eval(gameWatcher);
         return playerBuff.Owner;
     }
 }
@@ -61,12 +61,12 @@ public class OwnerOfPlayerBuff : ITargetPlayerValue
 
 public interface ITargetPlayerCollectionValue
 {
-    IReadOnlyCollection<IPlayerEntity> Eval(GameStatus gameStatus, GameContext context);
+    IReadOnlyCollection<IPlayerEntity> Eval(IGameplayStatusWatcher gameWatcher);
 }
 [Serializable]
 public class NonePlayers : ITargetPlayerCollectionValue
 {
-    public IReadOnlyCollection<IPlayerEntity> Eval(GameStatus gameStatus, GameContext context)
+    public IReadOnlyCollection<IPlayerEntity> Eval(IGameplayStatusWatcher gameWatcher)
     {
         return new PlayerEntity[0];
     }
@@ -76,8 +76,8 @@ public class SinglePlayerCollection : ITargetPlayerCollectionValue
 {
     public ITargetPlayerValue Target;
 
-    public IReadOnlyCollection<IPlayerEntity> Eval(GameStatus gameStatus, GameContext context)
+    public IReadOnlyCollection<IPlayerEntity> Eval(IGameplayStatusWatcher gameWatcher)
     {
-        return new [] { Target.Eval(gameStatus, context) };
+        return new [] { Target.Eval(gameWatcher) };
     }
 }

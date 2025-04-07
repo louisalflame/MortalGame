@@ -4,13 +4,13 @@ using UnityEngine;
 
 public interface ITargetCardValue
 {
-    ICardEntity Eval(GameStatus gameStatus, GameContext context);
+    ICardEntity Eval(IGameplayStatusWatcher gameWatcher);
 }
 
 [Serializable]
 public class NoneCard : ITargetCardValue
 {
-    public ICardEntity Eval(GameStatus gameStatus, GameContext context)
+    public ICardEntity Eval(IGameplayStatusWatcher gameWatcher)
     {
         return CardEntity.DummyCard;
     }
@@ -18,32 +18,33 @@ public class NoneCard : ITargetCardValue
 [Serializable]
 public class SelectedCard : ITargetCardValue
 {
-    public ICardEntity Eval(GameStatus gameStatus, GameContext context)
+    public ICardEntity Eval(IGameplayStatusWatcher gameWatcher)
     {
-        return context.SelectedCard;
+        return gameWatcher.GameContext.SelectedCard;
     }
 }
 
 public interface ITargetCardCollectionValue
 {
-    IReadOnlyCollection<ICardEntity> Eval(GameStatus gameStatus, GameContext context);
+    IReadOnlyCollection<ICardEntity> Eval(IGameplayStatusWatcher gameWatcher);
 }
+
 [Serializable]
 public class SingleCardCollection : ITargetCardCollectionValue
 {
     public ITargetCardValue TargetCard;
 
-    public IReadOnlyCollection<ICardEntity> Eval(GameStatus gameStatus, GameContext context)
+    public IReadOnlyCollection<ICardEntity> Eval(IGameplayStatusWatcher gameWatcher)
     {
-        return new [] { TargetCard.Eval(gameStatus, context) };
+        return new [] { TargetCard.Eval(gameWatcher) };
     }
 }
 [Serializable]
 public class AllyHandCards : ITargetCardCollectionValue
 {
-    public IReadOnlyCollection<ICardEntity> Eval(GameStatus gameStatus, GameContext context)
+    public IReadOnlyCollection<ICardEntity> Eval(IGameplayStatusWatcher gameWatcher)
     {
-        return context.ExecutePlayer.CardManager.HandCard.Cards;
+        return gameWatcher.GameContext.ExecutePlayer.CardManager.HandCard.Cards;
     }
 }
 

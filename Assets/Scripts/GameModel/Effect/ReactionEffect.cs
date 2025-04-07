@@ -1,12 +1,15 @@
-using System;
- 
+
 public interface IReactionEffect
+{
+
+}
+
+public interface IPlayerBuffEffect : IReactionEffect
 {
     
 }
 
-public class EffectiveDamageEffect : IReactionEffect
+public interface ICharacterBuffEffect : IReactionEffect
 {
-    public ITargetCharacterCollectionValue Targets;
-    public IIntegerValue Value;
+    
 }

@@ -427,7 +427,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
             {
                 case DamageEffect damageEffect:
                 {
-                    var targets = damageEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
+                    var targets = damageEffect.Targets.Eval(this);
                     foreach(var target in targets)
                     {
                         using(_contextMgr.SetEffectTargetCharacter(target))
@@ -444,7 +444,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 }
                 case PenetrateDamageEffect penetrateDamageEffect:
                 {
-                    var targets = penetrateDamageEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
+                    var targets = penetrateDamageEffect.Targets.Eval(this);
                     foreach(var target in targets)
                     {
                         using(_contextMgr.SetEffectTargetCharacter(target))
@@ -461,7 +461,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 }
                 case AdditionalAttackEffect additionalAttackEffect:
                 {
-                    var targets = additionalAttackEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
+                    var targets = additionalAttackEffect.Targets.Eval(this);
                     foreach(var target in targets)
                     {
                         using(_contextMgr.SetEffectTargetCharacter(target))
@@ -478,7 +478,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 }
                 case EffectiveAttackEffect effectiveAttackEffect:
                 {
-                    var targets = effectiveAttackEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
+                    var targets = effectiveAttackEffect.Targets.Eval(this);
                     foreach(var target in targets)
                     {
                         using(_contextMgr.SetEffectTargetCharacter(target))
@@ -495,7 +495,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 }
                 case HealEffect healEffect: 
                 {
-                    var targets = healEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
+                    var targets = healEffect.Targets.Eval(this);
                     foreach(var target in targets)
                     {
                         using(_contextMgr.SetEffectTargetCharacter(target))
@@ -512,7 +512,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 }
                 case ShieldEffect shieldEffect:
                 {
-                    var targets = shieldEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
+                    var targets = shieldEffect.Targets.Eval(this);
                     foreach(var target in targets)
                     {
                         using(_contextMgr.SetEffectTargetCharacter(target))
@@ -529,7 +529,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 }
                 case GainEnergyEffect gainEnergyEffect:
                 {
-                    var targets = gainEnergyEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
+                    var targets = gainEnergyEffect.Targets.Eval(this);
                     foreach(var target in targets)
                     {
                         using(_contextMgr.SetEffectTargetPlayer(target))
@@ -546,7 +546,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 }
                 case LoseEnegyEffect loseEnegyEffect:
                 {
-                    var targets = loseEnegyEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
+                    var targets = loseEnegyEffect.Targets.Eval(this);
                     foreach(var target in targets)
                     {
                         using(_contextMgr.SetEffectTargetPlayer(target))
@@ -565,7 +565,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 // === BUFF EFFECT ===
                 case AddBuffEffect addBuffEffect:
                 {
-                    var targets = addBuffEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
+                    var targets = addBuffEffect.Targets.Eval(this);
                     foreach(var target in targets)
                     {
                         using(_contextMgr.SetEffectTargetPlayer(target))
@@ -596,7 +596,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 }
                 case RemoveBuffEffect removeBuffEffect:
                 {
-                    var targets = removeBuffEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
+                    var targets = removeBuffEffect.Targets.Eval(this);
                     foreach(var target in targets)
                     {
                         using(_contextMgr.SetEffectTargetPlayer(target))
@@ -620,7 +620,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 // === CARD EFFECT ===
                 case DrawCardEffect drawCardEffect:
                 {
-                    var targets = drawCardEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
+                    var targets = drawCardEffect.Targets.Eval(this);
                     foreach(var target in targets)
                     {
                         using(_contextMgr.SetEffectTargetPlayer(target))
@@ -635,7 +635,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 }
                 case DiscardCardEffect discardCardEffect:
                 {
-                    var cards = discardCardEffect.TargetCards.Eval(_gameStatus, _contextMgr.Context);
+                    var cards = discardCardEffect.TargetCards.Eval(this);
                     foreach(var card in cards)
                     {
                         using(_contextMgr.SetEffectTargetPlayer(card.Owner))
@@ -654,7 +654,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 }
                 case ConsumeCardEffect consumeCardEffect:
                 {
-                    var cards = consumeCardEffect.TargetCards.Eval(_gameStatus, _contextMgr.Context);
+                    var cards = consumeCardEffect.TargetCards.Eval(this);
                     foreach(var card in cards)
                     {
                         using(_contextMgr.SetEffectTargetPlayer(card.Owner))
@@ -672,7 +672,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 }
                 case DisposeCardEffect disposeCardEffect:
                 {
-                    var cards = disposeCardEffect.TargetCards.Eval(_gameStatus, _contextMgr.Context);
+                    var cards = disposeCardEffect.TargetCards.Eval(this);
                     foreach(var card in cards.ToArray())
                     {
                         using(_contextMgr.SetEffectTargetPlayer(card.Owner))
@@ -690,7 +690,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 }
                 case CreateCardEffect createCardEffect:
                 {
-                    var target = createCardEffect.Target.Eval(_gameStatus, _contextMgr.Context);
+                    var target = createCardEffect.Target.Eval(this);
                     using(_contextMgr.SetEffectTargetPlayer(target))
                     {
                         foreach(var cardData in createCardEffect.CardDatas)
@@ -713,7 +713,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 }
                 case CloneCardEffect cloneCardEffect:
                 {
-                    var cards = cloneCardEffect.TargetCards.Eval(_gameStatus, _contextMgr.Context);
+                    var cards = cloneCardEffect.TargetCards.Eval(this);
                     foreach(var card in cards)
                     {
                         using(_contextMgr.SetEffectTargetPlayer(card.Owner))
@@ -737,7 +737,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 }
                 case AppendCardStatusEffect appendCardStatusEffect:
                 {
-                    var cards = appendCardStatusEffect.TargetCards.Eval(_gameStatus, _contextMgr.Context);
+                    var cards = appendCardStatusEffect.TargetCards.Eval(this);
                     foreach(var card in cards)
                     {
                         using(_contextMgr.SetEffectTargetPlayer(card.Owner))
@@ -775,13 +775,17 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
             using(_contextMgr.SetTriggeredPlayerBuff(buff))
             {
                 Debug.Log($"_TriggerBuffs buff:{buff} Timing:{timing}");
-                if (buff.Effects.TryGetValue(timing, out var buffEffects))
-                {
-                    foreach(var effect in buffEffects)
+                var conditionalEffectsOpt = _contextMgr.BuffLibrary.GetBuffEffects(buff.Id, timing);
+
+                conditionalEffectsOpt.MatchSome(conditionalEffects => {
+                    foreach(var conditionalEffect in conditionalEffects)
                     {
-                        _ApplyBuffEffect(effect);
+                        if (conditionalEffect.Conditions.All(c => c.Eval(this)))
+                        {
+                            _ApplyBuffEffect(conditionalEffect.Effect);
+                        }
                     }
-                }
+                });
             }
         }
     }
@@ -795,7 +799,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
             {
                 case EffectiveDamageBuffEffect effectiveDamageBuffEffect:
                 {
-                    var targets = effectiveDamageBuffEffect.Targets.Eval(_gameStatus, _contextMgr.Context);
+                    var targets = effectiveDamageBuffEffect.Targets.Eval(this);
                     foreach(var target in targets)
                     {
                         using(_contextMgr.SetEffectTargetCharacter(target))

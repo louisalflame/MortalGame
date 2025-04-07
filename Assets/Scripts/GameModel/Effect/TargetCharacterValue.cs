@@ -6,12 +6,12 @@ using UnityEngine;
 
 public interface ITargetCharacterValue
 {
-    ICharacterEntity Eval(GameStatus gameStatus, GameContext context);
+    ICharacterEntity Eval(IGameplayStatusWatcher gameWatcher);
 }
 [Serializable]
 public class NoneCharacter : ITargetCharacterValue
 {
-    public ICharacterEntity Eval(GameStatus gameStatus, GameContext context)
+    public ICharacterEntity Eval(IGameplayStatusWatcher gameWatcher)
     {
         return CharacterEntity.DummyCharacter;
     }
@@ -21,20 +21,21 @@ public class MainCharacterOfPlayer : ITargetCharacterValue
 {
     public ITargetPlayerValue Player;
 
-    public ICharacterEntity Eval(GameStatus gameStatus, GameContext context)
+    public ICharacterEntity Eval(IGameplayStatusWatcher gameWatcher)
     {
-        return Player.Eval(gameStatus, context).MainCharacter;
+        return Player.Eval(gameWatcher).MainCharacter;
     }
 }
 
 public interface ITargetCharacterCollectionValue
 {
-    IReadOnlyCollection<ICharacterEntity> Eval(GameStatus gameStatus, GameContext context);
+    IReadOnlyCollection<ICharacterEntity> Eval(IGameplayStatusWatcher gameWatcher);
 }
+
 [Serializable]
 public class NoneCharacters : ITargetCharacterCollectionValue
 {
-    public IReadOnlyCollection<ICharacterEntity> Eval(GameStatus gameStatus, GameContext context)
+    public IReadOnlyCollection<ICharacterEntity> Eval(IGameplayStatusWatcher gameWatcher)
     {
         return new ICharacterEntity[0];
     }
@@ -44,8 +45,8 @@ public class SingleCharacterCollection : ITargetCharacterCollectionValue
 {
     public ITargetCharacterValue Target;
 
-    public IReadOnlyCollection<ICharacterEntity> Eval(GameStatus gameStatus, GameContext context)
+    public IReadOnlyCollection<ICharacterEntity> Eval(IGameplayStatusWatcher gameWatcher)
     {
-        return new [] { Target.Eval(gameStatus, context) };
+        return new [] { Target.Eval(gameWatcher) };
     }
 }

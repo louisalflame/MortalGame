@@ -4,13 +4,13 @@ using UnityEngine;
 
 public interface ITargetPlayerBuffValue
 {
-    IPlayerBuffEntity Eval(GameStatus gameStatus, GameContext context);
+    IPlayerBuffEntity Eval(IGameplayStatusWatcher gameWatcher);
 }
 
 [Serializable]
 public class NoneBuff : ITargetPlayerBuffValue
 {
-    public IPlayerBuffEntity Eval(GameStatus gameStatus, GameContext context)
+    public IPlayerBuffEntity Eval(IGameplayStatusWatcher gameWatcher)
     {
         return PlayerBuffEntity.DummyBuff;
     }
@@ -18,8 +18,8 @@ public class NoneBuff : ITargetPlayerBuffValue
 [Serializable]
 public class TriggeredBuff : ITargetPlayerBuffValue
 {
-    public IPlayerBuffEntity Eval(GameStatus gameStatus, GameContext context)
+    public IPlayerBuffEntity Eval(IGameplayStatusWatcher gameWatcher)
     {
-        return context.TriggeredBuff;
+        return gameWatcher.GameContext.TriggeredBuff;
     }
 }

@@ -30,40 +30,68 @@ MonoBehaviour:
     - Name: MaxLevel
       Entry: 3
       Data: 999
+    - Name: Sessions
+      Entry: 7
+      Data: 1|System.Collections.Generic.List`1[[IReactionSessionData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: BuffEffects
       Entry: 7
-      Data: 1|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[PlayerBuffData+BuffEffect,
+      Data: 2|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[PlayerBuffData+BuffEffect,
         Assembly-CSharp]], Unity.Plastic.Antlr3.Runtime
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 2|PlayerBuffData+BuffEffect, Assembly-CSharp
+      Data: 3|PlayerBuffData+BuffEffect, Assembly-CSharp
     - Name: Timing
       Entry: 3
       Data: 5
-    - Name: Effects
+    - Name: ConditionEffects
       Entry: 7
-      Data: 3|IPlayerBuffEffect[], Assembly-CSharp
+      Data: 4|ConditionalEffect[], Assembly-CSharp
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 4|EffectiveDamageBuffEffect, Assembly-CSharp
+      Data: 5|ConditionalEffect, Assembly-CSharp
+    - Name: Conditions
+      Entry: 7
+      Data: 6|ICondition[], Assembly-CSharp
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Effect
+      Entry: 7
+      Data: 7|EffectiveDamageBuffEffect, Assembly-CSharp
     - Name: Targets
       Entry: 7
-      Data: 5|SingleCharacterCollection, Assembly-CSharp
+      Data: 8|SingleCharacterCollection, Assembly-CSharp
     - Name: Target
       Entry: 7
-      Data: 6|MainCharacterOfPlayer, Assembly-CSharp
+      Data: 9|MainCharacterOfPlayer, Assembly-CSharp
     - Name: Player
       Entry: 7
-      Data: 7|OwnerOfPlayerBuff, Assembly-CSharp
+      Data: 10|OwnerOfPlayerBuff, Assembly-CSharp
     - Name: PlayerBuff
       Entry: 7
-      Data: 8|TriggeredBuff, Assembly-CSharp
+      Data: 11|TriggeredBuff, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -78,7 +106,10 @@ MonoBehaviour:
       Data: 
     - Name: Value
       Entry: 7
-      Data: 9|ThisBuffLevel, Assembly-CSharp
+      Data: 12|ThisBuffLevel, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -102,7 +133,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 10|System.Collections.Generic.List`1[[PlayerBuffPropertyValue, Assembly-CSharp]],
+      Data: 13|System.Collections.Generic.List`1[[PlayerBuffPropertyValue, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
