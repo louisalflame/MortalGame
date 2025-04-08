@@ -4,6 +4,6 @@ using UnityEngine;
 
 public interface IPlayerBuffLifeTimeData
 {
-    ICardStatusLifeTimeEntity CreateEntity();
+    IPlayerBuffLifeTimeEntity CreateEntity();
 }
 

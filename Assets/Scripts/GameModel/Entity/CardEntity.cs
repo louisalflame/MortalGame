@@ -231,3 +231,20 @@ public class CardEntity : ICardEntity
         return false;
     }
 }
+
+public static class CardEntityExtensions
+{
+    public static bool IsConsumable(this ICardEntity card)
+    {
+        return card.HasProperty(CardProperty.Consumable);
+    }
+    public static bool IsDisposable(this ICardEntity card)
+    {
+        return card.HasProperty(CardProperty.Dispose) || card.HasProperty(CardProperty.AutoDispose);
+    }
+
+    public static bool HasProperty(this ICardEntity card, CardProperty property)
+    { 
+        return card.AllProperties.Any(p => p.Property == property);
+    }
+}

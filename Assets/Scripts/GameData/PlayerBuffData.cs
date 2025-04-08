@@ -45,7 +45,7 @@ public class PlayerBuffData
 
     [ShowInInspector]
     [BoxGroup("Properties")]
-    public List<PlayerBuffPropertyValue> PropertyDatas = new();
+    public List<IPlayerBuffPropertyData> PropertyDatas = new();
 
     [BoxGroup("LifeTime")]
     public IPlayerBuffLifeTimeData LifeTimeData;
