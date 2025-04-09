@@ -5,14 +5,14 @@ using UnityEngine;
 
 public interface IReactionSessionData
 {
+    string Id { get; }
     Dictionary<string, ISessionValueData> SessionValueTable { get; }
-
-    IReactionSessionEntity GetEntity(IGameplayStatusWatcher gameWatcher);
+    IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher);
 }
 
 public abstract class ReactionSessionData
 {
-    public string Id;
+    public string Id { get; set; }
     
     public Dictionary<string, ISessionValueData> Values;
 
@@ -22,7 +22,7 @@ public abstract class ReactionSessionData
 [Serializable]
 public class WholeGameSession : ReactionSessionData, IReactionSessionData
 {
-    public IReactionSessionEntity GetEntity(IGameplayStatusWatcher gameWatcher)
+    public IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
     {
         return new WholeGameSessionEntity(
             Id, 
@@ -35,7 +35,7 @@ public class WholeGameSession : ReactionSessionData, IReactionSessionData
 [Serializable]
 public class WholeTurnSession : ReactionSessionData, IReactionSessionData
 {
-    public IReactionSessionEntity GetEntity(IGameplayStatusWatcher gameWatcher)
+    public IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
     {
         return new WholeTurnSessionEntity(
             Id, 
@@ -48,7 +48,7 @@ public class WholeTurnSession : ReactionSessionData, IReactionSessionData
 [Serializable]
 public class ExectueTurnSession : ReactionSessionData, IReactionSessionData
 {
-    public IReactionSessionEntity GetEntity(IGameplayStatusWatcher gameWatcher)
+    public IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
     {
         return new WholeTurnSessionEntity(
             Id, 
@@ -61,7 +61,7 @@ public class ExectueTurnSession : ReactionSessionData, IReactionSessionData
 [Serializable]
 public class CardSession : ReactionSessionData, IReactionSessionData
 {
-    public IReactionSessionEntity GetEntity(IGameplayStatusWatcher gameWatcher)
+    public IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
     {
         return new WholeTurnSessionEntity(
             Id, 

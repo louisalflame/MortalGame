@@ -4,18 +4,20 @@ using System.Collections.Generic;
 
 public interface IReactionSessionEntity
 {
+    string Id { get; }
     void Update(IGameplayStatusWatcher gameWatcher, IReactionSessionData sessionData);
 }
 
 public abstract class ReactionSessionEntity : IReactionSessionEntity
 {
-    public string Id;
+    private string _id;
+    public string Id => _id;
 
     public Dictionary<string, ISessionValueEntity> Values;
 
     public ReactionSessionEntity(string id, Dictionary<string, ISessionValueEntity> values)
     {
-        Id = id;
+        _id = id;
         Values = values;
     }
 

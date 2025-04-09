@@ -6,7 +6,7 @@ public interface IPlayerBuffPropertyEntity
     PlayerBuffProperty Property { get; }
     
     int Eval(IGameplayStatusWatcher gameWatcher);
-    void UpdateTiming(IGameplayStatusWatcher gameWatcher, GameTiming timing);
+    void Update(IGameplayStatusWatcher gameWatcher);
 }
 
 public abstract class PlayerBuffPropertyEntity : IPlayerBuffPropertyEntity
@@ -18,7 +18,7 @@ public abstract class PlayerBuffPropertyEntity : IPlayerBuffPropertyEntity
         return 0;
     }
 
-    public virtual void UpdateTiming(IGameplayStatusWatcher gameWatcher, GameTiming timing)
+    public virtual void Update(IGameplayStatusWatcher gameWatcher)
     { }
 }
 

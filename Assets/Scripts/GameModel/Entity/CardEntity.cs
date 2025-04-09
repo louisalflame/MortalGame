@@ -30,7 +30,7 @@ public interface ICardEntity
     int EvalCost(IGameplayStatusWatcher gameWatcher);
     int EvalPower(IGameplayStatusWatcher gameWatcher);
 
-    bool TryUpdateCardsOnTiming(IGameplayStatusWatcher gameWatcher, GameTiming timing, out IGameEvent gameEvent);
+    bool TryUpdateCards(IGameplayStatusWatcher gameWatcher, out IGameEvent gameEvent);
 
     ICardEntity Clone(IPlayerEntity cloneOwner, IEnumerable<ICardStatusEntity> cardStatuses);
     void AddNewStatus(ICardStatusEntity status);
@@ -219,11 +219,11 @@ public class CardEntity : ICardEntity
         return power;
     }
 
-    public bool TryUpdateCardsOnTiming(IGameplayStatusWatcher gameWatcher, GameTiming timing, out IGameEvent gameEvent)
+    public bool TryUpdateCards(IGameplayStatusWatcher gameWatcher, out IGameEvent gameEvent)
     {
         foreach(var cardStatus in StatusList)
         {
-            cardStatus.UpdateTiming(gameWatcher, timing);
+            cardStatus.Update(gameWatcher);
         }
         
         // TODO: return event of property expired

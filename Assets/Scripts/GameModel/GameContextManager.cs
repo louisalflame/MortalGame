@@ -71,7 +71,7 @@ public class GameContextManager : IDisposable
         _contextStack.Push(Context.With(usingCard: usingCard));
         return this;
     }
-    public GameContextManager SetCardTiming(GameTiming gameTiming) 
+    public GameContextManager SetGameTiming(GameTiming gameTiming) 
     {
         _contextStack.Push(Context.With(gameTiming: gameTiming));
         return this;

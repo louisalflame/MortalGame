@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Sirenix.OdinInspector;
 
 public interface ICardEffect
@@ -67,7 +68,6 @@ public class LoseEnegyEffect : ICardEffect
 public class AddBuffEffect : ICardEffect
 {
     public ITargetPlayerCollectionValue Targets;
-
     [ValueDropdown("@DropdownHelper.BuffNames")]
     public string BuffId;
     public IIntegerValue Level;
@@ -76,6 +76,7 @@ public class AddBuffEffect : ICardEffect
 public class RemoveBuffEffect : ICardEffect
 {
     public ITargetPlayerCollectionValue Targets;
+    [ValueDropdown("@DropdownHelper.BuffNames")]
     public string BuffId;
 }
 
@@ -107,20 +108,24 @@ public class DisposeCardEffect : ICardEffect
 public class CreateCardEffect : ICardEffect
 {
     public ITargetPlayerValue Target;
-    public CardDataScriptable[] CardDatas;
-    public AddCardStatusData[] AddCardStatusDatas;
+    [ShowInInspector]
+    public List<CardDataScriptable> CardDatas = new ();    
+    [ShowInInspector]
+    public List<AddCardStatusData> AddCardStatusDatas = new ();
     public CardCollectionType CreateDestination;
 }
 [Serializable]
 public class CloneCardEffect : ICardEffect
 {
     public ITargetCardCollectionValue TargetCards;
-    public AddCardStatusData[] AddCardStatusDatas;
+    [ShowInInspector]
+    public List<AddCardStatusData> AddCardStatusDatas = new ();
     public CardCollectionType CloneDestination;
 }
 [Serializable]
 public class AppendCardStatusEffect : ICardEffect
 {
     public ITargetCardCollectionValue TargetCards;
-    public AddCardStatusData[] AddCardStatusDatas;
+    [ShowInInspector]
+    public List<AddCardStatusData> AddCardStatusDatas = new ();
 }

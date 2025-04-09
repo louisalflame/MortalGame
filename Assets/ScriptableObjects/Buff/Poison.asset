@@ -133,7 +133,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 13|System.Collections.Generic.List`1[[PlayerBuffPropertyValue, Assembly-CSharp]],
+      Data: 13|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -145,7 +145,13 @@ MonoBehaviour:
       Entry: 8
       Data: 
     - Name: LifeTimeData
-      Entry: 6
+      Entry: 7
+      Data: 14|PlayerBuffTurnLifeTimeData, Assembly-CSharp
+    - Name: Turn
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
       Data: 
     - Name: 
       Entry: 8

@@ -9,7 +9,7 @@ public interface ICardStatusEntity
     List<ICardPropertyEntity> Properties { get; }
     
     bool IsExpired();
-    void UpdateTiming(IGameplayStatusWatcher gameWatcher, GameTiming timing);
+    void Update(IGameplayStatusWatcher gameWatcher);
 }
 
 public class CardStatusEntity : ICardStatusEntity
@@ -51,13 +51,13 @@ public class CardStatusEntity : ICardStatusEntity
         return LifeTime.IsExpired();
     }
 
-    public void UpdateTiming(IGameplayStatusWatcher gameWatcher, GameTiming timing)
+    public void Update(IGameplayStatusWatcher gameWatcher)
     {
         foreach(var property in Properties)
         {
-            property.UpdateTiming(gameWatcher, timing);
+            property.Update(gameWatcher);
         }
 
-        LifeTime.UpdateTiming(gameWatcher, timing);
+        LifeTime.Update(gameWatcher);
     }
 }

@@ -38,4 +38,26 @@ public class PlayerBuffLibrary
 
         return _buffs[buffId].Sessions.ToArray();
     }
+
+    public IPlayerBuffLifeTimeData GetBuffLifeTime(string buffId)
+    {
+        if (!_buffs.ContainsKey(buffId))
+        {
+            Debug.LogError($"Buff ID {buffId} not found in library.");
+            return null;
+        }
+
+        return _buffs[buffId].LifeTimeData;
+    }
+
+    public IPlayerBuffPropertyData[] GetBuffProperties(string buffId)
+    {
+        if (!_buffs.ContainsKey(buffId))
+        {
+            Debug.LogError($"Buff ID {buffId} not found in library.");
+            return new IPlayerBuffPropertyData[0];
+        }
+
+        return _buffs[buffId].PropertyDatas.ToArray();
+    }
 }

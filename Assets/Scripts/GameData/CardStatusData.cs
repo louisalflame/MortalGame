@@ -8,11 +8,13 @@ public class CardStatusData
     [BoxGroup("Identification")]
     public string ID;
 
+    [ShowInInspector]
     [TitleGroup("Effects")]
-    public Dictionary<GameTiming, ICardEffect[]> Effects = new Dictionary<GameTiming, ICardEffect[]>();
+    public Dictionary<GameTiming, ICardEffect[]> Effects = new ();
 
+    [ShowInInspector]
     [TitleGroup("Properties")]
-    public List<ICardPropertyData> PropertyDatas;
+    public List<ICardPropertyData> PropertyDatas = new ();
 
     [TitleGroup("LifeTime")]
     public ICardStatusLifeTimeData LifeTimeData;
@@ -22,6 +24,7 @@ public class CardStatusData
 [Serializable]
 public class AddCardStatusData
 {
+    [ValueDropdown("@DropdownHelper.CardStatusNames")]
     public string CardStatusId;
     public IIntegerValue Power;
     public IIntegerValue Times;

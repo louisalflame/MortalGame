@@ -16,7 +16,7 @@ public interface IPlayerCardManager
 
     IEnumerable<IGameEvent> ClearHandOnTurnEnd(IGameplayStatusWatcher gameWatcher);
     
-    IEnumerable<IGameEvent> UpdateCardsOnTiming(IGameplayStatusWatcher gameWatcher, GameTiming timing);
+    IEnumerable<IGameEvent> UpdateCards(IGameplayStatusWatcher gameWatcher);
 
     Option<ICardEntity> GetCard(Guid cardIdentity);
     bool TryDiscardCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
@@ -87,14 +87,14 @@ public class PlayerCardManager : IPlayerCardManager
         return events;
     }
 
-    public IEnumerable<IGameEvent> UpdateCardsOnTiming(IGameplayStatusWatcher gameWatcher, GameTiming timing)
+    public IEnumerable<IGameEvent> UpdateCards(IGameplayStatusWatcher gameWatcher)
     {
         var events = new List<IGameEvent>();
 
         foreach(var card in HandCard.Cards)
         {
             // TODO : collect reactions
-            if(card.TryUpdateCardsOnTiming(gameWatcher, timing, out var cardEvent))
+            if(card.TryUpdateCards(gameWatcher, out var cardEvent))
             {
                 events.Add(cardEvent);
             }

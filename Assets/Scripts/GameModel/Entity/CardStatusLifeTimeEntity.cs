@@ -3,26 +3,26 @@ using UnityEngine;
 public interface ICardStatusLifeTimeEntity
 {
     bool IsExpired();
-    void UpdateTiming(IGameplayStatusWatcher gameWatcher, GameTiming timing);
+    void Update(IGameplayStatusWatcher gameWatcher);
 }
 
-public class CardStatusAlwaysLifeTimeEntity : ICardStatusLifeTimeEntity
+public class AlwaysLifeTimeCardStatusEntity : ICardStatusLifeTimeEntity
 {
     public bool IsExpired()
     {
         return false;
     }
 
-    public void UpdateTiming(IGameplayStatusWatcher gameWatcher, GameTiming timing)
+    public void Update(IGameplayStatusWatcher gameWatcher)
     {
     }
 }
 
-public class CardStatusTurnLifeTimeEntity : ICardStatusLifeTimeEntity
+public class TurnLifeTimeCardStatusEntity : ICardStatusLifeTimeEntity
 {
     private int _turn;
 
-    public CardStatusTurnLifeTimeEntity(int turn)
+    public TurnLifeTimeCardStatusEntity(int turn)
     {
         _turn = turn;
     }
@@ -32,9 +32,9 @@ public class CardStatusTurnLifeTimeEntity : ICardStatusLifeTimeEntity
         return _turn <= 0;
     }
 
-    public void UpdateTiming(IGameplayStatusWatcher gameWatcher, GameTiming timing)
+    public void Update(IGameplayStatusWatcher gameWatcher)
     {
-        if (timing == GameTiming.TurnEnd)
+        if (gameWatcher.GameContext.GameTiming == GameTiming.TurnEnd)
         {
             _turn--;
         }

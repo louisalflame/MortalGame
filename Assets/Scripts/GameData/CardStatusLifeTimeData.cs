@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public interface ICardStatusLifeTimeData
@@ -5,20 +6,22 @@ public interface ICardStatusLifeTimeData
     ICardStatusLifeTimeEntity CreateEntity();
 }
 
-public class CardStatusAlwaysLifeTimeData : ICardStatusLifeTimeData
+[Serializable]
+public class AlwaysLifeTimeCardStatusData : ICardStatusLifeTimeData
 {
     public ICardStatusLifeTimeEntity CreateEntity()
     {
-        return new CardStatusAlwaysLifeTimeEntity();
+        return new AlwaysLifeTimeCardStatusEntity();
     }
 }
 
-public class CardStatusTurnLifeTimeData : ICardStatusLifeTimeData
+[Serializable]
+public class TurnLifeTimeCardStatusData : ICardStatusLifeTimeData
 {
     public int Turn;
 
     public ICardStatusLifeTimeEntity CreateEntity()
     {
-        return new CardStatusTurnLifeTimeEntity(Turn);
+        return new TurnLifeTimeCardStatusEntity(Turn);
     }
 }
