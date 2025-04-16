@@ -9,8 +9,12 @@ public interface ICondition
     bool Eval(IGameplayStatusWatcher gameWatcher);
 }
 
+public interface ICardStatusCondition : ICondition { }
+public interface IPlayerBuffCondition : ICondition { }
+public interface ICharacterBuffCondition : ICondition { }
+
 [Serializable]
-public class TrueCondition : ICondition
+public class TrueCondition : ICardStatusCondition, IPlayerBuffCondition, ICharacterBuffCondition
 {
     public bool Eval(IGameplayStatusWatcher gameWatcher)
     {
@@ -19,7 +23,7 @@ public class TrueCondition : ICondition
 }
 
 [Serializable]
-public class FalseCondition : ICondition
+public class FalseCondition : ICardStatusCondition, IPlayerBuffCondition, ICharacterBuffCondition
 {
     public bool Eval(IGameplayStatusWatcher gameWatcher)
     {
@@ -28,7 +32,7 @@ public class FalseCondition : ICondition
 }
 
 [Serializable]
-public class AllCondition : ICondition
+public class AllCondition : ICardStatusCondition, IPlayerBuffCondition, ICharacterBuffCondition
 {
     public List<ICondition> Conditions;
 
@@ -39,12 +43,26 @@ public class AllCondition : ICondition
 }
 
 [Serializable]
-public class AnyCondition : ICondition
+public class AnyCondition : ICardStatusCondition, IPlayerBuffCondition, ICharacterBuffCondition
 {
     public List<ICondition> Conditions;
 
     public bool Eval(IGameplayStatusWatcher gameWatcher)
     {
         return Conditions.Any(condition => condition.Eval(gameWatcher));
+    }
+}
+
+[Serializable]
+public class IsSelfTurnCondition : IPlayerBuffCondition, ICharacterBuffCondition
+{
+    public ITargetPlayerValue TargetPlayer;
+
+    public bool Eval(IGameplayStatusWatcher gameWatcher)
+    {
+        return gameWatcher.GameStatus.CurrentPlayer.Match(
+            player => player == TargetPlayer.Eval(gameWatcher),
+            () => false
+        );
     }
 }

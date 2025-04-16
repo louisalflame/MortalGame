@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 public interface IReactionSessionData
@@ -14,9 +15,10 @@ public abstract class ReactionSessionData
 {
     public string Id { get; set; }
     
-    public Dictionary<string, ISessionValueData> Values;
+    [ShowInInspector]
+    protected Dictionary<string, ISessionValueData> _values = new();
 
-    public Dictionary<string, ISessionValueData> SessionValueTable => Values;
+    public Dictionary<string, ISessionValueData> SessionValueTable => _values;
 }
 
 [Serializable]
@@ -26,7 +28,7 @@ public class WholeGameSession : ReactionSessionData, IReactionSessionData
     {
         return new WholeGameSessionEntity(
             Id, 
-            Values.ToDictionary(
+            _values.ToDictionary(
                 kvp => kvp.Key,
                 kvp => kvp.Value.GetEntity(gameWatcher)));
     }
@@ -39,7 +41,7 @@ public class WholeTurnSession : ReactionSessionData, IReactionSessionData
     {
         return new WholeTurnSessionEntity(
             Id, 
-            Values.ToDictionary(
+            _values.ToDictionary(
                 kvp => kvp.Key,
                 kvp => kvp.Value.GetEntity(gameWatcher)));
     }
@@ -52,7 +54,7 @@ public class ExectueTurnSession : ReactionSessionData, IReactionSessionData
     {
         return new WholeTurnSessionEntity(
             Id, 
-            Values.ToDictionary(
+            _values.ToDictionary(
                 kvp => kvp.Key,
                 kvp => kvp.Value.GetEntity(gameWatcher)));
     }
@@ -65,7 +67,7 @@ public class CardSession : ReactionSessionData, IReactionSessionData
     {
         return new WholeTurnSessionEntity(
             Id, 
-            Values.ToDictionary(
+            _values.ToDictionary(
                 kvp => kvp.Key,
                 kvp => kvp.Value.GetEntity(gameWatcher)));
     }

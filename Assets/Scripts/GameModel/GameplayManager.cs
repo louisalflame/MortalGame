@@ -73,18 +73,23 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
         {
             case GameState.GameStart:
                 _GameStart();
+                _gameStatus.SetState(GameState.TurnStart);
                 break;
             case GameState.TurnStart:
                 _TurnStart();
+                _gameStatus.SetState(GameState.DrawCard);
                 break;
             case GameState.DrawCard:
                 _TurnDrawCard();
+                _gameStatus.SetState(GameState.EnemyPrepare);
                 break;
-            case GameState.EnemyPrepare:
+            case GameState.EnemyPrepare:     
                 _EnemyPreapre();
+                _gameStatus.SetState(GameState.PlayerPrepare);
                 break;
             case GameState.PlayerPrepare:
                 _PlayerPrepare();
+                _gameStatus.SetState(GameState.PlayerExecute);
                 break;
             case GameState.PlayerExecute:
                 _PlayerExecute();
@@ -94,6 +99,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 break;
             case GameState.TurnEnd:
                 _TurnEnd();
+                _gameStatus.SetState(GameState.TurnStart);
                 break;
             case GameState.GameEnd:
                 break;
@@ -108,8 +114,6 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
         _gameEvents.Add(new EnemySummonEvent() {
             Enemy = _gameStatus.Enemy 
         });
-
-        _gameStatus.SetState(GameState.TurnStart);
     }
 
     private void _TurnStart()
@@ -127,8 +131,6 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
 
         var enemyGainEnergyResult = _gameStatus.Enemy.EnergyManager.RecoverEnergy(_gameStatus.Enemy.EnergyRecoverPoint);
         _gameEvents.Add(new RecoverEnergyEvent(_gameStatus.Enemy, enemyGainEnergyResult));
-
-        _gameStatus.SetState(GameState.DrawCard);
     }
 
     private void _TurnDrawCard()
@@ -139,14 +141,11 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
         var allyDrawEvents = _DrawCards(_gameStatus.Ally, allyDrawCount);
         _gameEvents.AddRange(allyDrawEvents);
 
-        // TODO : apply allyDrawEvents.Reactions
-
         var enemyDrawEvents = _DrawCards(_gameStatus.Enemy, enemyDrawCount);
         _gameEvents.AddRange(enemyDrawEvents);
 
-        // TODO : apply enemyDrawEvents.Reactions
+        _TriggerTiming(GameTiming.DrawCard);
 
-        _gameStatus.SetState(GameState.EnemyPrepare);
         _gameActions.Clear();
     }
 
@@ -163,8 +162,6 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 });
             }
         }
-
-        _gameStatus.SetState(GameState.PlayerPrepare);
     }
 
     private void _PlayerPrepare()
@@ -173,8 +170,6 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
             Faction = _gameStatus.Ally.Faction,
             HandCardInfo = _gameStatus.Ally.CardManager.HandCard.ToCardCollectionInfo(this)
         });
-
-        _gameStatus.SetState(GameState.PlayerExecute);
     }
     public void _PlayerExecute()
     {
@@ -239,7 +234,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
             HandCardInfo = _gameStatus.Ally.CardManager.HandCard.ToCardCollectionInfo(this)
         });
         
-        var triggerEvts = _TriggerBuffs(_gameStatus.Ally, GameTiming.ExecuteEnd);
+        var triggerEvts = _TriggerTiming(GameTiming.ExecuteEnd);
         _gameEvents.AddRange(triggerEvts);
 
         _gameStatus.SetState(GameState.Enemy_Execute);
@@ -247,7 +242,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
     }   
     private void _FinishEnemyExecuteTurn()
     {
-        var triggerEvts = _TriggerBuffs(_gameStatus.Enemy, GameTiming.ExecuteEnd);
+        var triggerEvts = _TriggerTiming(GameTiming.ExecuteEnd);
         _gameEvents.AddRange(triggerEvts);
 
         _gameStatus.SetState(GameState.TurnEnd);
@@ -273,8 +268,6 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
             _gameEvents.AddRange(
                 _gameStatus.Enemy.CardManager.UpdateCards(this));
         }
-
-        _gameStatus.SetState(GameState.TurnStart);
     }
 
     private GameContextManager _SetUseCardSelectTarget(UseCardAction useCardAction)
@@ -331,13 +324,10 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                         {
                             if(usedCard.Effects.TryGetValue(GameTiming.PlayCard, out var onPlayEffects))
                             {
-                                using(_contextMgr.SetGameTiming(GameTiming.PlayCard))
+                                foreach(var effect in onPlayEffects)
                                 {
-                                    foreach(var effect in onPlayEffects)
-                                    {
-                                        var applyCardEvents = _ApplyCardEffect(effect);
-                                        useCardEvents.AddRange(applyCardEvents);
-                                    }
+                                    var applyCardEvents = _ApplyCardEffect(effect);
+                                    useCardEvents.AddRange(applyCardEvents);
                                 }
                             }
                         
@@ -724,72 +714,125 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
     // -2 update all property in playerBuff/ characterBuff/ cardStatus
     // -3 update all lifeTime in playerBuff/ characterBuff/ cardStatus
     // -4 remove all expired playerBuff/ characterBuff/ cardStatus and push into event
-    // -5 In SpecialTiming, collect all rectionEffect generated by playerBuff/ characterBuff/ cardStatus
-    //    Then, recursive generate triggerTiming and reactionEffect
-    private void _TriggerTiming(GameTiming gameTiming)
+    // -5 pass OBJECT from any time of any thing for any kind of session?
+    private void _UpdateTiming(GameTiming gameTiming)
     {
-        foreach(var buff in _gameStatus.Ally.BuffManager.Buffs)
-        {
-            using(_contextMgr.SetTriggeredPlayerBuff(buff))
+        using(_contextMgr.SetGameTiming(gameTiming))
+        {                
+            foreach(var buff in _gameStatus.Ally.BuffManager.Buffs)
             {
-                foreach(var reactionSession in buff.ReactionSessions)
+                using(_contextMgr.SetTriggeredPlayerBuff(buff))
                 {
-                    var data = _contextMgr.BuffLibrary.GetBuffSessions(buff.Id)
-                        .FirstOrDefault(s => reactionSession.Id == s.Id);
-                    reactionSession.Update(this, data);
+                    foreach(var session in buff.ReactionSessions)
+                    {
+                        var data = _contextMgr.BuffLibrary.GetBuffSessionData(buff.Id, session.Id);
+                        session.Update(this, data);
+                    }
+                    foreach(var propertyEntity in buff.Properties)
+                    {
+                        propertyEntity.Update(this);
+                    }
+                    buff.LifeTime.Update(this);
                 }
-                foreach(var propertyEntity in buff.Properties)
-                {
-                    propertyEntity.Update(this);
-                }
-                buff.LifeTime.Update(this);
             }
-        }
 
-        foreach(var character in _gameStatus.Ally.Characters)
-        { 
-        }
+            foreach(var character in _gameStatus.Ally.Characters)
+            { 
+            }
 
-        foreach(var card in _gameStatus.Ally.CardManager.HandCard.Cards)
-        { 
-        }
+            foreach(var card in _gameStatus.Ally.CardManager.HandCard.Cards)
+            { 
+            }
 
-        foreach(var buff in _gameStatus.Enemy.BuffManager.Buffs)
-        { 
-        }
+            foreach(var buff in _gameStatus.Enemy.BuffManager.Buffs)
+            { 
+                using(_contextMgr.SetTriggeredPlayerBuff(buff))
+                {
+                    foreach(var session in buff.ReactionSessions)
+                    {
+                        var data = _contextMgr.BuffLibrary.GetBuffSessionData(buff.Id, session.Id);
+                        session.Update(this, data);
+                    }
+                    foreach(var propertyEntity in buff.Properties)
+                    {
+                        propertyEntity.Update(this);
+                    }
+                    buff.LifeTime.Update(this);
+                }
+            }
 
-        foreach(var character in _gameStatus.Enemy.Characters)
-        { 
-        }
+            foreach(var character in _gameStatus.Enemy.Characters)
+            { 
+            }
 
-        foreach(var card in _gameStatus.Enemy.CardManager.HandCard.Cards)
-        { 
+            foreach(var card in _gameStatus.Enemy.CardManager.HandCard.Cards)
+            { 
+            }
         }
     }
 
-    private IEnumerable<IGameEvent> _TriggerBuffs(
-        PlayerEntity player, GameTiming timing)
+    // TODO: collect reactionEffects created from reactionSessions
+    private IEnumerable<IGameEvent> _TriggerTiming(GameTiming timing)
     {
         var triggerBuffEvents = new List<IGameEvent>();
-
-        var buffs = player.BuffManager.Buffs;
-        foreach(var buff in buffs)
+        using(_contextMgr.SetGameTiming(timing))
         {
-            using(_contextMgr.SetTriggeredPlayerBuff(buff))
+            foreach(var buff in _gameStatus.Ally.BuffManager.Buffs)
             {
-                Debug.Log($"_TriggerBuffs buff:{buff} Timing:{timing}");
-                var conditionalEffectsOpt = _contextMgr.BuffLibrary.GetBuffEffects(buff.Id, timing);
+                using(_contextMgr.SetTriggeredPlayerBuff(buff))
+                {
+                    Debug.Log($"_TriggerBuffs buff:{buff} Timing:{timing}");
+                    var conditionalEffectsOpt = _contextMgr.BuffLibrary.GetBuffEffects(buff.Id, timing);
 
-                conditionalEffectsOpt.MatchSome(conditionalEffects => {
-                    foreach(var conditionalEffect in conditionalEffects)
+                    conditionalEffectsOpt.MatchSome(conditionalEffects => 
                     {
-                        if (conditionalEffect.Conditions.All(c => c.Eval(this)))
+                        foreach(var conditionalEffect in conditionalEffects)
                         {
-                            var applyEvts = _ApplyBuffEffect(conditionalEffect.Effect);
-                            triggerBuffEvents.AddRange(applyEvts);
+                            if (conditionalEffect.Conditions.All(c => c.Eval(this)))
+                            {
+                                var applyEvts = _ApplyBuffEffect(conditionalEffect.Effect);
+                                triggerBuffEvents.AddRange(applyEvts);
+                            }
                         }
-                    }
-                });
+                    });
+                }
+            }
+
+            foreach(var character in _gameStatus.Ally.Characters)
+            { 
+            }
+
+            foreach(var card in _gameStatus.Ally.CardManager.HandCard.Cards)
+            { 
+            }
+
+            foreach(var buff in _gameStatus.Enemy.BuffManager.Buffs)
+            {
+                using(_contextMgr.SetTriggeredPlayerBuff(buff))
+                {
+                    Debug.Log($"_TriggerBuffs buff:{buff} Timing:{timing}");
+                    var conditionalEffectsOpt = _contextMgr.BuffLibrary.GetBuffEffects(buff.Id, timing);
+
+                    conditionalEffectsOpt.MatchSome(conditionalEffects => 
+                    {
+                        foreach(var conditionalEffect in conditionalEffects)
+                        {
+                            if (conditionalEffect.Conditions.All(c => c.Eval(this)))
+                            {
+                                var applyEvts = _ApplyBuffEffect(conditionalEffect.Effect);
+                                triggerBuffEvents.AddRange(applyEvts);
+                            }
+                        }
+                    });
+                }
+            }
+
+            foreach(var character in _gameStatus.Enemy.Characters)
+            { 
+            }
+
+            foreach(var card in _gameStatus.Enemy.CardManager.HandCard.Cards)
+            { 
             }
         }
         

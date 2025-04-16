@@ -58,19 +58,37 @@ MonoBehaviour:
       Data: 5
     - Name: ConditionEffects
       Entry: 7
-      Data: 4|ConditionalEffect[], Assembly-CSharp
+      Data: 4|ConditionalPlayerBuffEffect[], Assembly-CSharp
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 5|ConditionalEffect, Assembly-CSharp
+      Data: 5|ConditionalPlayerBuffEffect, Assembly-CSharp
     - Name: Conditions
       Entry: 7
-      Data: 6|ICondition[], Assembly-CSharp
+      Data: 6|IPlayerBuffCondition[], Assembly-CSharp
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 7|IsSelfTurnCondition, Assembly-CSharp
+    - Name: TargetPlayer
+      Entry: 7
+      Data: 8|OwnerOfPlayerBuff, Assembly-CSharp
+    - Name: PlayerBuff
+      Entry: 7
+      Data: 9|TriggeredBuff, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -79,19 +97,19 @@ MonoBehaviour:
       Data: 
     - Name: Effect
       Entry: 7
-      Data: 7|EffectiveDamageBuffEffect, Assembly-CSharp
+      Data: 10|EffectiveDamageBuffEffect, Assembly-CSharp
     - Name: Targets
       Entry: 7
-      Data: 8|SingleCharacterCollection, Assembly-CSharp
+      Data: 11|SingleCharacterCollection, Assembly-CSharp
     - Name: Target
       Entry: 7
-      Data: 9|MainCharacterOfPlayer, Assembly-CSharp
+      Data: 12|MainCharacterOfPlayer, Assembly-CSharp
     - Name: Player
       Entry: 7
-      Data: 10|OwnerOfPlayerBuff, Assembly-CSharp
+      Data: 13|OwnerOfPlayerBuff, Assembly-CSharp
     - Name: PlayerBuff
       Entry: 7
-      Data: 11|TriggeredBuff, Assembly-CSharp
+      Data: 14|TriggeredBuff, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -106,7 +124,7 @@ MonoBehaviour:
       Data: 
     - Name: Value
       Entry: 7
-      Data: 12|ThisBuffLevel, Assembly-CSharp
+      Data: 15|ThisBuffLevel, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -133,7 +151,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 13|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
+      Data: 16|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -146,7 +164,7 @@ MonoBehaviour:
       Data: 
     - Name: LifeTimeData
       Entry: 7
-      Data: 14|PlayerBuffTurnLifeTimeData, Assembly-CSharp
+      Data: 17|PlayerBuffTurnLifeTimeData, Assembly-CSharp
     - Name: Turn
       Entry: 3
       Data: 2

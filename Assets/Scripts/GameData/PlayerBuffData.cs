@@ -14,7 +14,7 @@ public class PlayerBuffData
         public GameTiming Timing;
 
         [ShowInInspector]
-        public ConditionalEffect[] ConditionEffects = new ConditionalEffect[0];
+        public ConditionalPlayerBuffEffect[] ConditionEffects = new ConditionalPlayerBuffEffect[0];
 
         private static IEnumerable _GetAllowedValues()
         {
@@ -38,9 +38,10 @@ public class PlayerBuffData
     [BoxGroup("Effects")]
     public List<IReactionSessionData> Sessions = new();
     
+    [Space(20)]
     [ShowInInspector]
-    [BoxGroup("Effects")]
     [TableList]
+    [BoxGroup("Effects")]
     public List<BuffEffect> BuffEffects = new();  
 
     [ShowInInspector]

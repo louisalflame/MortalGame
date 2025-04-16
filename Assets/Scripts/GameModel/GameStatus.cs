@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Optional;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -25,6 +26,7 @@ public class GameStatus
     public EnemyEntity Enemy { get; private set; }
     public ICharacterManager CharacterManager { get; private set; }
     public TurnStatus TurnStatus { get; private set; }
+    public Option<IPlayerEntity> CurrentPlayer { get; private set; } = Option.None<IPlayerEntity>();
 
     public GameStatus(
         int turnCount,
@@ -45,6 +47,15 @@ public class GameStatus
     public void SetState(GameState state)
     {
         State = state;
+
+        CurrentPlayer = State switch
+        {
+            GameState.EnemyPrepare => (Enemy as IPlayerEntity).Some(),
+            GameState.PlayerPrepare => (Ally as IPlayerEntity).Some(),
+            GameState.PlayerExecute => (Ally as IPlayerEntity).Some(),
+            GameState.Enemy_Execute => (Enemy as IPlayerEntity).Some(),
+            _ => Option.None<IPlayerEntity>()
+        };
     }
 
     public void SetNewTurn()

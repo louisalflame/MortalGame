@@ -4,10 +4,10 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 
 [Serializable]
-public class ConditionalEffect
+public class ConditionalPlayerBuffEffect
 {
     [ShowInInspector]
-    public ICondition[] Conditions = new ICondition[0];
+    public IPlayerBuffCondition[] Conditions = new IPlayerBuffCondition[0];
 
     [Space(20)]
     public IPlayerBuffEffect Effect;
