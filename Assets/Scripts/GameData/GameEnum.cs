@@ -84,3 +84,7 @@ public enum GameTiming
     DrawCard,
     PlayCard,
 }
+
+// TODO: which one is better? GameTiming or UpdateTiming?
+public enum UpdateTiming {}
+public enum TriggerTiming {}
