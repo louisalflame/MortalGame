@@ -246,34 +246,34 @@ public class GetShieldEvent : HealthEvent
     }
 }
 
-public class AddBuffEvent : IGameEvent
+public class AddPlayerBuffEvent : IGameEvent
 {
     public Faction Faction;
     public PlayerBuffInfo Buff;
 
-    public AddBuffEvent(IPlayerEntity player, PlayerBuffInfo buff)
+    public AddPlayerBuffEvent(IPlayerEntity player, PlayerBuffInfo buff)
     {
         Faction = player.Faction;
         Buff = buff;
     }
 }
-public class UpdateBuffEvent : IGameEvent
+public class UpdatePlayerBuffEvent : IGameEvent
 {
     public Faction Faction;
     public PlayerBuffInfo Buff;
 
-    public UpdateBuffEvent(IPlayerEntity player, PlayerBuffInfo buff)
+    public UpdatePlayerBuffEvent(IPlayerEntity player, PlayerBuffInfo buff)
     {
         Faction = player.Faction;
         Buff = buff;
     }
 }
-public class RemoveBuffEvent : IGameEvent
+public class RemovePlayerBuffEvent : IGameEvent
 {
     public Faction Faction;
     public PlayerBuffInfo Buff;
 
-    public RemoveBuffEvent(IPlayerEntity player, PlayerBuffInfo buff)
+    public RemovePlayerBuffEvent(IPlayerEntity player, PlayerBuffInfo buff)
     {
         Faction = player.Faction;
         Buff = buff;

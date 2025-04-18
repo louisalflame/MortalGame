@@ -186,10 +186,10 @@ public class GameplayView : MonoBehaviour, IGameplayView
                 case HealthEvent healthEvent:
                     _updateHealthView(healthEvent);
                     break;
-                case AddBuffEvent addBuffEvent:
+                case AddPlayerBuffEvent addBuffEvent:
                     _AddBuffView(addBuffEvent);
                     break;
-                case UpdateBuffEvent updateBuffEvent:
+                case UpdatePlayerBuffEvent updateBuffEvent:
                     _UpdateBuffView(updateBuffEvent);
                     break;
             }
@@ -422,7 +422,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
         }
     }
 
-    private void _AddBuffView(AddBuffEvent addBuffEvent)
+    private void _AddBuffView(AddPlayerBuffEvent addBuffEvent)
     {
         switch (addBuffEvent.Faction)
         {
@@ -434,7 +434,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
                 break;
         }
     }
-    private void _UpdateBuffView(UpdateBuffEvent updateBuffEvent)
+    private void _UpdateBuffView(UpdatePlayerBuffEvent updateBuffEvent)
     {
         switch (updateBuffEvent.Faction)
         {

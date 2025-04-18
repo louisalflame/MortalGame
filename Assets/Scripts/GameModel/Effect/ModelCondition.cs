@@ -6,7 +6,7 @@ using UnityEngine;
 
 public interface ICondition
 {
-    bool Eval(IGameplayStatusWatcher gameWatcher);
+    bool Eval(IGameplayStatusWatcher gameWatcher, IActionSource source);
 }
 
 public interface ICardStatusCondition : ICondition { }
@@ -16,7 +16,7 @@ public interface ICharacterBuffCondition : ICondition { }
 [Serializable]
 public class TrueCondition : ICardStatusCondition, IPlayerBuffCondition, ICharacterBuffCondition
 {
-    public bool Eval(IGameplayStatusWatcher gameWatcher)
+    public bool Eval(IGameplayStatusWatcher gameWatcher, IActionSource source)
     {
         return true;
     }
@@ -25,7 +25,7 @@ public class TrueCondition : ICardStatusCondition, IPlayerBuffCondition, ICharac
 [Serializable]
 public class FalseCondition : ICardStatusCondition, IPlayerBuffCondition, ICharacterBuffCondition
 {
-    public bool Eval(IGameplayStatusWatcher gameWatcher)
+    public bool Eval(IGameplayStatusWatcher gameWatcher, IActionSource source)
     {
         return false;
     }
@@ -36,9 +36,9 @@ public class AllCondition : ICardStatusCondition, IPlayerBuffCondition, ICharact
 {
     public List<ICondition> Conditions;
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher)
+    public bool Eval(IGameplayStatusWatcher gameWatcher, IActionSource source)
     {
-        return Conditions.All(condition => condition.Eval(gameWatcher));
+        return Conditions.All(condition => condition.Eval(gameWatcher, source));
     }
 }
 
@@ -47,9 +47,9 @@ public class AnyCondition : ICardStatusCondition, IPlayerBuffCondition, ICharact
 {
     public List<ICondition> Conditions;
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher)
+    public bool Eval(IGameplayStatusWatcher gameWatcher, IActionSource source)
     {
-        return Conditions.Any(condition => condition.Eval(gameWatcher));
+        return Conditions.Any(condition => condition.Eval(gameWatcher, source));
     }
 }
 
@@ -58,10 +58,10 @@ public class IsSelfTurnCondition : IPlayerBuffCondition, ICharacterBuffCondition
 {
     public ITargetPlayerValue TargetPlayer;
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher)
+    public bool Eval(IGameplayStatusWatcher gameWatcher, IActionSource source)
     {
         return gameWatcher.GameStatus.CurrentPlayer.Match(
-            player => player == TargetPlayer.Eval(gameWatcher),
+            player => player == TargetPlayer.Eval(gameWatcher, source),
             () => false
         );
     }

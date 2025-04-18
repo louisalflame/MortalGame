@@ -76,11 +76,6 @@ public class GameContextManager : IDisposable
         _contextStack.Push(Context.With(gameTiming: gameTiming));
         return this;
     }
-    public GameContextManager SetUsingCardEffect(ICardEffect usingCardEffect) 
-    {
-        _contextStack.Push(Context.With(usingCardEffect: usingCardEffect));
-        return this;
-    }
     public GameContextManager SetEffectTargetPlayer(IPlayerEntity effectTarget) 
     {
         _contextStack.Push(Context.With(effectTargetPlayer: effectTarget));
@@ -101,9 +96,9 @@ public class GameContextManager : IDisposable
         _contextStack.Push(Context.With(triggeredBuff: triggeredBuff));
         return this;
     }
-    public GameContextManager SetTriggeredPlayerBuffEffect(IPlayerBuffEffect triggeredBuffEffect) 
+    public GameContextManager SetAction(IAction action) 
     {
-        _contextStack.Push(Context.With(triggeredBuffEffect: triggeredBuffEffect));
+        _contextStack.Push(Context.With(action: action));
         return this;
     }
 }
@@ -115,14 +110,14 @@ public class GameContext : IDisposable
     public IPlayerEntity        SelectedPlayer;
     public ICharacterEntity     SelectedCharacter;
     public ICardEntity          SelectedCard;
+    
     public GameTiming           GameTiming;
     public ICardEntity          UsingCard;
-    public ICardEffect          UsingCardEffect;
     public IPlayerEntity        EffectTargetPlayer;
     public ICharacterEntity     EffectTargetCharacter;
     public ICardEntity          EffectTargetCard;
     public IPlayerBuffEntity    TriggeredBuff;
-    public IPlayerBuffEffect    TriggeredBuffEffect;
+    public IAction              Action;
 
     public GameContext() { }
     public GameContext With(
@@ -133,12 +128,11 @@ public class GameContext : IDisposable
         ICardEntity         selectedCard = null,
         GameTiming          gameTiming = default,
         ICardEntity         usingCard = null,
-        ICardEffect         usingCardEffect = null,
         IPlayerEntity       effectTargetPlayer = null,
         ICharacterEntity    effectTargetCharacter = null,
         ICardEntity         effectTargetCard = null,
         IPlayerBuffEntity   triggeredBuff = null,
-        IPlayerBuffEffect   triggeredBuffEffect = null)
+        IAction             action = null)
     {
         return new GameContext() 
         {
@@ -149,12 +143,11 @@ public class GameContext : IDisposable
             SelectedCard            = selectedCard ?? SelectedCard,
             UsingCard               = usingCard ?? UsingCard,
             GameTiming              = gameTiming == GameTiming.None ? GameTiming : gameTiming,
-            UsingCardEffect         = usingCardEffect ?? UsingCardEffect,
             EffectTargetPlayer      = effectTargetPlayer ?? EffectTargetPlayer,
             EffectTargetCharacter   = effectTargetCharacter ?? EffectTargetCharacter,
             EffectTargetCard        = effectTargetCard ?? EffectTargetCard,
             TriggeredBuff           = triggeredBuff ?? TriggeredBuff,
-            TriggeredBuffEffect     = triggeredBuffEffect ?? TriggeredBuffEffect
+            Action                  = action ?? Action,
         };
     }
 
@@ -166,11 +159,9 @@ public class GameContext : IDisposable
         SelectedCharacter = null;
         SelectedCard = null;
         UsingCard = null;
-        UsingCardEffect = null;
         EffectTargetPlayer = null;
         EffectTargetCharacter = null;
         EffectTargetCard = null;
         TriggeredBuff = null;
-        TriggeredBuffEffect = null; 
     }
 }

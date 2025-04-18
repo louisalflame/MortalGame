@@ -4,13 +4,13 @@ using UnityEngine;
 
 public interface ITargetCardValue
 {
-    ICardEntity Eval(IGameplayStatusWatcher gameWatcher);
+    ICardEntity Eval(IGameplayStatusWatcher gameWatcher, IActionSource source);
 }
 
 [Serializable]
 public class NoneCard : ITargetCardValue
 {
-    public ICardEntity Eval(IGameplayStatusWatcher gameWatcher)
+    public ICardEntity Eval(IGameplayStatusWatcher gameWatcher, IActionSource source)
     {
         return CardEntity.DummyCard;
     }
@@ -18,7 +18,7 @@ public class NoneCard : ITargetCardValue
 [Serializable]
 public class SelectedCard : ITargetCardValue
 {
-    public ICardEntity Eval(IGameplayStatusWatcher gameWatcher)
+    public ICardEntity Eval(IGameplayStatusWatcher gameWatcher, IActionSource source)
     {
         return gameWatcher.GameContext.SelectedCard;
     }
@@ -26,7 +26,7 @@ public class SelectedCard : ITargetCardValue
 
 public interface ITargetCardCollectionValue
 {
-    IReadOnlyCollection<ICardEntity> Eval(IGameplayStatusWatcher gameWatcher);
+    IReadOnlyCollection<ICardEntity> Eval(IGameplayStatusWatcher gameWatcher, IActionSource source);
 }
 
 [Serializable]
@@ -34,17 +34,22 @@ public class SingleCardCollection : ITargetCardCollectionValue
 {
     public ITargetCardValue TargetCard;
 
-    public IReadOnlyCollection<ICardEntity> Eval(IGameplayStatusWatcher gameWatcher)
+    public IReadOnlyCollection<ICardEntity> Eval(IGameplayStatusWatcher gameWatcher, IActionSource source)
     {
-        return new [] { TargetCard.Eval(gameWatcher) };
+        return new [] { TargetCard.Eval(gameWatcher, source) };
     }
 }
 [Serializable]
 public class AllyHandCards : ITargetCardCollectionValue
 {
-    public IReadOnlyCollection<ICardEntity> Eval(IGameplayStatusWatcher gameWatcher)
+    public IReadOnlyCollection<ICardEntity> Eval(IGameplayStatusWatcher gameWatcher, IActionSource source)
     {
-        return gameWatcher.GameContext.ExecutePlayer.CardManager.HandCard.Cards;
+        return source switch
+        {
+            CardSource cardSource   => cardSource.Card.Owner.CardManager.HandCard.Cards,
+            SystemSource _          => Array.Empty<ICardEntity>(),
+            _                       => Array.Empty<ICardEntity>()
+        };
     }
 }
 

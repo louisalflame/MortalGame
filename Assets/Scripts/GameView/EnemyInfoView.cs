@@ -53,15 +53,15 @@ public class EnemyInfoView : MonoBehaviour
         _healthBarView.SetShield(healthEvent.Dp);
     }
 
-    public void AddBuff(AddBuffEvent addBuffEvent)
+    public void AddBuff(AddPlayerBuffEvent addBuffEvent)
     {
         _buffCollectionView.AddBuff(addBuffEvent.Buff);
     }
-    public void RemoveBuff(RemoveBuffEvent removeBuffEvent)
+    public void RemoveBuff(RemovePlayerBuffEvent removeBuffEvent)
     {
         _buffCollectionView.RemoveBuff(removeBuffEvent.Buff);
     }
-    public void UpdateBuff(UpdateBuffEvent updateBuffEvent)
+    public void UpdateBuff(UpdatePlayerBuffEvent updateBuffEvent)
     {
         _buffCollectionView.UpdateBuff(updateBuffEvent.Buff);
     }

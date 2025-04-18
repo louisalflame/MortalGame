@@ -73,18 +73,43 @@ public enum TargetType
     Card,
 }
 
-public enum GameTiming
+public enum UpdateTiming
 {
     None = 0,
-    BattleBegin,
+    GameStart,
     TurnStart,
     TurnEnd,
     ExecuteStart,
     ExecuteEnd,
     DrawCard,
     PlayCard,
+
+    TriggerBuffStart,
 }
 
-// TODO: which one is better? GameTiming or UpdateTiming?
-public enum UpdateTiming {}
-public enum TriggerTiming {}
+public enum TriggerTiming
+{
+    None = 0,
+    GameStart,
+    TurnStart,
+    TurnEnd,
+    ExecuteStart,
+    ExecuteEnd,
+    DrawCard,
+    PlayCard,
+    TriggerEnd,
+}
+
+public enum GameTiming
+{
+    None = 0,
+    GameStart,
+    TurnStart,
+    TurnEnd,
+    ExecuteStart,
+    ExecuteEnd,
+    DrawCard,
+    PlayCard,
+    TriggerBuffEnd,
+    TriggerCardEnd,
+}
