@@ -22,78 +22,78 @@ public abstract class PlayerBuffPropertyEntity : IPlayerBuffPropertyEntity
     { }
 }
 
-public class AttackPropertyEntity : PlayerBuffPropertyEntity
+public class AttackPropertyPlayerBuffEntity : PlayerBuffPropertyEntity
 {
     public override PlayerBuffProperty Property => PlayerBuffProperty.AttackIncrease;
 
-    public AttackPropertyEntity() { }
+    public AttackPropertyPlayerBuffEntity() { }
 }
 
-public class PenetrateAttackPropertyEntity : PlayerBuffPropertyEntity
+public class PenetrateAttackPropertyPlayerBuffEntity : PlayerBuffPropertyEntity
 {
     public override PlayerBuffProperty Property => PlayerBuffProperty.PenetrateAttackIncrease;
 
-    public PenetrateAttackPropertyEntity() { }
+    public PenetrateAttackPropertyPlayerBuffEntity() { }
 }   
 
-public class AdditionalAttackPropertyEntity : PlayerBuffPropertyEntity
+public class AdditionalAttackPropertyPlayerBuffEntity : PlayerBuffPropertyEntity
 {
     public override PlayerBuffProperty Property => PlayerBuffProperty.AdditionalAttackIncrease;
 
-    public AdditionalAttackPropertyEntity()
+    public AdditionalAttackPropertyPlayerBuffEntity()
     {
     }
 }
 
-public class EffectiveAttackPropertyEntity : PlayerBuffPropertyEntity
+public class EffectiveAttackPropertyPlayerBuffEntity : PlayerBuffPropertyEntity
 {
     public override PlayerBuffProperty Property => PlayerBuffProperty.EffectiveAttackIncrease;
-    public EffectiveAttackPropertyEntity()
+    public EffectiveAttackPropertyPlayerBuffEntity()
     {
     }
 }
 
-public class DefensePropertyEntity : PlayerBuffPropertyEntity
+public class DefensePropertyPlayerBuffEntity : PlayerBuffPropertyEntity
 {
     public override PlayerBuffProperty Property => PlayerBuffProperty.DefenseIncrease;
 
-    public DefensePropertyEntity()
+    public DefensePropertyPlayerBuffEntity()
     {
     }
 }
 
-public class HealPropertyEntity : PlayerBuffPropertyEntity
+public class HealPropertyPlayerBuffEntity : PlayerBuffPropertyEntity
 {
     public override PlayerBuffProperty Property => PlayerBuffProperty.HealIncrease;
 
-    public HealPropertyEntity()
+    public HealPropertyPlayerBuffEntity()
     {
     }
 }
 
-public class EnergyPropertyEntity : PlayerBuffPropertyEntity
+public class EnergyPropertyPlayerBuffEntity : PlayerBuffPropertyEntity
 {
     public override PlayerBuffProperty Property => PlayerBuffProperty.EnergyIncrease;
 
-    public EnergyPropertyEntity()
+    public EnergyPropertyPlayerBuffEntity()
     {
     }
 }
 
-public class MaxHealthPropertyEntity : PlayerBuffPropertyEntity
+public class MaxHealthPropertyPlayerBuffEntity : PlayerBuffPropertyEntity
 {
     public override PlayerBuffProperty Property => PlayerBuffProperty.MaxHealthIncrease;
 
-    public MaxHealthPropertyEntity()
+    public MaxHealthPropertyPlayerBuffEntity()
     {
     }
 }
 
-public class MaxEnergyPropertyEntity : PlayerBuffPropertyEntity
+public class MaxEnergyPropertyPlayerBuffEntity : PlayerBuffPropertyEntity
 {
     public override PlayerBuffProperty Property => PlayerBuffProperty.MaxEnergyIncrease;
 
-    public MaxEnergyPropertyEntity()
+    public MaxEnergyPropertyPlayerBuffEntity()
     {
     }
 }

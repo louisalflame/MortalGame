@@ -33,9 +33,9 @@ public class PlayerBuffSource : IActionSource
 
 public class CardBuffSource : IActionSource
 {
-    public ICardStatusEntity Buff { get; private set; }
+    public ICardBuffEntity Buff { get; private set; }
 
-    public CardBuffSource(ICardStatusEntity buff)
+    public CardBuffSource(ICardBuffEntity buff)
     {
         Buff = buff;
     }

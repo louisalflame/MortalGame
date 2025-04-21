@@ -7,7 +7,7 @@ using UnityEngine;
 public static class DropdownHelper
 {
     const string BuffFolderPath = "Assets/ScriptableObjects/Buff";
-    const string CardStatusFolderPath = "Assets/ScriptableObjects/CardStatus";
+    const string CardBuffFolderPath = "Assets/ScriptableObjects/CardBuff";
     const string AssetExtension = "*.asset";
 
     public static IEnumerable<ValueDropdownItem> BuffNames
@@ -29,16 +29,16 @@ public static class DropdownHelper
         }
     }
 
-    public static IEnumerable<ValueDropdownItem> CardStatusNames
+    public static IEnumerable<ValueDropdownItem> CardBuffNames
     {
         get
         {
-            if (Directory.Exists(CardStatusFolderPath))
+            if (Directory.Exists(CardBuffFolderPath))
             {
-                var assetPaths = Directory.GetFiles(CardStatusFolderPath, AssetExtension);
+                var assetPaths = Directory.GetFiles(CardBuffFolderPath, AssetExtension);
                 foreach (var assetPath in assetPaths)
                 {
-                    var asset = AssetDatabase.LoadAssetAtPath<CardStatusScriptable>(assetPath);
+                    var asset = AssetDatabase.LoadAssetAtPath<CardBuffScriptable>(assetPath);
                     if (asset != null && string.IsNullOrEmpty(asset.Data.ID) == false)
                     {
                         yield return new ValueDropdownItem(asset.Data.ID, asset.Data.ID);

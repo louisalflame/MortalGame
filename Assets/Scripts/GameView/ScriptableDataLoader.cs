@@ -7,7 +7,7 @@ public class ScriptableDataLoader : MonoBehaviour
     [SerializeField]
     private AllCardScriptable _allCardScriptable;
     [SerializeField]
-    private AllCardStatusScriptable _allCardStatusScriptable;
+    private AllCardBuffScriptable _allCardBuffScriptable;
 
     [SerializeField]
     private AllBuffScriptable _allBuffScriptable;
@@ -22,7 +22,7 @@ public class ScriptableDataLoader : MonoBehaviour
     private LocalizeSettingScriptable _localizeSettingScriptable;
 
     public CardData[] AllCards => _allCardScriptable.AllCardData.Select(c => c.Data).ToArray();
-    public CardStatusData[] AllCardStatus => _allCardStatusScriptable.AllCardStatusData.Select(c => c.Data).ToArray();
+    public CardBuffData[] AllCardBuffs => _allCardBuffScriptable.AllCardBuffData.Select(c => c.Data).ToArray();
     public PlayerBuffData[] AllBuffs => _allBuffScriptable.AllBuffData.Select(b => b.Data).ToArray();
     public DispositionData[] DispositionSettings => _dispositionScriptable.Datas;
 

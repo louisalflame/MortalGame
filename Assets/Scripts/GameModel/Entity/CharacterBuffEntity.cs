@@ -5,52 +5,52 @@ using Optional;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public interface IPlayerBuffEntity
+public interface ICharacterBuffEntity
 {
     string Id { get; }
     Guid Identity { get; }
     int Level { get; }
-    Option<IPlayerEntity> Owner { get; }
+    Option<ICharacterEntity> Owner { get; }
     Option<IPlayerEntity> Caster { get; }
-    IReadOnlyCollection<IPlayerBuffPropertyEntity> Properties { get; }
-    IPlayerBuffLifeTimeEntity LifeTime { get; }
+    IReadOnlyCollection<ICharacterBuffPropertyEntity> Properties { get; }
+    ICharacterBuffLifeTimeEntity LifeTime { get; }
     IReadOnlyCollection<IReactionSessionEntity> ReactionSessions { get; }
 
     void AddLevel(int level);
     PlayerBuffInfo ToInfo();
 }
 
-public class PlayerBuffEntity : IPlayerBuffEntity
+public class CharacterBuffEntity : ICharacterBuffEntity
 {
     private string _id;
     private Guid _identity;
     private int _level;
-    private Option<IPlayerEntity> _owner;
+    private Option<ICharacterEntity> _owner;
     private Option<IPlayerEntity> _caster;
-    private List<IPlayerBuffPropertyEntity> _properties;
-    private IPlayerBuffLifeTimeEntity _lifeTime;
+    private List<ICharacterBuffPropertyEntity> _properties;
+    private ICharacterBuffLifeTimeEntity _lifeTime;
     private List<IReactionSessionEntity> _reactionSessions;
 
     public string Id => _id;
     public Guid Identity => _identity;
     public int Level => _level;
-    public Option<IPlayerEntity> Owner => _owner;
+    public Option<ICharacterEntity> Owner => _owner;
     public Option<IPlayerEntity> Caster => _caster;
-    public IReadOnlyCollection<IPlayerBuffPropertyEntity> Properties => _properties;
-    public IPlayerBuffLifeTimeEntity LifeTime => _lifeTime;
+    public IReadOnlyCollection<ICharacterBuffPropertyEntity> Properties => _properties;
+    public ICharacterBuffLifeTimeEntity LifeTime => _lifeTime;
     public IReadOnlyCollection<IReactionSessionEntity> ReactionSessions => _reactionSessions;
 
     public bool IsDummy => this == DummyBuff;
-    public static IPlayerBuffEntity DummyBuff = new DummyPlayerBuff();
+    public static ICharacterBuffEntity DummyBuff = new DummyCharacterBuff();
 
-    public PlayerBuffEntity(
+    public CharacterBuffEntity(
         string id,
         Guid identity,
         int level,
-        Option<IPlayerEntity> owner,
+        Option<ICharacterEntity> owner,
         Option<IPlayerEntity> caster,
-        IEnumerable<IPlayerBuffPropertyEntity> properties,
-        IPlayerBuffLifeTimeEntity lifeTime,
+        IEnumerable<ICharacterBuffPropertyEntity> properties,
+        ICharacterBuffLifeTimeEntity lifeTime,
         IEnumerable<IReactionSessionEntity> reactionSessions) 
     {
         _id = id;
@@ -78,16 +78,16 @@ public class PlayerBuffEntity : IPlayerBuffEntity
     } 
 }
 
-public class DummyPlayerBuff : PlayerBuffEntity
+public class DummyCharacterBuff : CharacterBuffEntity
 {
-    public DummyPlayerBuff() : base(
+    public DummyCharacterBuff() : base(
         string.Empty,
         Guid.Empty,
         1,
+        Option.None<ICharacterEntity>(),
         Option.None<IPlayerEntity>(),
-        Option.None<IPlayerEntity>(),
-        Enumerable.Empty<IPlayerBuffPropertyEntity>(),
-        new AlwaysLifeTimePlayerBuffEntity(),
+        Enumerable.Empty<ICharacterBuffPropertyEntity>(),
+        new AlwaysLifeTimeCharacterBuffEntity(),
         Enumerable.Empty<IReactionSessionEntity>())
     {
     }

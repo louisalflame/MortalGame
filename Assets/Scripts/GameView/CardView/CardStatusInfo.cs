@@ -1,11 +1,11 @@
 using UnityEngine;
 
-public class CardStatusInfo
+public class CardBuffInfo
 {
-    public string CardStatusDataId { get; }
+    public string CardBuffDataId { get; }
 
-    public CardStatusInfo(ICardStatusEntity statusEntity)     
+    public CardBuffInfo(ICardBuffEntity statusEntity)     
     {
-        CardStatusDataId = statusEntity.CardStatusDataID;
+        CardBuffDataId = statusEntity.CardBuffDataID;
     }
 }

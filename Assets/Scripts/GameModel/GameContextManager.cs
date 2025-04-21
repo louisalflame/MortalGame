@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class GameContextManager : IDisposable
 {
     public readonly CardLibrary CardLibrary;
-    public readonly CardStatusLibrary CardStatusLibrary;
+    public readonly CardBuffLibrary CardBuffLibrary;
     public readonly PlayerBuffLibrary BuffLibrary;
     public readonly DispositionLibrary DispositionLibrary;
     public readonly LocalizeLibrary LocalizeLibrary;
@@ -14,13 +14,13 @@ public class GameContextManager : IDisposable
 
     public GameContextManager(
         CardLibrary cardLibrary,
-        CardStatusLibrary cardStatusLibrary,
+        CardBuffLibrary cardBuffLibrary,
         PlayerBuffLibrary buffLibrary,
         DispositionLibrary dispositionLibrary,
         LocalizeLibrary localizeLibrary)
     {
         CardLibrary = cardLibrary;
-        CardStatusLibrary = cardStatusLibrary;
+        CardBuffLibrary = cardBuffLibrary;
         BuffLibrary = buffLibrary;
         DispositionLibrary = dispositionLibrary;
         LocalizeLibrary = localizeLibrary;

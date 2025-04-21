@@ -21,19 +21,17 @@ public interface ICardEntity
 
     Dictionary<GameTiming, List<ICardEffect>> Effects { get; }
     IEnumerable<ICardPropertyEntity> Properties { get; }
-    IEnumerable<ICardStatusEntity> StatusList { get; }
+    IEnumerable<ICardBuffEntity> BuffList { get; }
 
     IEnumerable<ICardPropertyEntity> AllProperties { get; }
-
-    IPlayerEntity Owner { get; }
 
     int EvalCost(IGameplayStatusWatcher gameWatcher);
     int EvalPower(IGameplayStatusWatcher gameWatcher);
 
     bool TryUpdateCards(IGameplayStatusWatcher gameWatcher, out IGameEvent gameEvent);
 
-    ICardEntity Clone(IPlayerEntity cloneOwner, IEnumerable<ICardStatusEntity> cardStatuses);
-    void AddNewStatus(ICardStatusEntity status);
+    ICardEntity Clone(IEnumerable<ICardBuffEntity> cardBuffs);
+    void AddNewStatus(ICardBuffEntity status);
 }
 
 public class CardEntity : ICardEntity
@@ -50,8 +48,7 @@ public class CardEntity : ICardEntity
     private List<ISubTargetSelectable> _subSelectables;
     private Dictionary<GameTiming, List<ICardEffect>> _effects;
     private List<ICardPropertyEntity> _properties;
-    private List<ICardStatusEntity> _statusList;
-    private IPlayerEntity _owner;
+    private List<ICardBuffEntity> _buffList;
 
     public Guid Identity => _indentity;
     public Option<Guid> OriginCardInstanceGuid => _originCardInstanceGuid;
@@ -65,10 +62,9 @@ public class CardEntity : ICardEntity
     public IEnumerable<ISubTargetSelectable> SubSelectables => _subSelectables;
     public Dictionary<GameTiming, List<ICardEffect>> Effects => _effects;
     public IEnumerable<ICardPropertyEntity> Properties => _properties;
-    public IEnumerable<ICardStatusEntity> StatusList => _statusList;
+    public IEnumerable<ICardBuffEntity> BuffList => _buffList;
     public IEnumerable<ICardPropertyEntity> AllProperties => 
-        Properties.Concat(StatusList.SelectMany(s => s.Properties));
-    public IPlayerEntity Owner => _owner;
+        Properties.Concat(BuffList.SelectMany(s => s.Properties));
     public bool IsDummy => this == DummyCard;
 
     public static ICardEntity DummyCard = new CardEntity(
@@ -84,8 +80,7 @@ public class CardEntity : ICardEntity
         subSelectables: new List<ISubTargetSelectable>(),
         effects: new Dictionary<GameTiming, List<ICardEffect>>(),
         properties: new List<ICardPropertyEntity>(),
-        statusList: new List<CardStatusEntity>(),
-        owner: PlayerEntity.DummyPlayer
+        buffList: new List<CardBuffEntity>()
     );
     
     private CardEntity(
@@ -101,8 +96,7 @@ public class CardEntity : ICardEntity
         IEnumerable<ISubTargetSelectable> subSelectables,
         Dictionary<GameTiming, List<ICardEffect>> effects,
         IEnumerable<ICardPropertyEntity> properties,
-        IEnumerable<ICardStatusEntity> statusList,
-        IPlayerEntity owner
+        IEnumerable<ICardBuffEntity> buffList
     )
     {
         _indentity = indentity;
@@ -120,11 +114,10 @@ public class CardEntity : ICardEntity
             pair => pair.Value.ToList()
         );
         _properties = properties.ToList();
-        _statusList = statusList.ToList();
-        _owner = owner;
+        _buffList = buffList.ToList();
     }
 
-    public static ICardEntity CreateFromInstance(CardInstance cardInstance, IPlayerEntity owner)
+    public static ICardEntity CreateFromInstance(CardInstance cardInstance)
     {
         return new CardEntity(
             indentity: Guid.NewGuid(),
@@ -142,12 +135,11 @@ public class CardEntity : ICardEntity
                     pair => pair.Value.ToList()
                 ),
             properties: cardInstance.PropertyDatas.Select(p => p.CreateEntity()),
-            statusList: new List<CardStatusEntity>(),
-            owner: owner
+            buffList: new List<CardBuffEntity>()
         );
     }
 
-    public static ICardEntity CreateFromData(CardData cardData, IPlayerEntity owner, IEnumerable<ICardStatusEntity> cardStatuses)
+    public static ICardEntity CreateFromData(CardData cardData, IEnumerable<ICardBuffEntity> cardBuffs)
     {
         return new CardEntity(
             indentity: Guid.NewGuid(),
@@ -165,12 +157,11 @@ public class CardEntity : ICardEntity
                     pair => pair.Effects.ToList()
                 ),
             properties: cardData.PropertyDatas.Select(p => p.CreateEntity()),
-            statusList: new List<CardStatusEntity>(),
-            owner: owner
+            buffList: cardBuffs.ToList()
         );
     }
 
-    public ICardEntity Clone(IPlayerEntity cloneOwner, IEnumerable<ICardStatusEntity> cardStatuses)
+    public ICardEntity Clone(IEnumerable<ICardBuffEntity> cardBuffs)
     {
         return new CardEntity(
             indentity: Guid.NewGuid(),
@@ -187,14 +178,13 @@ public class CardEntity : ICardEntity
                 pair => pair.Key,
                 pair => pair.Value.ToList()),
             properties: _properties.ToList(),
-            statusList: cardStatuses.ToList(),
-            owner: cloneOwner
+            buffList: cardBuffs.ToList()
         );
     }
 
-    public void AddNewStatus(ICardStatusEntity status)
+    public void AddNewStatus(ICardBuffEntity status)
     {
-        _statusList.Add(status);
+        _buffList.Add(status);
     }
 
     public int EvalCost(IGameplayStatusWatcher gameWatcher)
@@ -221,9 +211,9 @@ public class CardEntity : ICardEntity
 
     public bool TryUpdateCards(IGameplayStatusWatcher gameWatcher, out IGameEvent gameEvent)
     {
-        foreach(var cardStatus in StatusList)
+        foreach(var cardBuff in BuffList)
         {
-            cardStatus.Update(gameWatcher);
+            cardBuff.Update(gameWatcher);
         }
         
         // TODO: return event of property expired
@@ -234,6 +224,21 @@ public class CardEntity : ICardEntity
 
 public static class CardEntityExtensions
 {
+    public static Option<IPlayerEntity> Owner(this ICardEntity card, IGameplayStatusWatcher watcher)
+    {
+        var allyCardOpt = watcher.GameStatus.Ally.CardManager.GetCard(card.Identity);
+        if (allyCardOpt.HasValue)
+            return (watcher.GameStatus.Ally as IPlayerEntity).Some();
+        var enemyCardOpt = watcher.GameStatus.Enemy.CardManager.GetCard(card.Identity);
+        if (enemyCardOpt.HasValue)
+            return (watcher.GameStatus.Enemy as IPlayerEntity).Some();
+        return Option.None<IPlayerEntity>();
+    }
+    public static Faction Faction(this ICardEntity card, IGameplayStatusWatcher watcher)
+    {
+        return card.Owner(watcher).ValueOr(PlayerEntity.DummyPlayer).Faction;
+    }
+
     public static bool IsConsumable(this ICardEntity card)
     {
         return card.HasProperty(CardProperty.Consumable);

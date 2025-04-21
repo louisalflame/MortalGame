@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-public class CardStatusData
+public class CardBuffData
 {
     [BoxGroup("Identification")]
     public string ID;
@@ -17,15 +17,15 @@ public class CardStatusData
     public List<ICardPropertyData> PropertyDatas = new ();
 
     [TitleGroup("LifeTime")]
-    public ICardStatusLifeTimeData LifeTimeData;
+    public ICardBuffLifeTimeData LifeTimeData;
 }
 
 
 [Serializable]
-public class AddCardStatusData
+public class AddCardBuffData
 {
-    [ValueDropdown("@DropdownHelper.CardStatusNames")]
-    public string CardStatusId;
+    [ValueDropdown("@DropdownHelper.CardBuffNames")]
+    public string CardBuffId;
     public IIntegerValue Power;
     public IIntegerValue Times;
 }

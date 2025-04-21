@@ -54,6 +54,19 @@ public enum PlayerBuffProperty
     MaxHealthIncrease,
     MaxEnergyIncrease,
 }
+public enum CharacterBuffProperty
+{
+    None = 0,
+    AttackIncrease,
+    PenetrateAttackIncrease,
+    AdditionalAttackIncrease,
+    EffectiveAttackIncrease,
+    DefenseIncrease,
+    HealIncrease,
+    EnergyIncrease,
+    MaxHealthIncrease,
+    MaxEnergyIncrease,
+}
 
 public enum SelectType
 {

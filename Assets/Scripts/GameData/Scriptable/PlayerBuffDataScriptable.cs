@@ -1,7 +1,7 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "BuffDataScriptable", menuName = "Scriptable Objects/BuffDataScriptable")]
+[CreateAssetMenu(fileName = "PlayerBuffDataScriptable", menuName = "Scriptable Objects/PlayerBuffDataScriptable")]
 public class PlayerBuffDataScriptable : SerializedScriptableObject
 {
     public PlayerBuffData Data;

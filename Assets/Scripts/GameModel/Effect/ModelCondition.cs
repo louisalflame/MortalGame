@@ -9,12 +9,12 @@ public interface ICondition
     bool Eval(IGameplayStatusWatcher gameWatcher, IActionSource source);
 }
 
-public interface ICardStatusCondition : ICondition { }
+public interface ICardBuffCondition : ICondition { }
 public interface IPlayerBuffCondition : ICondition { }
 public interface ICharacterBuffCondition : ICondition { }
 
 [Serializable]
-public class TrueCondition : ICardStatusCondition, IPlayerBuffCondition, ICharacterBuffCondition
+public class TrueCondition : ICardBuffCondition, IPlayerBuffCondition, ICharacterBuffCondition
 {
     public bool Eval(IGameplayStatusWatcher gameWatcher, IActionSource source)
     {
@@ -23,7 +23,7 @@ public class TrueCondition : ICardStatusCondition, IPlayerBuffCondition, ICharac
 }
 
 [Serializable]
-public class FalseCondition : ICardStatusCondition, IPlayerBuffCondition, ICharacterBuffCondition
+public class FalseCondition : ICardBuffCondition, IPlayerBuffCondition, ICharacterBuffCondition
 {
     public bool Eval(IGameplayStatusWatcher gameWatcher, IActionSource source)
     {
@@ -32,7 +32,7 @@ public class FalseCondition : ICardStatusCondition, IPlayerBuffCondition, IChara
 }
 
 [Serializable]
-public class AllCondition : ICardStatusCondition, IPlayerBuffCondition, ICharacterBuffCondition
+public class AllCondition : ICardBuffCondition, IPlayerBuffCondition, ICharacterBuffCondition
 {
     public List<ICondition> Conditions;
 
@@ -43,7 +43,7 @@ public class AllCondition : ICardStatusCondition, IPlayerBuffCondition, ICharact
 }
 
 [Serializable]
-public class AnyCondition : ICardStatusCondition, IPlayerBuffCondition, ICharacterBuffCondition
+public class AnyCondition : ICardBuffCondition, IPlayerBuffCondition, ICharacterBuffCondition
 {
     public List<ICondition> Conditions;
 
@@ -61,8 +61,10 @@ public class IsSelfTurnCondition : IPlayerBuffCondition, ICharacterBuffCondition
     public bool Eval(IGameplayStatusWatcher gameWatcher, IActionSource source)
     {
         return gameWatcher.GameStatus.CurrentPlayer.Match(
-            player => player == TargetPlayer.Eval(gameWatcher, source),
-            () => false
+            currnentPlayer => TargetPlayer.Eval(gameWatcher, source).Match(
+                                targetPlayer => currnentPlayer == targetPlayer,
+                                ()           => false),
+            ()             => false
         );
     }
 }

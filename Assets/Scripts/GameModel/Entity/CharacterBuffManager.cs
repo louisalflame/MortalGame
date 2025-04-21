@@ -4,45 +4,45 @@ using System.Linq;
 using Optional;
 using UnityEngine;
 
-public interface IPlayerBuffManager
+public interface ICharacterBuffManager
 {
-    IReadOnlyCollection<IPlayerBuffEntity> Buffs { get; }
+    IReadOnlyCollection<ICharacterBuffEntity> Buffs { get; }
     bool AddBuff(
-        PlayerBuffLibrary buffLibrary, 
+        CharacterBuffLibrary buffLibrary, 
         IGameplayStatusWatcher gameWatcher, 
         IActionSource actionSource,
         IActionTarget actionTarget,
         string buffId, 
         int level, 
-        out IPlayerBuffEntity resultBuff);
+        out ICharacterBuffEntity resultBuff);
     bool RemoveBuff(
-        PlayerBuffLibrary buffLibrary, 
-        IGameplayStatusWatcher gameWatcher, 
+        CharacterBuffLibrary buffLibrary, 
+        IGameplayStatusWatcher gameWatcher,
         IActionSource actionSource,
         IActionTarget actionTarget,
         string buffId, 
-        out IPlayerBuffEntity resultBuff);
+        out ICharacterBuffEntity resultBuff);
 }
 
-public class PlayerBuffManager : IPlayerBuffManager
+public class CharacterBuffManager : ICharacterBuffManager
 {
-    private List<IPlayerBuffEntity> _buffs;
+    private List<ICharacterBuffEntity> _buffs;
 
-    public IReadOnlyCollection<IPlayerBuffEntity> Buffs => _buffs;
+    public IReadOnlyCollection<ICharacterBuffEntity> Buffs => _buffs;
 
-    public PlayerBuffManager()
+    public CharacterBuffManager()
     {
-        _buffs = new List<IPlayerBuffEntity>();
+        _buffs = new List<ICharacterBuffEntity>();
     }
 
     public bool AddBuff(
-        PlayerBuffLibrary buffLibrary, 
+        CharacterBuffLibrary buffLibrary, 
         IGameplayStatusWatcher gameWatcher, 
         IActionSource actionSource,
         IActionTarget actionTarget,
         string buffId, 
         int level, 
-        out IPlayerBuffEntity resultBuff)
+        out ICharacterBuffEntity resultBuff)
     {
         foreach (var existBuff in _buffs)
         {
@@ -56,8 +56,8 @@ public class PlayerBuffManager : IPlayerBuffManager
 
         var owner = actionTarget switch
         {
-            PlayerTarget playerTarget => Option.Some(playerTarget.Player),
-            _ => Option.None<IPlayerEntity>()
+            CharacterTarget characterTarget => Option.Some(characterTarget.Character),
+            _ => Option.None<ICharacterEntity>()
         };
         var caster = actionSource switch
         {
@@ -66,7 +66,7 @@ public class PlayerBuffManager : IPlayerBuffManager
             _ => Option.None<IPlayerEntity>()
         };
 
-        resultBuff = new PlayerBuffEntity(
+        resultBuff = new CharacterBuffEntity(
             buffId, 
             Guid.NewGuid(), 
             level, 
@@ -83,12 +83,12 @@ public class PlayerBuffManager : IPlayerBuffManager
     }
     
     public bool RemoveBuff(
-        PlayerBuffLibrary buffLibrary, 
+        CharacterBuffLibrary buffLibrary, 
         IGameplayStatusWatcher gameWatcher, 
         IActionSource actionSource,
         IActionTarget actionTarget,
         string buffId, 
-        out IPlayerBuffEntity resultBuff)
+        out ICharacterBuffEntity resultBuff)
     {
         foreach (var existBuff in _buffs)
         {

@@ -10,7 +10,7 @@ public enum LocalizeSimpleType
 public enum LocalizeTitleInfoType
 {
     Card,
-    CardStatus,
+    CardBuff,
     Buff,
     Disposition,
     GameKeyWord,

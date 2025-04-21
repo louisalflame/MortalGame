@@ -111,21 +111,22 @@ public class CreateCardEffect : ICardEffect
     [ShowInInspector]
     public List<CardDataScriptable> CardDatas = new ();    
     [ShowInInspector]
-    public List<AddCardStatusData> AddCardStatusDatas = new ();
+    public List<AddCardBuffData> AddCardBuffDatas = new ();
     public CardCollectionType CreateDestination;
 }
 [Serializable]
 public class CloneCardEffect : ICardEffect
 {
-    public ITargetCardCollectionValue TargetCards;
+    public ITargetPlayerValue Target;
+    public ITargetCardCollectionValue ClonedCards;
     [ShowInInspector]
-    public List<AddCardStatusData> AddCardStatusDatas = new ();
+    public List<AddCardBuffData> AddCardBuffDatas = new ();
     public CardCollectionType CloneDestination;
 }
 [Serializable]
-public class AppendCardStatusEffect : ICardEffect
+public class AppendCardBuffEffect : ICardEffect
 {
     public ITargetCardCollectionValue TargetCards;
     [ShowInInspector]
-    public List<AddCardStatusData> AddCardStatusDatas = new ();
+    public List<AddCardBuffData> AddCardBuffDatas = new ();
 }

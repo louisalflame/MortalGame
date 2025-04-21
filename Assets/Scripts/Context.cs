@@ -6,7 +6,7 @@ using UnityEngine;
 public class Context
 {
     public Dictionary<string, CardData> CardTable { get; private set; }
-    public Dictionary<string, CardStatusData> CardStatusTable { get; private set; }
+    public Dictionary<string, CardBuffData> CardBuffTable { get; private set; }
     public Dictionary<string, PlayerBuffData> BuffTable { get; private set; }
     public DispositionData[] DispositionSettings { get; private set; }
     public EnemyData[] AllEnemies { get; private set; }
@@ -18,7 +18,7 @@ public class Context
         ScriptableDataLoader scriptableDataLoader)
     {
         CardTable = scriptableDataLoader.AllCards.ToDictionary(c => c.ID, c => c);
-        CardStatusTable = scriptableDataLoader.AllCardStatus.ToDictionary(c => c.ID, c => c);
+        CardBuffTable = scriptableDataLoader.AllCardBuffs.ToDictionary(c => c.ID, c => c);
         BuffTable = scriptableDataLoader.AllBuffs.ToDictionary(b => b.ID, b => b);
         DispositionSettings = scriptableDataLoader.DispositionSettings;
         AllEnemies = scriptableDataLoader.AllEnemies;

@@ -4,16 +4,16 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 
 [Serializable]
-public class ConditionalPlayerBuffEffect
+public class ConditionalCharacterBuffEffect
 {
     [ShowInInspector]
-    public IPlayerBuffCondition[] Conditions = new IPlayerBuffCondition[0];
+    public ICharacterBuffCondition[] Conditions = new ICharacterBuffCondition[0];
 
     [Space(20)]
-    public IPlayerBuffEffect Effect;
+    public ICharacterBuffEffect Effect;
 }
 
-public class EffectiveDamagePlayerBuffEffect : IPlayerBuffEffect
+public class EffectiveDamageCharacterBuffEffect : ICharacterBuffEffect
 {
     public ITargetCharacterCollectionValue Targets;
     public IIntegerValue Value;

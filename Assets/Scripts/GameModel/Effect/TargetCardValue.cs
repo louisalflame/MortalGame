@@ -1,26 +1,28 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Optional;
 using UnityEngine;
 
 public interface ITargetCardValue
 {
-    ICardEntity Eval(IGameplayStatusWatcher gameWatcher, IActionSource source);
+    Option<ICardEntity> Eval(IGameplayStatusWatcher gameWatcher, IActionSource source);
 }
 
 [Serializable]
 public class NoneCard : ITargetCardValue
 {
-    public ICardEntity Eval(IGameplayStatusWatcher gameWatcher, IActionSource source)
+    public Option<ICardEntity> Eval(IGameplayStatusWatcher gameWatcher, IActionSource source)
     {
-        return CardEntity.DummyCard;
+        return Option.None<ICardEntity>();
     }
 }
 [Serializable]
 public class SelectedCard : ITargetCardValue
 {
-    public ICardEntity Eval(IGameplayStatusWatcher gameWatcher, IActionSource source)
+    public Option<ICardEntity> Eval(IGameplayStatusWatcher gameWatcher, IActionSource source)
     {
-        return gameWatcher.GameContext.SelectedCard;
+        return gameWatcher.GameContext.SelectedCard.Some();
     }
 }
 
@@ -36,7 +38,7 @@ public class SingleCardCollection : ITargetCardCollectionValue
 
     public IReadOnlyCollection<ICardEntity> Eval(IGameplayStatusWatcher gameWatcher, IActionSource source)
     {
-        return new [] { TargetCard.Eval(gameWatcher, source) };
+        return  TargetCard.Eval(gameWatcher, source).ToEnumerable().ToList();
     }
 }
 [Serializable]
@@ -46,7 +48,9 @@ public class AllyHandCards : ITargetCardCollectionValue
     {
         return source switch
         {
-            CardSource cardSource   => cardSource.Card.Owner.CardManager.HandCard.Cards,
+            CardSource cardSource   => cardSource.Card.Owner(gameWatcher).Match(
+                                        player  => player.CardManager.HandCard.Cards,
+                                        ()      => Array.Empty<ICardEntity>()),
             SystemSource _          => Array.Empty<ICardEntity>(),
             _                       => Array.Empty<ICardEntity>()
         };

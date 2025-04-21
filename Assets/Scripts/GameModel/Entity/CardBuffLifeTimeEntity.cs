@@ -1,12 +1,12 @@
 using UnityEngine;
 
-public interface ICardStatusLifeTimeEntity
+public interface ICardBuffLifeTimeEntity
 {
     bool IsExpired();
     void Update(IGameplayStatusWatcher gameWatcher);
 }
 
-public class AlwaysLifeTimeCardStatusEntity : ICardStatusLifeTimeEntity
+public class AlwaysLifeTimeCardBuffEntity : ICardBuffLifeTimeEntity
 {
     public bool IsExpired()
     {
@@ -18,11 +18,11 @@ public class AlwaysLifeTimeCardStatusEntity : ICardStatusLifeTimeEntity
     }
 }
 
-public class TurnLifeTimeCardStatusEntity : ICardStatusLifeTimeEntity
+public class TurnLifeTimeCardBuffEntity : ICardBuffLifeTimeEntity
 {
     private int _turn;
 
-    public TurnLifeTimeCardStatusEntity(int turn)
+    public TurnLifeTimeCardBuffEntity(int turn)
     {
         _turn = turn;
     }

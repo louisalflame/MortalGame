@@ -75,9 +75,9 @@ public class AllyEntity : PlayerEntity
     {
         _originPlayerInstanceGuid = originPlayerInstanceGuid.Some();
         _characters = characterParams
-            .Select(param => CharacterEntity.Create(param, this))
+            .Select(param => CharacterEntity.Create(param))
             .ToList();
-        _cardManager = new PlayerCardManager(handCardMaxCount, deckInstance, this);
+        _cardManager = new PlayerCardManager(handCardMaxCount, deckInstance);
         DispositionManager = new DispositionManager(currentDisposition, maxDisposition);
     }
 }
@@ -105,9 +105,9 @@ public class EnemyEntity : PlayerEntity
     {
         _originPlayerInstanceGuid = Option.None<Guid>();
         _characters = characterParams
-            .Select(param => CharacterEntity.Create(param, this))
+            .Select(param => CharacterEntity.Create(param))
             .ToList();
-        _cardManager = new PlayerCardManager(handCardMaxCount, enemyCardInstances, this);
+        _cardManager = new PlayerCardManager(handCardMaxCount, enemyCardInstances);
         SelectedCards = new SelectedCardEntity(selectedCardMaxCount, new List<ICardEntity>());
         TurnStartDrawCardCount = turnStartDrawCardCount;
         EnergyRecoverPoint = energyRecoverPoint;

@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public interface ICardStatusEntity
+public interface ICardBuffEntity
 {
-    string CardStatusDataID { get; }
+    string CardBuffDataID { get; }
     Dictionary<GameTiming, List<ICardEffect>> Effects { get; }
     List<ICardPropertyEntity> Properties { get; }
     
@@ -12,31 +12,31 @@ public interface ICardStatusEntity
     void Update(IGameplayStatusWatcher gameWatcher);
 }
 
-public class CardStatusEntity : ICardStatusEntity
+public class CardBuffEntity : ICardBuffEntity
 {
-    public string CardStatusDataID { get; private set; }
+    public string CardBuffDataID { get; private set; }
 
     public Dictionary<GameTiming, List<ICardEffect>> Effects { get; private set; }
 
     public List<ICardPropertyEntity> Properties { get; private set; }
 
-    public ICardStatusLifeTimeEntity LifeTime { get; private set; }
+    public ICardBuffLifeTimeEntity LifeTime { get; private set; }
 
-    private CardStatusEntity(
-        string cardStatusDataID,
+    private CardBuffEntity(
+        string cardBuffDataID,
         Dictionary<GameTiming, List<ICardEffect>> effects,
         List<ICardPropertyEntity> properties,
-        ICardStatusLifeTimeEntity lifeTime)
+        ICardBuffLifeTimeEntity lifeTime)
     {
-        CardStatusDataID = cardStatusDataID;
+        CardBuffDataID = cardBuffDataID;
         Effects = effects;
         Properties = properties;
         LifeTime = lifeTime;
     }
 
-    public static CardStatusEntity CreateEntity(CardStatusData data)
+    public static CardBuffEntity CreateEntity(CardBuffData data)
     {
-        return new CardStatusEntity(
+        return new CardBuffEntity(
             data.ID,
             data.Effects.ToDictionary(
                 pair => pair.Key,

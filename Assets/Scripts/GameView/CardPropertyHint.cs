@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class CardPropertyHint : MonoBehaviour
 {
     [SerializeField]
-    private CardStatusInfoViewFactory _cardStatusInfoViewFactory;
+    private CardBuffInfoViewFactory _cardBuffInfoViewFactory;
     [SerializeField]
     private GameKeyWordInfoViewFactory _gameKeyWordInfoViewFactory;
     [SerializeField]
@@ -17,7 +17,7 @@ public class CardPropertyHint : MonoBehaviour
     private float _offsetX;
 
     private LocalizeLibrary _localizeLibrary;
-    private List<CardStatusInfoView> _propertyViews = new List<CardStatusInfoView>();
+    private List<CardBuffInfoView> _propertyViews = new List<CardBuffInfoView>();
 
     public void Init(LocalizeLibrary localizeLibrary)
     {
@@ -30,11 +30,11 @@ public class CardPropertyHint : MonoBehaviour
 
         foreach(var statusInfo in cardInfo.StatusInfos)
         {
-            var cardStatusInfoView = _cardStatusInfoViewFactory.CreatePrefab();
-            cardStatusInfoView.transform.SetParent(_cardPropertyInfoViewParent, false);
-            _propertyViews.Add(cardStatusInfoView);
+            var cardBuffInfoView = _cardBuffInfoViewFactory.CreatePrefab();
+            cardBuffInfoView.transform.SetParent(_cardPropertyInfoViewParent, false);
+            _propertyViews.Add(cardBuffInfoView);
 
-            cardStatusInfoView.SetInfo(statusInfo, _localizeLibrary);
+            cardBuffInfoView.SetInfo(statusInfo, _localizeLibrary);
         }
     }
 
@@ -42,7 +42,7 @@ public class CardPropertyHint : MonoBehaviour
     {
         foreach (var propertyView in _propertyViews)
         {
-            _cardStatusInfoViewFactory.RecyclePrefab(propertyView);
+            _cardBuffInfoViewFactory.RecyclePrefab(propertyView);
         }
         _propertyViews.Clear();
     }

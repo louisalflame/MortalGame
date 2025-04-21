@@ -59,7 +59,7 @@ public abstract class MoveCardEvent : IGameEvent
 
     public MoveCardEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher, ICardColletionZone start, ICardColletionZone destination)
     {
-        Faction = card.Owner.Faction;
+        Faction = card.Faction(gameWatcher);
         CardInfo = new CardInfo(card, gameWatcher);
         StartZoneInfo = start.ToCardCollectionInfo(gameWatcher);
         DestinationZoneInfo = destination.ToCardCollectionInfo(gameWatcher);
@@ -73,7 +73,7 @@ public abstract class AddCardEvent : IGameEvent
 
     public AddCardEvent(ICardEntity card,IGameplayStatusWatcher gameWatcher, ICardColletionZone destination)
     {
-        Faction = card.Owner.Faction;
+        Faction = card.Faction(gameWatcher);
         CardInfo = new CardInfo(card, gameWatcher);
         DestinationZoneInfo = destination.ToCardCollectionInfo(gameWatcher);
     }
@@ -103,14 +103,14 @@ public class CloneCardEvent : AddCardEvent
     public CloneCardEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher, ICardColletionZone destination) :
         base(card, gameWatcher, destination) { }
 }
-public class AppendCardStatusEvent : IGameEvent
+public class AppendCardBuffEvent : IGameEvent
 {
     public Faction Faction;
     public CardInfo CardInfo;
 
-    public AppendCardStatusEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher)
+    public AppendCardBuffEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher)
     {
-        Faction = card.Owner.Faction;
+        Faction = card.Faction(gameWatcher);
         CardInfo = new CardInfo(card, gameWatcher);
     }
 }
@@ -183,9 +183,9 @@ public abstract class HealthEvent : IGameEvent
     public int Dp;
     public int MaxHp;
 
-    public HealthEvent(ICharacterEntity character)
+    public HealthEvent(Faction faction, ICharacterEntity character)
     {
-        Faction = character.Owner.Faction;
+        Faction = faction;
         Hp = character.CurrentHealth;
         Dp = character.CurrentArmor;
         MaxHp = character.MaxHealth;
@@ -198,7 +198,8 @@ public abstract class DamageEvent : HealthEvent
     public int DeltaShield;
     public int DamagePoint;
 
-    public DamageEvent(ICharacterEntity character, TakeDamageResult takeDamageResult) : base(character)
+    public DamageEvent(Faction faction, ICharacterEntity character, TakeDamageResult takeDamageResult) : 
+        base(faction, character)
     {
         Type = takeDamageResult.Type;
         DeltaHp = takeDamageResult.DeltaHp;
@@ -208,19 +209,23 @@ public abstract class DamageEvent : HealthEvent
 }
 public class NormalDamageEvent : DamageEvent
 {
-    public NormalDamageEvent(ICharacterEntity character, TakeDamageResult takeDamageResult) : base(character, takeDamageResult) { }
+    public NormalDamageEvent(Faction faction, ICharacterEntity character, TakeDamageResult takeDamageResult) : 
+        base(faction, character, takeDamageResult) { }
 }
 public class PenetrateDamageEvent : DamageEvent
 {
-    public PenetrateDamageEvent(ICharacterEntity character, TakeDamageResult takeDamageResult) : base(character, takeDamageResult) { }
+    public PenetrateDamageEvent(Faction faction, ICharacterEntity character, TakeDamageResult takeDamageResult) : 
+        base(faction, character, takeDamageResult) { }
 }
 public class AdditionalAttackEvent : DamageEvent
 {
-    public AdditionalAttackEvent(ICharacterEntity character, TakeDamageResult takeDamageResult) : base(character, takeDamageResult) { }
+    public AdditionalAttackEvent(Faction faction, ICharacterEntity character, TakeDamageResult takeDamageResult) : 
+        base(faction, character, takeDamageResult) { }
 }
 public class EffectiveAttackEvent : DamageEvent
 {
-    public EffectiveAttackEvent(ICharacterEntity character, TakeDamageResult takeDamageResult) : base(character, takeDamageResult) { }
+    public EffectiveAttackEvent(Faction faction, ICharacterEntity character, TakeDamageResult takeDamageResult) : 
+        base(faction, character, takeDamageResult) { }
 }
 
 public class GetHealEvent : HealthEvent
@@ -228,7 +233,8 @@ public class GetHealEvent : HealthEvent
     public int DeltaHp;
     public int HealPoint;
 
-    public GetHealEvent(ICharacterEntity character, GetHealResult getHealResult) : base(character)
+    public GetHealEvent(Faction faction, ICharacterEntity character, GetHealResult getHealResult) : 
+        base(faction, character)
     {
         DeltaHp = getHealResult.DeltaHp;
         HealPoint = getHealResult.HealPoint;
@@ -239,7 +245,8 @@ public class GetShieldEvent : HealthEvent
     public int DeltaShield;
     public int ShieldPoint;
 
-    public GetShieldEvent(ICharacterEntity character, GetShieldResult getShieldResult) : base(character)
+    public GetShieldEvent(Faction faction, ICharacterEntity character, GetShieldResult getShieldResult) : 
+        base(faction, character)
     {
         DeltaShield = getShieldResult.DeltaDp;
         ShieldPoint = getShieldResult.ShieldPoint;

@@ -16,7 +16,7 @@ public class CardInfo
     public MainSelectableInfo MainSelectable;
     public List<SubSelectableInfo> SubSelectables;
 
-    public List<CardStatusInfo> StatusInfos { get; private set; }
+    public List<CardBuffInfo> StatusInfos { get; private set; }
 
     public CardInfo(ICardEntity card, IGameplayStatusWatcher gameWatcher)
     {
@@ -31,7 +31,7 @@ public class CardInfo
         MainSelectable = new MainSelectableInfo(card.MainSelectable.SelectType);
         SubSelectables = card.SubSelectables.Select(s => new SubSelectableInfo(s.SelectType, s.TargetCount)).ToList();
 
-        StatusInfos = card.StatusList.Select(s => new CardStatusInfo(s)).ToList();
+        StatusInfos = card.BuffList.Select(s => new CardBuffInfo(s)).ToList();
     }
 }
 
