@@ -1,25 +1,23 @@
 using System;
+using Sirenix.OdinInspector;
 
 public interface ISessionValueData
 {
     ISessionValueEntity GetEntity(IGameplayStatusWatcher gameWatcher);
 }
 
+
 [Serializable]
 public class SessionBoolean : ISessionValueData
 {
     public bool Value;
 
-    // condition -> TODO: should lookup library 
-    // set
-    //  -- overwrite
-    //  -- and
-    //  -- or
-    //  -- not
+    [ShowInInspector]
+    public BooleanUpdateRules UpdateRules = new();
     
     public ISessionValueEntity GetEntity(IGameplayStatusWatcher gameWatcher)
     {
-        return new SessionBooleanEntity(Value, gameWatcher);
+        return new SessionBooleanEntity(Value, UpdateRules);
     }
 }
 
@@ -28,16 +26,11 @@ public class SessionInteger : ISessionValueData
 {
     public int Value;
 
-    // condition
-    // set
-    //  -- overwrite
-    //  -- add
-    //  -- multiply
-    //  -- divide
-    //  -- mod
+    [ShowInInspector]
+    public IntegerUpdateRules UpdateRules = new();
     
     public ISessionValueEntity GetEntity(IGameplayStatusWatcher gameWatcher)
     {
-        return new SessionIntegerEntity(Value, gameWatcher);
+        return new SessionIntegerEntity(Value, UpdateRules);
     }
 }

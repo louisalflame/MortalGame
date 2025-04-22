@@ -5,7 +5,9 @@ using System.Collections.Generic;
 public interface IReactionSessionEntity
 {
     string Id { get; }
-    void Update(IGameplayStatusWatcher gameWatcher, IReactionSessionData sessionData);
+    void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing);
+    void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent);
+    void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result);
 }
 
 public abstract class ReactionSessionEntity : IReactionSessionEntity
@@ -21,16 +23,29 @@ public abstract class ReactionSessionEntity : IReactionSessionEntity
         Values = values;
     }
 
-    public abstract void Update(IGameplayStatusWatcher gameWatcher, IReactionSessionData sessionData);
+    public abstract void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing);
+    public abstract void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent);
+    public abstract void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result);
 
-    public void _Update(IGameplayStatusWatcher gameWatcher, IReactionSessionData sessionData)
+    protected virtual void _UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
     {
         foreach (var kvp in Values)
         {
-            if (sessionData.SessionValueTable.TryGetValue(kvp.Key, out var sessionValueData))
-            {
-                kvp.Value.Update(gameWatcher, sessionValueData);
-            }
+            kvp.Value.UpdateByTiming(gameWatcher, timing);
+        }
+    }
+    protected virtual void _UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent)
+    {
+        foreach (var kvp in Values)
+        {
+            kvp.Value.UpdateIntent(gameWatcher, intent);
+        }
+    }
+    protected virtual void _UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result)
+    {
+        foreach (var kvp in Values)
+        {
+            kvp.Value.UpdateResult(gameWatcher, result);
         }
     }
 }
@@ -39,10 +54,17 @@ public class WholeGameSessionEntity : ReactionSessionEntity
 {
     public WholeGameSessionEntity(string id, Dictionary<string, ISessionValueEntity> values) : base(id, values) { }
 
-    public override void Update(IGameplayStatusWatcher gameWatcher, IReactionSessionData sessionData)
+    public override void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
     {
-        // Implement the logic for updating the whole game session entity
-        _Update(gameWatcher, sessionData);
+        _UpdateByTiming(gameWatcher, timing);
+    }
+    public override void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent)
+    {
+        _UpdateIntent(gameWatcher, intent);
+    }
+    public override void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result)
+    {
+        _UpdateResult(gameWatcher, result);
     }
 }
 
@@ -50,10 +72,17 @@ public class WholeTurnSessionEntity : ReactionSessionEntity
 {
     public WholeTurnSessionEntity(string id, Dictionary<string, ISessionValueEntity> values) : base(id, values) { }
 
-    public override void Update(IGameplayStatusWatcher gameWatcher, IReactionSessionData sessionData)
+    public override void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
     {
-        // Implement the logic for updating the whole turn session entity
-        _Update(gameWatcher, sessionData);
+        _UpdateByTiming(gameWatcher, timing);
+    }
+    public override void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent)
+    {
+        _UpdateIntent(gameWatcher, intent);
+    }
+    public override void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result)
+    {
+        _UpdateResult(gameWatcher, result);
     }
 }
 
@@ -61,10 +90,17 @@ public class ExectueTurnSessionEntity : ReactionSessionEntity
 {
     public ExectueTurnSessionEntity(string id, Dictionary<string, ISessionValueEntity> values) : base(id, values) { }
 
-    public override void Update(IGameplayStatusWatcher gameWatcher, IReactionSessionData sessionData)
+    public override void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
     {
-        // Implement the logic for updating the execute turn session entity
-        _Update(gameWatcher, sessionData);
+        _UpdateByTiming(gameWatcher, timing);
+    }
+    public override void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent)
+    {
+        _UpdateIntent(gameWatcher, intent);
+    }
+    public override void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result)
+    {
+        _UpdateResult(gameWatcher, result);
     }
 }
 
@@ -72,9 +108,16 @@ public class CardSessionEntity : ReactionSessionEntity
 {
     public CardSessionEntity(string id, Dictionary<string, ISessionValueEntity> values) : base(id, values) { }
 
-    public override void Update(IGameplayStatusWatcher gameWatcher, IReactionSessionData sessionData)
+    public override void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
     {
-        // Implement the logic for updating the card session entity
-        _Update(gameWatcher, sessionData);
+        _UpdateByTiming(gameWatcher, timing);
+    }
+    public override void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent)
+    {
+        _UpdateIntent(gameWatcher, intent);
+    }
+    public override void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result)
+    {
+        _UpdateResult(gameWatcher, result);
     }
 }

@@ -4,9 +4,9 @@ public interface IEnergyManager
 {
     int Energy { get; }
     int MaxEnergy { get; }
-    GainEnergyResult RecoverEnergy(int amount);
+    GetEnergyResult RecoverEnergy(int amount);
     LoseEnergyResult ConsumeEnergy(int amount);
-    GainEnergyResult GainEnergy(int amount);
+    GetEnergyResult GainEnergy(int amount);
     LoseEnergyResult LoseEnergy(int amount);
 }
 public class EnergyManager : IEnergyManager
@@ -23,11 +23,11 @@ public class EnergyManager : IEnergyManager
         _maxEnergy = maxEnergy;
     }
 
-    public GainEnergyResult RecoverEnergy(int amount)
+    public GetEnergyResult RecoverEnergy(int amount)
     {
         var deltaEp = _AcceptEnergyGain(amount, out var energyOver);
 
-        return new GainEnergyResult()
+        return new GetEnergyResult()
         {
             Type = EnergyGainType.Recover,
             EnergyPoint = amount,
@@ -48,11 +48,11 @@ public class EnergyManager : IEnergyManager
         };
     }
 
-    public GainEnergyResult GainEnergy(int amount)
+    public GetEnergyResult GainEnergy(int amount)
     {
         var deltaEp = _AcceptEnergyGain(amount, out var energyOver);
 
-        return new GainEnergyResult()
+        return new GetEnergyResult()
         {
             Type = EnergyGainType.GainEffect,
             EnergyPoint = amount,

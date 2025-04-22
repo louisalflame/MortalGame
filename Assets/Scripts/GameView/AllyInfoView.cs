@@ -47,9 +47,9 @@ public class AllyInfoView : MonoBehaviour
         _dispositionView.SetDisposition(ally.DispositionManager.CurrentDisposition, ally.DispositionManager.MaxDisposition);
     }
     
-    public void UpdateEnergy(ConsumeEnergyEvent consumeEnergyEvent)
+    public void UpdateEnergy(LoseEnergyEvent loseEnergyEvent)
     {
-        _energyBarView.SetEnergy(consumeEnergyEvent.Energy, consumeEnergyEvent.MaxEnergy);
+        _energyBarView.SetEnergy(loseEnergyEvent.Energy, loseEnergyEvent.MaxEnergy);
     }
     public void UpdateEnergy(GainEnergyEvent gainEnergyEvent)
     {

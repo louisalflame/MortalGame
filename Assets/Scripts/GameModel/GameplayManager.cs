@@ -74,7 +74,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
             case GameState.GameStart:
                 using(_contextMgr.SetGameTiming(GameTiming.GameStart))
                 {
-                    _UpdateTiming(new UpdateTimingAction(UpdateTiming.GameStart));
+                    _UpdateTiming(UpdateTiming.GameStart);
                     _GameStart();
                 }
                 _gameStatus.SetState(GameState.TurnStart);
@@ -82,7 +82,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
             case GameState.TurnStart:
                 using(_contextMgr.SetGameTiming(GameTiming.TurnStart))
                 {
-                    _UpdateTiming(new UpdateTimingAction(UpdateTiming.TurnStart));
+                    _UpdateTiming(UpdateTiming.TurnStart);
                     _TurnStart();
                 }
                 _gameStatus.SetState(GameState.DrawCard);
@@ -90,7 +90,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
             case GameState.DrawCard:
                 using(_contextMgr.SetGameTiming(GameTiming.DrawCard))
                 {
-                    _UpdateTiming(new UpdateTimingAction(UpdateTiming.DrawCard));
+                    _UpdateTiming(UpdateTiming.DrawCard);
                     _TurnDrawCard();
                 }
                 _gameStatus.SetState(GameState.EnemyPrepare);
@@ -112,7 +112,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
             case GameState.TurnEnd:
                 using(_contextMgr.SetGameTiming(GameTiming.TurnEnd))
                 {
-                    _UpdateTiming(new UpdateTimingAction(UpdateTiming.TurnEnd));
+                    _UpdateTiming(UpdateTiming.TurnEnd);
                     _TurnEnd();
                 }
                 _gameStatus.SetState(GameState.TurnStart);
@@ -144,10 +144,10 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
         
         var recoverEnergyPoint = _contextMgr.DispositionLibrary.GetRecoverEnergyPoint(_gameStatus.Ally.DispositionManager.CurrentDisposition);
         var allyGainEnergyResult = _gameStatus.Ally.EnergyManager.RecoverEnergy(recoverEnergyPoint);
-        _gameEvents.Add(new RecoverEnergyEvent(_gameStatus.Ally, allyGainEnergyResult));
+        _gameEvents.Add(new GainEnergyEvent(_gameStatus.Ally, allyGainEnergyResult));
 
         var enemyGainEnergyResult = _gameStatus.Enemy.EnergyManager.RecoverEnergy(_gameStatus.Enemy.EnergyRecoverPoint);
-        _gameEvents.Add(new RecoverEnergyEvent(_gameStatus.Enemy, enemyGainEnergyResult));
+        _gameEvents.Add(new GainEnergyEvent(_gameStatus.Enemy, enemyGainEnergyResult));
     }
 
     private void _TurnDrawCard()
@@ -251,7 +251,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
             HandCardInfo = _gameStatus.Ally.CardManager.HandCard.ToCardCollectionInfo(this)
         });
         
-        _UpdateTiming(new UpdateTimingAction(UpdateTiming.ExecuteEnd));
+        _UpdateTiming(UpdateTiming.ExecuteEnd);
         var triggerEvts = _TriggerTiming(GameTiming.ExecuteEnd);
         _gameEvents.AddRange(triggerEvts);
 
@@ -260,7 +260,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
     }   
     private void _FinishEnemyExecuteTurn()
     {
-        _UpdateTiming(new UpdateTimingAction(UpdateTiming.ExecuteEnd));
+        _UpdateTiming(UpdateTiming.ExecuteEnd);
         var triggerEvts = _TriggerTiming(GameTiming.ExecuteEnd);
         _gameEvents.AddRange(triggerEvts);
 
@@ -338,7 +338,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                     if (cardRuntimCost <= player.CurrentEnergy)
                     {
                         var loseEnergyResult = player.EnergyManager.ConsumeEnergy(cardRuntimCost);
-                        useCardEvents.Add(new ConsumeEnergyEvent(player, loseEnergyResult));
+                        useCardEvents.Add(new LoseEnergyEvent(player, loseEnergyResult));
 
                         if (player.CardManager.HandCard.RemoveCard(usedCard)) 
                         {
@@ -391,7 +391,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 var graveyardCards = player.CardManager.Graveyard.PopAllCards();
                 player.CardManager.Deck.EnqueueCardsThenShuffle(graveyardCards);
 
-                _UpdateTiming(new RecycleDeckAction(new PlayerTarget(player)));
+                _UpdateAction(new RecycleDeckAction(new PlayerTarget(player)));
                 _gameEvents.Add(new RecycleGraveyardEvent() {
                     Faction = player.Faction,
                     DeckInfo = player.CardManager.Deck.ToCardCollectionInfo(this),
@@ -415,7 +415,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
         if (player.CardManager.Deck.PopCard(out ICardEntity newCard))
         {
             player.CardManager.HandCard.AddCard(newCard);
-            _UpdateTiming(new DrawCardAction(source, new PlayerTarget(player), newCard));
+            _UpdateAction(new DrawCardAction(source, new PlayerTarget(player), newCard));
 
             var newCardInfo = new CardInfo(newCard, this);
             IGameEvent drawCardEvent = new DrawCardEvent(){
@@ -441,10 +441,11 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 {
                     var characterTarget = new CharacterTarget(target);
                     var damagePoint = damageEffect.Value.Eval(this);
-                    var takeDamageResult = target.HealthManager.TakeDamage(damagePoint, _contextMgr.Context);
+                    var damageResult = target.HealthManager.TakeDamage(damagePoint, _contextMgr.Context);
+                    var damageStyle = DamageStyle.None;
 
-                    _UpdateTiming(new NormalDamageAction(source, characterTarget, damagePoint));
-                    cardEffectEvents.Add(new NormalDamageEvent(target.Faction(this), target, takeDamageResult));
+                    _UpdateAction(new DamageAction(source, characterTarget, damageResult, damageStyle));
+                    cardEffectEvents.Add(new DamageEvent(target.Faction(this), target, damageResult, damageStyle));
                 }
                 break;
             }
@@ -455,10 +456,11 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 {
                     var characterTarget = new CharacterTarget(target);
                     var damagePoint = penetrateDamageEffect.Value.Eval(this);
-                    var takeDamageResult = target.HealthManager.TakePenetrateDamage(damagePoint, _contextMgr.Context);
+                    var damageResult = target.HealthManager.TakePenetrateDamage(damagePoint, _contextMgr.Context);
+                    var damageStyle = DamageStyle.None;
 
-                    _UpdateTiming(new PenetrateDamageAction(source, characterTarget, damagePoint));
-                    cardEffectEvents.Add(new PenetrateDamageEvent(target.Faction(this), target, takeDamageResult));
+                    _UpdateAction(new DamageAction(source, characterTarget, damageResult, damageStyle));
+                    cardEffectEvents.Add(new DamageEvent(target.Faction(this), target, damageResult, damageStyle));
                 }
                 break;
             }
@@ -469,10 +471,11 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 {
                     var characterTarget = new CharacterTarget(target);
                     var damagePoint = additionalAttackEffect.Value.Eval(this);
-                    var takeDamageResult = target.HealthManager.TakeAdditionalDamage(damagePoint, _contextMgr.Context);
+                    var damageResult = target.HealthManager.TakeAdditionalDamage(damagePoint, _contextMgr.Context);
+                    var damageStyle = DamageStyle.None;
 
-                    _UpdateTiming(new AdditionalDamageAction(source, characterTarget, damagePoint));
-                    cardEffectEvents.Add(new AdditionalAttackEvent(target.Faction(this), target, takeDamageResult));
+                    _UpdateAction(new DamageAction(source, characterTarget, damageResult, damageStyle));
+                    cardEffectEvents.Add(new DamageEvent(target.Faction(this), target, damageResult, damageStyle));
                 }
                 break;
             }
@@ -483,10 +486,11 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 {
                     var characterTarget = new CharacterTarget(target);
                     var damagePoint = effectiveAttackEffect.Value.Eval(this);
-                    var takeDamageResult = target.HealthManager.TakeEffectiveDamage(damagePoint, _contextMgr.Context);
+                    var damageResult = target.HealthManager.TakeEffectiveDamage(damagePoint, _contextMgr.Context);
+                    var damageStyle = DamageStyle.None;
 
-                    _UpdateTiming(new EffectiveDamageAction(source, characterTarget, damagePoint));
-                    cardEffectEvents.Add(new EffectiveAttackEvent(target.Faction(this), target, takeDamageResult));
+                    _UpdateAction(new DamageAction(source, characterTarget, damageResult, damageStyle));
+                    cardEffectEvents.Add(new DamageEvent(target.Faction(this), target, damageResult, damageStyle));
                 }
                 break;
             }
@@ -497,10 +501,10 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 {
                     var characterTarget = new CharacterTarget(target);
                     var healPoint = healEffect.Value.Eval(this);
-                    var getHealResult = target.HealthManager.GetHeal(healPoint, _contextMgr.Context);
+                    var healResult = target.HealthManager.GetHeal(healPoint, _contextMgr.Context);
 
-                    _UpdateTiming(new GetHealAction(source, characterTarget, healPoint));
-                    cardEffectEvents.Add(new GetHealEvent(target.Faction(this), target, getHealResult));
+                    _UpdateAction(new GetHealAction(source, characterTarget, healResult));
+                    cardEffectEvents.Add(new GetHealEvent(target.Faction(this), target, healResult));
                 }
                 break;
             }
@@ -511,10 +515,10 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 {
                     var characterTarget = new CharacterTarget(target);
                     var shieldPoint = shieldEffect.Value.Eval(this);
-                    var getShieldResult = target.HealthManager.GetShield(shieldPoint, _contextMgr.Context);
+                    var shieldResult = target.HealthManager.GetShield(shieldPoint, _contextMgr.Context);
 
-                    _UpdateTiming(new GetShieldAction(source, characterTarget, shieldPoint));
-                    cardEffectEvents.Add(new GetShieldEvent(target.Faction(this), target, getShieldResult));
+                    _UpdateAction(new GetShieldAction(source, characterTarget, shieldResult));
+                    cardEffectEvents.Add(new GetShieldEvent(target.Faction(this), target, shieldResult));
                 }
                 break;
             }
@@ -529,7 +533,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                         var gainEnergy = gainEnergyEffect.Value.Eval(this);
                         var gainEnergyResult = target.EnergyManager.GainEnergy(gainEnergy);
 
-                        _UpdateTiming(new GainEnergyAction(source, playerTarget, gainEnergy));
+                        _UpdateAction(new GainEnergyAction(source, playerTarget, gainEnergyResult));
                         cardEffectEvents.Add(new GainEnergyEvent(target, gainEnergyResult));
                     }
                 }
@@ -546,7 +550,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                         var loseEnergy = loseEnegyEffect.Value.Eval(this);
                         var loseEnergyResult = target.EnergyManager.LoseEnergy(loseEnergy);
 
-                        _UpdateTiming(new LoseEnergyAction(source, playerTarget, loseEnergy));
+                        _UpdateAction(new LoseEnergyAction(source, playerTarget, loseEnergyResult));
                         cardEffectEvents.Add(new LoseEnergyEvent(target, loseEnergyResult));
                     }
                 }
@@ -572,12 +576,12 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                             level,
                             out IPlayerBuffEntity resultBuff))
                         {
-                            _UpdateTiming(new AddPlayerBuffAction(source, playerTarget, resultBuff));
+                            _UpdateAction(new AddPlayerBuffAction(source, playerTarget, resultBuff));
                             cardEffectEvents.Add(new AddPlayerBuffEvent(target, resultBuff.ToInfo()));
                         }
                         else
                         {
-                            _UpdateTiming(new StackPlayerBuffAction(source, playerTarget, resultBuff));
+                            _UpdateAction(new StackPlayerBuffAction(source, playerTarget, resultBuff));
                             cardEffectEvents.Add(new UpdatePlayerBuffEvent(target, resultBuff.ToInfo()));
                         }
                     }
@@ -600,7 +604,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                             removeBuffEffect.BuffId,
                             out IPlayerBuffEntity resultBuff))
                         {
-                            _UpdateTiming(new RemovePlayerBuffAction(source, playerTarget, resultBuff));
+                            _UpdateAction(new RemovePlayerBuffAction(source, playerTarget, resultBuff));
                             cardEffectEvents.Add(new RemovePlayerBuffEvent(target, resultBuff.ToInfo()));
                         }
                     }
@@ -636,7 +640,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                                 card.Identity, out var discardedCard, out var start, out var destination)) 
                             {
                                 var cardTarget = new CardTarget(discardedCard);
-                                _UpdateTiming(new DiscardCardAction(source, cardTarget, discardedCard));
+                                _UpdateAction(new DiscardCardAction(source, cardTarget, discardedCard));
                                 cardEffectEvents.Add(new DiscardCardEvent(discardedCard, this, start, destination));
                             }
                         });                        
@@ -656,7 +660,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                                 card.Identity, out var consumedCard, out var start, out var destination)) 
                             {
                                 var cardTarget = new CardTarget(consumedCard);
-                                _UpdateTiming(new ConsumeCardAction(source, cardTarget, consumedCard));
+                                _UpdateAction(new ConsumeCardAction(source, cardTarget, consumedCard));
                                 cardEffectEvents.Add(new ConsumeCardEvent(consumedCard, this, start, destination));
                             }
                         });
@@ -676,7 +680,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                                 card.Identity, out var disposedCard, out var start, out var destination)) 
                             {
                                 var cardTarget = new CardTarget(disposedCard);
-                                _UpdateTiming(new DisposeCardAction(source, cardTarget, disposedCard));
+                                _UpdateAction(new DisposeCardAction(source, cardTarget, disposedCard));
                                 cardEffectEvents.Add(new DisposeCardEvent(disposedCard, this, start, destination));
                             }
                         });
@@ -758,65 +762,59 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
         return cardEffectEvents;
     }
 
-    // TODO:
-    // -1 update all session in playerBuff/ characterBuff/ cardBuff
-    // -2 update all property in playerBuff/ characterBuff/ cardBuff
-    // -3 update all lifeTime in playerBuff/ characterBuff/ cardBuff
-    // -4 remove all expired playerBuff/ characterBuff/ cardBuff and push into event
-    // -5 pass OBJECT from any time of any thing for any kind of session?
-    private void _UpdateTiming(IAction action)
+    private void _UpdateTiming(UpdateTiming updateTiming)
     {
-        using(_contextMgr.SetAction(action))
-        {                
-            foreach(var buff in _gameStatus.Ally.BuffManager.Buffs)
+
+    }
+
+    private void _UpdateAction(IResultAction resulAction)
+    {              
+        foreach(var buff in _gameStatus.Ally.BuffManager.Buffs)
+        {
+            using(_contextMgr.SetTriggeredPlayerBuff(buff))
             {
-                using(_contextMgr.SetTriggeredPlayerBuff(buff))
+                foreach(var session in buff.ReactionSessions)
                 {
-                    foreach(var session in buff.ReactionSessions)
-                    {
-                        var data = _contextMgr.BuffLibrary.GetBuffSessionData(buff.Id, session.Id);
-                        session.Update(this, data);
-                    }
-                    foreach(var propertyEntity in buff.Properties)
-                    {
-                        propertyEntity.Update(this);
-                    }
-                    buff.LifeTime.Update(this);
+                    session.UpdateResult(this, resulAction);
                 }
-            }
-
-            foreach(var character in _gameStatus.Ally.Characters)
-            { 
-            }
-
-            foreach(var card in _gameStatus.Ally.CardManager.HandCard.Cards)
-            { 
-            }
-
-            foreach(var buff in _gameStatus.Enemy.BuffManager.Buffs)
-            { 
-                using(_contextMgr.SetTriggeredPlayerBuff(buff))
+                foreach(var propertyEntity in buff.Properties)
                 {
-                    foreach(var session in buff.ReactionSessions)
-                    {
-                        var data = _contextMgr.BuffLibrary.GetBuffSessionData(buff.Id, session.Id);
-                        session.Update(this, data);
-                    }
-                    foreach(var propertyEntity in buff.Properties)
-                    {
-                        propertyEntity.Update(this);
-                    }
-                    buff.LifeTime.Update(this);
+                    propertyEntity.Update(this);
                 }
+                buff.LifeTime.UpdateResult(this, resulAction);
             }
+        }
 
-            foreach(var character in _gameStatus.Enemy.Characters)
-            { 
-            }
+        foreach(var character in _gameStatus.Ally.Characters)
+        { 
+        }
 
-            foreach(var card in _gameStatus.Enemy.CardManager.HandCard.Cards)
-            { 
+        foreach(var card in _gameStatus.Ally.CardManager.HandCard.Cards)
+        { 
+        }
+
+        foreach(var buff in _gameStatus.Enemy.BuffManager.Buffs)
+        { 
+            using(_contextMgr.SetTriggeredPlayerBuff(buff))
+            {
+                foreach(var session in buff.ReactionSessions)
+                {
+                    session.UpdateResult(this, resulAction);
+                }
+                foreach(var propertyEntity in buff.Properties)
+                {
+                    propertyEntity.Update(this);
+                }
+                buff.LifeTime.UpdateResult(this, resulAction);
             }
+        }
+
+        foreach(var character in _gameStatus.Enemy.Characters)
+        { 
+        }
+
+        foreach(var card in _gameStatus.Enemy.CardManager.HandCard.Cards)
+        { 
         }
     }
 
@@ -828,18 +826,18 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
         {
             foreach(var buff in _gameStatus.Ally.BuffManager.Buffs)
             {
-                var buffSource = new PlayerBuffSource(buff);
+                var buffTrigger = new PlayerBuffTrigger(buff);
                 using(_contextMgr.SetTriggeredPlayerBuff(buff))
                 {
                     var conditionalEffectsOpt = _contextMgr.BuffLibrary.GetBuffEffects(buff.Id, timing);
-
                     conditionalEffectsOpt.MatchSome(conditionalEffects => 
                     {
                         foreach(var conditionalEffect in conditionalEffects)
                         {
-                            if (conditionalEffect.Conditions.All(c => c.Eval(this, buffSource)))
+                            if (conditionalEffect.Conditions.All(c => c.Eval(this, buffTrigger)))
                             {
-                                var applyEvts = _ApplyBuffEffect(buffSource, conditionalEffect.Effect);
+                                var applySource = new PlayerBuffSource(buff);
+                                var applyEvts = _ApplyBuffEffect(applySource, conditionalEffect.Effect);
                                 triggerBuffEvents.AddRange(applyEvts);
                             }
                         }
@@ -857,7 +855,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
 
             foreach(var buff in _gameStatus.Enemy.BuffManager.Buffs)
             {
-                var buffSource = new PlayerBuffSource(buff);
+                var buffTrigger = new PlayerBuffTrigger(buff);
                 using(_contextMgr.SetTriggeredPlayerBuff(buff))
                 {
                     var conditionalEffectsOpt = _contextMgr.BuffLibrary.GetBuffEffects(buff.Id, timing);
@@ -866,9 +864,10 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                     {
                         foreach(var conditionalEffect in conditionalEffects)
                         {
-                            if (conditionalEffect.Conditions.All(c => c.Eval(this, buffSource)))
+                            if (conditionalEffect.Conditions.All(c => c.Eval(this, buffTrigger)))
                             {
-                                var applyEvts = _ApplyBuffEffect(buffSource, conditionalEffect.Effect);
+                                var applySource = new PlayerBuffSource(buff);
+                                var applyEvts = _ApplyBuffEffect(applySource, conditionalEffect.Effect);
                                 triggerBuffEvents.AddRange(applyEvts);
                             }
                         }
@@ -892,7 +891,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
     private IEnumerable<IGameEvent> _ApplyBuffEffect(IActionSource source, IPlayerBuffEffect buffEffect)
     {
         var appleBuffEffectEvents = new List<IGameEvent>();
-        _UpdateTiming(new UpdateTimingAction(UpdateTiming.TriggerBuffStart));
+        _UpdateTiming(UpdateTiming.TriggerBuffStart);
 
         switch(buffEffect)
         {
@@ -905,10 +904,11 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                     using(_contextMgr.SetEffectTargetCharacter(target))
                     {
                         var damagePoint = effectiveDamageBuffEffect.Value.Eval(this);
-                        var takeDamageResult = target.HealthManager.TakeEffectiveDamage(damagePoint, _contextMgr.Context);
+                        var damageResult = target.HealthManager.TakeEffectiveDamage(damagePoint, _contextMgr.Context);
+                        var damageStyle = DamageStyle.None;
 
-                        _UpdateTiming(new EffectiveDamageAction(source, characterTarget, damagePoint));
-                        appleBuffEffectEvents.Add(new EffectiveAttackEvent(target.Faction(this), target, takeDamageResult));
+                        _UpdateAction(new DamageAction(source, characterTarget, damageResult, damageStyle));
+                        appleBuffEffectEvents.Add(new DamageEvent(target.Faction(this), target, damageResult, damageStyle));
                     }
                 }
                 break;

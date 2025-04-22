@@ -3,7 +3,9 @@ using UnityEngine;
 public interface IPlayerBuffLifeTimeEntity
 {
     bool IsExpired();
-    void Update(IGameplayStatusWatcher gameWatcher);
+    void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing);
+    void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent);
+    void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result);
 }
 
 public class AlwaysLifeTimePlayerBuffEntity : IPlayerBuffLifeTimeEntity
@@ -13,9 +15,9 @@ public class AlwaysLifeTimePlayerBuffEntity : IPlayerBuffLifeTimeEntity
         return false;
     }
 
-    public void Update(IGameplayStatusWatcher gameWatcher)
-    {
-    }
+    public void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing) { }
+    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent) { }
+    public void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result) { }
 }
 
 public class TurnLifeTimePlayerBuffEntity : IPlayerBuffLifeTimeEntity
@@ -39,4 +41,14 @@ public class TurnLifeTimePlayerBuffEntity : IPlayerBuffLifeTimeEntity
             _turn--;
         }
     }
+
+    public void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
+    {
+        if (timing == UpdateTiming.TurnEnd)
+        {
+            _turn--;
+        }
+    }
+    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent) { }
+    public void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result) { }
 }

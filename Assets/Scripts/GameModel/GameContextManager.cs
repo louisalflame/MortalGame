@@ -96,11 +96,6 @@ public class GameContextManager : IDisposable
         _contextStack.Push(Context.With(triggeredBuff: triggeredBuff));
         return this;
     }
-    public GameContextManager SetAction(IAction action) 
-    {
-        _contextStack.Push(Context.With(action: action));
-        return this;
-    }
 }
 
 public class GameContext : IDisposable
@@ -117,7 +112,6 @@ public class GameContext : IDisposable
     public ICharacterEntity     EffectTargetCharacter;
     public ICardEntity          EffectTargetCard;
     public IPlayerBuffEntity    TriggeredBuff;
-    public IAction              Action;
 
     public GameContext() { }
     public GameContext With(
@@ -131,8 +125,7 @@ public class GameContext : IDisposable
         IPlayerEntity       effectTargetPlayer = null,
         ICharacterEntity    effectTargetCharacter = null,
         ICardEntity         effectTargetCard = null,
-        IPlayerBuffEntity   triggeredBuff = null,
-        IAction             action = null)
+        IPlayerBuffEntity   triggeredBuff = null)
     {
         return new GameContext() 
         {
@@ -146,8 +139,7 @@ public class GameContext : IDisposable
             EffectTargetPlayer      = effectTargetPlayer ?? EffectTargetPlayer,
             EffectTargetCharacter   = effectTargetCharacter ?? EffectTargetCharacter,
             EffectTargetCard        = effectTargetCard ?? EffectTargetCard,
-            TriggeredBuff           = triggeredBuff ?? TriggeredBuff,
-            Action                  = action ?? Action,
+            TriggeredBuff           = triggeredBuff ?? TriggeredBuff
         };
     }
 

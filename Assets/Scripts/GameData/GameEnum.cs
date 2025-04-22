@@ -21,17 +21,27 @@ public enum DamageType
     Additional,
     Effective
 }
+public enum DamageStyle
+{
+    None = 1 >> 0,
+    FullAttack = 1 >> 1,
+    QuickAttack = 1 >> 2,
+    ComboAttack = 1 >> 3,
+    FollowAttack = 1 >> 4,
+    CounterAttack = 1 >> 5,
+}
 
 public enum EnergyGainType
 {
+    None = 0,
     GainEffect,
     Recover,
 }
 public enum EnergyLoseType
 {
+    None = 0,
     LoseEffect,
     Consume,
-
 }
 
 public enum PlayerBuffPropertyDuration
@@ -96,7 +106,6 @@ public enum UpdateTiming
     ExecuteEnd,
     DrawCard,
     PlayCard,
-
     TriggerBuffStart,
 }
 

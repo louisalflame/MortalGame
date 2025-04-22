@@ -158,21 +158,19 @@ public abstract class EnergyEvent : IGameEvent
         MaxEnergy = player.MaxEnergy;
     }
 }
-public class RecoverEnergyEvent : EnergyEvent
-{
-    public RecoverEnergyEvent(IPlayerEntity player, GainEnergyResult gainEnergyResult) : base(player, gainEnergyResult.DeltaEp) { }
-}
-public class ConsumeEnergyEvent : EnergyEvent
-{
-    public ConsumeEnergyEvent(IPlayerEntity player, LoseEnergyResult loseEnergyResult) : base(player, loseEnergyResult.DeltaEp) { }
-}
 public class GainEnergyEvent : EnergyEvent
 {
-    public GainEnergyEvent(IPlayerEntity player, GainEnergyResult gainEnergyResult) : base(player, gainEnergyResult.DeltaEp) { }
+    public EnergyGainType GainType;
+
+    public GainEnergyEvent(IPlayerEntity player, GetEnergyResult result) : 
+        base(player, result.DeltaEp) { }
 }
 public class LoseEnergyEvent : EnergyEvent
 {
-    public LoseEnergyEvent(IPlayerEntity player, LoseEnergyResult loseEnergyResult) : base(player, loseEnergyResult.DeltaEp) { }
+    public EnergyLoseType LoseType;
+
+    public LoseEnergyEvent(IPlayerEntity player, LoseEnergyResult result) : 
+        base(player, result.DeltaEp) { }
 }
 
 public abstract class HealthEvent : IGameEvent
@@ -191,41 +189,26 @@ public abstract class HealthEvent : IGameEvent
         MaxHp = character.MaxHealth;
     }
 }
-public abstract class DamageEvent : HealthEvent
+public class DamageEvent : HealthEvent
 {
     public DamageType Type;
+    public DamageStyle Style;
     public int DeltaHp;
     public int DeltaShield;
     public int DamagePoint;
 
-    public DamageEvent(Faction faction, ICharacterEntity character, TakeDamageResult takeDamageResult) : 
-        base(faction, character)
+    public DamageEvent(
+        Faction faction, 
+        ICharacterEntity character, 
+        TakeDamageResult takeDamageResult, 
+        DamageStyle damageStyle) : base(faction, character)
     {
         Type = takeDamageResult.Type;
+        Style = damageStyle;
         DeltaHp = takeDamageResult.DeltaHp;
         DeltaShield = takeDamageResult.DeltaDp;
         DamagePoint = takeDamageResult.DamagePoint;
     }
-}
-public class NormalDamageEvent : DamageEvent
-{
-    public NormalDamageEvent(Faction faction, ICharacterEntity character, TakeDamageResult takeDamageResult) : 
-        base(faction, character, takeDamageResult) { }
-}
-public class PenetrateDamageEvent : DamageEvent
-{
-    public PenetrateDamageEvent(Faction faction, ICharacterEntity character, TakeDamageResult takeDamageResult) : 
-        base(faction, character, takeDamageResult) { }
-}
-public class AdditionalAttackEvent : DamageEvent
-{
-    public AdditionalAttackEvent(Faction faction, ICharacterEntity character, TakeDamageResult takeDamageResult) : 
-        base(faction, character, takeDamageResult) { }
-}
-public class EffectiveAttackEvent : DamageEvent
-{
-    public EffectiveAttackEvent(Faction faction, ICharacterEntity character, TakeDamageResult takeDamageResult) : 
-        base(faction, character, takeDamageResult) { }
 }
 
 public class GetHealEvent : HealthEvent

@@ -177,8 +177,8 @@ public class GameplayView : MonoBehaviour, IGameplayView
                 case PlayerExecuteEndEvent playerExecuteEndEvent:
                     _PlayerExecuteEnd(playerExecuteEndEvent);
                     break;
-                case ConsumeEnergyEvent consumeEnergyEvent:
-                    _ConsumeEnergyView(consumeEnergyEvent);
+                case LoseEnergyEvent loseEnergyEvent:
+                    _ConsumeEnergyView(loseEnergyEvent);
                     break;
                 case GainEnergyEvent gainEnergyEvent:
                     _gainEnergyView(gainEnergyEvent);
@@ -382,15 +382,15 @@ public class GameplayView : MonoBehaviour, IGameplayView
         }
     }
 
-    private void _ConsumeEnergyView(ConsumeEnergyEvent consumeEnergyEvent)
+    private void _ConsumeEnergyView(LoseEnergyEvent loseEnergyEvent)
     {
-        switch (consumeEnergyEvent.Faction)
+        switch (loseEnergyEvent.Faction)
         {
             case Faction.Ally:
-                _allyInfoView.UpdateEnergy(consumeEnergyEvent);
+                _allyInfoView.UpdateEnergy(loseEnergyEvent);
                 break;
             case Faction.Enemy:
-                _enemyInfoView.UpdateEnergy(consumeEnergyEvent);
+                _enemyInfoView.UpdateEnergy(loseEnergyEvent);
                 break;
         }
     }

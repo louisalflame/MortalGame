@@ -38,9 +38,9 @@ public class EnemyInfoView : MonoBehaviour
         _energyBarView.SetEnergy(enemy.CurrentEnergy, enemy.MaxEnergy);
     }
 
-    public void UpdateEnergy(ConsumeEnergyEvent consumeEnergyEvent)
+    public void UpdateEnergy(LoseEnergyEvent loseEnergyEvent)
     {
-        _energyBarView.SetEnergy(consumeEnergyEvent.Energy, consumeEnergyEvent.MaxEnergy);
+        _energyBarView.SetEnergy(loseEnergyEvent.Energy, loseEnergyEvent.MaxEnergy);
     }
     public void UpdateEnergy(GainEnergyEvent gainEnergyEvent)
     {

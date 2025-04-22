@@ -1,5 +1,19 @@
 using System;
 
+public interface IBooleanValue
+{
+    bool Eval(IGameplayStatusWatcher gameWatcher);
+}
+
+[Serializable]
+public class TrueValue : IBooleanValue
+{
+    public bool Eval(IGameplayStatusWatcher gameWatcher)
+    {
+        return true;
+    }
+}
+
 public interface IIntegerValue
 {
     int Eval(IGameplayStatusWatcher gameWatcher);

@@ -21,7 +21,7 @@ public class GetShieldResult
     public int OverDp;
 }
 
-public class GainEnergyResult
+public class GetEnergyResult
 {
     public EnergyGainType Type;
     public int EnergyPoint;
