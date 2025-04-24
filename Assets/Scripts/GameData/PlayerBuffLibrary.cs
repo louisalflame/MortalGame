@@ -13,7 +13,7 @@ public class PlayerBuffLibrary
         _buffs = new Dictionary<string, PlayerBuffData>(buffs);
     }
 
-    public Option<ConditionalPlayerBuffEffect[]> GetBuffEffects(string buffId, GameTiming gameTiming)
+    public Option<ConditionalPlayerBuffEffect[]> GetBuffEffects(string buffId, TriggerTiming triggerTiming)
     {
         if (!_buffs.ContainsKey(buffId))
         {
@@ -23,7 +23,7 @@ public class PlayerBuffLibrary
 
         return LinqEnumerableExtensions.FirstOrNone(
                 _buffs[buffId].BuffEffects
-                    .Where(pair => pair.Timing == gameTiming)
+                    .Where(pair => pair.Timing == triggerTiming)
                     .Select(pair => pair.ConditionEffects)
             );
     }

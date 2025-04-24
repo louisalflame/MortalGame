@@ -10,7 +10,7 @@ public class CardBuffData
 
     [ShowInInspector]
     [TitleGroup("Effects")]
-    public Dictionary<GameTiming, ICardEffect[]> Effects = new ();
+    public Dictionary<TriggerTiming, ICardEffect[]> Effects = new ();
 
     [ShowInInspector]
     [TitleGroup("Properties")]

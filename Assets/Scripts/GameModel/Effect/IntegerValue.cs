@@ -1,39 +1,20 @@
 using System;
 
-public interface IBooleanValue
-{
-    bool Eval(IGameplayStatusWatcher gameWatcher);
-}
-
-[Serializable]
-public class TrueValue : IBooleanValue
-{
-    public bool Eval(IGameplayStatusWatcher gameWatcher)
-    {
-        return true;
-    }
-}
-
 public interface IIntegerValue
 {
-    int Eval(IGameplayStatusWatcher gameWatcher);
+    int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource);
 }
 
 [Serializable]
 public class ThisCardPower : IIntegerValue
 {   
-    public int Eval(IGameplayStatusWatcher gameWatcher)
+    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
     {
-        return gameWatcher.GameContext.UsingCard.EvalPower(gameWatcher);
-    }
-}
-
-[Serializable]
-public class ThisCardCost : IIntegerValue
-{
-    public int Eval(IGameplayStatusWatcher gameWatcher)
-    {
-        return gameWatcher.GameContext.UsingCard.EvalCost(gameWatcher);
+        return triggerSource switch
+        {
+            CardPlay cardPlay => cardPlay.Card.Power,
+            _ => 0
+        };
     }
 }
 
@@ -42,7 +23,7 @@ public class ConstInteger : IIntegerValue
 {
     public int Value;
 
-    public int Eval(IGameplayStatusWatcher gameWatcher)
+    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
     {
         return Value;
     }
@@ -51,8 +32,13 @@ public class ConstInteger : IIntegerValue
 [Serializable]
 public class ThisBuffLevel : IIntegerValue
 {
-    public int Eval(IGameplayStatusWatcher gameWatcher)
+    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
     {
-        return gameWatcher.GameContext.TriggeredBuff.Level;
+        return triggerSource switch
+        {
+            PlayerBuffTrigger playerBuffTrigger => playerBuffTrigger.Buff.Level,
+            CharacterBuffTrigger characterBuffTrigger => characterBuffTrigger.Buff.Level,
+            _ => 0
+        };
     }
 }

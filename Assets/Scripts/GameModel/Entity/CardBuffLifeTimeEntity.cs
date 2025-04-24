@@ -3,7 +3,9 @@ using UnityEngine;
 public interface ICardBuffLifeTimeEntity
 {
     bool IsExpired();
-    void Update(IGameplayStatusWatcher gameWatcher);
+    void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing);
+    void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent);
+    void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result);
 }
 
 public class AlwaysLifeTimeCardBuffEntity : ICardBuffLifeTimeEntity
@@ -13,9 +15,11 @@ public class AlwaysLifeTimeCardBuffEntity : ICardBuffLifeTimeEntity
         return false;
     }
 
-    public void Update(IGameplayStatusWatcher gameWatcher)
-    {
-    }
+    public void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing) { }
+
+    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent) { }
+
+    public void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result) { }
 }
 
 public class TurnLifeTimeCardBuffEntity : ICardBuffLifeTimeEntity
@@ -32,11 +36,13 @@ public class TurnLifeTimeCardBuffEntity : ICardBuffLifeTimeEntity
         return _turn <= 0;
     }
 
-    public void Update(IGameplayStatusWatcher gameWatcher)
+    public void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
     {
-        if (gameWatcher.GameContext.GameTiming == GameTiming.TurnEnd)
+        if (timing == UpdateTiming.TurnEnd)
         {
             _turn--;
         }
     }
+    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent) { }
+    public void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result) { }
 }

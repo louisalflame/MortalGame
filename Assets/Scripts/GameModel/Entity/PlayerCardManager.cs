@@ -15,8 +15,6 @@ public interface IPlayerCardManager
     ICardColletionZone GetCardCollectionZone(CardCollectionType type);
 
     IEnumerable<IGameEvent> ClearHandOnTurnEnd(IGameplayStatusWatcher gameWatcher);
-    
-    IEnumerable<IGameEvent> UpdateCards(IGameplayStatusWatcher gameWatcher);
 
     Option<ICardEntity> GetCard(Guid cardIdentity);
     bool TryDiscardCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
@@ -74,7 +72,7 @@ public class PlayerCardManager : IPlayerCardManager
         var recycleCards = nonePreservedCards.Except(excludeCards);
         Graveyard.AddCards(recycleCards);
         events.Add(new RecycleHandCardEvent(){
-            Faction = gameWatcher.GameContext.ExecutePlayer.Faction,
+            Faction = this.Owner(gameWatcher).ValueOr(PlayerEntity.DummyPlayer).Faction,
             RecycledCardInfos = recycleCards.Select(c => new CardInfo(c, gameWatcher)).ToArray(),
             ExcludedCardInfos = excludeCards.Select(c => new CardInfo(c, gameWatcher)).ToArray(),
             HandCardInfo = HandCard.ToCardCollectionInfo(gameWatcher),
@@ -82,22 +80,6 @@ public class PlayerCardManager : IPlayerCardManager
             ExclusionZoneInfo = ExclusionZone.ToCardCollectionInfo(gameWatcher),
             DisposeZoneInfo = DisposeZone.ToCardCollectionInfo(gameWatcher),
         });
-
-        return events;
-    }
-
-    public IEnumerable<IGameEvent> UpdateCards(IGameplayStatusWatcher gameWatcher)
-    {
-        var events = new List<IGameEvent>();
-
-        foreach(var card in HandCard.Cards)
-        {
-            // TODO : collect reactions
-            if(card.TryUpdateCards(gameWatcher, out var cardEvent))
-            {
-                events.Add(cardEvent);
-            }
-        }
 
         return events;
     }
@@ -281,5 +263,17 @@ public class PlayerCardManager : IPlayerCardManager
             default:
                 break;
         }
+    }
+}
+
+public static class PlayerCardManagerExtensions
+{
+    public static Option<IPlayerEntity> Owner(this IPlayerCardManager cardManager, IGameplayStatusWatcher watcher)
+    {
+        if (watcher.GameStatus.Ally.CardManager == cardManager)
+            return (watcher.GameStatus.Ally as IPlayerEntity).Some();
+        if (watcher.GameStatus.Enemy.CardManager == cardManager)
+            return (watcher.GameStatus.Enemy as IPlayerEntity).Some();
+        return Option.None<IPlayerEntity>();
     }
 }

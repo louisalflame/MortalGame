@@ -11,7 +11,7 @@ public class CardData
     {
         [TableColumnWidth(150, false)]
         [ValueDropdown("_GetAllowedValues")]
-        public GameTiming Timing;
+        public TriggerTiming Timing;
 
         [ShowInInspector]
         // TODO: conditional cardeffect
@@ -20,11 +20,11 @@ public class CardData
         private static IEnumerable _GetAllowedValues()
         {
             return new[] { 
-                GameTiming.None,
-                GameTiming.TurnStart,
-                GameTiming.TurnEnd,
-                GameTiming.DrawCard,
-                GameTiming.PlayCard
+                TriggerTiming.None,
+                TriggerTiming.TurnStart,
+                TriggerTiming.TurnEnd,
+                TriggerTiming.DrawCard,
+                TriggerTiming.PlayCard
             };
         }
     }
@@ -65,7 +65,7 @@ public class CardData
     {
         if (CardEffects == null) return;
         
-        var keys = new HashSet<GameTiming>();
+        var keys = new HashSet<TriggerTiming>();
         CardEffects.RemoveAll(pair => 
         {
             if (keys.Contains(pair.Timing))

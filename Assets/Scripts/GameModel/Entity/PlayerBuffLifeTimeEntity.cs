@@ -34,14 +34,6 @@ public class TurnLifeTimePlayerBuffEntity : IPlayerBuffLifeTimeEntity
         return _turn <= 0;
     }
 
-    public void Update(IGameplayStatusWatcher gameWatcher)
-    {
-        if (gameWatcher.GameContext.GameTiming == GameTiming.TurnEnd)
-        {
-            _turn--;
-        }
-    }
-
     public void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
     {
         if (timing == UpdateTiming.TurnEnd)

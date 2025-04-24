@@ -19,7 +19,7 @@ public interface ICardEntity
     IMainTargetSelectable MainSelectable { get; }
     IEnumerable<ISubTargetSelectable> SubSelectables { get; }
 
-    Dictionary<GameTiming, List<ICardEffect>> Effects { get; }
+    Dictionary<TriggerTiming, List<ICardEffect>> Effects { get; }
     IEnumerable<ICardPropertyEntity> Properties { get; }
     IEnumerable<ICardBuffEntity> BuffList { get; }
 
@@ -27,8 +27,6 @@ public interface ICardEntity
 
     int EvalCost(IGameplayStatusWatcher gameWatcher);
     int EvalPower(IGameplayStatusWatcher gameWatcher);
-
-    bool TryUpdateCards(IGameplayStatusWatcher gameWatcher, out IGameEvent gameEvent);
 
     ICardEntity Clone(IEnumerable<ICardBuffEntity> cardBuffs);
     void AddNewStatus(ICardBuffEntity status);
@@ -46,7 +44,7 @@ public class CardEntity : ICardEntity
     private int _power;    
     private IMainTargetSelectable _mainSelectable;
     private List<ISubTargetSelectable> _subSelectables;
-    private Dictionary<GameTiming, List<ICardEffect>> _effects;
+    private Dictionary<TriggerTiming, List<ICardEffect>> _effects;
     private List<ICardPropertyEntity> _properties;
     private List<ICardBuffEntity> _buffList;
 
@@ -60,7 +58,7 @@ public class CardEntity : ICardEntity
     public int Power => _power;
     public IMainTargetSelectable MainSelectable => _mainSelectable;
     public IEnumerable<ISubTargetSelectable> SubSelectables => _subSelectables;
-    public Dictionary<GameTiming, List<ICardEffect>> Effects => _effects;
+    public Dictionary<TriggerTiming, List<ICardEffect>> Effects => _effects;
     public IEnumerable<ICardPropertyEntity> Properties => _properties;
     public IEnumerable<ICardBuffEntity> BuffList => _buffList;
     public IEnumerable<ICardPropertyEntity> AllProperties => 
@@ -78,7 +76,7 @@ public class CardEntity : ICardEntity
         power: 0,
         mainSelectable: new NoneSelectable(),
         subSelectables: new List<ISubTargetSelectable>(),
-        effects: new Dictionary<GameTiming, List<ICardEffect>>(),
+        effects: new Dictionary<TriggerTiming, List<ICardEffect>>(),
         properties: new List<ICardPropertyEntity>(),
         buffList: new List<CardBuffEntity>()
     );
@@ -94,7 +92,7 @@ public class CardEntity : ICardEntity
         int power,
         IMainTargetSelectable mainSelectable,
         IEnumerable<ISubTargetSelectable> subSelectables,
-        Dictionary<GameTiming, List<ICardEffect>> effects,
+        Dictionary<TriggerTiming, List<ICardEffect>> effects,
         IEnumerable<ICardPropertyEntity> properties,
         IEnumerable<ICardBuffEntity> buffList
     )
@@ -207,18 +205,6 @@ public class CardEntity : ICardEntity
         } 
 
         return power;
-    }
-
-    public bool TryUpdateCards(IGameplayStatusWatcher gameWatcher, out IGameEvent gameEvent)
-    {
-        foreach(var cardBuff in BuffList)
-        {
-            cardBuff.Update(gameWatcher);
-        }
-        
-        // TODO: return event of property expired
-        gameEvent = NoneEvent.Instance;
-        return false;
     }
 }
 

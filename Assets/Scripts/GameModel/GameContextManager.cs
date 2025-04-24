@@ -41,16 +41,6 @@ public class GameContextManager : IDisposable
         _contextStack.Push(Context.With());
         return this;
     }
-    public GameContextManager SetExecutePlayer(IPlayerEntity executePlayer) 
-    {
-        _contextStack.Push(Context.With(executePlayer: executePlayer));
-        return this;
-    }
-    public GameContextManager SetCardCaster(IPlayerEntity cardCaster) 
-    {
-        _contextStack.Push(Context.With(cardCaster: cardCaster));
-        return this;
-    }
     public GameContextManager SetSelectedPlayer(IPlayerEntity selectedPlayer) 
     {
         _contextStack.Push(Context.With(selectedPlayer: selectedPlayer));
@@ -66,94 +56,32 @@ public class GameContextManager : IDisposable
         _contextStack.Push(Context.With(selectedCard: selectedCard));
         return this;
     }
-    public GameContextManager SetUsingCard(ICardEntity usingCard) 
-    {
-        _contextStack.Push(Context.With(usingCard: usingCard));
-        return this;
-    }
-    public GameContextManager SetGameTiming(GameTiming gameTiming) 
-    {
-        _contextStack.Push(Context.With(gameTiming: gameTiming));
-        return this;
-    }
-    public GameContextManager SetEffectTargetPlayer(IPlayerEntity effectTarget) 
-    {
-        _contextStack.Push(Context.With(effectTargetPlayer: effectTarget));
-        return this;
-    }
-    public GameContextManager SetEffectTargetCharacter(ICharacterEntity effectTarget) 
-    {
-        _contextStack.Push(Context.With(effectTargetCharacter: effectTarget));
-        return this;
-    }
-    public GameContextManager SetEffectTargetCard(ICardEntity effectTarget) 
-    {
-        _contextStack.Push(Context.With(effectTargetCard: effectTarget));
-        return this;
-    }
-    public GameContextManager SetTriggeredPlayerBuff(IPlayerBuffEntity triggeredBuff) 
-    {
-        _contextStack.Push(Context.With(triggeredBuff: triggeredBuff));
-        return this;
-    }
 }
 
 public class GameContext : IDisposable
 {
-    public IPlayerEntity        ExecutePlayer;
-    public IPlayerEntity        CardCaster;
     public IPlayerEntity        SelectedPlayer;
     public ICharacterEntity     SelectedCharacter;
     public ICardEntity          SelectedCard;
     
-    public GameTiming           GameTiming;
-    public ICardEntity          UsingCard;
-    public IPlayerEntity        EffectTargetPlayer;
-    public ICharacterEntity     EffectTargetCharacter;
-    public ICardEntity          EffectTargetCard;
-    public IPlayerBuffEntity    TriggeredBuff;
-
     public GameContext() { }
     public GameContext With(
-        IPlayerEntity       executePlayer = null,
-        IPlayerEntity       cardCaster = null,
         IPlayerEntity       selectedPlayer = null,
         ICharacterEntity    selectedCharacter = null,
-        ICardEntity         selectedCard = null,
-        GameTiming          gameTiming = default,
-        ICardEntity         usingCard = null,
-        IPlayerEntity       effectTargetPlayer = null,
-        ICharacterEntity    effectTargetCharacter = null,
-        ICardEntity         effectTargetCard = null,
-        IPlayerBuffEntity   triggeredBuff = null)
+        ICardEntity         selectedCard = null)
     {
         return new GameContext() 
         {
-            ExecutePlayer           = executePlayer ?? ExecutePlayer,
-            CardCaster              = cardCaster ?? CardCaster,
             SelectedPlayer          = selectedPlayer ?? SelectedPlayer,
             SelectedCharacter       = selectedCharacter ?? SelectedCharacter,
-            SelectedCard            = selectedCard ?? SelectedCard,
-            UsingCard               = usingCard ?? UsingCard,
-            GameTiming              = gameTiming == GameTiming.None ? GameTiming : gameTiming,
-            EffectTargetPlayer      = effectTargetPlayer ?? EffectTargetPlayer,
-            EffectTargetCharacter   = effectTargetCharacter ?? EffectTargetCharacter,
-            EffectTargetCard        = effectTargetCard ?? EffectTargetCard,
-            TriggeredBuff           = triggeredBuff ?? TriggeredBuff
+            SelectedCard            = selectedCard ?? SelectedCard
         };
     }
 
     public void Dispose() 
     {
-        ExecutePlayer = null;
-        CardCaster = null;
         SelectedPlayer = null;
         SelectedCharacter = null;
         SelectedCard = null;
-        UsingCard = null;
-        EffectTargetPlayer = null;
-        EffectTargetCharacter = null;
-        EffectTargetCard = null;
-        TriggeredBuff = null;
     }
 }

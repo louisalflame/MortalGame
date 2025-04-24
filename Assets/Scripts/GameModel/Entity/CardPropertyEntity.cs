@@ -6,7 +6,9 @@ public interface ICardPropertyEntity
     CardProperty Property { get; }
     
     int Eval(IGameplayStatusWatcher gameWatcher);
-    void Update(IGameplayStatusWatcher gameWatcher);
+    void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing);
+    void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent);
+    void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result);
 }
 
 public abstract class CardPropertyEntity : ICardPropertyEntity
@@ -18,7 +20,9 @@ public abstract class CardPropertyEntity : ICardPropertyEntity
         return 0;
     }
 
-    public virtual void Update(IGameplayStatusWatcher gameWatcher) { }
+    public virtual void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing) {}
+    public virtual void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent) {}
+    public virtual void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result) {}
 }
 
 public class PreservedPropertyEntity : CardPropertyEntity

@@ -4,47 +4,11 @@ using System.Linq;
 using Optional;
 using UnityEngine;
 
-public static class TargetCardValueExtensions
-{
-    public static Option<ICardEntity> Eval(
-        this ITargetCardValue targetCardValue, 
-        IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger,
-        IActionSource source)
-    {
-        return targetCardValue.Eval(gameWatcher, trigger.SomeNotNull(), source.SomeNotNull());
-    }
-    public static Option<ICardEntity> Eval(
-        this ITargetCardValue targetCardValue, 
-        IGameplayStatusWatcher gameWatcher,
-        IActionSource source)
-    {
-        return targetCardValue.Eval(gameWatcher, Option.None<ITriggerSource>(), source.SomeNotNull());
-    }
-
-    public static IReadOnlyCollection<ICardEntity> Eval(
-        this ITargetCardCollectionValue targetCardColleionValue, 
-        IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger,
-        IActionSource source)
-    {
-        return targetCardColleionValue.Eval(gameWatcher, trigger.SomeNotNull(), source.SomeNotNull());
-    }
-    public static IReadOnlyCollection<ICardEntity> Eval(
-        this ITargetCardCollectionValue targetCardColleionValue, 
-        IGameplayStatusWatcher gameWatcher, 
-        IActionSource source)
-    {
-        return targetCardColleionValue.Eval(gameWatcher,  Option.None<ITriggerSource>(), source.SomeNotNull());
-    }
-}
-
 public interface ITargetCardValue
 {
     Option<ICardEntity> Eval(
         IGameplayStatusWatcher gameWatcher, 
-        Option<ITriggerSource> trigger, 
-        Option<IActionSource> source);
+        ITriggerSource trigger);
 }
 
 [Serializable]
@@ -52,8 +16,7 @@ public class NoneCard : ITargetCardValue
 {
     public Option<ICardEntity> Eval(
         IGameplayStatusWatcher gameWatcher, 
-        Option<ITriggerSource> trigger, 
-        Option<IActionSource> source)
+        ITriggerSource trigger)
     {
         return Option.None<ICardEntity>();
     }
@@ -63,8 +26,7 @@ public class SelectedCard : ITargetCardValue
 {
     public Option<ICardEntity> Eval(
         IGameplayStatusWatcher gameWatcher, 
-        Option<ITriggerSource> trigger, 
-        Option<IActionSource> source)
+        ITriggerSource trigger)
     {
         return gameWatcher.GameContext.SelectedCard.Some();
     }
@@ -74,8 +36,7 @@ public interface ITargetCardCollectionValue
 {
     IReadOnlyCollection<ICardEntity> Eval(
         IGameplayStatusWatcher gameWatcher, 
-        Option<ITriggerSource> trigger,
-        Option<IActionSource> source);
+        ITriggerSource trigger);
 }
 
 [Serializable]
@@ -85,10 +46,9 @@ public class SingleCardCollection : ITargetCardCollectionValue
 
     public IReadOnlyCollection<ICardEntity> Eval(
         IGameplayStatusWatcher gameWatcher, 
-        Option<ITriggerSource> trigger, 
-        Option<IActionSource> source)
+        ITriggerSource trigger)
     {
-        return TargetCard.Eval(gameWatcher, trigger, source).ToEnumerable().ToList();
+        return TargetCard.Eval(gameWatcher, trigger).ToEnumerable().ToList();
     }
 }
 [Serializable]
@@ -98,10 +58,9 @@ public class AllyHandCards : ITargetCardCollectionValue
 
     public IReadOnlyCollection<ICardEntity> Eval(
         IGameplayStatusWatcher gameWatcher, 
-        Option<ITriggerSource> trigger, 
-        Option<IActionSource> source)
+        ITriggerSource trigger)
     {
-        var playerOpt = Player.Eval(gameWatcher, trigger, source);
+        var playerOpt = Player.Eval(gameWatcher, trigger);
         return playerOpt.Map(player => player.CardManager.HandCard.Cards).ValueOr(Array.Empty<ICardEntity>());
     }
 }

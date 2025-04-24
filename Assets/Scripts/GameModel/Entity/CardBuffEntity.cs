@@ -5,18 +5,20 @@ using UnityEngine;
 public interface ICardBuffEntity
 {
     string CardBuffDataID { get; }
-    Dictionary<GameTiming, List<ICardEffect>> Effects { get; }
+    Dictionary<TriggerTiming, List<ICardEffect>> Effects { get; }
     List<ICardPropertyEntity> Properties { get; }
     
     bool IsExpired();
-    void Update(IGameplayStatusWatcher gameWatcher);
+    void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing);
+    void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent);
+    void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result);
 }
 
 public class CardBuffEntity : ICardBuffEntity
 {
     public string CardBuffDataID { get; private set; }
 
-    public Dictionary<GameTiming, List<ICardEffect>> Effects { get; private set; }
+    public Dictionary<TriggerTiming, List<ICardEffect>> Effects { get; private set; }
 
     public List<ICardPropertyEntity> Properties { get; private set; }
 
@@ -24,7 +26,7 @@ public class CardBuffEntity : ICardBuffEntity
 
     private CardBuffEntity(
         string cardBuffDataID,
-        Dictionary<GameTiming, List<ICardEffect>> effects,
+        Dictionary<TriggerTiming, List<ICardEffect>> effects,
         List<ICardPropertyEntity> properties,
         ICardBuffLifeTimeEntity lifeTime)
     {
@@ -51,13 +53,19 @@ public class CardBuffEntity : ICardBuffEntity
         return LifeTime.IsExpired();
     }
 
-    public void Update(IGameplayStatusWatcher gameWatcher)
+    public void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
     {
         foreach(var property in Properties)
         {
-            property.Update(gameWatcher);
+            property.UpdateByTiming(gameWatcher, timing);
         }
 
-        LifeTime.Update(gameWatcher);
+        LifeTime.UpdateByTiming(gameWatcher, timing);
     }
+
+    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent)
+    { }
+
+    public void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result)
+    { }
 }

@@ -11,7 +11,7 @@ public class PlayerBuffData
     {
         [TableColumnWidth(150, false)]
         [ValueDropdown("_GetAllowedValues")]
-        public GameTiming Timing;
+        public TriggerTiming Timing;
 
         [ShowInInspector]
         public ConditionalPlayerBuffEffect[] ConditionEffects = new ConditionalPlayerBuffEffect[0];
@@ -19,11 +19,11 @@ public class PlayerBuffData
         private static IEnumerable _GetAllowedValues()
         {
             return new[] { 
-                GameTiming.None,
-                GameTiming.TurnStart,
-                GameTiming.TurnEnd,
-                GameTiming.ExecuteStart,
-                GameTiming.ExecuteEnd,
+                TriggerTiming.None,
+                TriggerTiming.TurnStart,
+                TriggerTiming.TurnEnd,
+                TriggerTiming.ExecuteStart,
+                TriggerTiming.ExecuteEnd,
             };
         }
     }
@@ -55,7 +55,7 @@ public class PlayerBuffData
     {
         if (BuffEffects == null) return;
         
-        var keys = new HashSet<GameTiming>();
+        var keys = new HashSet<TriggerTiming>();
         BuffEffects.RemoveAll(pair => 
         {
             if (keys.Contains(pair.Timing))

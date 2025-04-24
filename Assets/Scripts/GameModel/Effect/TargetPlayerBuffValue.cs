@@ -3,24 +3,11 @@ using System.Collections.Generic;
 using Optional;
 using UnityEngine;
 
-public static class TargetPlayerBuffValueExtensions
-{
-    public static Option<IPlayerBuffEntity> Eval(
-        this ITargetPlayerBuffValue targetPlayerBuffValue, 
-        IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger = null,
-        IActionSource source = null)
-    {
-        return targetPlayerBuffValue.Eval(gameWatcher, trigger.SomeNotNull(), source.SomeNotNull());
-    }
-}
-
 public interface ITargetPlayerBuffValue
 {
     Option<IPlayerBuffEntity> Eval(
         IGameplayStatusWatcher gameWatcher, 
-        Option<ITriggerSource> trigger,
-        Option<IActionSource> source);
+        ITriggerSource trigger);
 }
 
 [Serializable]
@@ -28,8 +15,7 @@ public class NoneBuff : ITargetPlayerBuffValue
 {
     public Option<IPlayerBuffEntity> Eval(
         IGameplayStatusWatcher gameWatcher,
-        Option<ITriggerSource> trigger,
-        Option<IActionSource> source)
+        ITriggerSource trigger)
     {
         return Option.None<IPlayerBuffEntity>();
     }
@@ -39,17 +25,12 @@ public class TriggeredPlayerBuff : ITargetPlayerBuffValue
 {
     public Option<IPlayerBuffEntity> Eval(
         IGameplayStatusWatcher gameWatcher,
-        Option<ITriggerSource> trigger,
-        Option<IActionSource> source)
+        ITriggerSource trigger)
     {
-        return trigger.Match(
-            t => {
-                return t switch
-                {
-                    PlayerBuffTrigger playerBuffTrigger => playerBuffTrigger.Buff.Some(),
-                    _ => Option.None<IPlayerBuffEntity>()
-                };
-            },
-            () => Option.None<IPlayerBuffEntity>());
+        return trigger switch
+        {
+            PlayerBuffTrigger playerBuffTrigger => playerBuffTrigger.Buff.Some(),
+            _ => Option.None<IPlayerBuffEntity>()
+        };
     }
 }

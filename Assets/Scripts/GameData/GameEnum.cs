@@ -107,6 +107,7 @@ public enum UpdateTiming
     DrawCard,
     PlayCard,
     TriggerBuffStart,
+    TriggerBuffEnd,
 }
 
 public enum TriggerTiming
@@ -119,19 +120,6 @@ public enum TriggerTiming
     ExecuteEnd,
     DrawCard,
     PlayCard,
-    TriggerEnd,
+    TriggerBuffEnd,
 }
 
-public enum GameTiming
-{
-    None = 0,
-    GameStart,
-    TurnStart,
-    TurnEnd,
-    ExecuteStart,
-    ExecuteEnd,
-    DrawCard,
-    PlayCard,
-    TriggerBuffEnd,
-    TriggerCardEnd,
-}
