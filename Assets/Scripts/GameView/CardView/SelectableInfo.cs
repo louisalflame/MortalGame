@@ -28,15 +28,21 @@ public static class SelectableInfoUtility
     {
         switch(selectType)
         {
-            case SelectType.None:
             case SelectType.Character:
+                return targetType == TargetType.AllyCharacter || 
+                       targetType == TargetType.EnemyCharacter;
             case SelectType.AllyCharacter:
+                return targetType == TargetType.AllyCharacter;
             case SelectType.EnemyCharacter:  
-                return targetType == TargetType.Character;
+                return targetType == TargetType.EnemyCharacter;
             case SelectType.Card:
+                return targetType == TargetType.AllyCard || 
+                       targetType == TargetType.EnemyCard;
             case SelectType.AllyCard:   
+                return targetType == TargetType.AllyCard;
             case SelectType.EnemyCard:  
-                return targetType == TargetType.Card;
+                return targetType == TargetType.EnemyCard;
+            case SelectType.None:
             default:    
                 return false;        
         }

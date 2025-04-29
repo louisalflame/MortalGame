@@ -2,39 +2,55 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Optional;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public interface ICharacterManager
+public static class CharacterManagerExtensions
 {
-    IReadOnlyCollection<ICharacterEntity> Characters { get; }
-    Option<ICharacterEntity> GetCharacter(Guid identity);
-    void AddCharacters(IEnumerable<ICharacterEntity> characters);
-    void RemoveCharacter(ICharacterEntity character);
-}
-
-public class CharacterManager : ICharacterManager
-{
-    private List<ICharacterEntity> _characters;
-    public IReadOnlyCollection<ICharacterEntity> Characters => _characters;
-
-    public CharacterManager()
+    public static Option<ICharacterEntity> GetAllyCharacter(this GameStatus gameStatus, Guid identity)
     {
-        _characters = new List<ICharacterEntity>();
+        foreach (var character in gameStatus.Ally.Characters)
+        {
+            if (character.Identity == identity)
+            {
+                return character.SomeNotNull();
+            }
+        }
+
+        return Option.None<ICharacterEntity>();
     }
 
-    public Option<ICharacterEntity> GetCharacter(Guid identity)
+    public static Option<ICharacterEntity> GetEnemyCharacter(this GameStatus gameStatus, Guid identity)
     {
-        var character = Characters.FirstOrDefault(p => p.Identity == identity);
-        return character.SomeNotNull();
+        foreach (var character in gameStatus.Enemy.Characters)
+        {
+            if (character.Identity == identity)
+            {
+                return character.SomeNotNull();
+            }
+        }
+
+        return Option.None<ICharacterEntity>();
     }
 
-    public void AddCharacters(IEnumerable<ICharacterEntity> characters)
+    public static Option<ICharacterEntity> GetCharacter(this GameStatus gameStatus, Guid identity)
     {
-        _characters.AddRange(characters);
-    }
+        foreach (var character in gameStatus.Ally.Characters)
+        {
+            if (character.Identity == identity)
+            {
+                return character.SomeNotNull();
+            }
+        }
 
-    public void RemoveCharacter(ICharacterEntity character)
-    {
-        _characters.Remove(character);
+        foreach (var character in gameStatus.Enemy.Characters)
+        {
+            if (character.Identity == identity)
+            {
+                return character.SomeNotNull();
+            }
+        }
+
+        return Option.None<ICharacterEntity>();
     }
 }

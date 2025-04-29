@@ -97,7 +97,7 @@ MonoBehaviour:
       Data: 8|SinglePlayerCollection, Assembly-CSharp
     - Name: Target
       Entry: 7
-      Data: 9|ThisExecutePlayer, Assembly-CSharp
+      Data: 9|CurrentPlayer, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 

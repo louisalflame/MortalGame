@@ -33,6 +33,16 @@ public class MainCharacterOfPlayer : ITargetCharacterValue
         return Player.Eval(gameWatcher, trigger).Map(player => player.MainCharacter);
     }
 }
+[Serializable]
+public class SelectedCharacter : ITargetCharacterValue
+{
+    public Option<ICharacterEntity> Eval(
+        IGameplayStatusWatcher gameWatcher, 
+        ITriggerSource trigger)
+    {
+        return gameWatcher.GameContext.SelectedCharacter.SomeNotNull();
+    }
+}
 
 public interface ITargetCharacterCollectionValue
 {

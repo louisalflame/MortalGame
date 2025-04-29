@@ -22,6 +22,9 @@ public class PlayerBuffData
                 TriggerTiming.None,
                 TriggerTiming.TurnStart,
                 TriggerTiming.TurnEnd,
+                TriggerTiming.DrawCard,
+                TriggerTiming.PlayCardStart,
+                TriggerTiming.PlayCardEnd,
                 TriggerTiming.ExecuteStart,
                 TriggerTiming.ExecuteEnd,
             };

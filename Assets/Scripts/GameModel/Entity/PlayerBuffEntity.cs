@@ -10,7 +10,6 @@ public interface IPlayerBuffEntity
     string Id { get; }
     Guid Identity { get; }
     int Level { get; }
-    Option<IPlayerEntity> Owner { get; }
     Option<IPlayerEntity> Caster { get; }
     IReadOnlyCollection<IPlayerBuffPropertyEntity> Properties { get; }
     IPlayerBuffLifeTimeEntity LifeTime { get; }
@@ -34,7 +33,6 @@ public class PlayerBuffEntity : IPlayerBuffEntity
     public string Id => _id;
     public Guid Identity => _identity;
     public int Level => _level;
-    public Option<IPlayerEntity> Owner => _owner;
     public Option<IPlayerEntity> Caster => _caster;
     public IReadOnlyCollection<IPlayerBuffPropertyEntity> Properties => _properties;
     public IPlayerBuffLifeTimeEntity LifeTime => _lifeTime;
@@ -47,7 +45,6 @@ public class PlayerBuffEntity : IPlayerBuffEntity
         string id,
         Guid identity,
         int level,
-        Option<IPlayerEntity> owner,
         Option<IPlayerEntity> caster,
         IEnumerable<IPlayerBuffPropertyEntity> properties,
         IPlayerBuffLifeTimeEntity lifeTime,
@@ -56,7 +53,6 @@ public class PlayerBuffEntity : IPlayerBuffEntity
         _id = id;
         _identity = identity;
         _level = level;
-        _owner = owner;
         _caster = caster;
         _properties = properties.ToList();
         _lifeTime = lifeTime;
@@ -85,10 +81,21 @@ public class DummyPlayerBuff : PlayerBuffEntity
         Guid.Empty,
         1,
         Option.None<IPlayerEntity>(),
-        Option.None<IPlayerEntity>(),
         Enumerable.Empty<IPlayerBuffPropertyEntity>(),
         new AlwaysLifeTimePlayerBuffEntity(),
         Enumerable.Empty<IReactionSessionEntity>())
     {
+    }
+}
+
+public static class PlayerBuffEntityExtensions
+{
+    public static Option<IPlayerEntity> Owner(this IPlayerBuffEntity playerBuffEntity, IGameplayStatusWatcher watcher)
+    {
+        if (watcher.GameStatus.Ally.BuffManager.Buffs.Contains(playerBuffEntity))
+            return (watcher.GameStatus.Ally as IPlayerEntity).Some();
+        if (watcher.GameStatus.Enemy.BuffManager.Buffs.Contains(playerBuffEntity))
+            return (watcher.GameStatus.Enemy as IPlayerEntity).Some();
+        return Option.None<IPlayerEntity>();
     }
 }

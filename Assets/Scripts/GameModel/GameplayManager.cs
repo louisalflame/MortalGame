@@ -270,25 +270,43 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
         Debug.Log($"SetUseCardSelectTarget targettype:{useCardAction.TargetType}");
         switch(useCardAction.TargetType)
         { 
-            case TargetType.Character:
+            case TargetType.AllyCharacter:
                 return useCardAction.SelectedTarget.Match(
-                    targetIdentity => {
-                        var targetCharacterOption = _gameStatus.CharacterManager.GetCharacter(targetIdentity);
-                        return targetCharacterOption.Match(
-                            targetCharacter => {
-                                return _contextMgr.SetSelectedCharacter(targetCharacter); 
-                            },
-                            () => { return _contextMgr.SetClone(); }
+                    allyCharacterIdentity => {
+                        var allyCharacterOpt = _gameStatus.GetAllyCharacter(allyCharacterIdentity);
+                        return allyCharacterOpt.Match(
+                            allyCharacter => _contextMgr.SetSelectedCharacter(allyCharacter),
+                            () => _contextMgr.SetClone()
                         );
                     },
                     () => _contextMgr.SetClone());
-            case TargetType.Card:
+            case TargetType.EnemyCharacter:
                 return useCardAction.SelectedTarget.Match(
-                    targetCardIndentity => {
-                        var targetCardOption = _gameStatus.Ally.CardManager.GetCard(targetCardIndentity);
-                        return targetCardOption.Match(
-                            targetCard => { return _contextMgr.SetSelectedCard(targetCard); },
-                            ()         => { return _contextMgr.SetClone(); }
+                    enemyCharacterIdentity => {
+                        var enemyCharacterOpt = _gameStatus.GetEnemyCharacter(enemyCharacterIdentity);
+                        return enemyCharacterOpt.Match(
+                            enemyCharacter => _contextMgr.SetSelectedCharacter(enemyCharacter),
+                            () => _contextMgr.SetClone()
+                        );
+                    },
+                    () => _contextMgr.SetClone());
+            case TargetType.AllyCard:
+                return useCardAction.SelectedTarget.Match(
+                    allyCardIndentity => {                        
+                        var allyCardOpt = _gameStatus.Ally.CardManager.GetCard(allyCardIndentity);
+                        return allyCardOpt.Match(
+                            allyCard => _contextMgr.SetSelectedCard(allyCard),
+                            () => _contextMgr.SetClone()
+                        );
+                    },
+                    () => _contextMgr.SetClone());
+            case TargetType.EnemyCard:
+                return useCardAction.SelectedTarget.Match(
+                    enemyCardIndentity => {
+                        var enemyCardOpt = _gameStatus.Enemy.CardManager.GetCard(enemyCardIndentity);
+                        return enemyCardOpt.Match(
+                            enemyCard => _contextMgr.SetSelectedCard(enemyCard),
+                            () => _contextMgr.SetClone()
                         );
                     },
                     () => _contextMgr.SetClone());
@@ -532,7 +550,6 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                         _contextMgr.BuffLibrary, 
                         this, 
                         actionSource,
-                        playerTarget,
                         addBuffEffect.BuffId, 
                         level,
                         out IPlayerBuffEntity resultBuff))
@@ -558,7 +575,6 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                         _contextMgr.BuffLibrary, 
                         this, 
                         actionSource,
-                        playerTarget,
                         removeBuffEffect.BuffId,
                         out IPlayerBuffEntity resultBuff))
                     {
@@ -584,9 +600,10 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
             }
             case DiscardCardEffect discardCardEffect:
             {
-                var cards = discardCardEffect.TargetCards.Eval(this, triggerSource);
-                foreach(var card in cards)
+                var cards = discardCardEffect.TargetCards.Eval(this, triggerSource).ToList();
+                for(var i = 0; i < cards.Count; i++)
                 {
+                    var card = cards[i];
                     card.Owner(this).MatchSome(cardOwner => {                                
                         if (cardOwner.CardManager.TryDiscardCard(
                             card.Identity, out var discardedCard, out var start, out var destination)) 
@@ -601,9 +618,10 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
             }
             case ConsumeCardEffect consumeCardEffect:
             {
-                var cards = consumeCardEffect.TargetCards.Eval(this, triggerSource);
-                foreach(var card in cards)
+                var cards = consumeCardEffect.TargetCards.Eval(this, triggerSource).ToList();
+                for(var i = 0; i < cards.Count; i++)
                 {   
+                    var card = cards[i];
                     card.Owner(this).MatchSome(cardOwner => {
                         if (cardOwner.CardManager.TryConsumeCard(
                             card.Identity, out var consumedCard, out var start, out var destination)) 
@@ -618,9 +636,10 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
             }
             case DisposeCardEffect disposeCardEffect:
             {
-                var cards = disposeCardEffect.TargetCards.Eval(this, triggerSource);
-                foreach(var card in cards.ToArray())
+                var cards = disposeCardEffect.TargetCards.Eval(this, triggerSource).ToList();
+                for(var i = 0; i < cards.Count; i++)
                 {
+                    var card = cards[i];
                     card.Owner(this).MatchSome(cardOwner => {
                         if (cardOwner.CardManager.TryDisposeCard(
                             card.Identity, out var disposedCard, out var start, out var destination)) 
@@ -675,9 +694,10 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
             }
             case AppendCardBuffEffect appendCardBuffEffect:
             {
-                var cards = appendCardBuffEffect.TargetCards.Eval(this, triggerSource);
-                foreach(var card in cards)
-                {
+                var cards = appendCardBuffEffect.TargetCards.Eval(this, triggerSource).ToList();
+                for(var i = 0; i < cards.Count; i++)
+                {   
+                    var card = cards[i];
                     var addCardBuffs = appendCardBuffEffect.AddCardBuffDatas
                         .Select(addData => {
                             var cardBuffData = _contextMgr.CardBuffLibrary.GetCardBuffData(addData.CardBuffId);

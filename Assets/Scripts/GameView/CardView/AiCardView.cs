@@ -22,7 +22,7 @@ public class AiCardView : MonoBehaviour, IRecyclable, ISelectableView
     private CompositeDisposable _disposables = new CompositeDisposable();
 
     public RectTransform RectTransform => _rectTransform;
-    public TargetType TargetType => TargetType.Card;
+    public TargetType TargetType => TargetType.EnemyCard;
     public Guid TargetIdentity => _cardIdentity;
 
     private Guid _cardIdentity;

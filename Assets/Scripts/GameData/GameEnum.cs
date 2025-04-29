@@ -92,8 +92,10 @@ public enum SelectType
 public enum TargetType
 {
     None = 0,
-    Character,
-    Card,
+    AllyCard,
+    EnemyCard,
+    AllyCharacter,
+    EnemyCharacter,
 }
 
 public enum UpdateTiming
@@ -119,7 +121,8 @@ public enum TriggerTiming
     ExecuteStart,
     ExecuteEnd,
     DrawCard,
-    PlayCard,
+    PlayCardStart,
+    PlayCardEnd,
     TriggerBuffEnd,
 }
 

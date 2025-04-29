@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Optional;
 using Unity.VisualScripting;
@@ -212,6 +213,11 @@ public static class CardEntityExtensions
 {
     public static Option<IPlayerEntity> Owner(this ICardEntity card, IGameplayStatusWatcher watcher)
     {
+        UnityEngine.Debug.Log($"Card {card.Identity} owner check");
+        UnityEngine.Debug.Log($"watcher {watcher} ");
+        UnityEngine.Debug.Log($"watcher.GameStatus {watcher.GameStatus} ");
+        UnityEngine.Debug.Log($"watcher.GameStatus.Ally {watcher.GameStatus.Ally} ");
+        UnityEngine.Debug.Log($"watcher.GameStatus.Ally.CardManager {watcher.GameStatus.Ally.CardManager} ");
         var allyCardOpt = watcher.GameStatus.Ally.CardManager.GetCard(card.Identity);
         if (allyCardOpt.HasValue)
             return (watcher.GameStatus.Ally as IPlayerEntity).Some();

@@ -76,13 +76,16 @@ MonoBehaviour:
       Data: 7|IsSelfTurnCondition, Assembly-CSharp
     - Name: TargetPlayer
       Entry: 7
-      Data: 8|OwnerOfPlayerBuff, Assembly-CSharp
+      Data: 8|PlayerBuffContentPlayer, Assembly-CSharp
     - Name: PlayerBuff
       Entry: 7
-      Data: 9|TriggeredBuff, Assembly-CSharp
+      Data: 9|TriggeredPlayerBuff, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
+    - Name: Type
+      Entry: 3
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -97,7 +100,7 @@ MonoBehaviour:
       Data: 
     - Name: Effect
       Entry: 7
-      Data: 10|EffectiveDamageBuffEffect, Assembly-CSharp
+      Data: 10|EffectiveDamagePlayerBuffEffect, Assembly-CSharp
     - Name: Targets
       Entry: 7
       Data: 11|SingleCharacterCollection, Assembly-CSharp
@@ -106,13 +109,16 @@ MonoBehaviour:
       Data: 12|MainCharacterOfPlayer, Assembly-CSharp
     - Name: Player
       Entry: 7
-      Data: 13|OwnerOfPlayerBuff, Assembly-CSharp
+      Data: 13|PlayerBuffContentPlayer, Assembly-CSharp
     - Name: PlayerBuff
       Entry: 7
-      Data: 14|TriggeredBuff, Assembly-CSharp
+      Data: 14|TriggeredPlayerBuff, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
+    - Name: Type
+      Entry: 3
+      Data: 0
     - Name: 
       Entry: 8
       Data: 

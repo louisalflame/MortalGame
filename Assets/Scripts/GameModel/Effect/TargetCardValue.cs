@@ -28,7 +28,7 @@ public class SelectedCard : ITargetCardValue
         IGameplayStatusWatcher gameWatcher, 
         ITriggerSource trigger)
     {
-        return gameWatcher.GameContext.SelectedCard.Some();
+        return gameWatcher.GameContext.SelectedCard.SomeNotNull();
     }
 }
 

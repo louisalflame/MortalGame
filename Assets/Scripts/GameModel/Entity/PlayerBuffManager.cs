@@ -11,7 +11,6 @@ public interface IPlayerBuffManager
         PlayerBuffLibrary buffLibrary, 
         IGameplayStatusWatcher gameWatcher, 
         IActionSource actionSource,
-        IActionTarget actionTarget,
         string buffId, 
         int level, 
         out IPlayerBuffEntity resultBuff);
@@ -19,7 +18,6 @@ public interface IPlayerBuffManager
         PlayerBuffLibrary buffLibrary, 
         IGameplayStatusWatcher gameWatcher, 
         IActionSource actionSource,
-        IActionTarget actionTarget,
         string buffId, 
         out IPlayerBuffEntity resultBuff);
 }
@@ -39,7 +37,6 @@ public class PlayerBuffManager : IPlayerBuffManager
         PlayerBuffLibrary buffLibrary, 
         IGameplayStatusWatcher gameWatcher, 
         IActionSource actionSource,
-        IActionTarget actionTarget,
         string buffId, 
         int level, 
         out IPlayerBuffEntity resultBuff)
@@ -54,11 +51,6 @@ public class PlayerBuffManager : IPlayerBuffManager
             }
         }
 
-        var owner = actionTarget switch
-        {
-            PlayerTarget playerTarget => Option.Some(playerTarget.Player),
-            _ => Option.None<IPlayerEntity>()
-        };
         var caster = actionSource switch
         {
             CardSource cardSource => cardSource.Card.Owner(gameWatcher),
@@ -69,8 +61,7 @@ public class PlayerBuffManager : IPlayerBuffManager
         resultBuff = new PlayerBuffEntity(
             buffId, 
             Guid.NewGuid(), 
-            level, 
-            owner,
+            level,
             caster,
             buffLibrary.GetBuffProperties(buffId)
                 .Select(p => p.CreateEntity(gameWatcher)),
@@ -86,7 +77,6 @@ public class PlayerBuffManager : IPlayerBuffManager
         PlayerBuffLibrary buffLibrary, 
         IGameplayStatusWatcher gameWatcher, 
         IActionSource actionSource,
-        IActionTarget actionTarget,
         string buffId, 
         out IPlayerBuffEntity resultBuff)
     {

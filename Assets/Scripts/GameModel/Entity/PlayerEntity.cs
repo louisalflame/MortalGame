@@ -7,7 +7,7 @@ using UnityEngine;
 public interface IPlayerEntity
 {
     Faction Faction { get; }
-    IReadOnlyCollection<CharacterEntity> Characters { get; }
+    IReadOnlyCollection<ICharacterEntity> Characters { get; }
     IPlayerCardManager CardManager { get; }
     int CurrentEnergy { get; }
     int MaxEnergy { get; }
@@ -32,7 +32,7 @@ public abstract class PlayerEntity : IPlayerEntity
     public int CurrentEnergy => EnergyManager.Energy;
     public int MaxEnergy => EnergyManager.MaxEnergy;
     public Option<Guid> OriginPlayerInstanceGuid => _originPlayerInstanceGuid;
-    public IReadOnlyCollection<CharacterEntity> Characters => _characters;
+    public IReadOnlyCollection<ICharacterEntity> Characters => _characters;
     public IPlayerCardManager CardManager => _cardManager;
 
 

@@ -44,13 +44,13 @@ public class OppositePlayer : ITargetPlayerValue
         var referenceOpt = Reference.Eval(gameWatcher, trigger);
         return
             referenceOpt.FlatMap(reference => 
-                reference.Faction == Faction.Ally ? (gameWatcher.GameStatus.Ally as IPlayerEntity).Some() :
-                reference.Faction == Faction.Enemy ? (gameWatcher.GameStatus.Enemy as IPlayerEntity).Some() :
+                reference.Faction == Faction.Ally ? (gameWatcher.GameStatus.Enemy as IPlayerEntity).Some() :
+                reference.Faction == Faction.Enemy ? (gameWatcher.GameStatus.Ally as IPlayerEntity).Some() :
                 Option.None<IPlayerEntity>());
     }
 }
 [Serializable]
-public class CasterOfCard : ITargetPlayerValue
+public class CardOwner : ITargetPlayerValue
 {
     public ITargetCardValue Card;
 
@@ -63,16 +63,28 @@ public class CasterOfCard : ITargetPlayerValue
     }
 }
 [Serializable]
-public class OwnerOfPlayerBuff : ITargetPlayerValue
+public class PlayerBuffContentPlayer : ITargetPlayerValue
 {
+    public enum PlayerType
+    {
+        Owner,
+        Caster,
+    }
+
     public ITargetPlayerBuffValue PlayerBuff;
+    public PlayerType Type;
 
     public Option<IPlayerEntity> Eval(
         IGameplayStatusWatcher gameWatcher, 
         ITriggerSource trigger)
     {
         var playerBuffOpt = PlayerBuff.Eval(gameWatcher, trigger);
-        return playerBuffOpt.FlatMap(playerBuff => playerBuff.Owner);
+        return playerBuffOpt.FlatMap(playerBuff => Type switch
+        {
+            PlayerType.Owner => playerBuff.Owner(gameWatcher),
+            PlayerType.Caster => playerBuff.Caster,
+            _ => Option.None<IPlayerEntity>()
+        });
     }
 }
 

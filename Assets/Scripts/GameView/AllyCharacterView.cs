@@ -12,7 +12,7 @@ public class AllyCharacterView : BaseCharacterView, ISelectableView
     private RectTransform _rectTransform;
 
     public RectTransform RectTransform => _rectTransform;
-    public TargetType TargetType => TargetType.Character;
+    public TargetType TargetType => TargetType.AllyCharacter;
     public Guid TargetIdentity => _playerIdentity;
 
     private Guid _playerIdentity;

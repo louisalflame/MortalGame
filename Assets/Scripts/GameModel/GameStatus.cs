@@ -24,7 +24,6 @@ public class GameStatus
     public GameState State { get; private set; }
     public AllyEntity Ally { get; private set; }
     public EnemyEntity Enemy { get; private set; }
-    public ICharacterManager CharacterManager { get; private set; }
     public TurnStatus TurnStatus { get; private set; }
     public Option<IPlayerEntity> CurrentPlayer { get; private set; } = Option.None<IPlayerEntity>();
 
@@ -38,9 +37,6 @@ public class GameStatus
         State = state;
         Ally = player;
         Enemy = enemy;
-        CharacterManager = new CharacterManager();
-        CharacterManager.AddCharacters(player.Characters);
-        CharacterManager.AddCharacters(enemy.Characters);
         TurnStatus = new TurnStatus();
     } 
 

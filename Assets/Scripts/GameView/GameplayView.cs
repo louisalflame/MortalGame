@@ -157,7 +157,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
                     _ConsumeCardView(consumeCardEvent);
                     break;
                 case DisposeCardEvent disposeCardEvent:
-                    
+                    _DisposeCardView(disposeCardEvent);
                     break;
                 case CloneCardEvent cloneCardEvent:
                     _CloneCardView(cloneCardEvent);
