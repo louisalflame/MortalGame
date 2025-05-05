@@ -7,7 +7,7 @@ using UnityEngine;
 public class CardData
 {
     [Serializable]
-    public class CardEffect
+    public class TriggeredCardEffect
     {
         [TableColumnWidth(150, false)]
         [ValueDropdown("_GetAllowedValues")]
@@ -24,7 +24,6 @@ public class CardData
                 TriggerTiming.TurnStart,
                 TriggerTiming.TurnEnd,
                 TriggerTiming.DrawCard,
-                TriggerTiming.PlayCard
             };
         }
     }
@@ -53,9 +52,13 @@ public class CardData
     [BoxGroup("Target")]
     public List<ISubTargetSelectable> SubSelectables = new();
  
+    [BoxGroup("Effects")]
+    [ShowInInspector]
+    public List<ICardEffect> Effects = new();    
+    [BoxGroup("Effects")]
     [ShowInInspector]
     [TableList]
-    public List<CardEffect> CardEffects = new();
+    public List<TriggeredCardEffect> TriggeredEffects = new();
 
     [ShowInInspector]
     [BoxGroup("Properties")]
@@ -63,10 +66,10 @@ public class CardData
 
     public void OnValidate()
     {
-        if (CardEffects == null) return;
+        if (TriggeredEffects == null) return;
         
         var keys = new HashSet<TriggerTiming>();
-        CardEffects.RemoveAll(pair => 
+        TriggeredEffects.RemoveAll(pair => 
         {
             if (keys.Contains(pair.Timing))
             {

@@ -32,8 +32,8 @@ MonoBehaviour:
       Data: 99
     - Name: Sessions
       Entry: 7
-      Data: 1|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[IReactionSession, Assembly-CSharp]],
-        Unity.Plastic.Antlr3.Runtime
+      Data: 1|System.Collections.Generic.List`1[[IReactionSessionData, Assembly-CSharp]],
+        mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -49,7 +49,49 @@ MonoBehaviour:
         Assembly-CSharp]], Unity.Plastic.Antlr3.Runtime
     - Name: 
       Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 3|PlayerBuffData+BuffEffect, Assembly-CSharp
+    - Name: Timing
+      Entry: 3
+      Data: 7
+    - Name: ConditionEffects
+      Entry: 7
+      Data: 4|ConditionalPlayerBuffEffect[], Assembly-CSharp
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 5|ConditionalPlayerBuffEffect, Assembly-CSharp
+    - Name: Conditions
+      Entry: 7
+      Data: 6|IPlayerBuffCondition[], Assembly-CSharp
+    - Name: 
+      Entry: 12
       Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Effect
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -58,7 +100,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 3|System.Collections.Generic.List`1[[PlayerBuffPropertyValue, Assembly-CSharp]],
+      Data: 7|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12

@@ -330,13 +330,10 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
 
                 if (player.CardManager.HandCard.RemoveCard(usedCard)) 
                 {
-                    if(usedCard.Effects.TryGetValue(TriggerTiming.PlayCard, out var onPlayEffects))
+                    foreach(var effect in usedCard.Effects)
                     {
-                        foreach(var effect in onPlayEffects)
-                        {
-                            var applyCardEvents = _ApplyCardEffect(new CardSource(usedCard), new CardPlay(usedCard), effect);
-                            useCardEvents.AddRange(applyCardEvents);
-                        }
+                        var applyCardEvents = _ApplyCardEffect(new CardSource(usedCard), new CardPlay(usedCard), effect);
+                        useCardEvents.AddRange(applyCardEvents);
                     }
                 
                     ICardColletionZone destination =  

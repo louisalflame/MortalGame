@@ -20,7 +20,8 @@ public interface ICardEntity
     IMainTargetSelectable MainSelectable { get; }
     IEnumerable<ISubTargetSelectable> SubSelectables { get; }
 
-    Dictionary<TriggerTiming, List<ICardEffect>> Effects { get; }
+    List<ICardEffect> Effects { get; }
+    Dictionary<TriggerTiming, List<ICardEffect>> TriggeredEffects { get; }
     IEnumerable<ICardPropertyEntity> Properties { get; }
     IEnumerable<ICardBuffEntity> BuffList { get; }
 
@@ -45,7 +46,8 @@ public class CardEntity : ICardEntity
     private int _power;    
     private IMainTargetSelectable _mainSelectable;
     private List<ISubTargetSelectable> _subSelectables;
-    private Dictionary<TriggerTiming, List<ICardEffect>> _effects;
+    private List<ICardEffect> _effects;
+    private Dictionary<TriggerTiming, List<ICardEffect>> _triggeredEffects;
     private List<ICardPropertyEntity> _properties;
     private List<ICardBuffEntity> _buffList;
 
@@ -59,7 +61,8 @@ public class CardEntity : ICardEntity
     public int Power => _power;
     public IMainTargetSelectable MainSelectable => _mainSelectable;
     public IEnumerable<ISubTargetSelectable> SubSelectables => _subSelectables;
-    public Dictionary<TriggerTiming, List<ICardEffect>> Effects => _effects;
+    public List<ICardEffect> Effects => _effects;
+    public Dictionary<TriggerTiming, List<ICardEffect>> TriggeredEffects => _triggeredEffects;
     public IEnumerable<ICardPropertyEntity> Properties => _properties;
     public IEnumerable<ICardBuffEntity> BuffList => _buffList;
     public IEnumerable<ICardPropertyEntity> AllProperties => 
@@ -77,7 +80,8 @@ public class CardEntity : ICardEntity
         power: 0,
         mainSelectable: new NoneSelectable(),
         subSelectables: new List<ISubTargetSelectable>(),
-        effects: new Dictionary<TriggerTiming, List<ICardEffect>>(),
+        effects: new List<ICardEffect>(),
+        triggeredEffects: new Dictionary<TriggerTiming, List<ICardEffect>>(),
         properties: new List<ICardPropertyEntity>(),
         buffList: new List<CardBuffEntity>()
     );
@@ -93,7 +97,8 @@ public class CardEntity : ICardEntity
         int power,
         IMainTargetSelectable mainSelectable,
         IEnumerable<ISubTargetSelectable> subSelectables,
-        Dictionary<TriggerTiming, List<ICardEffect>> effects,
+        List<ICardEffect> effects,
+        Dictionary<TriggerTiming, List<ICardEffect>> triggeredEffects,
         IEnumerable<ICardPropertyEntity> properties,
         IEnumerable<ICardBuffEntity> buffList
     )
@@ -108,7 +113,8 @@ public class CardEntity : ICardEntity
         _power = power;
         _mainSelectable = mainSelectable;
         _subSelectables = subSelectables.ToList();
-        _effects = effects.ToDictionary(
+        _effects = effects.ToList();
+        _triggeredEffects = triggeredEffects.ToDictionary(
             pair => pair.Key,
             pair => pair.Value.ToList()
         );
@@ -129,7 +135,8 @@ public class CardEntity : ICardEntity
             power: cardInstance.Power,
             mainSelectable: cardInstance.MainSelectable,
             subSelectables: cardInstance.SubSelectables,
-            effects: cardInstance.Effects.ToDictionary(
+            effects: cardInstance.Effects.ToList(),
+            triggeredEffects: cardInstance.TriggeredEffects.ToDictionary(
                     pair => pair.Key,
                     pair => pair.Value.ToList()
                 ),
@@ -151,7 +158,8 @@ public class CardEntity : ICardEntity
             power: cardData.Power,
             mainSelectable: cardData.MainSelectable,
             subSelectables: cardData.SubSelectables,
-            effects: cardData.CardEffects.ToDictionary(
+            effects: cardData.Effects.ToList(),
+            triggeredEffects: cardData.TriggeredEffects.ToDictionary(
                     pair => pair.Timing,
                     pair => pair.Effects.ToList()
                 ),
@@ -173,7 +181,8 @@ public class CardEntity : ICardEntity
             power: _power,
             mainSelectable: _mainSelectable,
             subSelectables: _subSelectables,
-            effects: _effects.ToDictionary(
+            effects: _effects.ToList(),
+            triggeredEffects: _triggeredEffects.ToDictionary(
                 pair => pair.Key,
                 pair => pair.Value.ToList()),
             properties: _properties.ToList(),

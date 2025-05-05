@@ -70,34 +70,22 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: CardEffects
-      Entry: 7
-      Data: 4|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[CardData+CardEffect,
-        Assembly-CSharp]], Unity.Plastic.Antlr3.Runtime
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 5|CardData+CardEffect, Assembly-CSharp
-    - Name: Timing
-      Entry: 3
-      Data: 7
     - Name: Effects
       Entry: 7
-      Data: 6|ICardEffect[], Assembly-CSharp
+      Data: 4|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[ICardEffect, Assembly-CSharp]],
+        Unity.Plastic.Antlr3.Runtime
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 7|ConsumeCardEffect, Assembly-CSharp
+      Data: 5|ConsumeCardEffect, Assembly-CSharp
     - Name: TargetCards
       Entry: 7
-      Data: 8|SingleCardCollection, Assembly-CSharp
+      Data: 6|SingleCardCollection, Assembly-CSharp
     - Name: TargetCard
       Entry: 7
-      Data: 9|SelectedCard, Assembly-CSharp
+      Data: 7|SelectedCard, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -109,13 +97,13 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 10|GainEnergyEffect, Assembly-CSharp
+      Data: 8|GainEnergyEffect, Assembly-CSharp
     - Name: Targets
       Entry: 7
-      Data: 11|SinglePlayerCollection, Assembly-CSharp
+      Data: 9|SinglePlayerCollection, Assembly-CSharp
     - Name: Target
       Entry: 7
-      Data: 12|CurrentPlayer, Assembly-CSharp
+      Data: 10|CurrentPlayer, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -124,7 +112,7 @@ MonoBehaviour:
       Data: 
     - Name: Value
       Entry: 7
-      Data: 13|ThisCardPower, Assembly-CSharp
+      Data: 11|ThisCardPower, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -137,9 +125,13 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: TriggeredEffects
+      Entry: 7
+      Data: 12|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[CardData+TriggeredCardEffect,
+        Assembly-CSharp]], Unity.Plastic.Antlr3.Runtime
     - Name: 
-      Entry: 8
-      Data: 
+      Entry: 12
+      Data: 0
     - Name: 
       Entry: 13
       Data: 
@@ -148,7 +140,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 14|System.Collections.Generic.List`1[[ICardPropertyData, Assembly-CSharp]],
+      Data: 13|System.Collections.Generic.List`1[[ICardPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
