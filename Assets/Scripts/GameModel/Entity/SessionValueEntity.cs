@@ -3,24 +3,32 @@ using System.Linq;
 
 public interface ISessionValueEntity
 {
-    void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing);
-    void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent);
-    void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result);
+    void UpdateByTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing);
+    void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent);
+    void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result);
 }
 
 [Serializable]
 public class SessionBooleanEntity : ISessionValueEntity
 {
     public bool Value;
-    public readonly BooleanUpdateRules TimingRules;
+    public readonly BooleanUpdateTimingRules TimingRules;
+    public readonly BooleanUpdateIntentRules IntentRules;
+    public readonly BooleanUpdateResultRules ResultRules;
     
-    public SessionBooleanEntity(bool value, BooleanUpdateRules timingRules)
+    public SessionBooleanEntity(
+        bool value, 
+        BooleanUpdateTimingRules timingRules,
+        BooleanUpdateIntentRules intentRules, 
+        BooleanUpdateResultRules resultRules)
     {
         Value = value;
         TimingRules = timingRules;
+        IntentRules = intentRules;
+        ResultRules = resultRules;
     }
 
-    public void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
+    public void UpdateByTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing)
     {
         if (TimingRules.TryGetValue(timing, out var rules))
         {
@@ -37,11 +45,11 @@ public class SessionBooleanEntity : ISessionValueEntity
         }
     }
 
-    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent)
+    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent)
     {
     }
 
-    public void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result)
+    public void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result)
     {
     }
 }
@@ -50,23 +58,43 @@ public class SessionBooleanEntity : ISessionValueEntity
 public class SessionIntegerEntity : ISessionValueEntity
 {
     public int Value;
-    public readonly IntegerUpdateRules Rules;
+    public readonly IntegerUpdateTimingRules TimingRules;
+    public readonly IntegerUpdateIntentRules IntentRules;
+    public readonly IntegerUpdateResultRules ResultRules;
 
-    public SessionIntegerEntity(int value, IntegerUpdateRules rules)
+    public SessionIntegerEntity(
+        int value, 
+        IntegerUpdateTimingRules timingRules,
+        IntegerUpdateIntentRules intentRules,
+        IntegerUpdateResultRules resultRules)
     {
         Value = value;
-        Rules = rules;
+        TimingRules = timingRules;
+        IntentRules = intentRules;
+        ResultRules = resultRules;
     }
 
-    public void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
+    public void UpdateByTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing)
     {
     }
 
-    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent)
+    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent)
     {
+        if (IntentRules.TryGetValue(intent.ActionType, out var rules))
+        {
+            foreach (var rule in rules)
+            {
+                if (rule.Conditions.All(condition => condition.Eval(gameWatcher, trigger)))
+                {
+                    Value = rule.NewValue.Eval(gameWatcher, trigger);
+                    break;
+                }
+                
+            }
+        }
     }
 
-    public void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result)
+    public void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result)
     {
     }
 }

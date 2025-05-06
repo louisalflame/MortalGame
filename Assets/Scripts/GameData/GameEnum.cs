@@ -7,6 +7,16 @@ public enum ArithmeticType
     Multiply,
     Overwrite
 }
+public enum ArithmeticConditionType
+{
+    None = 0,
+    Equal,
+    NotEqual,
+    GreaterThan,
+    LessThan,
+    GreaterThanOrEqual,
+    LessThanOrEqual,
+}
 public enum Faction
 {
     None = 0,
@@ -98,6 +108,28 @@ public enum TargetType
     EnemyCharacter,
 }
 
+public enum UpdateAction
+{
+    None = 0,
+    Summon,
+    Death,
+    Damage,
+    Heal,
+    Shield,
+    GainEnergy,
+    LoseEnergy,
+    RecycleDeck,
+    Buff,
+    Debuff,
+    DrawCard,
+    DiscardCard,
+    ConsumeCard,
+    DisposeCard,
+    PlayCard,
+    AddPlayerBuff,
+    StackPlayerBuff,
+    RemovePlayerBuff,
+}
 public enum UpdateTiming
 {
     None = 0,

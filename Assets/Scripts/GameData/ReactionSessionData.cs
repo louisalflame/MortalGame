@@ -11,13 +11,14 @@ public interface IReactionSessionData
     IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher);
 }
 
+[Serializable]
 public abstract class ReactionSessionData
 {
     public string Id { get; set; }
     
     [ShowInInspector]
+    [SerializeField]
     protected Dictionary<string, ISessionValueData> _values = new();
-
     public Dictionary<string, ISessionValueData> SessionValueTable => _values;
 }
 
@@ -52,7 +53,7 @@ public class ExectueTurnSession : ReactionSessionData, IReactionSessionData
 {
     public IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
     {
-        return new WholeTurnSessionEntity(
+        return new ExectueTurnSessionEntity(
             Id, 
             _values.ToDictionary(
                 kvp => kvp.Key,
@@ -61,11 +62,11 @@ public class ExectueTurnSession : ReactionSessionData, IReactionSessionData
 }
 
 [Serializable]
-public class CardSession : ReactionSessionData, IReactionSessionData
+public class PlayCardSession : ReactionSessionData, IReactionSessionData
 {
     public IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
     {
-        return new WholeTurnSessionEntity(
+        return new PlayCardSessionEntity(
             Id, 
             _values.ToDictionary(
                 kvp => kvp.Key,

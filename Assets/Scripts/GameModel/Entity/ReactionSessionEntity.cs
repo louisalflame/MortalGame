@@ -5,9 +5,9 @@ using System.Collections.Generic;
 public interface IReactionSessionEntity
 {
     string Id { get; }
-    void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing);
-    void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent);
-    void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result);
+    void UpdateByTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing);
+    void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent);
+    void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result);
 }
 
 public abstract class ReactionSessionEntity : IReactionSessionEntity
@@ -23,29 +23,29 @@ public abstract class ReactionSessionEntity : IReactionSessionEntity
         Values = values;
     }
 
-    public abstract void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing);
-    public abstract void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent);
-    public abstract void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result);
+    public abstract void UpdateByTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing);
+    public abstract void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent);
+    public abstract void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result);
 
-    protected virtual void _UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
+    protected virtual void _UpdateByTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing)
     {
         foreach (var kvp in Values)
         {
-            kvp.Value.UpdateByTiming(gameWatcher, timing);
+            kvp.Value.UpdateByTiming(gameWatcher, trigger, timing);
         }
     }
-    protected virtual void _UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent)
+    protected virtual void _UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent)
     {
         foreach (var kvp in Values)
         {
-            kvp.Value.UpdateIntent(gameWatcher, intent);
+            kvp.Value.UpdateIntent(gameWatcher, trigger, intent);
         }
     }
-    protected virtual void _UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result)
+    protected virtual void _UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result)
     {
         foreach (var kvp in Values)
         {
-            kvp.Value.UpdateResult(gameWatcher, result);
+            kvp.Value.UpdateResult(gameWatcher, trigger, result);
         }
     }
 }
@@ -54,17 +54,17 @@ public class WholeGameSessionEntity : ReactionSessionEntity
 {
     public WholeGameSessionEntity(string id, Dictionary<string, ISessionValueEntity> values) : base(id, values) { }
 
-    public override void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
+    public override void UpdateByTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing)
     {
-        _UpdateByTiming(gameWatcher, timing);
+        _UpdateByTiming(gameWatcher, trigger, timing);
     }
-    public override void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent)
+    public override void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent)
     {
-        _UpdateIntent(gameWatcher, intent);
+        _UpdateIntent(gameWatcher, trigger, intent);
     }
-    public override void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result)
+    public override void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result)
     {
-        _UpdateResult(gameWatcher, result);
+        _UpdateResult(gameWatcher, trigger, result);
     }
 }
 
@@ -72,17 +72,17 @@ public class WholeTurnSessionEntity : ReactionSessionEntity
 {
     public WholeTurnSessionEntity(string id, Dictionary<string, ISessionValueEntity> values) : base(id, values) { }
 
-    public override void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
+    public override void UpdateByTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing)
     {
-        _UpdateByTiming(gameWatcher, timing);
+        _UpdateByTiming(gameWatcher, trigger, timing);
     }
-    public override void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent)
+    public override void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent)
     {
-        _UpdateIntent(gameWatcher, intent);
+        _UpdateIntent(gameWatcher, trigger, intent);
     }
-    public override void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result)
+    public override void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result)
     {
-        _UpdateResult(gameWatcher, result);
+        _UpdateResult(gameWatcher, trigger, result);
     }
 }
 
@@ -90,34 +90,34 @@ public class ExectueTurnSessionEntity : ReactionSessionEntity
 {
     public ExectueTurnSessionEntity(string id, Dictionary<string, ISessionValueEntity> values) : base(id, values) { }
 
-    public override void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
+    public override void UpdateByTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing)
     {
-        _UpdateByTiming(gameWatcher, timing);
+        _UpdateByTiming(gameWatcher, trigger, timing);
     }
-    public override void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent)
+    public override void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent)
     {
-        _UpdateIntent(gameWatcher, intent);
+        _UpdateIntent(gameWatcher, trigger, intent);
     }
-    public override void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result)
+    public override void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result)
     {
-        _UpdateResult(gameWatcher, result);
+        _UpdateResult(gameWatcher, trigger, result);
     }
 }
 
-public class CardSessionEntity : ReactionSessionEntity
+public class PlayCardSessionEntity : ReactionSessionEntity
 {
-    public CardSessionEntity(string id, Dictionary<string, ISessionValueEntity> values) : base(id, values) { }
+    public PlayCardSessionEntity(string id, Dictionary<string, ISessionValueEntity> values) : base(id, values) { }
 
-    public override void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
+    public override void UpdateByTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing)
     {
-        _UpdateByTiming(gameWatcher, timing);
+        _UpdateByTiming(gameWatcher, trigger, timing);
     }
-    public override void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent)
+    public override void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent)
     {
-        _UpdateIntent(gameWatcher, intent);
+        _UpdateIntent(gameWatcher, trigger, intent);
     }
-    public override void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result)
+    public override void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result)
     {
-        _UpdateResult(gameWatcher, result);
+        _UpdateResult(gameWatcher, trigger, result);
     }
 }

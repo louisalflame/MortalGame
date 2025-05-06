@@ -36,7 +36,227 @@ MonoBehaviour:
         Assembly-CSharp]], Unity.Plastic.Antlr3.Runtime
     - Name: 
       Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 2|PlayCardSession, Assembly-CSharp
+    - Name: _values
+      Entry: 7
+      Data: 3|Unity.VisualScripting.FlexibleDictionary`2[[System.String, mscorlib],[ISessionValueData,
+        Assembly-CSharp]], Unity.VisualScripting.Core
+    - Name: comparer
+      Entry: 7
+      Data: 4|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: atk
+    - Name: $v
+      Entry: 7
+      Data: 5|SessionInteger, Assembly-CSharp
+    - Name: Value
+      Entry: 3
       Data: 0
+    - Name: TimingRules
+      Entry: 7
+      Data: 6|IntegerUpdateTimingRules, Assembly-CSharp
+    - Name: comparer
+      Entry: 7
+      Data: 7|System.Collections.Generic.EnumEqualityComparer`1[[UpdateTiming, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: IntentRules
+      Entry: 7
+      Data: 8|IntegerUpdateIntentRules, Assembly-CSharp
+    - Name: comparer
+      Entry: 7
+      Data: 9|System.Collections.Generic.EnumEqualityComparer`1[[UpdateAction, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 15
+    - Name: $v
+      Entry: 7
+      Data: 10|ConditionIntegerUpdateRule[], Assembly-CSharp
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 11|ConditionIntegerUpdateRule, Assembly-CSharp
+    - Name: Conditions
+      Entry: 7
+      Data: 12|ICondition[], Assembly-CSharp
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 13|IsSelfTurnCondition, Assembly-CSharp
+    - Name: TargetPlayer
+      Entry: 7
+      Data: 14|PlayerBuffContentPlayer, Assembly-CSharp
+    - Name: PlayerBuff
+      Entry: 7
+      Data: 15|TriggeredPlayerBuff, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Type
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 16|IntegerCondition, Assembly-CSharp
+    - Name: Value1
+      Entry: 7
+      Data: 17|PlayerIntegerProperty, Assembly-CSharp
+    - Name: Player
+      Entry: 7
+      Data: 18|CurrentPlayer, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Property
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Value2
+      Entry: 7
+      Data: 19|ConstInteger, Assembly-CSharp
+    - Name: Value
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Condition
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NewValue
+      Entry: 7
+      Data: 20|PlayerBuffIntegerProperty, Assembly-CSharp
+    - Name: PlayerBuff
+      Entry: 7
+      Data: 21|TriggeredPlayerBuff, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Property
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Type
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ResultRules
+      Entry: 7
+      Data: 22|IntegerUpdateResultRules, Assembly-CSharp
+    - Name: comparer
+      Entry: 9
+      Data: 9
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -45,7 +265,7 @@ MonoBehaviour:
       Data: 
     - Name: BuffEffects
       Entry: 7
-      Data: 2|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[PlayerBuffData+BuffEffect,
+      Data: 23|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[PlayerBuffData+BuffEffect,
         Assembly-CSharp]], Unity.Plastic.Antlr3.Runtime
     - Name: 
       Entry: 12
@@ -58,11 +278,17 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 3|System.Collections.Generic.List`1[[PlayerBuffPropertyValue, Assembly-CSharp]],
+      Data: 24|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 25|AttackPropertyPlayerBuffData, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -70,7 +296,10 @@ MonoBehaviour:
       Entry: 8
       Data: 
     - Name: LifeTimeData
-      Entry: 6
+      Entry: 7
+      Data: 26|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
+    - Name: 
+      Entry: 8
       Data: 
     - Name: 
       Entry: 8

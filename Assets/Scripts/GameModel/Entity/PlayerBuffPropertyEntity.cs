@@ -6,7 +6,9 @@ public interface IPlayerBuffPropertyEntity
     PlayerBuffProperty Property { get; }
     
     int Eval(IGameplayStatusWatcher gameWatcher);
-    void Update(IGameplayStatusWatcher gameWatcher);
+    void UpdateTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing);
+    void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent);
+    void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result);
 }
 
 public abstract class PlayerBuffPropertyEntity : IPlayerBuffPropertyEntity
@@ -18,7 +20,11 @@ public abstract class PlayerBuffPropertyEntity : IPlayerBuffPropertyEntity
         return 0;
     }
 
-    public virtual void Update(IGameplayStatusWatcher gameWatcher)
+    public virtual void UpdateTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing)
+    { }
+    public virtual void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent)
+    { }
+    public virtual void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result)
     { }
 }
 

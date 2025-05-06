@@ -58,7 +58,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 3|System.Collections.Generic.List`1[[PlayerBuffPropertyValue, Assembly-CSharp]],
+      Data: 3|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -70,7 +70,10 @@ MonoBehaviour:
       Entry: 8
       Data: 
     - Name: LifeTimeData
-      Entry: 6
+      Entry: 7
+      Data: 4|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
+    - Name: 
+      Entry: 8
       Data: 
     - Name: 
       Entry: 8

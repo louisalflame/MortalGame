@@ -1,5 +1,6 @@
 using System;
 using Sirenix.OdinInspector;
+using UnityEngine;
 
 public interface ISessionValueData
 {
@@ -13,11 +14,15 @@ public class SessionBoolean : ISessionValueData
     public bool Value;
 
     [ShowInInspector]
-    public BooleanUpdateRules UpdateRules = new();
+    public BooleanUpdateTimingRules TimingRules = new();
+    [ShowInInspector]
+    public BooleanUpdateIntentRules IntentRules = new();
+    [ShowInInspector]
+    public BooleanUpdateResultRules ResultRules = new();
     
     public ISessionValueEntity GetEntity(IGameplayStatusWatcher gameWatcher)
     {
-        return new SessionBooleanEntity(Value, UpdateRules);
+        return new SessionBooleanEntity(Value, TimingRules, IntentRules, ResultRules);
     }
 }
 
@@ -27,10 +32,14 @@ public class SessionInteger : ISessionValueData
     public int Value;
 
     [ShowInInspector]
-    public IntegerUpdateRules UpdateRules = new();
-    
+    public IntegerUpdateTimingRules TimingRules = new();
+    [ShowInInspector]
+    public IntegerUpdateIntentRules IntentRules = new();
+    [ShowInInspector]
+    public IntegerUpdateResultRules ResultRules = new();
+
     public ISessionValueEntity GetEntity(IGameplayStatusWatcher gameWatcher)
     {
-        return new SessionIntegerEntity(Value, UpdateRules);
+        return new SessionIntegerEntity(Value, TimingRules, IntentRules, ResultRules);
     }
 }

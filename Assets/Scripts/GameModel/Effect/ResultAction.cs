@@ -3,6 +3,7 @@ using UnityEngine;
 
 public abstract class BaseResultAction : IResultAction
 {
+    public abstract UpdateAction ActionType { get; }
     public IActionSource Source { get; private set; }
     public IActionTarget Target { get; private set; }
 
@@ -13,27 +14,30 @@ public abstract class BaseResultAction : IResultAction
     }
 }
 
-public class SummonAction : BaseResultAction
+public class SummonResultAction : BaseResultAction
 {
-    public SummonAction(IActionSource source, IActionTarget target) : base(source, target)
+    public override UpdateAction ActionType => UpdateAction.Summon;
+    public SummonResultAction(IActionSource source, IActionTarget target) : base(source, target)
     {
     }
 }
 
-public class DeathAction : BaseResultAction
+public class DeathResultAction : BaseResultAction
 {
-    public DeathAction(IActionSource source, IActionTarget target) : base(source, target)
+    public override UpdateAction ActionType => UpdateAction.Death;
+    public DeathResultAction(IActionSource source, IActionTarget target) : base(source, target)
     {
     }
 }
 
-public class DamageAction : BaseResultAction
+public class DamageResultAction : BaseResultAction
 {
+    public override UpdateAction ActionType => UpdateAction.Damage;
     public TakeDamageResult DamageResult { get; private set; }
     public DamageStyle Style { get; private set; }
     public DamageType Type => DamageResult.Type;
 
-    public DamageAction(
+    public DamageResultAction(
         IActionSource source, 
         IActionTarget target, 
         TakeDamageResult damageResult,
@@ -44,11 +48,12 @@ public class DamageAction : BaseResultAction
     }
 }
 
-public class GetHealAction : BaseResultAction
+public class HealResultAction : BaseResultAction
 {
     public GetHealResult HealResult { get; private set; }
+    public override UpdateAction ActionType => UpdateAction.Heal;
 
-    public GetHealAction(
+    public HealResultAction(
         IActionSource source, 
         IActionTarget target,
         GetHealResult healResult) : base(source, target)
@@ -56,11 +61,12 @@ public class GetHealAction : BaseResultAction
         HealResult = healResult;
     }
 }
-public class GetShieldAction : BaseResultAction
+public class ShieldResultAction : BaseResultAction
 {
+    public override UpdateAction ActionType => UpdateAction.Shield;
     public GetShieldResult ShieldResult { get; private set; }
 
-    public GetShieldAction(
+    public ShieldResultAction(
         IActionSource source,
         IActionTarget target,
         GetShieldResult shieldResult) : base(source, target)
@@ -69,11 +75,12 @@ public class GetShieldAction : BaseResultAction
     }
 }
 
-public class GainEnergyAction : BaseResultAction
+public class GainEnergyResultAction : BaseResultAction
 {    
+    public override UpdateAction ActionType => UpdateAction.GainEnergy;
     public GetEnergyResult EnergyResult { get; private set; }
 
-    public GainEnergyAction(
+    public GainEnergyResultAction(
         IActionSource source, 
         IActionTarget target,
         GetEnergyResult energyResult) : base(source, target)
@@ -81,11 +88,12 @@ public class GainEnergyAction : BaseResultAction
         EnergyResult = energyResult;
     }
 }
-public class LoseEnergyAction : BaseResultAction
+public class LoseEnergyResultAction : BaseResultAction
 {
+    public override UpdateAction ActionType => UpdateAction.LoseEnergy;
     public LoseEnergyResult EnergyResult { get; private set; }
 
-    public LoseEnergyAction(
+    public LoseEnergyResultAction(
         IActionSource source, 
         IActionTarget target,
         LoseEnergyResult energyResult) : base(source, target)
@@ -94,80 +102,100 @@ public class LoseEnergyAction : BaseResultAction
     }
 }
 
-public class RecycleDeckAction : BaseResultAction
+public class PlayCardResultAction : BaseResultAction
 {
-    public RecycleDeckAction(IActionTarget target) : base(new SystemSource(), target)
-    {
-    }
-}
-
-public class DrawCardAction : BaseResultAction
-{
+    public override UpdateAction ActionType => UpdateAction.PlayCard;
     public ICardEntity Card { get; private set; }
 
-    public DrawCardAction(IActionSource source, IActionTarget target, ICardEntity card) :
+    public PlayCardResultAction(IActionSource source, IActionTarget target, ICardEntity card) :
         base(source, target)
     {
         Card = card;
     }
 }
 
-public class DiscardCardAction : BaseResultAction
+public class RecycleDeckResultAction : BaseResultAction
 {
-    public ICardEntity Card { get; private set; }
-
-    public DiscardCardAction(IActionSource source, IActionTarget target, ICardEntity card) :
-        base(source, target)
+    public override UpdateAction ActionType => UpdateAction.RecycleDeck;
+    public RecycleDeckResultAction(IActionTarget target) : base(new SystemSource(), target)
     {
-        Card = card;
     }
 }
-public class ConsumeCardAction : BaseResultAction
+
+public class DrawCardResultAction : BaseResultAction
 {
+    public override UpdateAction ActionType => UpdateAction.DrawCard;
     public ICardEntity Card { get; private set; }
 
-    public ConsumeCardAction(IActionSource source, IActionTarget target, ICardEntity card) :
-        base(source, target)
-    {
-        Card = card;
-    }
-}
-public class DisposeCardAction : BaseResultAction
-{
-    public ICardEntity Card { get; private set; }
-
-    public DisposeCardAction(IActionSource source, IActionTarget target, ICardEntity card) :
+    public DrawCardResultAction(IActionSource source, IActionTarget target, ICardEntity card) :
         base(source, target)
     {
         Card = card;
     }
 }
 
-public class AddPlayerBuffAction : BaseResultAction
+public class DiscardCardResultAction : BaseResultAction
 {
+    public override UpdateAction ActionType => UpdateAction.DiscardCard;
+    public ICardEntity Card { get; private set; }
+
+    public DiscardCardResultAction(IActionSource source, IActionTarget target, ICardEntity card) :
+        base(source, target)
+    {
+        Card = card;
+    }
+}
+public class ConsumeCardResultAction : BaseResultAction
+{
+    public override UpdateAction ActionType => UpdateAction.ConsumeCard;
+    public ICardEntity Card { get; private set; }
+
+    public ConsumeCardResultAction(IActionSource source, IActionTarget target, ICardEntity card) :
+        base(source, target)
+    {
+        Card = card;
+    }
+}
+public class DisposeCardResultAction : BaseResultAction
+{
+    public override UpdateAction ActionType => UpdateAction.DisposeCard;
+    public ICardEntity Card { get; private set; }
+
+    public DisposeCardResultAction(IActionSource source, IActionTarget target, ICardEntity card) :
+        base(source, target)
+    {
+        Card = card;
+    }
+}
+
+public class AddPlayerBuffResultAction : BaseResultAction
+{
+    public override UpdateAction ActionType => UpdateAction.AddPlayerBuff;
     public IPlayerBuffEntity Buff { get; private set; }
 
-    public AddPlayerBuffAction(IActionSource source, IActionTarget target, IPlayerBuffEntity buff) :
+    public AddPlayerBuffResultAction(IActionSource source, IActionTarget target, IPlayerBuffEntity buff) :
         base(source, target)
     {
         Buff = buff;
     }
 }
-public class StackPlayerBuffAction : BaseResultAction
+public class StackPlayerBuffResultAction : BaseResultAction
 {
+    public override UpdateAction ActionType => UpdateAction.StackPlayerBuff;
     public IPlayerBuffEntity Buff { get; private set; }
 
-    public StackPlayerBuffAction(IActionSource source, IActionTarget target, IPlayerBuffEntity buff) :
+    public StackPlayerBuffResultAction(IActionSource source, IActionTarget target, IPlayerBuffEntity buff) :
         base(source, target)
     {
         Buff = buff;
     }
 }
-public class RemovePlayerBuffAction : BaseResultAction
+public class RemovePlayerBuffResultAction : BaseResultAction
 {
+    public override UpdateAction ActionType => UpdateAction.RemovePlayerBuff;
     public IPlayerBuffEntity Buff { get; private set; }
 
-    public RemovePlayerBuffAction(IActionSource source, IActionTarget target, IPlayerBuffEntity buff) :
+    public RemovePlayerBuffResultAction(IActionSource source, IActionTarget target, IPlayerBuffEntity buff) :
         base(source, target)
     {
         Buff = buff;

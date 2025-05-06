@@ -118,7 +118,16 @@ MonoBehaviour:
       Data: 
     - Name: Value
       Entry: 7
-      Data: 12|ThisCardPower, Assembly-CSharp
+      Data: 12|CardIntegerProperty, Assembly-CSharp
+    - Name: Card
+      Entry: 7
+      Data: 13|PlayingCard, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Property
+      Entry: 3
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -133,7 +142,7 @@ MonoBehaviour:
       Data: 
     - Name: TriggeredEffects
       Entry: 7
-      Data: 13|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[CardData+TriggeredCardEffect,
+      Data: 14|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[CardData+TriggeredCardEffect,
         Assembly-CSharp]], Unity.Plastic.Antlr3.Runtime
     - Name: 
       Entry: 12
@@ -146,7 +155,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 14|System.Collections.Generic.List`1[[ICardPropertyData, Assembly-CSharp]],
+      Data: 15|System.Collections.Generic.List`1[[ICardPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12

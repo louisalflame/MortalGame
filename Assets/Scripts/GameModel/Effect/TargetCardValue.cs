@@ -31,6 +31,20 @@ public class SelectedCard : ITargetCardValue
         return gameWatcher.GameContext.SelectedCard.SomeNotNull();
     }
 }
+[Serializable]
+public class PlayingCard : ITargetCardValue
+{
+    public Option<ICardEntity> Eval(
+        IGameplayStatusWatcher gameWatcher, 
+        ITriggerSource trigger)
+    {
+        return trigger switch
+        {
+            CardPlay cardPlay => cardPlay.Card.SomeNotNull(),
+            _ => Option.None<ICardEntity>()
+        };
+    }
+}
 
 public interface ITargetCardCollectionValue
 {
