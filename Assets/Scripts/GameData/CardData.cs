@@ -37,7 +37,8 @@ public class CardData
     [TitleGroup("BasicData")]
     public CardType Type;
     [TitleGroup("BasicData")]
-    public CardTheme[] Themes;
+    [ShowInInspector]
+    public CardTheme[] Themes = new CardTheme[0];
     [TitleGroup("BasicData")]
     [Range(0, 10)]
     public int Cost;
@@ -45,9 +46,10 @@ public class CardData
     [Range(0, 20)]
     public int Power;
     
+    [ShowInInspector]
     [BoxGroup("Target")]
     [PropertySpace(SpaceBefore = 0, SpaceAfter = 10)]
-    public IMainTargetSelectable MainSelectable;
+    public IMainTargetSelectable MainSelectable = new NoneSelectable();
     [ShowInInspector]
     [BoxGroup("Target")]
     public List<ISubTargetSelectable> SubSelectables = new();

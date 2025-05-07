@@ -139,7 +139,8 @@ public enum UpdateTiming
     ExecuteStart,
     ExecuteEnd,
     DrawCard,
-    PlayCard,
+    PlayCardStart,
+    PlayCardEnd,
     TriggerBuffStart,
     TriggerBuffEnd,
 }

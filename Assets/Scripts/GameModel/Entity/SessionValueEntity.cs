@@ -3,6 +3,7 @@ using System.Linq;
 
 public interface ISessionValueEntity
 {
+    ISessionValueEntity Clone();
     void UpdateByTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing);
     void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent);
     void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result);
@@ -12,9 +13,10 @@ public interface ISessionValueEntity
 public class SessionBooleanEntity : ISessionValueEntity
 {
     public bool Value;
-    public readonly BooleanUpdateTimingRules TimingRules;
-    public readonly BooleanUpdateIntentRules IntentRules;
-    public readonly BooleanUpdateResultRules ResultRules;
+    private readonly bool _initialValue;
+    private readonly BooleanUpdateTimingRules _timingRules;
+    private readonly BooleanUpdateIntentRules _intentRules;
+    private readonly BooleanUpdateResultRules _resultRules;
     
     public SessionBooleanEntity(
         bool value, 
@@ -22,15 +24,25 @@ public class SessionBooleanEntity : ISessionValueEntity
         BooleanUpdateIntentRules intentRules, 
         BooleanUpdateResultRules resultRules)
     {
-        Value = value;
-        TimingRules = timingRules;
-        IntentRules = intentRules;
-        ResultRules = resultRules;
+        _initialValue = value;
+        _timingRules = timingRules;
+        _intentRules = intentRules;
+        _resultRules = resultRules;
+        Value = _initialValue;
+    }
+
+    public ISessionValueEntity Clone()
+    {
+        return new SessionBooleanEntity(
+            Value, 
+            _timingRules,
+            _intentRules, 
+            _resultRules);
     }
 
     public void UpdateByTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing)
     {
-        if (TimingRules.TryGetValue(timing, out var rules))
+        if (_timingRules.TryGetValue(timing, out var rules))
         {
             foreach (var rule in rules)
             {
@@ -58,9 +70,10 @@ public class SessionBooleanEntity : ISessionValueEntity
 public class SessionIntegerEntity : ISessionValueEntity
 {
     public int Value;
-    public readonly IntegerUpdateTimingRules TimingRules;
-    public readonly IntegerUpdateIntentRules IntentRules;
-    public readonly IntegerUpdateResultRules ResultRules;
+    private readonly int _initialValue;
+    private readonly IntegerUpdateTimingRules _timingRules;
+    private readonly IntegerUpdateIntentRules _intentRules;
+    private readonly IntegerUpdateResultRules _resultRules;
 
     public SessionIntegerEntity(
         int value, 
@@ -68,10 +81,20 @@ public class SessionIntegerEntity : ISessionValueEntity
         IntegerUpdateIntentRules intentRules,
         IntegerUpdateResultRules resultRules)
     {
-        Value = value;
-        TimingRules = timingRules;
-        IntentRules = intentRules;
-        ResultRules = resultRules;
+        _initialValue = value;
+        _timingRules = timingRules;
+        _intentRules = intentRules;
+        _resultRules = resultRules;
+        Value = _initialValue;
+    }
+
+    public ISessionValueEntity Clone()
+    {
+        return new SessionIntegerEntity(
+            Value, 
+            _timingRules,
+            _intentRules, 
+            _resultRules);
     }
 
     public void UpdateByTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing)
@@ -80,7 +103,7 @@ public class SessionIntegerEntity : ISessionValueEntity
 
     public void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent)
     {
-        if (IntentRules.TryGetValue(intent.ActionType, out var rules))
+        if (_intentRules.TryGetValue(intent.ActionType, out var rules))
         {
             foreach (var rule in rules)
             {

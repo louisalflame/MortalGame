@@ -20,6 +20,16 @@ public interface IPlayerBuffManager
         IActionSource actionSource,
         string buffId, 
         out IPlayerBuffEntity resultBuff);
+
+    void UpdateTiming(
+        IGameplayStatusWatcher gameWatcher,
+        UpdateTiming timing);
+    void UpdateIntent(
+        IGameplayStatusWatcher gameWatcher,
+        IIntentAction intent);
+    void UpdateResult(
+        IGameplayStatusWatcher gameWatcher,
+        IResultAction result);
 }
 
 public class PlayerBuffManager : IPlayerBuffManager
@@ -92,5 +102,65 @@ public class PlayerBuffManager : IPlayerBuffManager
 
         resultBuff = null;
         return false;   
+    }
+
+    public void UpdateTiming(
+        IGameplayStatusWatcher gameWatcher,
+        UpdateTiming timing)
+    {
+        foreach (var buff in _buffs)
+        {
+            var triggerBuff = new PlayerBuffTrigger(buff);
+
+            foreach(var session in buff.ReactionSessions)
+            {
+                session.UpdateTiming(gameWatcher, triggerBuff, timing);
+            }
+            foreach(var propertyEntity in buff.Properties)
+            {
+                propertyEntity.UpdateTiming(gameWatcher, triggerBuff, timing);
+            }
+            buff.LifeTime.UpdateByTiming(gameWatcher, triggerBuff, timing);
+        }
+    }
+    
+    public void UpdateIntent(
+        IGameplayStatusWatcher gameWatcher,
+        IIntentAction intent)
+    {
+        foreach (var buff in _buffs)
+        {
+            var triggerBuff = new PlayerBuffTrigger(buff);
+
+            foreach(var session in buff.ReactionSessions)
+            {
+                session.UpdateIntent(gameWatcher, triggerBuff, intent);
+            }
+            foreach(var propertyEntity in buff.Properties)
+            {
+                propertyEntity.UpdateIntent(gameWatcher, triggerBuff, intent);
+            }
+            buff.LifeTime.UpdateIntent(gameWatcher, triggerBuff, intent);
+        }
+    }
+
+    public void UpdateResult(
+        IGameplayStatusWatcher gameWatcher,
+        IResultAction result)
+    {
+        foreach (var buff in _buffs)
+        {
+            var triggerBuff = new PlayerBuffTrigger(buff);
+
+            foreach(var session in buff.ReactionSessions)
+            {
+                session.UpdateResult(gameWatcher, triggerBuff, result);
+            }
+            foreach(var propertyEntity in buff.Properties)
+            {
+                propertyEntity.UpdateResult(gameWatcher, triggerBuff, result);
+            }
+            buff.LifeTime.UpdateResult(gameWatcher, triggerBuff, result);
+        }
     }
 }

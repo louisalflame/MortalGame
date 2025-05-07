@@ -34,13 +34,13 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 10
+      Data: 11
     - Name: 
       Entry: 7
       Data: 
     - Name: $k
       Entry: 1
-      Data: Attack001
+      Data: Attack
     - Name: $v
       Entry: 7
       Data: 2|LocalizeTitleInfoData, Assembly-CSharp
@@ -61,7 +61,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: BuffPoison001
+      Data: BuffPoison
     - Name: $v
       Entry: 7
       Data: 3|LocalizeTitleInfoData, Assembly-CSharp
@@ -70,7 +70,7 @@ MonoBehaviour:
       Data: "\u4E0A\u6BD2"
     - Name: Info
       Entry: 1
-      Data: "\u8CE6\u4E88\u4E2D\u6BD2"
+      Data: "\u8CE6\u4E881\u4E2D\u6BD2"
     - Name: 
       Entry: 8
       Data: 
@@ -82,7 +82,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Defense001
+      Data: Defense
     - Name: $v
       Entry: 7
       Data: 4|LocalizeTitleInfoData, Assembly-CSharp
@@ -103,7 +103,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Heal001
+      Data: Heal
     - Name: $v
       Entry: 7
       Data: 5|LocalizeTitleInfoData, Assembly-CSharp
@@ -145,7 +145,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: DrawCard001
+      Data: DrawCard
     - Name: $v
       Entry: 7
       Data: 7|LocalizeTitleInfoData, Assembly-CSharp
@@ -166,7 +166,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: CloneCard001
+      Data: CloneCard
     - Name: $v
       Entry: 7
       Data: 8|LocalizeTitleInfoData, Assembly-CSharp
@@ -187,7 +187,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: DiscardCard001
+      Data: DiscardCard
     - Name: $v
       Entry: 7
       Data: 9|LocalizeTitleInfoData, Assembly-CSharp
@@ -208,7 +208,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: ConsumeCard001
+      Data: ConsumeCard
     - Name: $v
       Entry: 7
       Data: 10|LocalizeTitleInfoData, Assembly-CSharp
@@ -229,7 +229,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: DisposeCard001
+      Data: DisposeCard
     - Name: $v
       Entry: 7
       Data: 11|LocalizeTitleInfoData, Assembly-CSharp
@@ -239,6 +239,27 @@ MonoBehaviour:
     - Name: Info
       Entry: 1
       Data: "\u6C38\u4E45\u79FB\u96641\u5361\u4E14\u6230\u9B25\u5F8C\u4E0D\u6703\u6062\u5FA9"
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: BuffFullAttack
+    - Name: $v
+      Entry: 7
+      Data: 12|LocalizeTitleInfoData, Assembly-CSharp
+    - Name: Title
+      Entry: 1
+      Data: "\u91CD\u64CA"
+    - Name: Info
+      Entry: 1
+      Data: "\u7372\u5F971\u91CD\u64CA"
     - Name: 
       Entry: 8
       Data: 

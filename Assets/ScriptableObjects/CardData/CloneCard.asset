@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ce3be97fe6785cd4fbfc49b770ec0d97, type: 3}
-  m_Name: DiscardCard001
+  m_Name: CloneCard
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -26,7 +26,7 @@ MonoBehaviour:
       Data: 0|CardData, Assembly-CSharp
     - Name: ID
       Entry: 1
-      Data: DiscardCard001
+      Data: CloneCard
     - Name: Rarity
       Entry: 3
       Data: 3
@@ -38,7 +38,10 @@ MonoBehaviour:
       Data: 1|CardTheme[], Assembly-CSharp
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 1
+    - Name: 
+      Entry: 3
+      Data: 1
     - Name: 
       Entry: 13
       Data: 
@@ -50,10 +53,10 @@ MonoBehaviour:
       Data: 1
     - Name: Power
       Entry: 3
-      Data: 5
+      Data: 0
     - Name: MainSelectable
       Entry: 7
-      Data: 2|NoneSelectable, Assembly-CSharp
+      Data: 2|CardAllySelectable, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -72,59 +75,48 @@ MonoBehaviour:
       Data: 
     - Name: Effects
       Entry: 7
-      Data: 4|System.Collections.Generic.List`1[[ICardEffect, Assembly-CSharp]],
+      Data: 4|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[ICardEffect, Assembly-CSharp]],
+        Unity.Plastic.Antlr3.Runtime
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 5|CloneCardEffect, Assembly-CSharp
+    - Name: Target
+      Entry: 7
+      Data: 6|CurrentPlayer, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ClonedCards
+      Entry: 7
+      Data: 7|SingleCardCollection, Assembly-CSharp
+    - Name: TargetCard
+      Entry: 7
+      Data: 8|SelectedCard, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: AddCardBuffDatas
+      Entry: 7
+      Data: 9|System.Collections.Generic.List`1[[AddCardBuffData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
-      Data: 2
-    - Name: 
-      Entry: 7
-      Data: 5|DiscardCardEffect, Assembly-CSharp
-    - Name: TargetCards
-      Entry: 7
-      Data: 6|AllyHandCards, Assembly-CSharp
-    - Name: Player
-      Entry: 7
-      Data: 7|CurrentPlayer, Assembly-CSharp
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 8|DrawCardEffect, Assembly-CSharp
-    - Name: Targets
-      Entry: 7
-      Data: 9|SinglePlayerCollection, Assembly-CSharp
-    - Name: Target
-      Entry: 7
-      Data: 10|CurrentPlayer, Assembly-CSharp
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: Value
-      Entry: 7
-      Data: 11|CardIntegerProperty, Assembly-CSharp
-    - Name: Card
-      Entry: 7
-      Data: 12|PlayingCard, Assembly-CSharp
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: Property
-      Entry: 3
       Data: 0
     - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
       Entry: 8
       Data: 
+    - Name: CloneDestination
+      Entry: 3
+      Data: 2
     - Name: 
       Entry: 8
       Data: 
@@ -136,7 +128,7 @@ MonoBehaviour:
       Data: 
     - Name: TriggeredEffects
       Entry: 7
-      Data: 13|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[CardData+TriggeredCardEffect,
+      Data: 10|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[CardData+TriggeredCardEffect,
         Assembly-CSharp]], Unity.Plastic.Antlr3.Runtime
     - Name: 
       Entry: 12
@@ -149,7 +141,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 14|System.Collections.Generic.List`1[[ICardPropertyData, Assembly-CSharp]],
+      Data: 11|System.Collections.Generic.List`1[[ICardPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12

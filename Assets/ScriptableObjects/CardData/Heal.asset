@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ce3be97fe6785cd4fbfc49b770ec0d97, type: 3}
-  m_Name: Defense001
+  m_Name: Heal
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -26,10 +26,10 @@ MonoBehaviour:
       Data: 0|CardData, Assembly-CSharp
     - Name: ID
       Entry: 1
-      Data: Defense001
+      Data: Heal
     - Name: Rarity
       Entry: 3
-      Data: 1
+      Data: 2
     - Name: Type
       Entry: 3
       Data: 2
@@ -47,13 +47,13 @@ MonoBehaviour:
       Data: 
     - Name: Cost
       Entry: 3
-      Data: 1
+      Data: 2
     - Name: Power
       Entry: 3
-      Data: 3
+      Data: 5
     - Name: MainSelectable
       Entry: 7
-      Data: 2|CharacterAllySelectable, Assembly-CSharp
+      Data: 2|CharacterSelectable, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -79,7 +79,7 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 7
-      Data: 5|ShieldEffect, Assembly-CSharp
+      Data: 5|HealEffect, Assembly-CSharp
     - Name: Targets
       Entry: 7
       Data: 6|SingleCharacterCollection, Assembly-CSharp
@@ -138,7 +138,7 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 7
-      Data: 12|PreservedPropertyData, Assembly-CSharp
+      Data: 12|AutoDisposePropertyData, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 

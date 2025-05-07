@@ -323,16 +323,21 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
         {
             var useCardEvents = new List<IGameEvent>();
             var cardRuntimCost = usedCard.EvalCost(this);
-            if (cardRuntimCost <= player.CurrentEnergy)
+            if (cardRuntimCost <= player.CurrentEnergy) 
             {
                 var loseEnergyResult = player.EnergyManager.ConsumeEnergy(cardRuntimCost);
                 useCardEvents.Add(new LoseEnergyEvent(player, loseEnergyResult));
 
                 if (player.CardManager.HandCard.RemoveCard(usedCard)) 
                 {
+                    // Create PlayCardSession
+                    _UpdateTiming(UpdateTiming.PlayCardStart);
+
                     var source = new CardSource(usedCard);
                     var trigger = new CardPlay(usedCard);
                     _UpdateAction(new PlayCardIntentAction(source, new SystemTarget(), usedCard));
+
+                    _TriggerTiming(TriggerTiming.PlayCardStart);
 
                     foreach(var effect in usedCard.Effects)
                     {
@@ -353,14 +358,14 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                         GraveyardInfo = player.CardManager.Graveyard.ToCardCollectionInfo(this)
                     };
                     useCardEvents.Add(usedCardEvent);
+
+                    // Close PlayCardSession
+                    _UpdateTiming(UpdateTiming.PlayCardEnd);
+
+                    _TriggerTiming(TriggerTiming.PlayCardEnd);
                 }
             }
 
-            // TODO : apply reactionEffects
-
-            // TODO : figure out pass how many value is enough?
-            // TODO : figure out is it needed to invork more action during every function? 
-            //        or how to check how many action happened in 1 card?
             OnUseCard?.Invoke(); // pass record to History
 
             _gameEvents.AddRange(useCardEvents);
@@ -721,24 +726,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
 
     private void _UpdateTiming(UpdateTiming updateTiming)
     {
-
-    }
-
-    private void _UpdateAction(IIntentAction intentAction)
-    {              
-        foreach(var buff in _gameStatus.Ally.BuffManager.Buffs)
-        {
-            var triggerBuff = new PlayerBuffTrigger(buff);
-            foreach(var session in buff.ReactionSessions)
-            {
-                session.UpdateIntent(this, triggerBuff, intentAction);
-            }
-            foreach(var propertyEntity in buff.Properties)
-            {
-                propertyEntity.UpdateIntent(this, triggerBuff, intentAction);
-            }
-            buff.LifeTime.UpdateIntent(this, triggerBuff, intentAction);
-        }
+        _gameStatus.Ally.BuffManager.UpdateTiming(this, updateTiming);
 
         foreach(var character in _gameStatus.Ally.Characters)
         {
@@ -748,19 +736,30 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
         { 
         }
 
-        foreach(var buff in _gameStatus.Enemy.BuffManager.Buffs)
-        {
-            var triggerBuff = new PlayerBuffTrigger(buff);
-            foreach(var session in buff.ReactionSessions)
-            {
-                session.UpdateIntent(this, triggerBuff, intentAction);
-            }
-            foreach(var propertyEntity in buff.Properties)
-            {
-                propertyEntity.UpdateIntent(this, triggerBuff, intentAction);
-            }
-            buff.LifeTime.UpdateIntent(this, triggerBuff, intentAction);
+        _gameStatus.Enemy.BuffManager.UpdateTiming(this, updateTiming);
+
+        foreach(var character in _gameStatus.Enemy.Characters)
+        { 
         }
+
+        foreach(var card in _gameStatus.Enemy.CardManager.HandCard.Cards)
+        { 
+        }
+    }
+
+    private void _UpdateAction(IIntentAction intentAction)
+    {
+        _gameStatus.Ally.BuffManager.UpdateIntent(this, intentAction);
+
+        foreach(var character in _gameStatus.Ally.Characters)
+        {
+        }
+
+        foreach(var card in _gameStatus.Ally.CardManager.HandCard.Cards)
+        { 
+        }
+
+        _gameStatus.Enemy.BuffManager.UpdateIntent(this, intentAction);
 
         foreach(var character in _gameStatus.Enemy.Characters)
         { 
@@ -772,20 +771,8 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
     }
 
     private void _UpdateAction(IResultAction resulAction)
-    {              
-        foreach(var buff in _gameStatus.Ally.BuffManager.Buffs)
-        {
-            var triggerBuff = new PlayerBuffTrigger(buff);
-            foreach(var session in buff.ReactionSessions)
-            {
-                session.UpdateResult(this, triggerBuff, resulAction);
-            }
-            foreach(var propertyEntity in buff.Properties)
-            {
-                propertyEntity.UpdateResult(this, triggerBuff, resulAction);
-            }
-            buff.LifeTime.UpdateResult(this, triggerBuff, resulAction);
-        }
+    {
+        _gameStatus.Ally.BuffManager.UpdateResult(this, resulAction);
 
         foreach(var character in _gameStatus.Ally.Characters)
         {
@@ -795,19 +782,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
         { 
         }
 
-        foreach(var buff in _gameStatus.Enemy.BuffManager.Buffs)
-        {
-            var triggerBuff = new PlayerBuffTrigger(buff);
-            foreach(var session in buff.ReactionSessions)
-            {
-                session.UpdateResult(this, triggerBuff, resulAction);
-            }
-            foreach(var propertyEntity in buff.Properties)
-            {
-                propertyEntity.UpdateResult(this, triggerBuff, resulAction);
-            }
-            buff.LifeTime.UpdateResult(this, triggerBuff, resulAction);
-        }
+        _gameStatus.Enemy.BuffManager.UpdateResult(this, resulAction);
 
         foreach(var character in _gameStatus.Enemy.Characters)
         { 

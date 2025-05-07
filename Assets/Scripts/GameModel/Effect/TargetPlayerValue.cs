@@ -87,7 +87,19 @@ public class PlayerBuffContentPlayer : ITargetPlayerValue
         });
     }
 }
+[SerializeField]
+public class CharacterOwner : ITargetPlayerValue
+{
+    public ITargetCharacterValue Character;
 
+    public Option<IPlayerEntity> Eval(
+        IGameplayStatusWatcher gameWatcher, 
+        ITriggerSource trigger)
+    {
+        var characterOpt = Character.Eval(gameWatcher, trigger);
+        return characterOpt.FlatMap(character => character.Owner(gameWatcher));
+    }
+}
 
 public interface ITargetPlayerCollectionValue
 {

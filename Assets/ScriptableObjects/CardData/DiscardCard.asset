@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ce3be97fe6785cd4fbfc49b770ec0d97, type: 3}
-  m_Name: ConsumeCard001
+  m_Name: DiscardCard
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -26,13 +26,13 @@ MonoBehaviour:
       Data: 0|CardData, Assembly-CSharp
     - Name: ID
       Entry: 1
-      Data: ConsumeCard001
+      Data: DiscardCard
     - Name: Rarity
       Entry: 3
-      Data: 4
+      Data: 3
     - Name: Type
       Entry: 3
-      Data: 1
+      Data: 3
     - Name: Themes
       Entry: 7
       Data: 1|CardTheme[], Assembly-CSharp
@@ -50,17 +50,17 @@ MonoBehaviour:
       Data: 1
     - Name: Power
       Entry: 3
-      Data: 2
+      Data: 5
     - Name: MainSelectable
       Entry: 7
-      Data: 2|CardSelectable, Assembly-CSharp
+      Data: 2|NoneSelectable, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
     - Name: SubSelectables
       Entry: 7
-      Data: 3|System.Collections.Generic.List`1[[ISubTargetSelectable, Assembly-CSharp]],
-        mscorlib
+      Data: 3|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[ISubTargetSelectable,
+        Assembly-CSharp]], Unity.Plastic.Antlr3.Runtime
     - Name: 
       Entry: 12
       Data: 0
@@ -72,20 +72,20 @@ MonoBehaviour:
       Data: 
     - Name: Effects
       Entry: 7
-      Data: 4|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[ICardEffect, Assembly-CSharp]],
-        Unity.Plastic.Antlr3.Runtime
+      Data: 4|System.Collections.Generic.List`1[[ICardEffect, Assembly-CSharp]],
+        mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 5|ConsumeCardEffect, Assembly-CSharp
+      Data: 5|DiscardCardEffect, Assembly-CSharp
     - Name: TargetCards
       Entry: 7
-      Data: 6|SingleCardCollection, Assembly-CSharp
-    - Name: TargetCard
+      Data: 6|AllyHandCards, Assembly-CSharp
+    - Name: Player
       Entry: 7
-      Data: 7|SelectedCard, Assembly-CSharp
+      Data: 7|CurrentPlayer, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -97,7 +97,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 8|GainEnergyEffect, Assembly-CSharp
+      Data: 8|DrawCardEffect, Assembly-CSharp
     - Name: Targets
       Entry: 7
       Data: 9|SinglePlayerCollection, Assembly-CSharp

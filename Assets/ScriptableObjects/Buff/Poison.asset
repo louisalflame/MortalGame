@@ -130,7 +130,16 @@ MonoBehaviour:
       Data: 
     - Name: Value
       Entry: 7
-      Data: 15|ThisBuffLevel, Assembly-CSharp
+      Data: 15|PlayerBuffIntegerProperty, Assembly-CSharp
+    - Name: PlayerBuff
+      Entry: 7
+      Data: 16|TriggeredPlayerBuff, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Property
+      Entry: 3
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -157,7 +166,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 16|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
+      Data: 17|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -170,7 +179,7 @@ MonoBehaviour:
       Data: 
     - Name: LifeTimeData
       Entry: 7
-      Data: 17|PlayerBuffTurnLifeTimeData, Assembly-CSharp
+      Data: 18|PlayerBuffTurnLifeTimeData, Assembly-CSharp
     - Name: Turn
       Entry: 3
       Data: 2
