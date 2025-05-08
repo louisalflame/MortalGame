@@ -181,7 +181,7 @@ MonoBehaviour:
       Data: 
     - Name: Condition
       Entry: 3
-      Data: 1
+      Data: 5
     - Name: 
       Entry: 8
       Data: 
@@ -206,7 +206,7 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: Type
+    - Name: Operation
       Entry: 3
       Data: 0
     - Name: 
@@ -286,6 +286,21 @@ MonoBehaviour:
     - Name: 
       Entry: 7
       Data: 25|AttackPropertyPlayerBuffData, Assembly-CSharp
+    - Name: Value
+      Entry: 7
+      Data: 26|PlayerBuffSessionInteger, Assembly-CSharp
+    - Name: PlayerBuff
+      Entry: 7
+      Data: 27|TriggeredPlayerBuff, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: SessionIntegerId
+      Entry: 1
+      Data: atk
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -297,7 +312,7 @@ MonoBehaviour:
       Data: 
     - Name: LifeTimeData
       Entry: 7
-      Data: 26|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
+      Data: 28|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 

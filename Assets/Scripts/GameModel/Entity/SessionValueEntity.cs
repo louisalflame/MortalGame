@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 public interface ISessionValueEntity
@@ -40,29 +42,50 @@ public class SessionBooleanEntity : ISessionValueEntity
             _resultRules);
     }
 
+    private void _UpdateRules(
+        IReadOnlyCollection<ConditionBooleanUpdateRule> rules,
+        IGameplayStatusWatcher gameWatcher, 
+        ITriggerSource trigger)
+    {
+        foreach (var rule in rules)
+        {
+            if (rule.Conditions.All(condition => condition.Eval(gameWatcher, trigger)))
+            {
+                var newVal = rule.NewValue.Eval(gameWatcher, trigger);
+                Value = rule.Operation switch
+                {
+                    ConditionBooleanUpdateRule.UpdateType.AndOrigin => Value && newVal,
+                    ConditionBooleanUpdateRule.UpdateType.OrOrigin => Value || newVal,
+                    ConditionBooleanUpdateRule.UpdateType.Overwrite => newVal,
+                    _ => Value
+                };
+            }
+            break;
+        }
+    }
+
     public void UpdateByTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing)
     {
         if (_timingRules.TryGetValue(timing, out var rules))
         {
-            foreach (var rule in rules)
-            {
-                //TODO
-                /*if (rule.Conditions.All(condition => condition.Eval(gameWatcher, )))
-                {
-                    Value = rule.NewValue.Eval(gameWatcher);
-                    break;
-                }
-                */
-            }
+            _UpdateRules(rules, gameWatcher, trigger);
         }
     }
 
     public void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent)
     {
+        if (_intentRules.TryGetValue(intent.ActionType, out var rules))
+        {
+            _UpdateRules(rules, gameWatcher, trigger);
+        }
     }
 
     public void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result)
-    {
+    {        
+        if (_resultRules.TryGetValue(result.ActionType, out var rules))
+        {
+            _UpdateRules(rules, gameWatcher, trigger);
+        }
     }
 }
 
@@ -97,27 +120,48 @@ public class SessionIntegerEntity : ISessionValueEntity
             _resultRules);
     }
 
+    private void _UpdateRules(
+        IReadOnlyCollection<ConditionIntegerUpdateRule> rules,
+        IGameplayStatusWatcher gameWatcher, 
+        ITriggerSource trigger)
+    {
+        foreach (var rule in rules)
+        {
+            if (rule.Conditions.All(condition => condition.Eval(gameWatcher, trigger)))
+            {
+                var newVal = rule.NewValue.Eval(gameWatcher, trigger);
+                Value = rule.Operation switch
+                {
+                    ConditionIntegerUpdateRule.UpdateType.AddOrigin => Value + newVal,
+                    ConditionIntegerUpdateRule.UpdateType.Overwrite => newVal,
+                    _ => Value
+                };
+            }
+            break;
+        }
+    }
+
     public void UpdateByTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing)
     {
+        if (_timingRules.TryGetValue(timing, out var rules))
+        {
+            _UpdateRules(rules, gameWatcher, trigger);
+        }
     }
 
     public void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent)
     {
         if (_intentRules.TryGetValue(intent.ActionType, out var rules))
         {
-            foreach (var rule in rules)
-            {
-                if (rule.Conditions.All(condition => condition.Eval(gameWatcher, trigger)))
-                {
-                    Value = rule.NewValue.Eval(gameWatcher, trigger);
-                    break;
-                }
-                
-            }
+            _UpdateRules(rules, gameWatcher, trigger);
         }
     }
 
     public void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result)
     {
+        if (_resultRules.TryGetValue(result.ActionType, out var rules))
+        {
+            _UpdateRules(rules, gameWatcher, trigger);
+        }
     }
 }

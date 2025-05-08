@@ -130,3 +130,23 @@ public class DummyPlayer : PlayerEntity
     public DummyPlayer() : base(Faction.None, 0, 0)
     { }
 }
+
+public static class PlayerEntityExtensions
+{
+    public static int GetPlayerBuffProperty(this IPlayerEntity player, IGameplayStatusWatcher watcher, PlayerBuffProperty targetProperty)
+    {
+        var value = 0;
+        foreach(var playerBuff in player.BuffManager.Buffs)
+        {
+            var triggerBuff = new PlayerBuffTrigger(playerBuff);
+            foreach(var property in playerBuff.Properties)
+            {
+                if (property.Property == targetProperty)
+                {
+                    value += property.Eval(watcher, triggerBuff);
+                }
+            }
+        }
+        return value;
+    }
+}

@@ -39,25 +39,7 @@ public class CharacterBuffLibrary
 
         return _buffs[buffId].Sessions.ToArray();
     }
-
-    public IReactionSessionData GetBuffSessionData(string buffId, string sessionId)
-    {
-        if (!_buffs.ContainsKey(buffId))
-        {
-            Debug.LogError($"Buff ID {buffId} not found in library.");
-            return null;
-        }
-
-        var data = _buffs[buffId].Sessions.First(s => s.Id == sessionId);
-        if (data == null)
-        {
-            Debug.LogError($"Session ID {sessionId} not found in buff ID {buffId}.");
-            return null;
-        }
-
-        return data;
-    }
-
+    
     public ICharacterBuffLifeTimeData GetBuffLifeTime(string buffId)
     {
         if (!_buffs.ContainsKey(buffId))

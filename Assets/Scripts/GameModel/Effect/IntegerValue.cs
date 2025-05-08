@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using Optional.Collections;
 
 public interface IIntegerValue
 {
@@ -92,6 +94,21 @@ public class PlayerIntegerProperty : IIntegerValue
                     PlayerIntegerValueType.CurrentEnergy => player.CurrentEnergy,
                     _ => 0
                 })
+            .ValueOr(0);
+    }
+}
+
+[Serializable]
+public class PlayerBuffSessionInteger : IIntegerValue
+{
+    public ITargetPlayerBuffValue PlayerBuff;
+    public string SessionIntegerId;
+
+    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
+    {
+        return PlayerBuff
+            .Eval(gameWatcher, triggerSource)
+            .FlatMap(playerBuff => playerBuff.GetSessionInteger(SessionIntegerId))
             .ValueOr(0);
     }
 }

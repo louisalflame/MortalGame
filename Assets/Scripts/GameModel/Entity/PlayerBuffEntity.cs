@@ -98,4 +98,29 @@ public static class PlayerBuffEntityExtensions
             return (watcher.GameStatus.Enemy as IPlayerEntity).Some();
         return Option.None<IPlayerEntity>();
     }
+
+    public static Option<bool> GetSessionBoolean(
+        this IPlayerBuffEntity playerBuffEntity,
+        string key)
+    {
+        foreach (var session in playerBuffEntity.ReactionSessions)
+        {
+            var result = session.GetSessionBoolean(key);
+            if (result.HasValue)
+                return result;
+        }
+        return Option.None<bool>();
+    }
+    public static Option<int> GetSessionInteger(
+        this IPlayerBuffEntity playerBuffEntity,
+        string key)
+    {
+        foreach (var session in playerBuffEntity.ReactionSessions)
+        {
+            var result = session.GetSessionInteger(key);
+            if (result.HasValue)
+                return result;
+        }
+        return Option.None<int>();
+    }
 }

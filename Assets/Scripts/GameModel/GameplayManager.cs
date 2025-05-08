@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Optional;
+using Optional.Unsafe;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -421,6 +422,24 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
         return Option.None<IGameEvent>();
     }
 
+    private int _DamagePoint(
+        int rawDamagePoint,
+        IActionSource actionSource,
+        IActionTarget actionTarget)
+    {
+        switch(actionSource)
+        {
+            case CardSource cardSource:
+                var playerBuffAttackIncrease = _gameStatus.CurrentPlayer
+                    .Map(player => player.GetPlayerBuffProperty(this, PlayerBuffProperty.AttackIncrease))
+                    .ValueOr(0);
+
+                return rawDamagePoint + playerBuffAttackIncrease;
+            default:
+                return rawDamagePoint;
+        }
+    }
+
     private IEnumerable<IGameEvent> _ApplyCardEffect(
         IActionSource actionSource, ITriggerSource triggerSource, ICardEffect cardEffect)
     {
@@ -434,6 +453,8 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 {
                     var characterTarget = new CharacterTarget(target);
                     var damagePoint = damageEffect.Value.Eval(this, triggerSource);
+                    damagePoint = _DamagePoint(damagePoint, actionSource, characterTarget);
+
                     var damageResult = target.HealthManager.TakeDamage(damagePoint, _contextMgr.Context);
                     var damageStyle = DamageStyle.None;
 

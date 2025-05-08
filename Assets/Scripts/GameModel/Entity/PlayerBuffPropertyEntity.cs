@@ -5,34 +5,40 @@ public interface IPlayerBuffPropertyEntity
 {
     PlayerBuffProperty Property { get; }
     
-    int Eval(IGameplayStatusWatcher gameWatcher);
-    void UpdateTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing);
-    void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent);
-    void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result);
+    int Eval(
+        IGameplayStatusWatcher gameWatcher,
+        ITriggerSource triggerSource);
 }
 
 public abstract class PlayerBuffPropertyEntity : IPlayerBuffPropertyEntity
 {
     public abstract PlayerBuffProperty Property { get; }
 
-    public virtual int Eval(IGameplayStatusWatcher gameWatcher)
+    public virtual int Eval(
+        IGameplayStatusWatcher gameWatcher,
+        ITriggerSource triggerSource)
     {
         return 0;
     }
-
-    public virtual void UpdateTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing)
-    { }
-    public virtual void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent)
-    { }
-    public virtual void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result)
-    { }
 }
 
 public class AttackPropertyPlayerBuffEntity : PlayerBuffPropertyEntity
 {
     public override PlayerBuffProperty Property => PlayerBuffProperty.AttackIncrease;
 
-    public AttackPropertyPlayerBuffEntity() { }
+    private readonly IIntegerValue _value;
+
+    public AttackPropertyPlayerBuffEntity(IIntegerValue value) 
+    { 
+        _value = value;
+    }
+
+    public override int Eval(
+        IGameplayStatusWatcher gameWatcher,
+        ITriggerSource triggerSource)
+    {
+        return _value.Eval(gameWatcher, triggerSource);
+    }
 }
 
 public class PenetrateAttackPropertyPlayerBuffEntity : PlayerBuffPropertyEntity

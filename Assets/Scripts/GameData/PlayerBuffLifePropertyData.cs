@@ -10,9 +10,11 @@ public interface IPlayerBuffPropertyData
 [Serializable]
 public class AttackPropertyPlayerBuffData : IPlayerBuffPropertyData
 {
+    public IIntegerValue Value;
+
     public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
     {
-        return new AttackPropertyPlayerBuffEntity();
+        return new AttackPropertyPlayerBuffEntity(Value);
     }
 }
 

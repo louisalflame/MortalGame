@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Optional;
 
 
 public interface IReactionSessionEntity
 {
-    string Id { get; }
+    Option<bool> GetSessionBoolean(string key);
+    Option<int> GetSessionInteger(string key);
+
     void UpdateTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing);
     void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent);
     void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result);
@@ -13,17 +16,32 @@ public interface IReactionSessionEntity
 
 public abstract class ReactionSessionEntity : IReactionSessionEntity
 {
-    private string _id;
-    public string Id => _id;
-
     protected Dictionary<string, ISessionValueEntity> _baseEntities;
     protected Dictionary<string, ISessionValueEntity> _values;
 
-    public ReactionSessionEntity(string id, Dictionary<string, ISessionValueEntity> values)
+    public ReactionSessionEntity(Dictionary<string, ISessionValueEntity> values)
     {
-        _id = id;
         _baseEntities = values;
         _values = new Dictionary<string, ISessionValueEntity>();
+    }
+
+    public Option<bool> GetSessionBoolean(string key)
+    {
+        if (_values.TryGetValue(key, out var valueEntity) &&
+            valueEntity is SessionBooleanEntity booleanEntity)
+        {
+            return booleanEntity.Value.SomeNotNull();
+        }
+        return Option.None<bool>();
+    }
+    public Option<int> GetSessionInteger(string key)
+    {
+        if (_values.TryGetValue(key, out var valueEntity) &&
+            valueEntity is SessionIntegerEntity integerEntity)
+        {
+            return integerEntity.Value.SomeNotNull();
+        }
+        return Option.None<int>();
     }
 
     public abstract void UpdateTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing);
@@ -67,7 +85,7 @@ public abstract class ReactionSessionEntity : IReactionSessionEntity
 
 public class WholeGameSessionEntity : ReactionSessionEntity
 {
-    public WholeGameSessionEntity(string id, Dictionary<string, ISessionValueEntity> values) : base(id, values) 
+    public WholeGameSessionEntity(Dictionary<string, ISessionValueEntity> values) : base(values) 
     {
         _Reset();
     }
@@ -88,7 +106,7 @@ public class WholeGameSessionEntity : ReactionSessionEntity
 
 public class WholeTurnSessionEntity : ReactionSessionEntity
 {
-    public WholeTurnSessionEntity(string id, Dictionary<string, ISessionValueEntity> values) : base(id, values) { }
+    public WholeTurnSessionEntity(Dictionary<string, ISessionValueEntity> values) : base(values) { }
 
     public override void UpdateTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing)
     {
@@ -115,7 +133,7 @@ public class WholeTurnSessionEntity : ReactionSessionEntity
 
 public class ExectueTurnSessionEntity : ReactionSessionEntity
 {
-    public ExectueTurnSessionEntity(string id, Dictionary<string, ISessionValueEntity> values) : base(id, values) { }
+    public ExectueTurnSessionEntity(Dictionary<string, ISessionValueEntity> values) : base(values) { }
 
     public override void UpdateTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing)
     {
@@ -142,7 +160,7 @@ public class ExectueTurnSessionEntity : ReactionSessionEntity
 
 public class PlayCardSessionEntity : ReactionSessionEntity
 {
-    public PlayCardSessionEntity(string id, Dictionary<string, ISessionValueEntity> values) : base(id, values) { }    
+    public PlayCardSessionEntity(Dictionary<string, ISessionValueEntity> values) : base(values) { }    
 
     public override void UpdateTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing)
     {

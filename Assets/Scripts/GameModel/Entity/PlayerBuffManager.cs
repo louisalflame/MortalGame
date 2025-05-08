@@ -116,10 +116,7 @@ public class PlayerBuffManager : IPlayerBuffManager
             {
                 session.UpdateTiming(gameWatcher, triggerBuff, timing);
             }
-            foreach(var propertyEntity in buff.Properties)
-            {
-                propertyEntity.UpdateTiming(gameWatcher, triggerBuff, timing);
-            }
+            
             buff.LifeTime.UpdateByTiming(gameWatcher, triggerBuff, timing);
         }
     }
@@ -136,10 +133,7 @@ public class PlayerBuffManager : IPlayerBuffManager
             {
                 session.UpdateIntent(gameWatcher, triggerBuff, intent);
             }
-            foreach(var propertyEntity in buff.Properties)
-            {
-                propertyEntity.UpdateIntent(gameWatcher, triggerBuff, intent);
-            }
+
             buff.LifeTime.UpdateIntent(gameWatcher, triggerBuff, intent);
         }
     }
@@ -156,10 +150,7 @@ public class PlayerBuffManager : IPlayerBuffManager
             {
                 session.UpdateResult(gameWatcher, triggerBuff, result);
             }
-            foreach(var propertyEntity in buff.Properties)
-            {
-                propertyEntity.UpdateResult(gameWatcher, triggerBuff, result);
-            }
+
             buff.LifeTime.UpdateResult(gameWatcher, triggerBuff, result);
         }
     }
