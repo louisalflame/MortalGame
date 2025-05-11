@@ -30,9 +30,11 @@ public class AiCardView : MonoBehaviour, IRecyclable, ISelectableView
     public void SetCardInfo(CardInfo cardInfo, LocalizeLibrary localizeLibrary)
     {
         var cardLocalizeData = localizeLibrary.Get(LocalizeTitleInfoType.Card, cardInfo.CardDataID);
+        var templateValue = cardInfo.GetTemplateValues();
+
         _cardIdentity = cardInfo.Identity;
         _title.text = cardLocalizeData.Title;
-        _info.text = cardLocalizeData.Info;
+        _info.text = cardLocalizeData.Info.ReplaceTemplateKeys(templateValue);
         _cost.text = cardInfo.Cost.ToString();
         _power.text = cardInfo.Power.ToString();
     }

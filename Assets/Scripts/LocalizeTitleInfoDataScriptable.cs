@@ -11,5 +11,7 @@ public class LocalizeTitleInfoDataScriptable : SerializedScriptableObject
 public class LocalizeTitleInfoData
 {
     public string Title;
+    
+    [MultiLineProperty]
     public string Info;
 }

@@ -33,6 +33,18 @@ public class CardInfo
 
         StatusInfos = card.BuffList.Select(s => new CardBuffInfo(s)).ToList();
     }
+
+    public const string KEY_COST = "cost";
+    public const string KEY_POWER = "power";
+
+    public Dictionary<string, string> GetTemplateValues()
+    {
+        return new Dictionary<string, string>()
+        {
+            { KEY_COST, Cost.ToString() },
+            { KEY_POWER, Power.ToString() },
+        };
+    }
 }
 
 public class CardCollectionInfo

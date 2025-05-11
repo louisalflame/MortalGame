@@ -120,7 +120,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
         _graveyardCardView.Init(statusWatcher, reciever);
         _submitView.Init(reciever);
 
-        _focusCardDetailView.Init(_overlayCanvas, localizeLibrary);
+        _focusCardDetailView.Init(localizeLibrary);
         _singleCardDetailPopupPanel.Init(localizeLibrary);
         _simpleHintView.Init(localizeLibrary);
     }

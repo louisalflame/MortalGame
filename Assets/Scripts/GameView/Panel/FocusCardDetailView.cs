@@ -12,26 +12,24 @@ public class FocusCardDetailView : MonoBehaviour
     [SerializeField]
     private CardPropertyHint _cardPropertyHint;
 
-    private Canvas _canvas;
     private LocalizeLibrary _localizeLibrary;
 
-    public void Init(Canvas canvas, LocalizeLibrary localizeLibrary)
+    public void Init(LocalizeLibrary localizeLibrary)
     {
-        _canvas = canvas;
         _localizeLibrary = localizeLibrary;
         _cardPropertyHint.Init(localizeLibrary);
     }   
 
-    public void ShowFocus(CardInfo cardInfo, CardView cardView, bool smallDirection)
+    public void ShowFocus(CardInfo cardInfo, RectTransform targetRect)
     {
+        var canvas = _content.GetComponentInParent<Canvas>();
+        var rectOnCanvas = canvas.GetRectOnCanvas(targetRect);
+
+        _content.anchoredPosition = new Vector2(rectOnCanvas.center.x, _content.anchoredPosition.y);
+        var hintDirection = rectOnCanvas.center.x > 0;
+
         _cardView.SetCardInfo(cardInfo, _localizeLibrary);
-        _cardPropertyHint.ShowHint(cardInfo, smallDirection);
-
-        var cardViewPosition = Camera.main.WorldToScreenPoint(cardView.transform.position);
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            _canvas.transform as RectTransform, cardViewPosition, null, out Vector2 overlayPosition);
-
-        _content.anchoredPosition = new Vector2(overlayPosition.x, _content.anchoredPosition.y);
+        _cardPropertyHint.ShowHint(cardInfo, hintDirection);
 
         _panel.SetActive(true);
     }

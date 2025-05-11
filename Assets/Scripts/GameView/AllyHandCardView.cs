@@ -133,8 +133,7 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
             }
 
             focusView.ShowHandCardFocusContent();
-            var isOverHalf = _focusingCardInfo.Value > _cardCollectionInfo.Count / 2f;
-            _focusCardDetailView.ShowFocus(_focusingCardInfo.Key, focusView, isOverHalf);
+            _focusCardDetailView.ShowFocus(_focusingCardInfo.Key, focusView.RectTransform);
         }
     }
     public void FocusStop(Guid focusIdentity)

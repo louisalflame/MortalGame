@@ -48,8 +48,8 @@ MonoBehaviour:
       Entry: 1
       Data: "\u4E2D\u6BD2"
     - Name: Info
-      Entry: 6
-      Data: 
+      Entry: 1
+      Data: "\u5C64\u6578 : {:level}\n\u81EA\u8EAB\u884C\u52D5\u7D50\u675F\u6642\u53D7\u5230\u50B7\u5BB3"
     - Name: 
       Entry: 8
       Data: 
@@ -69,8 +69,8 @@ MonoBehaviour:
       Entry: 1
       Data: "\u91CD\u64CA"
     - Name: Info
-      Entry: 6
-      Data: 
+      Entry: 1
+      Data: "\u5C64\u6578 : {:level}\n\u8017\u76E1\u6C23\u529B\u7684\u653B\u64CA\u589E\u52A0"
     - Name: 
       Entry: 8
       Data: 

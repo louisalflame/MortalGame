@@ -49,7 +49,7 @@ MonoBehaviour:
       Data: "\u653B\u64CA"
     - Name: Info
       Entry: 1
-      Data: "\u57FA\u790E\u50B7\u5BB3"
+      Data: "{:power}\u57FA\u790E\u50B7\u5BB3"
     - Name: 
       Entry: 8
       Data: 
@@ -70,7 +70,7 @@ MonoBehaviour:
       Data: "\u4E0A\u6BD2"
     - Name: Info
       Entry: 1
-      Data: "\u8CE6\u4E881\u4E2D\u6BD2"
+      Data: "\u8CE6\u4E88{:power}\u4E2D\u6BD2"
     - Name: 
       Entry: 8
       Data: 
@@ -91,7 +91,7 @@ MonoBehaviour:
       Data: "\u9632\u79A6"
     - Name: Info
       Entry: 1
-      Data: "\u7372\u5F97\u8B77\u76FE"
+      Data: "\u7372\u5F97{:power}\u8B77\u76FE"
     - Name: 
       Entry: 8
       Data: 
@@ -112,7 +112,7 @@ MonoBehaviour:
       Data: "\u4F11\u606F"
     - Name: Info
       Entry: 1
-      Data: "\u6062\u5FA9\u8840\u91CF"
+      Data: "\u6062\u5FA9{:power}\u8840\u91CF"
     - Name: 
       Entry: 8
       Data: 
@@ -133,7 +133,7 @@ MonoBehaviour:
       Data: "\u7A7F\u900F"
     - Name: Info
       Entry: 1
-      Data: "\u7A7F\u900FPower"
+      Data: "{:power}\u7A7F\u900F\u50B7\u5BB3"
     - Name: 
       Entry: 8
       Data: 
@@ -154,7 +154,7 @@ MonoBehaviour:
       Data: "\u62BD\u5361"
     - Name: Info
       Entry: 1
-      Data: "\u62BDPower\u5361"
+      Data: "\u62BD{:power}\u5F35\u5361"
     - Name: 
       Entry: 8
       Data: 
@@ -175,7 +175,7 @@ MonoBehaviour:
       Data: "\u8907\u88FD"
     - Name: Info
       Entry: 1
-      Data: "\u8907\u88FD\u4E00\u5F35\u624B\u724C"
+      Data: "\u8907\u88FD{:power}\u5F35\u624B\u724C"
     - Name: 
       Entry: 8
       Data: 
@@ -259,7 +259,7 @@ MonoBehaviour:
       Data: "\u91CD\u64CA"
     - Name: Info
       Entry: 1
-      Data: "\u7372\u5F971\u91CD\u64CA"
+      Data: "\u7372\u5F97{:power}\u91CD\u64CA"
     - Name: 
       Entry: 8
       Data: 
