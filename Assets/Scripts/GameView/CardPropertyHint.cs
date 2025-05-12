@@ -10,7 +10,7 @@ public class CardPropertyHint : MonoBehaviour
     [SerializeField]
     private GameKeyWordInfoViewFactory _gameKeyWordInfoViewFactory;
     [SerializeField]
-    private Transform _cardPropertyInfoViewParent;
+    private RectTransform _layoutParent;
     [SerializeField]
     private RectTransform _content;
     [SerializeField]
@@ -24,18 +24,31 @@ public class CardPropertyHint : MonoBehaviour
         _localizeLibrary = localizeLibrary;
     }
 
-    public void ShowHint(CardInfo cardInfo, bool smallDirection)
+    public void ShowHint(CardInfo cardInfo, bool smallDirection, RectTransform referenceRect)
     {
-        _UpdateContentAnchorPivotX(smallDirection);
-
         foreach(var statusInfo in cardInfo.StatusInfos)
         {
             var cardBuffInfoView = _cardBuffInfoViewFactory.CreatePrefab();
-            cardBuffInfoView.transform.SetParent(_cardPropertyInfoViewParent, false);
+            cardBuffInfoView.transform.SetParent(_layoutParent, false);
             _propertyViews.Add(cardBuffInfoView);
 
             cardBuffInfoView.SetInfo(statusInfo, _localizeLibrary);
         }
+        
+        LayoutRebuilder.ForceRebuildLayoutImmediate(_layoutParent);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(_content);
+        
+        var canvas = _content.GetComponentInParent<Canvas>();
+        var rectOnCanvas = canvas.GetRectOnCanvas(referenceRect, _content.parent as RectTransform);
+
+        var anchorY = _content.rect.height > rectOnCanvas.height ?
+            rectOnCanvas.min.y + _content.rect.height / 2 : 
+            rectOnCanvas.max.y - _content.rect.height / 2;
+
+        _content.pivot = new Vector2(smallDirection ? 0 : 1, _content.pivot.y);
+        _content.anchoredPosition = new Vector2(
+            smallDirection ? _offsetX : -_offsetX, 
+            anchorY);
     }
 
     public void HideHint()
@@ -45,11 +58,5 @@ public class CardPropertyHint : MonoBehaviour
             _cardBuffInfoViewFactory.RecyclePrefab(propertyView);
         }
         _propertyViews.Clear();
-    }
-
-    private void _UpdateContentAnchorPivotX(bool isRightSide)
-    {
-        _content.pivot = new Vector2(isRightSide ? 0 : 1, _content.pivot.y);
-        _content.anchoredPosition = new Vector2(isRightSide ? _offsetX : -_offsetX, _content.anchoredPosition.y);
     }
 }

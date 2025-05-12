@@ -3,7 +3,7 @@ using Sirenix.OdinInspector;
 
 public interface IPlayerBuffPropertyData
 {
-    IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher);
+    IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger);
 }
 
 
@@ -12,7 +12,7 @@ public class AttackPropertyPlayerBuffData : IPlayerBuffPropertyData
 {
     public IIntegerValue Value;
 
-    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new AttackPropertyPlayerBuffEntity(Value);
     }
@@ -21,7 +21,7 @@ public class AttackPropertyPlayerBuffData : IPlayerBuffPropertyData
 [Serializable]
 public class PenetrateAttackPropertyPlayerBuffData : IPlayerBuffPropertyData
 {
-    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new PenetrateAttackPropertyPlayerBuffEntity();
     }
@@ -30,7 +30,7 @@ public class PenetrateAttackPropertyPlayerBuffData : IPlayerBuffPropertyData
 [Serializable]
 public class AdditionalAttackPropertyPlayerBuffData : IPlayerBuffPropertyData
 {
-    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new AdditionalAttackPropertyPlayerBuffEntity();
     }
@@ -39,7 +39,7 @@ public class AdditionalAttackPropertyPlayerBuffData : IPlayerBuffPropertyData
 [Serializable]
 public class EffectiveAttackPropertyPlayerBuffData : IPlayerBuffPropertyData
 {
-    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new EffectiveAttackPropertyPlayerBuffEntity();
     }
@@ -48,7 +48,7 @@ public class EffectiveAttackPropertyPlayerBuffData : IPlayerBuffPropertyData
 [Serializable]
 public class DefensePropertyPlayerBuffData : IPlayerBuffPropertyData
 {
-    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new DefensePropertyPlayerBuffEntity();
     }
@@ -57,7 +57,7 @@ public class DefensePropertyPlayerBuffData : IPlayerBuffPropertyData
 [Serializable]
 public class HealPropertyPlayerBuffData : IPlayerBuffPropertyData
 {
-    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new HealPropertyPlayerBuffEntity();
     }
@@ -66,7 +66,7 @@ public class HealPropertyPlayerBuffData : IPlayerBuffPropertyData
 [Serializable]
 public class EnergyPropertyPlayerBuffData : IPlayerBuffPropertyData
 {
-    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new EnergyPropertyPlayerBuffEntity();
     }
@@ -75,7 +75,7 @@ public class EnergyPropertyPlayerBuffData : IPlayerBuffPropertyData
 [Serializable]
 public class MaxHealthPropertyPlayerBuffData : IPlayerBuffPropertyData
 {
-    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new MaxHealthPropertyPlayerBuffEntity();
     }
@@ -84,7 +84,7 @@ public class MaxHealthPropertyPlayerBuffData : IPlayerBuffPropertyData
 [Serializable]
 public class MaxEnergyPropertyPlayerBuffData : IPlayerBuffPropertyData
 {
-    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new MaxEnergyPropertyPlayerBuffEntity();
     }

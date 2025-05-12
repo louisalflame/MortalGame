@@ -4,7 +4,7 @@ using UnityEngine;
 
 public interface ISessionValueData
 {
-    ISessionValueEntity GetEntity(IGameplayStatusWatcher gameWatcher);
+    ISessionValueEntity GetEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger);
 }
 
 
@@ -20,7 +20,7 @@ public class SessionBoolean : ISessionValueData
     [ShowInInspector]
     public BooleanUpdateResultRules ResultRules = new();
     
-    public ISessionValueEntity GetEntity(IGameplayStatusWatcher gameWatcher)
+    public ISessionValueEntity GetEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new SessionBooleanEntity(Value, TimingRules, IntentRules, ResultRules);
     }
@@ -38,7 +38,7 @@ public class SessionInteger : ISessionValueData
     [ShowInInspector]
     public IntegerUpdateResultRules ResultRules = new();
 
-    public ISessionValueEntity GetEntity(IGameplayStatusWatcher gameWatcher)
+    public ISessionValueEntity GetEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new SessionIntegerEntity(Value, TimingRules, IntentRules, ResultRules);
     }

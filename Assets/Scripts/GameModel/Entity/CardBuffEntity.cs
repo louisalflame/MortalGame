@@ -36,7 +36,7 @@ public class CardBuffEntity : ICardBuffEntity
         LifeTime = lifeTime;
     }
 
-    public static CardBuffEntity CreateEntity(CardBuffData data)
+    public static CardBuffEntity CreateEntity(CardBuffData data, IGameplayStatusWatcher watcher, ITriggerSource trigger)
     {
         return new CardBuffEntity(
             data.ID,
@@ -44,7 +44,7 @@ public class CardBuffEntity : ICardBuffEntity
                 pair => pair.Key,
                 pair => pair.Value.ToList()),
             data.PropertyDatas.Select(p => p.CreateEntity()).ToList(),
-            data.LifeTimeData.CreateEntity()
+            data.LifeTimeData.CreateEntity(watcher, trigger)
         );
     }
 

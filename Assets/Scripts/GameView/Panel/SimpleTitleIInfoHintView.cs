@@ -38,7 +38,7 @@ public class SimpleTitleIInfoHintView : MonoBehaviour
     private void _SetAnchorPosition(RectTransform targetRect)
     {
         var canvas = _hintRectTransform.GetComponentInParent<Canvas>();
-        var rectOnCanvas = canvas.GetRectOnCanvas(targetRect);
+        var rectOnCanvas = canvas.GetRectOnCanvas(targetRect, _hintRectTransform.parent as RectTransform);
 
         if(rectOnCanvas.center.x > 0)
         {

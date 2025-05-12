@@ -9,7 +9,8 @@ public interface ICharacterBuffManager
     IReadOnlyCollection<ICharacterBuffEntity> Buffs { get; }
     bool AddBuff(
         CharacterBuffLibrary buffLibrary, 
-        IGameplayStatusWatcher gameWatcher, 
+        IGameplayStatusWatcher gameWatcher,
+        ITriggerSource triggerSource,
         IActionSource actionSource,
         IActionTarget actionTarget,
         string buffId, 
@@ -37,7 +38,8 @@ public class CharacterBuffManager : ICharacterBuffManager
 
     public bool AddBuff(
         CharacterBuffLibrary buffLibrary, 
-        IGameplayStatusWatcher gameWatcher, 
+        IGameplayStatusWatcher gameWatcher,
+        ITriggerSource triggerSource, 
         IActionSource actionSource,
         IActionTarget actionTarget,
         string buffId, 
@@ -73,11 +75,11 @@ public class CharacterBuffManager : ICharacterBuffManager
             owner,
             caster,
             buffLibrary.GetBuffProperties(buffId)
-                .Select(p => p.CreateEntity(gameWatcher)),
+                .Select(p => p.CreateEntity(gameWatcher, triggerSource)),
             buffLibrary.GetBuffLifeTime(buffId)
-                .CreateEntity(gameWatcher),
+                .CreateEntity(gameWatcher, triggerSource),
             buffLibrary.GetBuffSessions(buffId)
-                .Select(s => s.CreateEntity(gameWatcher)));
+                .Select(s => s.CreateEntity(gameWatcher, triggerSource)));
         _buffs.Add(resultBuff);
         return true;
     }

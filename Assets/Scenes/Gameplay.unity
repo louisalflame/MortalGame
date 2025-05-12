@@ -2132,7 +2132,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2525063016402359166, guid: 3208aa1c6494b4b479f31b46d0bde183, type: 3}
       propertyPath: m_Pivot.x
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 2525063016402359166, guid: 3208aa1c6494b4b479f31b46d0bde183, type: 3}
       propertyPath: m_Pivot.y

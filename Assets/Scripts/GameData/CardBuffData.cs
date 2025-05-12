@@ -26,6 +26,4 @@ public class AddCardBuffData
 {
     [ValueDropdown("@DropdownHelper.CardBuffNames")]
     public string CardBuffId;
-    public IIntegerValue Power;
-    public IIntegerValue Times;
 }

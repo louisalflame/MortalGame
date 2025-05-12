@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class CanvasRectUtility
 {
-    public static Rect GetRectOnCanvas(this Canvas canvas, RectTransform targetRect)
+    public static Rect GetRectOnCanvas(this Canvas canvas, RectTransform targetRect, RectTransform parentRect)
     {
         // 取得世界空間四個角點
         Vector3[] rectWorldCorners = new Vector3[4];
@@ -20,7 +20,7 @@ public static class CanvasRectUtility
                 targetCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera, 
                 rectWorldCorners[i]);
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                canvas.GetComponent<RectTransform>(), 
+                parentRect, 
                 screenPos, 
                 canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera, 
                 out canvasLocalCorners[i]);

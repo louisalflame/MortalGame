@@ -10,6 +10,7 @@ public interface IPlayerBuffManager
     bool AddBuff(
         PlayerBuffLibrary buffLibrary, 
         IGameplayStatusWatcher gameWatcher, 
+        ITriggerSource triggerSource,
         IActionSource actionSource,
         string buffId, 
         int level, 
@@ -45,7 +46,8 @@ public class PlayerBuffManager : IPlayerBuffManager
 
     public bool AddBuff(
         PlayerBuffLibrary buffLibrary, 
-        IGameplayStatusWatcher gameWatcher, 
+        IGameplayStatusWatcher gameWatcher,
+        ITriggerSource triggerSource,
         IActionSource actionSource,
         string buffId, 
         int level, 
@@ -74,11 +76,11 @@ public class PlayerBuffManager : IPlayerBuffManager
             level,
             caster,
             buffLibrary.GetBuffProperties(buffId)
-                .Select(p => p.CreateEntity(gameWatcher)),
+                .Select(p => p.CreateEntity(gameWatcher, triggerSource)),
             buffLibrary.GetBuffLifeTime(buffId)
-                .CreateEntity(gameWatcher),
+                .CreateEntity(gameWatcher, triggerSource),
             buffLibrary.GetBuffSessions(buffId)
-                .Select(s => s.CreateEntity(gameWatcher)));
+                .Select(s => s.CreateEntity(gameWatcher, triggerSource)));
         _buffs.Add(resultBuff);
         return true;
     }

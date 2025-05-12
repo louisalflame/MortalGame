@@ -7,7 +7,7 @@ using UnityEngine;
 public interface IReactionSessionData
 {
     Dictionary<string, ISessionValueData> SessionValueTable { get; }
-    IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher);
+    IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger);
 }
 
 [Serializable]
@@ -22,47 +22,47 @@ public abstract class ReactionSessionData
 [Serializable]
 public class WholeGameSession : ReactionSessionData, IReactionSessionData
 {
-    public IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new WholeGameSessionEntity(
             _values.ToDictionary(
                 kvp => kvp.Key,
-                kvp => kvp.Value.GetEntity(gameWatcher)));
+                kvp => kvp.Value.GetEntity(gameWatcher, trigger)));
     }
 }
 
 [Serializable]
 public class WholeTurnSession : ReactionSessionData, IReactionSessionData
 {
-    public IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new WholeTurnSessionEntity(
             _values.ToDictionary(
                 kvp => kvp.Key,
-                kvp => kvp.Value.GetEntity(gameWatcher)));
+                kvp => kvp.Value.GetEntity(gameWatcher, trigger)));
     }
 }
 
 [Serializable]
 public class ExectueTurnSession : ReactionSessionData, IReactionSessionData
 {
-    public IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new ExectueTurnSessionEntity(
             _values.ToDictionary(
                 kvp => kvp.Key,
-                kvp => kvp.Value.GetEntity(gameWatcher)));
+                kvp => kvp.Value.GetEntity(gameWatcher, trigger)));
     }
 }
 
 [Serializable]
 public class PlayCardSession : ReactionSessionData, IReactionSessionData
 {
-    public IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new PlayCardSessionEntity(
             _values.ToDictionary(
                 kvp => kvp.Key,
-                kvp => kvp.Value.GetEntity(gameWatcher)));
+                kvp => kvp.Value.GetEntity(gameWatcher, trigger)));
     }
 }

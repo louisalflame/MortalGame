@@ -46,7 +46,7 @@ public class SingleCardDetailPopupPanel : MonoBehaviour
             _state = SingleCardDetailPopupPanelState.Idle;
             _panel.SetActive(true);
 
-            _cardPropertyHint.ShowHint(cardInfo, false);
+            _cardPropertyHint.ShowHint(cardInfo, false, _cardView.RectTransform);
 
             while (_state != SingleCardDetailPopupPanelState.Close)
             {

@@ -576,6 +576,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                     if (target.BuffManager.AddBuff(
                         _contextMgr.BuffLibrary, 
                         this, 
+                        triggerSource,
                         actionSource,
                         addBuffEffect.BuffId, 
                         level,
@@ -688,7 +689,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                         var addCardBuffs = createCardEffect.AddCardBuffDatas
                             .Select(addData => {
                                 var cardBuffData = _contextMgr.CardBuffLibrary.GetCardBuffData(addData.CardBuffId);
-                                return CardBuffEntity.CreateEntity(cardBuffData);
+                                return CardBuffEntity.CreateEntity(cardBuffData, this, triggerSource);
                             });
                         var cardEntity = CardEntity.CreateFromData(cardData.Data, addCardBuffs);
                         targetPlayer.CardManager.AddNewCard(cardEntity, createCardEffect.CreateDestination);
@@ -709,7 +710,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                         var addCardBuffs = cloneCardEffect.AddCardBuffDatas
                             .Select(addData => {
                                 var cardBuffData = _contextMgr.CardBuffLibrary.GetCardBuffData(addData.CardBuffId);
-                                return CardBuffEntity.CreateEntity(cardBuffData);
+                                return CardBuffEntity.CreateEntity(cardBuffData, this, triggerSource);
                             });
                         var cloneCard = card.Clone(addCardBuffs);     
                         targetPlayer.CardManager.AddNewCard(cloneCard, cloneCardEffect.CloneDestination);                            
@@ -728,7 +729,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                     var addCardBuffs = appendCardBuffEffect.AddCardBuffDatas
                         .Select(addData => {
                             var cardBuffData = _contextMgr.CardBuffLibrary.GetCardBuffData(addData.CardBuffId);
-                            return CardBuffEntity.CreateEntity(cardBuffData);
+                            return CardBuffEntity.CreateEntity(cardBuffData, this, triggerSource);
                         });
                     
                     foreach(var addCardBuff in addCardBuffs)

@@ -23,17 +23,17 @@ MonoBehaviour:
     SerializationNodes:
     - Name: Data
       Entry: 7
-      Data: 0|CardStatusData, Assembly-CSharp
+      Data: 0|CardBuffData, Assembly-CSharp
     - Name: ID
       Entry: 1
       Data: SealedOneTurn
     - Name: Effects
       Entry: 7
-      Data: 1|System.Collections.Generic.Dictionary`2[[CardTiming, Assembly-CSharp],[ICardEffect[],
+      Data: 1|System.Collections.Generic.Dictionary`2[[TriggerTiming, Assembly-CSharp],[ICardEffect[],
         Assembly-CSharp]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 2|System.Collections.Generic.EnumEqualityComparer`1[[CardTiming, Assembly-CSharp]],
+      Data: 2|System.Collections.Generic.EnumEqualityComparer`1[[TriggerTiming, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -63,12 +63,6 @@ MonoBehaviour:
     - Name: 
       Entry: 7
       Data: 4|SealedPropertyData, Assembly-CSharp
-    - Name: UseCount
-      Entry: 7
-      Data: 5|CardPropertyDefaultUseData, Assembly-CSharp
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -80,10 +74,16 @@ MonoBehaviour:
       Data: 
     - Name: LifeTimeData
       Entry: 7
-      Data: 6|CardStatusTurnLifeTimeData, Assembly-CSharp
+      Data: 5|TurnLifeTimeCardBuffData, Assembly-CSharp
     - Name: Turn
+      Entry: 7
+      Data: 6|ConstInteger, Assembly-CSharp
+    - Name: Value
       Entry: 3
       Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 8
       Data: 

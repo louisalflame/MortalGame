@@ -3,14 +3,14 @@ using Sirenix.OdinInspector;
 
 public interface ICharacterBuffPropertyData
 {
-    ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher);
+    ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger);
 }
 
 
 [Serializable]
 public class AttackPropertyCharacterBuffData : ICharacterBuffPropertyData
 {
-    public ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new AttackPropertyCharacterBuffEntity();
     }
@@ -19,7 +19,7 @@ public class AttackPropertyCharacterBuffData : ICharacterBuffPropertyData
 [Serializable]
 public class PenetrateAttackPropertyCharacterBuffData : ICharacterBuffPropertyData
 {
-    public ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new PenetrateAttackPropertyCharacterBuffEntity();
     }
@@ -28,7 +28,7 @@ public class PenetrateAttackPropertyCharacterBuffData : ICharacterBuffPropertyDa
 [Serializable]
 public class AdditionalAttackPropertyCharacterBuffData : ICharacterBuffPropertyData
 {
-    public ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new AdditionalAttackPropertyCharacterBuffEntity();
     }
@@ -37,7 +37,7 @@ public class AdditionalAttackPropertyCharacterBuffData : ICharacterBuffPropertyD
 [Serializable]
 public class EffectiveAttackPropertyCharacterBuffData : ICharacterBuffPropertyData
 {
-    public ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new EffectiveAttackPropertyCharacterBuffEntity();
     }
@@ -46,7 +46,7 @@ public class EffectiveAttackPropertyCharacterBuffData : ICharacterBuffPropertyDa
 [Serializable]
 public class DefensePropertyCharacterBuffData : ICharacterBuffPropertyData
 {
-    public ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new DefensePropertyCharacterBuffEntity();
     }
@@ -55,7 +55,7 @@ public class DefensePropertyCharacterBuffData : ICharacterBuffPropertyData
 [Serializable]
 public class HealPropertyCharacterBuffData : ICharacterBuffPropertyData
 {
-    public ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new HealPropertyCharacterBuffEntity();
     }
@@ -64,7 +64,7 @@ public class HealPropertyCharacterBuffData : ICharacterBuffPropertyData
 [Serializable]
 public class EnergyPropertyCharacterBuffData : ICharacterBuffPropertyData
 {
-    public ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new EnergyPropertyCharacterBuffEntity();
     }
@@ -73,7 +73,7 @@ public class EnergyPropertyCharacterBuffData : ICharacterBuffPropertyData
 [Serializable]
 public class MaxHealthPropertyCharacterBuffData : ICharacterBuffPropertyData
 {
-    public ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new MaxHealthPropertyCharacterBuffEntity();
     }
@@ -82,7 +82,7 @@ public class MaxHealthPropertyCharacterBuffData : ICharacterBuffPropertyData
 [Serializable]
 public class MaxEnergyPropertyCharacterBuffData : ICharacterBuffPropertyData
 {
-    public ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new MaxEnergyPropertyCharacterBuffEntity();
     }

@@ -2,13 +2,13 @@ using System;
 
 public interface IPlayerBuffLifeTimeData
 {
-    IPlayerBuffLifeTimeEntity CreateEntity(IGameplayStatusWatcher gameWatcher);
+    IPlayerBuffLifeTimeEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger);
 }
 
 [Serializable]
 public class AlwaysLifeTimePlayerBuffData : IPlayerBuffLifeTimeData
 {
-    public IPlayerBuffLifeTimeEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public IPlayerBuffLifeTimeEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return new AlwaysLifeTimePlayerBuffEntity();
     }
@@ -17,10 +17,10 @@ public class AlwaysLifeTimePlayerBuffData : IPlayerBuffLifeTimeData
 [Serializable]
 public class PlayerBuffTurnLifeTimeData : IPlayerBuffLifeTimeData
 {
-    public int Turn;
+    public IIntegerValue Turn;
 
-    public IPlayerBuffLifeTimeEntity CreateEntity(IGameplayStatusWatcher gameWatcher)
+    public IPlayerBuffLifeTimeEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
-        return new TurnLifeTimePlayerBuffEntity(Turn);
+        return new TurnLifeTimePlayerBuffEntity(Turn.Eval(gameWatcher, trigger));
     }
 }

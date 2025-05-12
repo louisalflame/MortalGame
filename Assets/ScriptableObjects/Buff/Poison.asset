@@ -179,10 +179,7 @@ MonoBehaviour:
       Data: 
     - Name: LifeTimeData
       Entry: 7
-      Data: 18|PlayerBuffTurnLifeTimeData, Assembly-CSharp
-    - Name: Turn
-      Entry: 3
-      Data: 2
+      Data: 18|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
