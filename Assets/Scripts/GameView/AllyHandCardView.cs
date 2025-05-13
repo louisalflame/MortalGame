@@ -1,6 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Optional;
+using Optional.Unsafe;
+using Optional.Linq;
+using Optional.Utilities;
+using Optional.Collections;
 using Sirenix.OdinInspector;
 using Unity.Burst.Intrinsics;
 using UnityEngine;
@@ -10,9 +15,9 @@ public interface IHandCardViewHandler
 {
     void FocusStart(Guid cardIdentity);
     void FocusStop(Guid cardIdentity);
-    void BeginDrag(Guid cardIdentity, PointerEventData pointerEventData);
-    void Drag(Guid cardIdentity, PointerEventData pointerEventData);
-    void EndDrag(Guid cardIdentity, PointerEventData pointerEventData);
+    void BeginDrag(Guid cardIdentity, Vector2 mousePosition);
+    void Drag(Guid cardIdentity, Vector2 mousePosition);
+    void EndDrag(Guid cardIdentity, Vector2 mousePosition);
 }
 
 public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
@@ -65,10 +70,10 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
     private CardCollectionInfo _cardCollectionInfo;
 
     // Focusing
-    private KeyValuePair<CardInfo, int> _focusingCardInfo;
+    private Option<KeyValuePair<CardInfo, int>> _focusingCardTupleOpt;
     private FocusCardDetailView _focusCardDetailView;
     // Dragging
-    private KeyValuePair<CardInfo, int> _draggingCardInfo;
+    private Option<KeyValuePair<CardInfo, int>> _draggingCardTupleOpt;
     private Vector2 _beginDragPosition;
     private Vector2 _dragOffset;
     private ISelectableView _currentSelectedView;
@@ -99,20 +104,35 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
         _RearrangeCardViews();
     }
 
+    private void Update()
+    {/*
+        // Force End Drag if mouse is outside the card view
+        if (_draggingCardTupleOpt.TryGetValue(out var draggingCardInfo) &&
+            _cardViewDict.TryGetValue(draggingCardInfo.Key.Identity, out var dragView) &&
+            !RectTransformUtility.RectangleContainsScreenPoint(
+                dragView.RectTransform, Input.mousePosition, _canvas.worldCamera))
+        {
+            _lineRenderer.gameObject.SetActive(false);
+            dragView.EndDrag(_beginDragPosition, draggingCardInfo.Value);
+            _draggingCardTupleOpt = Option.None<KeyValuePair<CardInfo, int>>();
+        }*/
+    }
+
     public void FocusStart(Guid focusIdentity)
     {
-        if (_draggingCardInfo.Key == null &&
-            _focusingCardInfo.Key == null &&
+        if (!_draggingCardTupleOpt.HasValue &&
+            !_focusingCardTupleOpt.HasValue &&
             _cardViewDict.TryGetValue(focusIdentity, out var focusView))
         {
-            _focusingCardInfo = _cardCollectionInfo.CardInfos
+            var focusingCardInfo = _cardCollectionInfo.CardInfos
                 .FirstOrDefault(kvp => kvp.Key.Identity == focusIdentity);
+            _focusingCardTupleOpt = focusingCardInfo.SomeNotNull();
             
             var smaller = _cardCollectionInfo.CardInfos
-                .Where(kvp => kvp.Value < _focusingCardInfo.Value)
+                .Where(kvp => kvp.Value < focusingCardInfo.Value)
                 .Select(kvp => kvp.Key.Identity);
             var larger = _cardCollectionInfo.CardInfos
-                .Where(kvp => kvp.Value > _focusingCardInfo.Value)
+                .Where(kvp => kvp.Value > focusingCardInfo.Value)
                 .Select(kvp => kvp.Key.Identity);
             
             foreach(var identity in smaller)
@@ -133,70 +153,68 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
             }
 
             focusView.ShowHandCardFocusContent();
-            _focusCardDetailView.ShowFocus(_focusingCardInfo.Key, focusView.RectTransform);
-        }
+            _focusCardDetailView.ShowFocus(focusingCardInfo.Key, focusView.RectTransform);
+        }        
     }
     public void FocusStop(Guid focusIdentity)
     {
-        if (_draggingCardInfo.Key == null &&
-            _focusingCardInfo.Key != null &&
+        if (!_draggingCardTupleOpt.HasValue &&
+            _focusingCardTupleOpt.TryGetValue(out var focusingCardTuple) &&
             _cardViewDict.TryGetValue(focusIdentity, out var focusView))
         {
-            focusView.HideHandCardFocusContent();
-            _focusCardDetailView.HideFocus();
-            _focusingCardInfo = default;
-            
-            foreach(var cardView in _cardViews)
-            {
-                cardView.RemoveLocationOffset(focusIdentity, _focusDuration);
-            }
+            _FocusStop(focusView, focusIdentity);
+        }
+    }
+    private void _FocusStop(CardView focusView, Guid focusIdentity)
+    {
+        focusView.HideHandCardFocusContent();
+        _focusCardDetailView.HideFocus();
+        _focusingCardTupleOpt = Option.None<KeyValuePair<CardInfo, int>>();
+        
+        foreach(var cardView in _cardViews)
+        {
+            cardView.RemoveLocationOffset(focusIdentity, _focusDuration);
         }
     }
 
-    public void BeginDrag(Guid dragIdentity, PointerEventData pointerEventData)
+    public void BeginDrag(Guid dragIdentity, Vector2 mousePosition)
     {
-        if (_draggingCardInfo.Key == null &&
+        if (!_draggingCardTupleOpt.HasValue &&
             _cardViewDict.TryGetValue(dragIdentity, out var dragView))
         {
             // Clear focus content
-            if (_focusingCardInfo.Key != null && 
-                _cardViewDict.TryGetValue(_focusingCardInfo.Key.Identity, out var focusView))
+            if (_focusingCardTupleOpt.TryGetValue(out var focusingCardTuple) &&
+                _cardViewDict.TryGetValue(focusingCardTuple.Key.Identity, out var focusView))
             {
-                focusView.HideHandCardFocusContent();
-                _focusCardDetailView.HideFocus();
-                _focusingCardInfo = default;
-                foreach(var cardView in _cardViews.Where(view => view != focusView))
-                {
-                    cardView.RemoveLocationOffset(dragIdentity, _focusDuration);
-                }
-            }
+                _FocusStop(focusView, focusingCardTuple.Key.Identity);
+            }           
 
-            _draggingCardInfo = _cardCollectionInfo.CardInfos
-                .FirstOrDefault(kvp => kvp.Key.Identity == dragIdentity);
+            _draggingCardTupleOpt = _cardCollectionInfo.CardInfos
+                .FirstOrDefault(kvp => kvp.Key.Identity == dragIdentity).SomeNotNull();
 
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                _canvas.transform as RectTransform, pointerEventData.position, _canvas.worldCamera, out Vector2 localPoint);    
-            _beginDragPosition = dragView.transform.GetComponent<RectTransform>().anchoredPosition;
+                dragView.RectTransform.parent.GetComponent<RectTransform>(), mousePosition, _canvas.worldCamera, out Vector2 localPoint);    
+            _beginDragPosition = dragView.RectTransform.anchoredPosition;
             _dragOffset = _beginDragPosition - localPoint;
             dragView.BeginDrag(_beginDragPosition);
-        }
+        }        
     }
-    public void Drag(Guid dragIdentity, PointerEventData pointerEventData)
+    public void Drag(Guid dragIdentity, Vector2 mousePosition)
     {
-        if (_draggingCardInfo.Key != null &&
+        if (_draggingCardTupleOpt.TryGetValue(out var draggingCardTuple) &&
             _cardViewDict.TryGetValue(dragIdentity, out var dragView))
         {
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                _canvas.transform as RectTransform, pointerEventData.position, _canvas.worldCamera, out Vector2 localPoint);
+                dragView.RectTransform.parent.GetComponent<RectTransform>(), mousePosition, _canvas.worldCamera, out Vector2 localPoint);
             var localDragPoint = localPoint + _dragOffset;
 
-            var draggingInfo = _draggingCardInfo.Key;
+            var draggingInfo = draggingCardTuple.Key;
             if (draggingInfo.MainSelectable.SelectType != SelectType.None)
             {
                 var selectView = _reciever.SelectableViews
                     .Where(view => view != dragView as ISelectableView)
                     .Where(view => draggingInfo.MainSelectable.SelectType.IsSelectable(view.TargetType))
-                    .Where(view => RectTransformUtility.RectangleContainsScreenPoint(view.RectTransform, pointerEventData.position, _canvas.worldCamera))
+                    .Where(view => RectTransformUtility.RectangleContainsScreenPoint(view.RectTransform, mousePosition, _canvas.worldCamera))
                     .FirstOrDefault();
                 if (_currentSelectedView != selectView)
                 {
@@ -224,7 +242,7 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
             }
             else
             {
-                if (RectTransformUtility.RectangleContainsScreenPoint(_reciever.BasicSelectableView.RectTransform, pointerEventData.position, _canvas.worldCamera))
+                if (RectTransformUtility.RectangleContainsScreenPoint(_reciever.BasicSelectableView.RectTransform, mousePosition, _canvas.worldCamera))
                 {
                     dragView.Drag(localDragPoint, draggingInfo.MainSelectable.SelectType, true);
                 }
@@ -233,23 +251,23 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
                     dragView.Drag(localDragPoint, draggingInfo.MainSelectable.SelectType, false);
                 }
             }
-        }
+        }        
     }
-    public void EndDrag(Guid dragIdentity, PointerEventData pointerEventData)
+    public void EndDrag(Guid dragIdentity, Vector2 mousePosition)
     {
-        if (_draggingCardInfo.Key != null &&
+        if (_draggingCardTupleOpt.TryGetValue(out var draggingCardTuple) &&
             _cardViewDict.TryGetValue(dragIdentity, out var dragView))
         {
             _lineRenderer.gameObject.SetActive(false);
-            dragView.EndDrag(_beginDragPosition, _draggingCardInfo.Value);
+            dragView.EndDrag(_beginDragPosition, draggingCardTuple.Value);
 
-            var draggingInfo = _draggingCardInfo.Key;
+            var draggingInfo = draggingCardTuple.Key;
             if (draggingInfo.MainSelectable.SelectType != SelectType.None)
             {
                 var selectView = _reciever.SelectableViews
                     .Where(view => view != dragView as ISelectableView)
                     .Where(view => draggingInfo.MainSelectable.SelectType.IsSelectable(view.TargetType))
-                    .Where(view => RectTransformUtility.RectangleContainsScreenPoint(view.RectTransform, pointerEventData.position, _canvas.worldCamera))
+                    .Where(view => RectTransformUtility.RectangleContainsScreenPoint(view.RectTransform, mousePosition, _canvas.worldCamera))
                     .FirstOrDefault();
                 if (selectView != null)
                 {
@@ -259,14 +277,14 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
             }
             else
             {
-                if (RectTransformUtility.RectangleContainsScreenPoint(_reciever.BasicSelectableView.RectTransform, pointerEventData.position, _canvas.worldCamera))
+                if (RectTransformUtility.RectangleContainsScreenPoint(_reciever.BasicSelectableView.RectTransform, mousePosition, _canvas.worldCamera))
                 {
                     _reciever.RecieveEvent(new UseCardAction(dragIdentity));
                 }
             }
 
-            _draggingCardInfo = default;
-        }
+            _draggingCardTupleOpt = Option.None<KeyValuePair<CardInfo, int>>();
+        }        
     }
 
     public void RemoveCardView(UsedCardEvent usedCardEvent)

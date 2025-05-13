@@ -76,13 +76,13 @@ public class CardView : MonoBehaviour, IRecyclable, ISelectableView
             .AddTo(_disposables);
         
         _button.OnBeginDragAsObservable()
-            .Subscribe(pointerEventData => handler.BeginDrag(cardInfo.Identity, pointerEventData))
+            .Subscribe(pointerEventData => handler.BeginDrag(cardInfo.Identity, pointerEventData.position))
             .AddTo(_disposables);
         _button.OnDragAsObservable()
-            .Subscribe(pointerEventData => handler.Drag(cardInfo.Identity, pointerEventData))
+            .Subscribe(pointerEventData => handler.Drag(cardInfo.Identity, pointerEventData.position))
             .AddTo(_disposables);
         _button.OnEndDragAsObservable()
-            .Subscribe(pointerEventData => handler.EndDrag(cardInfo.Identity, pointerEventData))
+            .Subscribe(pointerEventData => handler.EndDrag(cardInfo.Identity, pointerEventData.position))
             .AddTo(_disposables);
     }
     public void EnableSimpleCardAction(CardInfo cardInfo, IAllCardViewHandler handler)
@@ -119,6 +119,8 @@ public class CardView : MonoBehaviour, IRecyclable, ISelectableView
     public void Drag(Vector2 dragPosition, SelectType selectType, bool isSelecting)
     {
         RectTransform.anchoredPosition = dragPosition;
+        Canvas.ForceUpdateCanvases();
+        //Debug.Log($"Drag: {dragPosition}  now {RectTransform.anchoredPosition}");
         _canvasGroup.alpha = 
             isSelecting ? (selectType == SelectType.None ? 1f: 0f) : 0.5f;
     }
