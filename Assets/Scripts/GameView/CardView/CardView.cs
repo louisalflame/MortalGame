@@ -8,7 +8,29 @@ using UniRx.Triggers;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CardView : MonoBehaviour, IRecyclable, ISelectableView
+public interface ICardView : IRecyclable, ISelectableView
+{
+    Canvas Canvas { get; }
+    RectTransform ParentRectTransform { get; }
+
+    void SetCardInfo(CardInfo cardInfo, LocalizeLibrary localizeLibrary);
+
+    void SetPositionAndRotation(Vector3 position, Quaternion rotation);
+    void AddLocationOffset(Guid guid, Vector3 offset, float duration);
+    void RemoveLocationOffset(Guid guid, float duration);
+
+    void ShowHandCardFocusContent();
+    void HideHandCardFocusContent();
+
+    void BeginDrag(Vector2 dragPosition);
+    void Drag(Vector2 dragPosition, SelectType selectType, bool isSelecting);
+    void EndDrag(Vector2 beginDragPosition, int originSiblingIndex);
+
+    void EnableHandCardAction(CardInfo cardInfo, IHandCardViewHandler handler);
+    void DisableCardAction();
+}
+
+public class CardView : MonoBehaviour, ICardView
 {
     [BoxGroup("Content")]
     [SerializeField]
@@ -36,6 +58,9 @@ public class CardView : MonoBehaviour, IRecyclable, ISelectableView
     public RectTransform RectTransform => _rectTransform;
     public TargetType TargetType => TargetType.AllyCard;
     public Guid TargetIdentity => _cardIdentity;
+
+    public RectTransform ParentRectTransform => transform.parent.GetComponent<RectTransform>();
+    public Canvas Canvas => transform.GetComponentInParent<Canvas>();
 
     private CompositeDisposable _disposables = new CompositeDisposable();
     private Vector3 _localPosition;
@@ -119,8 +144,6 @@ public class CardView : MonoBehaviour, IRecyclable, ISelectableView
     public void Drag(Vector2 dragPosition, SelectType selectType, bool isSelecting)
     {
         RectTransform.anchoredPosition = dragPosition;
-        Canvas.ForceUpdateCanvases();
-        //Debug.Log($"Drag: {dragPosition}  now {RectTransform.anchoredPosition}");
         _canvasGroup.alpha = 
             isSelecting ? (selectType == SelectType.None ? 1f: 0f) : 0.5f;
     }

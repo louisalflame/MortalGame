@@ -26,6 +26,13 @@ public class CardPropertyHint : MonoBehaviour
 
     public void ShowHint(CardInfo cardInfo, bool smallDirection, RectTransform referenceRect)
     {
+        if(cardInfo.StatusInfos.Count == 0)
+        {
+            HideHint();
+            return;
+        }
+
+        _content.gameObject.SetActive(true);
         foreach(var statusInfo in cardInfo.StatusInfos)
         {
             var cardBuffInfoView = _cardBuffInfoViewFactory.CreatePrefab();
@@ -58,5 +65,6 @@ public class CardPropertyHint : MonoBehaviour
             _cardBuffInfoViewFactory.RecyclePrefab(propertyView);
         }
         _propertyViews.Clear();
+        _content.gameObject.SetActive(false);
     }
 }

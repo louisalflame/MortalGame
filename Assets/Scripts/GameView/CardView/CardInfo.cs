@@ -17,6 +17,7 @@ public class CardInfo
     public List<SubSelectableInfo> SubSelectables;
 
     public List<CardBuffInfo> StatusInfos { get; private set; }
+    public List<CardProperty> Properties { get; private set; }
 
     public CardInfo(ICardEntity card, IGameplayStatusWatcher gameWatcher)
     {
@@ -32,6 +33,7 @@ public class CardInfo
         SubSelectables = card.SubSelectables.Select(s => new SubSelectableInfo(s.SelectType, s.TargetCount)).ToList();
 
         StatusInfos = card.BuffList.Select(s => new CardBuffInfo(s)).ToList();
+        Properties = card.AllProperties.Select(p => p.Property).ToList();
     }
 
     public const string KEY_COST = "cost";

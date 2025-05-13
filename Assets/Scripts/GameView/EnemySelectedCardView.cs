@@ -22,8 +22,8 @@ public class EnemySelectedCardView : MonoBehaviour
     
     public IEnumerable<ISelectableView> SelectableViews => _cardViews;
 
-    private List<AiCardView> _cardViews = new List<AiCardView>();
-    private Dictionary<Guid, AiCardView> _cardViewDict = new Dictionary<Guid, AiCardView>();
+    private List<IAiCardView> _cardViews = new List<IAiCardView>();
+    private Dictionary<Guid, IAiCardView> _cardViewDict = new Dictionary<Guid, IAiCardView>();
 
     private IGameplayStatusWatcher _statusWatcher;
     private IGameplayActionReciever _reciever;
@@ -78,7 +78,7 @@ public class EnemySelectedCardView : MonoBehaviour
         {
             _cardViews.Remove(cardView);
             _cardViewDict.Remove(usedCardEvent.UsedCardInfo.Identity);
-            _cardViewFactory.RecyclePrefab(cardView);
+            _cardViewFactory.RecyclePrefab(cardView as AiCardView);
 
             _RearrangeCardViews();
         }
@@ -89,7 +89,7 @@ public class EnemySelectedCardView : MonoBehaviour
         {
             _cardViews.Remove(cardView);
             _cardViewDict.Remove(discardCardEvent.CardInfo.Identity);
-            _cardViewFactory.RecyclePrefab(cardView);
+            _cardViewFactory.RecyclePrefab(cardView as AiCardView);
 
             _RearrangeCardViews();
         }
@@ -100,7 +100,7 @@ public class EnemySelectedCardView : MonoBehaviour
         {
             _cardViews.Remove(cardView);
             _cardViewDict.Remove(consumeCardEvent.CardInfo.Identity);
-            _cardViewFactory.RecyclePrefab(cardView);
+            _cardViewFactory.RecyclePrefab(cardView as AiCardView);
 
             _RearrangeCardViews();
         }
@@ -111,7 +111,7 @@ public class EnemySelectedCardView : MonoBehaviour
         {
             _cardViews.Remove(cardView);
             _cardViewDict.Remove(disposeCardEvent.CardInfo.Identity);
-            _cardViewFactory.RecyclePrefab(cardView);
+            _cardViewFactory.RecyclePrefab(cardView as AiCardView);
 
             _RearrangeCardViews();
         }
@@ -123,7 +123,7 @@ public class EnemySelectedCardView : MonoBehaviour
         {
             _cardViews.Remove(cardView);
             _cardViewDict.Remove(enemyUnselectedCardEvent.SelectedCardInfo.Identity);
-            _cardViewFactory.RecyclePrefab(cardView);
+            _cardViewFactory.RecyclePrefab(cardView as AiCardView);
 
             _RearrangeCardViews();
         }
@@ -132,12 +132,11 @@ public class EnemySelectedCardView : MonoBehaviour
     {
         foreach(var cardInfo in recycleHandCardEvent.RecycledCardInfos)
         {
-Debug.Log($"==> enemyselect create cardview: {cardInfo.Identity}");
             if(_cardViewDict.TryGetValue(cardInfo.Identity, out var cardView))
             {
                 _cardViews.Remove(cardView);
                 _cardViewDict.Remove(cardInfo.Identity);
-                _cardViewFactory.RecyclePrefab(cardView);
+                _cardViewFactory.RecyclePrefab(cardView as AiCardView);
             }
         }
 
@@ -153,7 +152,7 @@ Debug.Log($"==> enemyselect create cardview: {cardInfo.Identity}");
         {
             var cardView = _cardViews[i];
             var x = widthInterval * i - _handCardArea.rect.width / 2 + widthInterval / 2;
-            cardView.transform.localPosition = new Vector3(x, 0, 0);
+            cardView.SetPositionAndRotation( new Vector3(x, 0, 0), Quaternion.identity );
         }
     }
 }

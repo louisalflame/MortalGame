@@ -5,7 +5,13 @@ using UniRx.Triggers;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class AiCardView : MonoBehaviour, IRecyclable, ISelectableView
+public interface IAiCardView : IRecyclable, ISelectableView
+{
+    void SetCardInfo(CardInfo cardInfo, LocalizeLibrary localizeLibrary);
+    void SetPositionAndRotation(Vector3 position, Quaternion rotation);
+}
+
+public class AiCardView : MonoBehaviour, IAiCardView
 {
     [SerializeField]
     private RectTransform _rectTransform;
@@ -37,6 +43,10 @@ public class AiCardView : MonoBehaviour, IRecyclable, ISelectableView
         _info.text = cardLocalizeData.Info.ReplaceTemplateKeys(templateValue);
         _cost.text = cardInfo.Cost.ToString();
         _power.text = cardInfo.Power.ToString();
+    }
+    public void SetPositionAndRotation(Vector3 position, Quaternion rotation)
+    {
+        transform.SetLocalPositionAndRotation(position, rotation);
     }
 
     public void Reset()
