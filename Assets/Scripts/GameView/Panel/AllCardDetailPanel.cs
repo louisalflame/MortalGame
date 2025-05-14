@@ -67,7 +67,8 @@ public class AllCardDetailPanel : MonoBehaviour, IAllCardDetailPanel
         {
             var cardView = _cardViewFactory.CreatePrefab();
             cardView.transform.SetParent(_cardViewParent, false);
-            cardView.SetCardInfo(cardInfo, _localizeLibrary);
+            cardView.Initialize(_localizeLibrary);
+            cardView.SetCardInfo(cardInfo);
             cardView.EnableSimpleCardAction(cardInfo, handler);
             _cardViewDict.Add(cardInfo.Identity, cardView);
         }

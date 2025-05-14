@@ -18,6 +18,7 @@ public class FocusCardDetailView : MonoBehaviour
     {
         _localizeLibrary = localizeLibrary;
         _cardPropertyHint.Init(localizeLibrary);
+        _cardView.Initialize(localizeLibrary);
     }   
 
     public void ShowFocus(CardInfo cardInfo, RectTransform targetRect)
@@ -30,7 +31,7 @@ public class FocusCardDetailView : MonoBehaviour
         _content.anchoredPosition = new Vector2(rectOnCanvas.center.x, _content.anchoredPosition.y);
         var hintDirection = rectOnCanvas.center.x > 0;
 
-        _cardView.SetCardInfo(cardInfo, _localizeLibrary);
+        _cardView.SetCardInfo(cardInfo);
         _cardPropertyHint.ShowHint(cardInfo, hintDirection, _cardView.RectTransform);
     }
 

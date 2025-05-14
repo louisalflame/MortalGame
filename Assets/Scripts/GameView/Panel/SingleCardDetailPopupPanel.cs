@@ -27,11 +27,12 @@ public class SingleCardDetailPopupPanel : MonoBehaviour
     {
         _localizeLibrary = localizeLibrary;
         _cardPropertyHint.Init(_localizeLibrary);
+        _cardView.Initialize(_localizeLibrary);
     }
 
     public async UniTask Run(CardInfo cardInfo)
     {
-        _cardView.SetCardInfo(cardInfo, _localizeLibrary);
+        _cardView.SetCardInfo(cardInfo);
 
         var disposables = new CompositeDisposable();
         foreach (var button in _closeButtons)

@@ -13,7 +13,8 @@ public interface ICardView : IRecyclable, ISelectableView
     Canvas Canvas { get; }
     RectTransform ParentRectTransform { get; }
 
-    void SetCardInfo(CardInfo cardInfo, LocalizeLibrary localizeLibrary);
+    void Initialize(LocalizeLibrary localizeLibrary);
+    void SetCardInfo(CardInfo cardInfo);
 
     void SetPositionAndRotation(Vector3 position, Quaternion rotation);
     void AddLocationOffset(Guid guid, Vector3 offset, float duration);
@@ -48,6 +49,10 @@ public class CardView : MonoBehaviour, ICardView
     [SerializeField]
     private TextMeshProUGUI _power;
 
+    [BoxGroup("Effect")]
+    [SerializeField]
+    private GameObject _sealedEffectObj;
+
     [BoxGroup("UI")]
     [SerializeField]
     private Button _button;
@@ -68,11 +73,22 @@ public class CardView : MonoBehaviour, ICardView
     private Dictionary<Guid, List<Vector3>> _offsets = new Dictionary<Guid, List<Vector3>>();
     private Tween _currentMoveTween;
 
+    private LocalizeLibrary _localizeLibrary;
     private Guid _cardIdentity;
 
-    public void SetCardInfo(CardInfo cardInfo, LocalizeLibrary localizeLibrary)
+    public void Initialize(LocalizeLibrary localizeLibrary)
     {
-        var cardLocalizeData = localizeLibrary.Get(LocalizeTitleInfoType.Card, cardInfo.CardDataID);
+        _localizeLibrary = localizeLibrary;
+        Reset();
+    }
+
+    public void SetCardInfo(CardInfo cardInfo)
+    {
+        _Render(cardInfo);
+    }
+    private void _Render(CardInfo cardInfo)
+    {
+        var cardLocalizeData = _localizeLibrary.Get(LocalizeTitleInfoType.Card, cardInfo.CardDataID);
         var templateValue = cardInfo.GetTemplateValues();
 
         _cardIdentity = cardInfo.Identity;
@@ -80,6 +96,8 @@ public class CardView : MonoBehaviour, ICardView
         _info.text = cardLocalizeData.Info.ReplaceTemplateKeys(templateValue);
         _cost.text = cardInfo.Cost.ToString();
         _power.text = cardInfo.Power.ToString();
+
+        _sealedEffectObj.SetActive(cardInfo.Properties.Contains(CardProperty.Sealed));
     }
 
     public void OnSelect()
@@ -91,6 +109,7 @@ public class CardView : MonoBehaviour, ICardView
 
     public void EnableHandCardAction(CardInfo cardInfo, IHandCardViewHandler handler)
     {
+        _Render(cardInfo);
         _button.interactable = true;
         
         _button.OnPointerEnterAsObservable()

@@ -93,8 +93,9 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
     {
         _cardCollectionInfo = handCardInfo;
         var cardView = _cardViewFactory.CreatePrefab();
+        cardView.Initialize(_localizeLibrary);
         cardView.transform.SetParent(_cardViewParent, false);
-        cardView.SetCardInfo(newCardInfo, _localizeLibrary);
+        cardView.SetCardInfo(newCardInfo);
         _cardViews.Add(cardView);
         _cardViewDict.Add(newCardInfo.Identity, cardView);
 
