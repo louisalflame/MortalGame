@@ -18,3 +18,11 @@ public class EffectiveDamagePlayerBuffEffect : IPlayerBuffEffect
     public ITargetCharacterCollectionValue Targets;
     public IIntegerValue Value;
 }
+
+public class AddCardBuffPlayerBuffEffect : IPlayerBuffEffect
+{
+    ITargetCardCollectionValue Targets;
+    
+    [ShowInInspector]
+    public List<AddCardBuffData> AddCardBuffDatas = new ();
+}

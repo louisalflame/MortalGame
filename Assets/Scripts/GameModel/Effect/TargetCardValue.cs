@@ -40,7 +40,7 @@ public class PlayingCard : ITargetCardValue
     {
         return trigger switch
         {
-            CardPlay cardPlay => cardPlay.Card.SomeNotNull(),
+            CardPlayTrigger cardPlay => cardPlay.Card.SomeNotNull(),
             _ => Option.None<ICardEntity>()
         };
     }

@@ -11,13 +11,15 @@ public class SystemSource : IActionSource
     }
 }
 
-public record CardSource : IActionSource
+public class CardPlaySource : IActionSource
 {
     public ICardEntity Card { get; private set; }
+    public int HandCardIndex { get; private set; }
 
-    public CardSource(ICardEntity card)
+    public CardPlaySource(ICardEntity card, int handCardIndex)
     {
         Card = card;
+        HandCardIndex = handCardIndex;
     }
 }
 

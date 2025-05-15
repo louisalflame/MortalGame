@@ -4,11 +4,11 @@ public interface ITriggerSource
 { 
 }
 
-public class CardPlay : ITriggerSource
+public class CardPlayTrigger : ITriggerSource
 {
     public ICardEntity Card { get; private set; }
 
-    public CardPlay(ICardEntity card)
+    public CardPlayTrigger(ICardEntity card)
     {
         Card = card;
     }

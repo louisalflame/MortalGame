@@ -65,7 +65,7 @@ public class LoseEnegyEffect : ICardEffect
 }
 
 [Serializable]
-public class AddBuffEffect : ICardEffect
+public class AddPlayerBuffEffect : ICardEffect
 {
     public ITargetPlayerCollectionValue Targets;
     [ValueDropdown("@DropdownHelper.BuffNames")]
@@ -73,7 +73,7 @@ public class AddBuffEffect : ICardEffect
     public IIntegerValue Level;
 }
 [Serializable]
-public class RemoveBuffEffect : ICardEffect
+public class RemovePlayerBuffEffect : ICardEffect
 {
     public ITargetPlayerCollectionValue Targets;
     [ValueDropdown("@DropdownHelper.BuffNames")]

@@ -64,23 +64,65 @@ public class IsSelfTurnCondition : IPlayerBuffCondition, ICharacterBuffCondition
 [Serializable]
 public class IntegerCondition : ICardBuffCondition, IPlayerBuffCondition, ICharacterBuffCondition
 {
-    public IIntegerValue Value1;
-    public IIntegerValue Value2;
-    public ArithmeticConditionType Condition;
+    public IIntegerValue Value;
+
+    public IIntegerValueCondition Condition;
 
     public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
-        var val1 = Value1.Eval(gameWatcher, trigger);
-        var val2 = Value2.Eval(gameWatcher, trigger);
-        return Condition switch
-        {
-            ArithmeticConditionType.Equal               => val1 == val2,
-            ArithmeticConditionType.NotEqual            => val1 != val2,
-            ArithmeticConditionType.GreaterThan         => val1 > val2,
-            ArithmeticConditionType.LessThan            => val1 < val2,
-            ArithmeticConditionType.GreaterThanOrEqual  => val1 >= val2,
-            ArithmeticConditionType.LessThanOrEqual     => val1 <= val2,
-            _ => false
-        };
+        var value = Value.Eval(gameWatcher, trigger);
+        return Condition.Eval(gameWatcher, trigger, value);
+    }
+}
+
+[Serializable]
+public class CardCondition : ICardBuffCondition, IPlayerBuffCondition, ICharacterBuffCondition
+{
+    public ITargetCardValue Card;
+    public ICardValueCondition Condition;
+
+    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
+    {
+        var cardOpt = Card.Eval(gameWatcher, trigger);
+        return Condition.Eval(gameWatcher, trigger, cardOpt);
+    }
+}
+
+[Serializable]
+public class PlayerCondition : ICardBuffCondition, IPlayerBuffCondition, ICharacterBuffCondition
+{
+    public ITargetPlayerValue Player;
+    public IPlayerValueCondition Condition;
+
+    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
+    {
+        var playerOpt = Player.Eval(gameWatcher, trigger);
+        return Condition.Eval(gameWatcher, trigger, playerOpt);
+    }
+}
+
+[Serializable]
+public class CharacterCondition : ICardBuffCondition, IPlayerBuffCondition, ICharacterBuffCondition
+{
+    public ITargetCharacterValue Character;
+    public ICharacterValueCondition Condition;
+
+    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
+    {
+        var characterOpt = Character.Eval(gameWatcher, trigger);
+        return Condition.Eval(gameWatcher, trigger, characterOpt);
+    }
+}
+
+[Serializable]
+public class PlayerBuffCondition : IPlayerBuffCondition
+{
+    public ITargetPlayerBuffValue PlayerBuff;
+    public IPlayerBuffValueCondition Condition;
+
+    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
+    {
+        var playerBuffOpt = PlayerBuff.Eval(gameWatcher, trigger);
+        return Condition.Eval(gameWatcher, trigger, playerBuffOpt);
     }
 }

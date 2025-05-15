@@ -329,13 +329,13 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 var loseEnergyResult = player.EnergyManager.ConsumeEnergy(cardRuntimCost);
                 useCardEvents.Add(new LoseEnergyEvent(player, loseEnergyResult));
 
-                if (player.CardManager.HandCard.RemoveCard(usedCard)) 
+                if (player.CardManager.HandCard.TryRemoveCard(usedCard, out int playCardIndex)) 
                 {
                     // Create PlayCardSession
                     _UpdateTiming(UpdateTiming.PlayCardStart);
 
-                    var source = new CardSource(usedCard);
-                    var trigger = new CardPlay(usedCard);
+                    var source = new CardPlaySource(usedCard, playCardIndex);
+                    var trigger = new CardPlayTrigger(usedCard);
                     _UpdateAction(new PlayCardIntentAction(source, new SystemTarget(), usedCard));
 
                     _TriggerTiming(TriggerTiming.PlayCardStart);
@@ -422,6 +422,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
         return Option.None<IGameEvent>();
     }
 
+#region Formula
     private int _DamagePoint(
         int rawDamagePoint,
         IActionSource actionSource,
@@ -429,7 +430,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
     {
         switch(actionSource)
         {
-            case CardSource cardSource:
+            case CardPlaySource cardSource:
                 var playerBuffAttackIncrease = _gameStatus.CurrentPlayer
                     .Map(player => player.GetPlayerBuffProperty(this, PlayerBuffProperty.AttackIncrease))
                     .ValueOr(0);
@@ -439,6 +440,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 return rawDamagePoint;
         }
     }
+#endregion
 
     private IEnumerable<IGameEvent> _ApplyCardEffect(
         IActionSource actionSource, ITriggerSource triggerSource, ICardEffect cardEffect)
@@ -566,7 +568,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
             }
 
             // === BUFF EFFECT ===
-            case AddBuffEffect addBuffEffect:
+            case AddPlayerBuffEffect addBuffEffect:
             {
                 var targets = addBuffEffect.Targets.Eval(this, triggerSource);
                 foreach(var target in targets)
@@ -593,7 +595,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 }
                 break;
             }
-            case RemoveBuffEffect removeBuffEffect:
+            case RemovePlayerBuffEffect removeBuffEffect:
             {
                 var targets = removeBuffEffect.Targets.Eval(this, triggerSource);
                 foreach(var target in targets)
