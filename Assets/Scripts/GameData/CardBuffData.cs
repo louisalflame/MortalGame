@@ -9,12 +9,17 @@ public class CardBuffData
     public string ID;
 
     [ShowInInspector]
-    [TitleGroup("Effects")]
-    public Dictionary<TriggerTiming, ICardEffect[]> Effects = new ();
+    [BoxGroup("Effects")]
+    public List<IReactionSessionData> Sessions = new();
+
+    [Space(20)]
+    [ShowInInspector]
+    [BoxGroup("Effects")]
+    public Dictionary<TriggerTiming, ConditionalCardBuffEffect[]> Effects = new ();
 
     [ShowInInspector]
     [TitleGroup("Properties")]
-    public List<ICardPropertyData> PropertyDatas = new ();
+    public List<ICardBuffPropertyData> PropertyDatas = new ();
 
     [TitleGroup("LifeTime")]
     public ICardBuffLifeTimeData LifeTimeData;
@@ -26,4 +31,6 @@ public class AddCardBuffData
 {
     [ValueDropdown("@DropdownHelper.CardBuffNames")]
     public string CardBuffId;
+
+    public IIntegerValue Level;
 }

@@ -4,5 +4,5 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "AllBuffScriptable", menuName = "Scriptable Objects/AllBuffScriptable")]
 public class AllBuffScriptable : SerializedScriptableObject
 {
-    public PlayerBuffDataScriptable[] AllBuffData;
+    public PlayerBuffDataScriptable[] AllBuffData = new PlayerBuffDataScriptable[0];
 }

@@ -1,7 +1,6 @@
 using Optional;
 using UnityEngine;
 
-
 public interface IIntentAction
 {
     UpdateAction ActionType { get; }

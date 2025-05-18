@@ -38,27 +38,25 @@ public class CardView : MonoBehaviour, ICardView
     private RectTransform _rectTransform;
     [BoxGroup("Content")]
     [SerializeField]
-    private TextMeshProUGUI _title;
-    [BoxGroup("Content")]
-    [SerializeField]
-    private TextMeshProUGUI _info;
-    [BoxGroup("Content")]
-    [SerializeField]
-    private TextMeshProUGUI _cost;
-    [BoxGroup("Content")]
-    [SerializeField]
-    private TextMeshProUGUI _power;
-
-    [BoxGroup("Effect")]
-    [SerializeField]
-    private GameObject _sealedEffectObj;
-
-    [BoxGroup("UI")]
-    [SerializeField]
     private Button _button;
-    [BoxGroup("UI")]
+    [BoxGroup("Content")]
     [SerializeField]
     private CanvasGroup _canvasGroup;
+
+    [SerializeField]
+    private TextMeshProUGUI _title;
+    [SerializeField]
+    private TextMeshProUGUI _info;
+    [SerializeField]
+    private TextMeshProUGUI _cost;
+    [SerializeField]
+    private IntValueSwitch _costColorSwitch;    
+    [SerializeField]
+    private IntColorMapping _powerColorMapping;
+
+    [TitleGroup("Effect")]
+    [SerializeField]
+    private GameObject _sealedEffectObj;
 
     public RectTransform RectTransform => _rectTransform;
     public TargetType TargetType => TargetType.AllyCard;
@@ -92,10 +90,19 @@ public class CardView : MonoBehaviour, ICardView
         var templateValue = cardInfo.GetTemplateValues();
 
         _cardIdentity = cardInfo.Identity;
+        _cost.text = cardInfo.Cost.ToString();
+        _costColorSwitch.Value =
+            cardInfo.Cost > cardInfo.OriginCost ? 1 :
+            cardInfo.Cost < cardInfo.OriginCost ? 2 : 0;
+
+        var originPowerString = templateValue[CardInfo.KEY_POWER];
+        templateValue[CardInfo.KEY_POWER] = 
+            cardInfo.Power > cardInfo.OriginPower ? $"<color=#{_powerColorMapping.GetHtmlColor(1)}>{originPowerString}</color>" :
+            cardInfo.Power < cardInfo.OriginPower ? $"<color=#{_powerColorMapping.GetHtmlColor(2)}>{originPowerString}</color>" :
+            originPowerString;
+
         _title.text = cardLocalizeData.Title;
         _info.text = cardLocalizeData.Info.ReplaceTemplateKeys(templateValue);
-        _cost.text = cardInfo.Cost.ToString();
-        _power.text = cardInfo.Power.ToString();
 
         _sealedEffectObj.SetActive(cardInfo.Properties.Contains(CardProperty.Sealed));
     }

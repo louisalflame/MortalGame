@@ -25,3 +25,12 @@ public class TurnLifeTimeCardBuffData : ICardBuffLifeTimeData
         return new TurnLifeTimeCardBuffEntity(Turn.Eval(watcher, trigger));
     }
 }
+
+[Serializable]
+public class HandCardLifeTimeCardBuffData : ICardBuffLifeTimeData
+{
+    public ICardBuffLifeTimeEntity CreateEntity(IGameplayStatusWatcher watcher, ITriggerSource trigger)
+    {
+        return new HandCardLifeTimeCardBuffEntity();
+    }
+}

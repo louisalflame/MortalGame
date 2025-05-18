@@ -3,5 +3,5 @@ using UnityEngine;
 
 public interface IPlayerBuffValueCondition
 {
-    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, Option<IPlayerBuffEntity> playerBuff);
+    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IPlayerBuffEntity playerBuff);
 }

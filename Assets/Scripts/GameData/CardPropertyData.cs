@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,6 +8,7 @@ public interface ICardPropertyData
     ICardPropertyEntity CreateEntity();
 }
 
+[Serializable]
 public class PreservedPropertyData : ICardPropertyData
 {
     public ICardPropertyEntity CreateEntity()
@@ -15,6 +17,7 @@ public class PreservedPropertyData : ICardPropertyData
     }
 }
 
+[Serializable]
 public class InitialPriorityPropertyData : ICardPropertyData
 {
     public ICardPropertyEntity CreateEntity()
@@ -23,6 +26,7 @@ public class InitialPriorityPropertyData : ICardPropertyData
     }
 }
 
+[Serializable]
 public class ConsumablePropertyData : ICardPropertyData
 {
     public ICardPropertyEntity CreateEntity()
@@ -31,6 +35,7 @@ public class ConsumablePropertyData : ICardPropertyData
     }
 }
 
+[Serializable]
 public class DisposePropertyData : ICardPropertyData
 {
     public ICardPropertyEntity CreateEntity()
@@ -39,6 +44,7 @@ public class DisposePropertyData : ICardPropertyData
     }
 }
 
+[Serializable]
 public class AutoDisposePropertyData : ICardPropertyData
 {
     public ICardPropertyEntity CreateEntity()
@@ -47,6 +53,7 @@ public class AutoDisposePropertyData : ICardPropertyData
     }
 }
 
+[Serializable]
 public class SealedPropertyData : ICardPropertyData
 {
     public ICardPropertyEntity CreateEntity()

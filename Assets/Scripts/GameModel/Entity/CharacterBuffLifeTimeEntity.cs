@@ -3,9 +3,9 @@ using UnityEngine;
 public interface ICharacterBuffLifeTimeEntity
 {
     bool IsExpired();
-    void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing);
-    void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent);
-    void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result);
+    void UpdateTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing);
+    void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent);
+    void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result);
 }
 
 public class AlwaysLifeTimeCharacterBuffEntity : ICharacterBuffLifeTimeEntity
@@ -15,11 +15,11 @@ public class AlwaysLifeTimeCharacterBuffEntity : ICharacterBuffLifeTimeEntity
         return false;
     }
 
-    public void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing) { }
+    public void UpdateTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing) { }
 
-    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent) { }
+    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent) { }
 
-    public void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result) { }
+    public void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result) { }
 }
 
 public class TurnLifeTimeCharacterBuffEntity : ICharacterBuffLifeTimeEntity
@@ -36,15 +36,15 @@ public class TurnLifeTimeCharacterBuffEntity : ICharacterBuffLifeTimeEntity
         return _turn <= 0;
     }
 
-    public void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing) 
+    public void UpdateTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing) 
     { 
-        if (timing == UpdateTiming.TurnEnd)
+        if (timing == global::UpdateTiming.TurnEnd)
         {
             _turn--;
         }
     }
 
-    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent) { }
+    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent) { }
 
-    public void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result) { }
+    public void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result) { }
 }

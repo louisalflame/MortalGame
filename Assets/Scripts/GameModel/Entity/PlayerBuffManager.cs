@@ -55,7 +55,7 @@ public class PlayerBuffManager : IPlayerBuffManager
     {
         foreach (var existBuff in _buffs)
         {
-            if (existBuff.Id == buffId)
+            if (existBuff.PlayerBuffDataId == buffId)
             {
                 existBuff.AddLevel(level);
                 resultBuff = existBuff;
@@ -94,7 +94,7 @@ public class PlayerBuffManager : IPlayerBuffManager
     {
         foreach (var existBuff in _buffs)
         {
-            if (existBuff.Id == buffId)
+            if (existBuff.PlayerBuffDataId == buffId)
             {
                 _buffs.Remove(existBuff);
                 resultBuff = existBuff;
@@ -110,16 +110,19 @@ public class PlayerBuffManager : IPlayerBuffManager
         IGameplayStatusWatcher gameWatcher,
         UpdateTiming timing)
     {
-        foreach (var buff in _buffs)
+        foreach (var buff in _buffs.ToList())
         {
             var triggerBuff = new PlayerBuffTrigger(buff);
-
-            foreach(var session in buff.ReactionSessions)
+            foreach (var session in buff.ReactionSessions)
             {
                 session.UpdateTiming(gameWatcher, triggerBuff, timing);
             }
-            
+
             buff.LifeTime.UpdateByTiming(gameWatcher, triggerBuff, timing);
+            if (buff.IsExpired())
+            {
+                _buffs.Remove(buff);
+            }
         }
     }
     
@@ -127,16 +130,19 @@ public class PlayerBuffManager : IPlayerBuffManager
         IGameplayStatusWatcher gameWatcher,
         IIntentAction intent)
     {
-        foreach (var buff in _buffs)
+        foreach (var buff in _buffs.ToList())
         {
             var triggerBuff = new PlayerBuffTrigger(buff);
-
-            foreach(var session in buff.ReactionSessions)
+            foreach (var session in buff.ReactionSessions)
             {
                 session.UpdateIntent(gameWatcher, triggerBuff, intent);
             }
 
-            buff.LifeTime.UpdateIntent(gameWatcher, triggerBuff, intent);
+            buff.LifeTime.UpdateIntent(gameWatcher, triggerBuff, intent);            
+            if (buff.IsExpired())
+            {
+                _buffs.Remove(buff);
+            }
         }
     }
 
@@ -144,16 +150,19 @@ public class PlayerBuffManager : IPlayerBuffManager
         IGameplayStatusWatcher gameWatcher,
         IResultAction result)
     {
-        foreach (var buff in _buffs)
+        foreach (var buff in _buffs.ToList())
         {
             var triggerBuff = new PlayerBuffTrigger(buff);
-
-            foreach(var session in buff.ReactionSessions)
+            foreach (var session in buff.ReactionSessions)
             {
                 session.UpdateResult(gameWatcher, triggerBuff, result);
             }
 
-            buff.LifeTime.UpdateResult(gameWatcher, triggerBuff, result);
+            buff.LifeTime.UpdateResult(gameWatcher, triggerBuff, result);            
+            if (buff.IsExpired())
+            {
+                _buffs.Remove(buff);
+            }
         }
     }
 }

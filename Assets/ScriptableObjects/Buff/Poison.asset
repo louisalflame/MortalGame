@@ -67,7 +67,8 @@ MonoBehaviour:
       Data: 5|ConditionalPlayerBuffEffect, Assembly-CSharp
     - Name: Conditions
       Entry: 7
-      Data: 6|IPlayerBuffCondition[], Assembly-CSharp
+      Data: 6|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[IPlayerBuffCondition,
+        Assembly-CSharp]], Unity.Plastic.Antlr3.Runtime
     - Name: 
       Entry: 12
       Data: 1

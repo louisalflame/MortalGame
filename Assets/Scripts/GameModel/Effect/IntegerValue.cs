@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Optional.Collections;
+using Sirenix.OdinInspector;
 
 public interface IIntegerValue
 {
@@ -27,6 +28,7 @@ public class CardIntegerProperty : IIntegerValue
         Cost,
     }
 
+    [HorizontalGroup("1")]
     public ITargetCardValue Card;
     public CardIntegerValueType Property;
 
@@ -46,31 +48,6 @@ public class CardIntegerProperty : IIntegerValue
 }
 
 [Serializable]
-public class PlayerBuffIntegerProperty : IIntegerValue
-{
-    public enum PlayerBuffIntegerValueType
-    {
-        Level,
-    }
-
-    public ITargetPlayerBuffValue PlayerBuff;
-    public PlayerBuffIntegerValueType Property;
-
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
-    {
-        return PlayerBuff
-            .Eval(gameWatcher, triggerSource)
-            .Map(
-                playerBuff => Property switch
-                {
-                    PlayerBuffIntegerValueType.Level => playerBuff.Level,
-                    _ => 0
-                })
-            .ValueOr(0);
-    }
-}
-
-[Serializable]
 public class PlayerIntegerProperty : IIntegerValue
 {
     public enum PlayerIntegerValueType
@@ -79,8 +56,9 @@ public class PlayerIntegerProperty : IIntegerValue
         CurrentEnergy,
     }
 
+    [HorizontalGroup("1")]
     public ITargetPlayerValue Player;
-    public PlayerIntegerValueType Property; 
+    public PlayerIntegerValueType Property;
 
     public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
     {
@@ -99,8 +77,61 @@ public class PlayerIntegerProperty : IIntegerValue
 }
 
 [Serializable]
+public class CardBuffIntegerProperty : IIntegerValue
+{
+    public enum CardBuffIntegerValueType
+    {
+        Level
+    }
+
+    [HorizontalGroup("1")]
+    public ITargetCardBuffValue CardBuff;
+    public CardBuffIntegerValueType Property;
+
+    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
+    {
+        var cardBuffOpt = CardBuff.Eval(gameWatcher, triggerSource);
+        return cardBuffOpt
+            .Map(
+                cardBuff => Property switch
+                {
+                    CardBuffIntegerValueType.Level => cardBuff.Level,
+                    _ => 0
+                })
+            .ValueOr(0);
+    }
+}
+
+[Serializable]
+public class PlayerBuffIntegerProperty : IIntegerValue
+{
+    public enum PlayerBuffIntegerValueType
+    {
+        Level,
+    }
+
+    [HorizontalGroup("1")]
+    public ITargetPlayerBuffValue PlayerBuff;
+    public PlayerBuffIntegerValueType Property;
+
+    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
+    {
+        return PlayerBuff
+            .Eval(gameWatcher, triggerSource)
+            .Map(
+                playerBuff => Property switch
+                {
+                    PlayerBuffIntegerValueType.Level => playerBuff.Level,
+                    _ => 0
+                })
+            .ValueOr(0);
+    }
+}
+
+[Serializable]
 public class PlayerBuffSessionInteger : IIntegerValue
 {
+    [HorizontalGroup("1")]
     public ITargetPlayerBuffValue PlayerBuff;
     public string SessionIntegerId;
 

@@ -7,7 +7,7 @@ using UnityEngine;
 
 public interface IPlayerBuffEntity
 {
-    string Id { get; }
+    string PlayerBuffDataId { get; }
     Guid Identity { get; }
     int Level { get; }
     Option<IPlayerEntity> Caster { get; }
@@ -15,22 +15,22 @@ public interface IPlayerBuffEntity
     IPlayerBuffLifeTimeEntity LifeTime { get; }
     IReadOnlyCollection<IReactionSessionEntity> ReactionSessions { get; }
 
+    bool IsExpired();
     void AddLevel(int level);
     PlayerBuffInfo ToInfo();
 }
 
 public class PlayerBuffEntity : IPlayerBuffEntity
 {
-    private string _id;
-    private Guid _identity;
+    private readonly string _playerBuffDataId;
+    private readonly Guid _identity;
     private int _level;
-    private Option<IPlayerEntity> _owner;
-    private Option<IPlayerEntity> _caster;
-    private List<IPlayerBuffPropertyEntity> _properties;
-    private IPlayerBuffLifeTimeEntity _lifeTime;
-    private List<IReactionSessionEntity> _reactionSessions;
+    private readonly Option<IPlayerEntity> _caster;
+    private readonly IReadOnlyList<IPlayerBuffPropertyEntity> _properties;
+    private readonly IPlayerBuffLifeTimeEntity _lifeTime;
+    private readonly IReadOnlyList<IReactionSessionEntity> _reactionSessions;
 
-    public string Id => _id;
+    public string PlayerBuffDataId => _playerBuffDataId;
     public Guid Identity => _identity;
     public int Level => _level;
     public Option<IPlayerEntity> Caster => _caster;
@@ -42,7 +42,7 @@ public class PlayerBuffEntity : IPlayerBuffEntity
     public static IPlayerBuffEntity DummyBuff = new DummyPlayerBuff();
 
     public PlayerBuffEntity(
-        string id,
+        string playerBuffDataId,
         Guid identity,
         int level,
         Option<IPlayerEntity> caster,
@@ -50,13 +50,18 @@ public class PlayerBuffEntity : IPlayerBuffEntity
         IPlayerBuffLifeTimeEntity lifeTime,
         IEnumerable<IReactionSessionEntity> reactionSessions) 
     {
-        _id = id;
+        _playerBuffDataId = playerBuffDataId;
         _identity = identity;
         _level = level;
         _caster = caster;
         _properties = properties.ToList();
         _lifeTime = lifeTime;
         _reactionSessions = reactionSessions.ToList();
+    }
+
+    public bool IsExpired()
+    {
+        return _lifeTime.IsExpired();
     }
 
     public void AddLevel(int level)
@@ -67,7 +72,7 @@ public class PlayerBuffEntity : IPlayerBuffEntity
     public PlayerBuffInfo ToInfo()
     {
         return new PlayerBuffInfo() {
-            Id = Id,
+            Id = PlayerBuffDataId,
             Identity = Identity,
             Level = Level
         };

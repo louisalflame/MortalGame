@@ -8,84 +8,84 @@ public interface IPlayerBuffPropertyData
 
 
 [Serializable]
-public class AttackPropertyPlayerBuffData : IPlayerBuffPropertyData
+public class AttackPlayerBuffPropertyData : IPlayerBuffPropertyData
 {
     public IIntegerValue Value;
 
     public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
-        return new AttackPropertyPlayerBuffEntity(Value);
+        return new AttackPlayerBuffPropertyEntity(Value);
     }
 }
 
 [Serializable]
-public class PenetrateAttackPropertyPlayerBuffData : IPlayerBuffPropertyData
+public class PenetrateAttackPlayerBuffPropertyData : IPlayerBuffPropertyData
 {
     public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
-        return new PenetrateAttackPropertyPlayerBuffEntity();
+        return new PenetrateAttackPlayerBuffPropertyEntity();
     }
 }
 
 [Serializable]
-public class AdditionalAttackPropertyPlayerBuffData : IPlayerBuffPropertyData
+public class AdditionalAttackPlayerBuffPropertyData : IPlayerBuffPropertyData
 {
     public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
-        return new AdditionalAttackPropertyPlayerBuffEntity();
+        return new AdditionalAttackPlayerBuffPropertyEntity();
     }
 }
 
 [Serializable]
-public class EffectiveAttackPropertyPlayerBuffData : IPlayerBuffPropertyData
+public class EffectiveAttackPlayerBuffPropertyData : IPlayerBuffPropertyData
 {
     public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
-        return new EffectiveAttackPropertyPlayerBuffEntity();
+        return new EffectiveAttackPlayerBuffPropertyEntity();
     }
 }
 
 [Serializable]
-public class DefensePropertyPlayerBuffData : IPlayerBuffPropertyData
+public class DefensePlayerBuffPropertyData : IPlayerBuffPropertyData
 {
     public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
-        return new DefensePropertyPlayerBuffEntity();
+        return new DefensePlayerBuffPropertyEntity();
     }
 }
 
 [Serializable]
-public class HealPropertyPlayerBuffData : IPlayerBuffPropertyData
+public class HealPlayerBuffPropertyData : IPlayerBuffPropertyData
 {
     public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
-        return new HealPropertyPlayerBuffEntity();
+        return new HealPlayerBuffPropertyEntity();
     }
 }
 
 [Serializable]
-public class EnergyPropertyPlayerBuffData : IPlayerBuffPropertyData
+public class EnergyPlayerBuffPropertyData : IPlayerBuffPropertyData
 {
     public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
-        return new EnergyPropertyPlayerBuffEntity();
+        return new EnergyPlayerBuffPropertyEntity();
     }
 }
 
 [Serializable]
-public class MaxHealthPropertyPlayerBuffData : IPlayerBuffPropertyData
+public class MaxHealthPlayerBuffPropertyData : IPlayerBuffPropertyData
 {
     public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
-        return new MaxHealthPropertyPlayerBuffEntity();
+        return new MaxHealthPlayerBuffPropertyEntity();
     }
 }
 
 [Serializable]
-public class MaxEnergyPropertyPlayerBuffData : IPlayerBuffPropertyData
+public class MaxEnergyPlayerBuffPropertyData : IPlayerBuffPropertyData
 {
     public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
-        return new MaxEnergyPropertyPlayerBuffEntity();
+        return new MaxEnergyPlayerBuffPropertyEntity();
     }
 }

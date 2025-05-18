@@ -5,71 +5,52 @@ public interface ICardPropertyEntity
 {
     CardProperty Property { get; }
     
-    int Eval(IGameplayStatusWatcher gameWatcher);
-    void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing);
-    void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent);
-    void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result);
+    int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource);
 }
 
-public abstract class CardPropertyEntity : ICardPropertyEntity
+public class PreservedPropertyEntity : ICardPropertyEntity
 {
-    public abstract CardProperty Property { get; }
-
-    public virtual int Eval(IGameplayStatusWatcher gameWatcher)
-    {
-        return 0;
-    }
-
-    public virtual void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing) {}
-    public virtual void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent) {}
-    public virtual void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result) {}
-}
-
-public class PreservedPropertyEntity : CardPropertyEntity
-{
-    public override CardProperty Property => CardProperty.Preserved;
+    public CardProperty Property => CardProperty.Preserved;
 
     public PreservedPropertyEntity() { }
+    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource) => 0;
 }
 
-public class InitialPriorityPropertyEntity : CardPropertyEntity
+public class InitialPriorityPropertyEntity : ICardPropertyEntity
 {
-    public override CardProperty Property => CardProperty.InitialPriority;
+    public CardProperty Property => CardProperty.InitialPriority;
 
     public InitialPriorityPropertyEntity() { }
+    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource) => 0;
 }   
 
-public class ConsumablePropertyEntity : CardPropertyEntity
+public class ConsumablePropertyEntity : ICardPropertyEntity
 {
-    public override CardProperty Property => CardProperty.Consumable;
+    public CardProperty Property => CardProperty.Consumable;
 
-    public ConsumablePropertyEntity()
-    {
-    }
+    public ConsumablePropertyEntity() { }
+    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource) => 0;
 }
 
-public class DisposePropertyEntity : CardPropertyEntity
+public class DisposePropertyEntity : ICardPropertyEntity
 {
-    public override CardProperty Property => CardProperty.Dispose;
-    public DisposePropertyEntity()
-    {
-    }
+    public CardProperty Property => CardProperty.Dispose;
+    public DisposePropertyEntity() { }
+    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource) => 0;
 }
 
-public class AutoDisposePropertyEntity : CardPropertyEntity
+public class AutoDisposePropertyEntity : ICardPropertyEntity
 {
-    public override CardProperty Property => CardProperty.AutoDispose;
+    public CardProperty Property => CardProperty.AutoDispose;
 
-    public AutoDisposePropertyEntity()
-    {
-    }
+    public AutoDisposePropertyEntity() { }
+    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource) => 0;
 }
 
-public class SealedPropertyEntity : CardPropertyEntity
+public class SealedPropertyEntity : ICardPropertyEntity
 {
-    public override CardProperty Property => CardProperty.Sealed;
+    public CardProperty Property => CardProperty.Sealed;
 
-    public SealedPropertyEntity()
-    {
-    }
+    public SealedPropertyEntity() { }
+    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource) => 0;
 }

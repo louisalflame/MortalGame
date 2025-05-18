@@ -1,71 +1,60 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Optional;
 using UnityEngine;
 
 public interface ICardBuffEntity
 {
     string CardBuffDataID { get; }
-    Dictionary<TriggerTiming, List<ICardEffect>> Effects { get; }
-    List<ICardPropertyEntity> Properties { get; }
+    Guid Identity { get; }
+    int Level { get; }
+    Option<IPlayerEntity> Caster { get; }
+    IReadOnlyCollection<ICardBuffPropertyEntity> Properties { get; }    
+    ICardBuffLifeTimeEntity LifeTime { get; }
+    IReadOnlyCollection<IReactionSessionEntity> ReactionSessions { get; }
     
     bool IsExpired();
-    void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing);
-    void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent);
-    void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result);
 }
 
 public class CardBuffEntity : ICardBuffEntity
 {
-    public string CardBuffDataID { get; private set; }
+    private readonly string _cardBuffDataId;
+    private readonly Guid _identity;
+    private int _level;
+    private readonly Option<IPlayerEntity> _caster;
+    private readonly IReadOnlyList<ICardBuffPropertyEntity> _properties;
+    private readonly ICardBuffLifeTimeEntity _lifeTime;
+    private readonly IReadOnlyList<IReactionSessionEntity> _reactionSessions;
 
-    public Dictionary<TriggerTiming, List<ICardEffect>> Effects { get; private set; }
+    public string CardBuffDataID => _cardBuffDataId;
+    public Guid Identity => _identity;
+    public int Level => _level;
+    public Option<IPlayerEntity> Caster => _caster;
+    public IReadOnlyCollection<ICardBuffPropertyEntity> Properties => _properties;
+    public ICardBuffLifeTimeEntity LifeTime => _lifeTime;
+    public IReadOnlyCollection<IReactionSessionEntity> ReactionSessions => _reactionSessions;
 
-    public List<ICardPropertyEntity> Properties { get; private set; }
-
-    public ICardBuffLifeTimeEntity LifeTime { get; private set; }
-
-    private CardBuffEntity(
+    public CardBuffEntity(
         string cardBuffDataID,
-        Dictionary<TriggerTiming, List<ICardEffect>> effects,
-        List<ICardPropertyEntity> properties,
-        ICardBuffLifeTimeEntity lifeTime)
+        Guid identity,
+        int level,
+        Option<IPlayerEntity> caster,
+        IEnumerable<ICardBuffPropertyEntity> properties,
+        ICardBuffLifeTimeEntity lifeTime,
+        IEnumerable<IReactionSessionEntity> reactionSessions)
     {
-        CardBuffDataID = cardBuffDataID;
-        Effects = effects;
-        Properties = properties;
-        LifeTime = lifeTime;
-    }
-
-    public static CardBuffEntity CreateEntity(CardBuffData data, IGameplayStatusWatcher watcher, ITriggerSource trigger)
-    {
-        return new CardBuffEntity(
-            data.ID,
-            data.Effects.ToDictionary(
-                pair => pair.Key,
-                pair => pair.Value.ToList()),
-            data.PropertyDatas.Select(p => p.CreateEntity()).ToList(),
-            data.LifeTimeData.CreateEntity(watcher, trigger)
-        );
+        _cardBuffDataId = cardBuffDataID;
+        _identity = identity;
+        _level = level;
+        _caster = caster;
+        _properties = properties.ToList();
+        _lifeTime = lifeTime;
+        _reactionSessions = reactionSessions.ToList();
     }
 
     public bool IsExpired()
     {
         return LifeTime.IsExpired();
     }
-
-    public void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
-    {
-        foreach(var property in Properties)
-        {
-            property.UpdateByTiming(gameWatcher, timing);
-        }
-
-        LifeTime.UpdateByTiming(gameWatcher, timing);
-    }
-
-    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent)
-    { }
-
-    public void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result)
-    { }
 }

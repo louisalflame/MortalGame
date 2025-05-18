@@ -17,6 +17,15 @@ public enum ArithmeticConditionType
     GreaterThanOrEqual,
     LessThanOrEqual,
 }
+public enum SetConditionType
+{
+    None = 0,
+    AnyInside,
+    AllInside,
+    AnyOutside,
+    AllOutside,
+}
+
 public enum Faction
 {
     None = 0,
@@ -64,28 +73,28 @@ public enum PlayerBuffPropertyDuration
 public enum PlayerBuffProperty
 {
     None = 0,
-    AttackIncrease,
-    PenetrateAttackIncrease,
-    AdditionalAttackIncrease,
-    EffectiveAttackIncrease,
-    DefenseIncrease,
-    HealIncrease,
-    EnergyIncrease,
-    MaxHealthIncrease,
-    MaxEnergyIncrease,
+    Attack,
+    PenetrateAttack,
+    AdditionalAttack,
+    EffectiveAttack,
+    Defense,
+    Heal,
+    EnergyGain,
+    MaxHealth,
+    MaxEnergy,
 }
 public enum CharacterBuffProperty
 {
     None = 0,
-    AttackIncrease,
+    Attack,
     PenetrateAttackIncrease,
-    AdditionalAttackIncrease,
-    EffectiveAttackIncrease,
-    DefenseIncrease,
-    HealIncrease,
-    EnergyIncrease,
-    MaxHealthIncrease,
-    MaxEnergyIncrease,
+    AdditionalAttack,
+    EffectiveAttack,
+    Defense,
+    Heal,
+    EnergyGain,
+    MaxHealth,
+    MaxEnergy,
 }
 
 public enum SelectType

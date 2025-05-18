@@ -6,97 +6,75 @@ public interface ICharacterBuffPropertyEntity
     CharacterBuffProperty Property { get; }
     
     int Eval(IGameplayStatusWatcher gameWatcher);
-    void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing);
-    void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent);
-    void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result);
 }
 
-public abstract class CharacterBuffPropertyEntity : ICharacterBuffPropertyEntity
+public class AttackPropertyCharacterBuffEntity : ICharacterBuffPropertyEntity
 {
-    public abstract CharacterBuffProperty Property { get; }
-
-    public virtual int Eval(IGameplayStatusWatcher gameWatcher)
-    {
-        return 0;
-    }
-
-    public virtual void UpdateByTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing) {}
-    public virtual void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent) {}
-    public virtual void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result) {}
-}
-
-public class AttackPropertyCharacterBuffEntity : CharacterBuffPropertyEntity
-{
-    public override CharacterBuffProperty Property => CharacterBuffProperty.AttackIncrease;
+    public CharacterBuffProperty Property => CharacterBuffProperty.Attack;
 
     public AttackPropertyCharacterBuffEntity() { }
+    public int Eval(IGameplayStatusWatcher gameWatcher) => 0;
 }
 
-public class PenetrateAttackPropertyCharacterBuffEntity : CharacterBuffPropertyEntity
+public class PenetrateAttackPropertyCharacterBuffEntity : ICharacterBuffPropertyEntity
 {
-    public override CharacterBuffProperty Property => CharacterBuffProperty.PenetrateAttackIncrease;
+    public CharacterBuffProperty Property => CharacterBuffProperty.PenetrateAttackIncrease;
 
     public PenetrateAttackPropertyCharacterBuffEntity() { }
+    public int Eval(IGameplayStatusWatcher gameWatcher) => 0;
 }   
 
-public class AdditionalAttackPropertyCharacterBuffEntity : CharacterBuffPropertyEntity
+public class AdditionalAttackPropertyCharacterBuffEntity : ICharacterBuffPropertyEntity
 {
-    public override CharacterBuffProperty Property => CharacterBuffProperty.AdditionalAttackIncrease;
+    public CharacterBuffProperty Property => CharacterBuffProperty.AdditionalAttack;
 
-    public AdditionalAttackPropertyCharacterBuffEntity()
-    {
-    }
+    public AdditionalAttackPropertyCharacterBuffEntity() { }
+    public int Eval(IGameplayStatusWatcher gameWatcher) => 0;
 }
 
-public class EffectiveAttackPropertyCharacterBuffEntity : CharacterBuffPropertyEntity
+public class EffectiveAttackPropertyCharacterBuffEntity : ICharacterBuffPropertyEntity
 {
-    public override CharacterBuffProperty Property => CharacterBuffProperty.EffectiveAttackIncrease;
-    public EffectiveAttackPropertyCharacterBuffEntity()
-    {
-    }
+    public CharacterBuffProperty Property => CharacterBuffProperty.EffectiveAttack;
+    public EffectiveAttackPropertyCharacterBuffEntity() { }
+    public int Eval(IGameplayStatusWatcher gameWatcher) => 0;
 }
 
-public class DefensePropertyCharacterBuffEntity : CharacterBuffPropertyEntity
+public class DefensePropertyCharacterBuffEntity : ICharacterBuffPropertyEntity
 {
-    public override CharacterBuffProperty Property => CharacterBuffProperty.DefenseIncrease;
+    public CharacterBuffProperty Property => CharacterBuffProperty.Defense;
 
-    public DefensePropertyCharacterBuffEntity()
-    {
-    }
+    public DefensePropertyCharacterBuffEntity() { }
+    public int Eval(IGameplayStatusWatcher gameWatcher) => 0;
 }
 
-public class HealPropertyCharacterBuffEntity : CharacterBuffPropertyEntity
+public class HealPropertyCharacterBuffEntity : ICharacterBuffPropertyEntity
 {
-    public override CharacterBuffProperty Property => CharacterBuffProperty.HealIncrease;
+    public CharacterBuffProperty Property => CharacterBuffProperty.Heal;
 
-    public HealPropertyCharacterBuffEntity()
-    {
-    }
+    public HealPropertyCharacterBuffEntity() { }
+    public int Eval(IGameplayStatusWatcher gameWatcher) => 0;
 }
 
-public class EnergyPropertyCharacterBuffEntity : CharacterBuffPropertyEntity
+public class EnergyPropertyCharacterBuffEntity : ICharacterBuffPropertyEntity
 {
-    public override CharacterBuffProperty Property => CharacterBuffProperty.EnergyIncrease;
+    public CharacterBuffProperty Property => CharacterBuffProperty.EnergyGain;
 
-    public EnergyPropertyCharacterBuffEntity()
-    {
-    }
+    public EnergyPropertyCharacterBuffEntity() { }
+    public int Eval(IGameplayStatusWatcher gameWatcher) => 0;
 }
 
-public class MaxHealthPropertyCharacterBuffEntity : CharacterBuffPropertyEntity
+public class MaxHealthPropertyCharacterBuffEntity : ICharacterBuffPropertyEntity
 {
-    public override CharacterBuffProperty Property => CharacterBuffProperty.MaxHealthIncrease;
+    public CharacterBuffProperty Property => CharacterBuffProperty.MaxHealth;
 
-    public MaxHealthPropertyCharacterBuffEntity()
-    {
-    }
+    public MaxHealthPropertyCharacterBuffEntity() { }
+    public int Eval(IGameplayStatusWatcher gameWatcher) => 0;
 }
 
-public class MaxEnergyPropertyCharacterBuffEntity : CharacterBuffPropertyEntity
+public class MaxEnergyPropertyCharacterBuffEntity : ICharacterBuffPropertyEntity
 {
-    public override CharacterBuffProperty Property => CharacterBuffProperty.MaxEnergyIncrease;
+    public CharacterBuffProperty Property => CharacterBuffProperty.MaxEnergy;
 
-    public MaxEnergyPropertyCharacterBuffEntity()
-    {
-    }
+    public MaxEnergyPropertyCharacterBuffEntity() { }
+    public int Eval(IGameplayStatusWatcher gameWatcher) => 0;
 }

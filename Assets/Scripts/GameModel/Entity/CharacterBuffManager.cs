@@ -8,21 +8,25 @@ public interface ICharacterBuffManager
 {
     IReadOnlyCollection<ICharacterBuffEntity> Buffs { get; }
     bool AddBuff(
-        CharacterBuffLibrary buffLibrary, 
+        CharacterBuffLibrary buffLibrary,
         IGameplayStatusWatcher gameWatcher,
         ITriggerSource triggerSource,
         IActionSource actionSource,
         IActionTarget actionTarget,
-        string buffId, 
-        int level, 
+        string buffId,
+        int level,
         out ICharacterBuffEntity resultBuff);
     bool RemoveBuff(
-        CharacterBuffLibrary buffLibrary, 
+        CharacterBuffLibrary buffLibrary,
         IGameplayStatusWatcher gameWatcher,
         IActionSource actionSource,
         IActionTarget actionTarget,
-        string buffId, 
+        string buffId,
         out ICharacterBuffEntity resultBuff);
+    
+    void UpdateTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing);
+    void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent);
+    void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result);
 }
 
 public class CharacterBuffManager : ICharacterBuffManager
@@ -37,13 +41,13 @@ public class CharacterBuffManager : ICharacterBuffManager
     }
 
     public bool AddBuff(
-        CharacterBuffLibrary buffLibrary, 
+        CharacterBuffLibrary buffLibrary,
         IGameplayStatusWatcher gameWatcher,
-        ITriggerSource triggerSource, 
+        ITriggerSource triggerSource,
         IActionSource actionSource,
         IActionTarget actionTarget,
-        string buffId, 
-        int level, 
+        string buffId,
+        int level,
         out ICharacterBuffEntity resultBuff)
     {
         foreach (var existBuff in _buffs)
@@ -69,10 +73,9 @@ public class CharacterBuffManager : ICharacterBuffManager
         };
 
         resultBuff = new CharacterBuffEntity(
-            buffId, 
-            Guid.NewGuid(), 
-            level, 
-            owner,
+            buffId,
+            Guid.NewGuid(),
+            level,
             caster,
             buffLibrary.GetBuffProperties(buffId)
                 .Select(p => p.CreateEntity(gameWatcher, triggerSource)),
@@ -83,13 +86,13 @@ public class CharacterBuffManager : ICharacterBuffManager
         _buffs.Add(resultBuff);
         return true;
     }
-    
+
     public bool RemoveBuff(
-        CharacterBuffLibrary buffLibrary, 
-        IGameplayStatusWatcher gameWatcher, 
+        CharacterBuffLibrary buffLibrary,
+        IGameplayStatusWatcher gameWatcher,
         IActionSource actionSource,
         IActionTarget actionTarget,
-        string buffId, 
+        string buffId,
         out ICharacterBuffEntity resultBuff)
     {
         foreach (var existBuff in _buffs)
@@ -103,6 +106,60 @@ public class CharacterBuffManager : ICharacterBuffManager
         }
 
         resultBuff = null;
-        return false;   
+        return false;
+    }
+
+    public void UpdateTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
+    {
+        foreach (var buff in _buffs.ToList())
+        {
+            var triggeredBuff = new CharacterBuffTrigger(buff);
+            foreach (var session in buff.ReactionSessions)
+            {
+                session.UpdateTiming(gameWatcher, triggeredBuff, timing);
+            }
+
+            buff.LifeTime.UpdateTiming(gameWatcher, triggeredBuff, timing);
+            if (buff.IsExpired())
+            {
+                _buffs.Remove(buff);
+            }
+        }
+    }
+
+    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent)
+    {
+        foreach (var buff in _buffs.ToList())
+        {
+            var triggeredBuff = new CharacterBuffTrigger(buff);
+            foreach (var session in buff.ReactionSessions)
+            {
+                session.UpdateIntent(gameWatcher, triggeredBuff, intent);
+            }
+
+            buff.LifeTime.UpdateIntent(gameWatcher, triggeredBuff, intent);
+            if (buff.IsExpired())
+            {
+                _buffs.Remove(buff);
+            }
+        }
+    }
+    
+    public void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result)
+    {
+        foreach (var buff in _buffs.ToList())
+        {
+            var triggeredBuff = new CharacterBuffTrigger(buff);
+            foreach (var session in buff.ReactionSessions)
+            {
+                session.UpdateResult(gameWatcher, triggeredBuff, result);
+            }
+
+            buff.LifeTime.UpdateResult(gameWatcher, triggeredBuff, result);
+            if (buff.IsExpired())
+            {
+                _buffs.Remove(buff);
+            }
+        }
     }
 }

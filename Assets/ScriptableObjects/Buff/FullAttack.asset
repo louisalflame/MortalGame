@@ -154,36 +154,81 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 16|IntegerCondition, Assembly-CSharp
-    - Name: Value
-      Entry: 7
-      Data: 17|PlayerIntegerProperty, Assembly-CSharp
+      Data: 16|PlayerCondition, Assembly-CSharp
     - Name: Player
       Entry: 7
-      Data: 18|CurrentPlayer, Assembly-CSharp
+      Data: 17|CurrentPlayer, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
-    - Name: Property
+    - Name: Conditions
+      Entry: 7
+      Data: 18|System.Collections.Generic.List`1[[IPlayerValueCondition, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 19|PlayerEnergyCondition, Assembly-CSharp
+    - Name: Conditions
+      Entry: 7
+      Data: 20|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[IPlayerEnergyCondition,
+        Assembly-CSharp]], Unity.Plastic.Antlr3.Runtime
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 21|EnergyIntegerCondition, Assembly-CSharp
+    - Name: ValueType
       Entry: 3
       Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: Condition
+    - Name: Conditions
       Entry: 7
-      Data: 19|IntegerCompare, Assembly-CSharp
+      Data: 22|System.Collections.Generic.List`1[[IIntegerValueCondition, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 23|IntegerCompare, Assembly-CSharp
     - Name: Arithmetic
       Entry: 3
       Data: 1
     - Name: CompareValue
       Entry: 7
-      Data: 20|ConstInteger, Assembly-CSharp
+      Data: 24|ConstInteger, Assembly-CSharp
     - Name: Value
       Entry: 3
       Data: 0
     - Name: 
       Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
       Data: 
     - Name: 
       Entry: 8
@@ -199,10 +244,10 @@ MonoBehaviour:
       Data: 
     - Name: NewValue
       Entry: 7
-      Data: 21|PlayerBuffIntegerProperty, Assembly-CSharp
+      Data: 25|PlayerBuffIntegerProperty, Assembly-CSharp
     - Name: PlayerBuff
       Entry: 7
-      Data: 22|TriggeredPlayerBuff, Assembly-CSharp
+      Data: 26|TriggeredPlayerBuff, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -235,7 +280,7 @@ MonoBehaviour:
       Data: 
     - Name: ResultRules
       Entry: 7
-      Data: 23|IntegerUpdateResultRules, Assembly-CSharp
+      Data: 27|IntegerUpdateResultRules, Assembly-CSharp
     - Name: comparer
       Entry: 9
       Data: 9
@@ -271,8 +316,21 @@ MonoBehaviour:
       Data: 
     - Name: BuffEffects
       Entry: 7
-      Data: 24|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[PlayerBuffData+BuffEffect,
-        Assembly-CSharp]], Unity.Plastic.Antlr3.Runtime
+      Data: 28|System.Collections.Generic.Dictionary`2[[TriggerTiming, Assembly-CSharp],[ConditionalPlayerBuffEffect[],
+        Assembly-CSharp]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 29|System.Collections.Generic.EnumEqualityComparer`1[[TriggerTiming,
+        Assembly-CSharp]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 12
       Data: 0
@@ -284,20 +342,20 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 25|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
+      Data: 30|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 26|AttackPropertyPlayerBuffData, Assembly-CSharp
+      Data: 31|AttackPlayerBuffPropertyData, Assembly-CSharp
     - Name: Value
       Entry: 7
-      Data: 27|PlayerBuffSessionInteger, Assembly-CSharp
+      Data: 32|PlayerBuffSessionInteger, Assembly-CSharp
     - Name: PlayerBuff
       Entry: 7
-      Data: 28|TriggeredPlayerBuff, Assembly-CSharp
+      Data: 33|TriggeredPlayerBuff, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -318,7 +376,7 @@ MonoBehaviour:
       Data: 
     - Name: LifeTimeData
       Entry: 7
-      Data: 29|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
+      Data: 34|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 

@@ -6,5 +6,5 @@ public class AllPlayerScriptable : SerializedScriptableObject
 {
     public AllyScriptable AllyObject;
 
-    public EnemyScriptable[] EnemyObjects;
+    public EnemyScriptable[] EnemyObjects = new EnemyScriptable[0];
 }

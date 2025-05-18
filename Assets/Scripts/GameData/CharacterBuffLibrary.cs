@@ -14,26 +14,24 @@ public class CharacterBuffLibrary
         _buffs = new Dictionary<string, CharacterBuffData>(buffs);
     }
 
-    public Option<ConditionalCharacterBuffEffect[]> GetBuffEffects(string buffId, TriggerTiming gameTiming)
+    public Option<ConditionalCharacterBuffEffect[]> GetBuffEffects(string buffId, TriggerTiming triggerTiming)
     {
         if (!_buffs.ContainsKey(buffId))
         {
-            Debug.LogError($"Buff ID {buffId} not found in library.");
+            Debug.LogError($"CharacterBuff ID[{buffId}] not found in library.");
             return Option.None<ConditionalCharacterBuffEffect[]>();
         }
 
-        return LinqEnumerableExtensions.FirstOrNone(
-                _buffs[buffId].BuffEffects
-                    .Where(pair => pair.Timing == gameTiming)
-                    .Select(pair => pair.ConditionEffects)
-            );
+        return _buffs[buffId].BuffEffects.TryGetValue(triggerTiming, out var effects)
+            ? effects.SomeNotNull()
+            : Option.None<ConditionalCharacterBuffEffect[]>();
     }
 
     public IReactionSessionData[] GetBuffSessions(string buffId)
     {
         if (!_buffs.ContainsKey(buffId))
         {
-            Debug.LogError($"Buff ID {buffId} not found in library.");
+            Debug.LogError($"CharacterBuff ID[{buffId}] not found in library.");
             return null;
         }
 
@@ -44,7 +42,7 @@ public class CharacterBuffLibrary
     {
         if (!_buffs.ContainsKey(buffId))
         {
-            Debug.LogError($"Buff ID {buffId} not found in library.");
+            Debug.LogError($"CharacterBuff ID[{buffId}] not found in library.");
             return null;
         }
 
@@ -55,7 +53,7 @@ public class CharacterBuffLibrary
     {
         if (!_buffs.ContainsKey(buffId))
         {
-            Debug.LogError($"Buff ID {buffId} not found in library.");
+            Debug.LogError($"CharacterBuff ID[{buffId}] not found in library.");
             return Array.Empty<ICharacterBuffPropertyData>();
         }
 

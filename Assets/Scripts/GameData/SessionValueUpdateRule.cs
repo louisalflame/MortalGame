@@ -7,7 +7,11 @@ using Sirenix.OdinInspector;
 public class ConditionUpdateRule<T>
 {
     [ShowInInspector]
+    
+    [PropertyOrder(1)]
     public ICondition[] Conditions = new ICondition[0];
+    
+    [PropertyOrder(3)]
     public T NewValue;
 }
 
@@ -20,7 +24,8 @@ public class ConditionBooleanUpdateRule : ConditionUpdateRule<IBooleanValue>
         AndOrigin,
         OrOrigin,
     }
-
+    
+    [PropertyOrder(2)]
     public UpdateType Operation = UpdateType.Overwrite;
  }
  [Serializable]
@@ -32,6 +37,7 @@ public class ConditionIntegerUpdateRule : ConditionUpdateRule<IIntegerValue>
         AddOrigin,
     }
 
+    [PropertyOrder(2)]
     public UpdateType Operation = UpdateType.Overwrite;
 }
 

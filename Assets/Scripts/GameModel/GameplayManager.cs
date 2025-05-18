@@ -335,11 +335,11 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                     _UpdateTiming(UpdateTiming.PlayCardStart);
 
                     var source = new CardPlaySource(usedCard, playCardIndex);
-                    var trigger = new CardPlayTrigger(usedCard);
                     _UpdateAction(new PlayCardIntentAction(source, new SystemTarget(), usedCard));
 
                     _TriggerTiming(TriggerTiming.PlayCardStart);
 
+                    var trigger = new CardPlayTrigger(usedCard, loseEnergyResult, playCardIndex);
                     foreach(var effect in usedCard.Effects)
                     {
                         var applyCardEvents = _ApplyCardEffect(source, trigger, effect);
@@ -432,7 +432,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
         {
             case CardPlaySource cardSource:
                 var playerBuffAttackIncrease = _gameStatus.CurrentPlayer
-                    .Map(player => player.GetPlayerBuffProperty(this, PlayerBuffProperty.AttackIncrease))
+                    .Map(player => player.GetPlayerBuffProperty(this, PlayerBuffProperty.Attack))
                     .ValueOr(0);
 
                 return rawDamagePoint + playerBuffAttackIncrease;
@@ -688,12 +688,13 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 target.MatchSome(targetPlayer => {
                     foreach(var cardData in createCardEffect.CardDatas)
                     {
-                        var addCardBuffs = createCardEffect.AddCardBuffDatas
-                            .Select(addData => {
-                                var cardBuffData = _contextMgr.CardBuffLibrary.GetCardBuffData(addData.CardBuffId);
-                                return CardBuffEntity.CreateEntity(cardBuffData, this, triggerSource);
-                            });
-                        var cardEntity = CardEntity.CreateFromData(cardData.Data, addCardBuffs);
+                        var cardEntity = CardEntity.RuntimeCreateFromData(
+                            cardData.Data,
+                            _contextMgr.CardBuffLibrary,
+                            this,
+                            triggerSource,
+                            actionSource,
+                            createCardEffect.AddCardBuffDatas);
                         targetPlayer.CardManager.AddNewCard(cardEntity, createCardEffect.CreateDestination);
 
                         var destination = targetPlayer.CardManager.GetCardCollectionZone( createCardEffect.CreateDestination);
@@ -709,12 +710,17 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                     var cards = cloneCardEffect.ClonedCards.Eval(this, triggerSource);
                     foreach(var card in cards)
                     {
-                        var addCardBuffs = cloneCardEffect.AddCardBuffDatas
-                            .Select(addData => {
-                                var cardBuffData = _contextMgr.CardBuffLibrary.GetCardBuffData(addData.CardBuffId);
-                                return CardBuffEntity.CreateEntity(cardBuffData, this, triggerSource);
-                            });
-                        var cloneCard = card.Clone(addCardBuffs);     
+                        var cloneCard = card.Clone();
+                        foreach(var addCardBuff in cloneCardEffect.AddCardBuffDatas)
+                        {
+                            cloneCard.AddCardBuff(
+                                _contextMgr.CardBuffLibrary,
+                                this,
+                                triggerSource,
+                                actionSource,
+                                addCardBuff.CardBuffId,
+                                addCardBuff.Level.Eval(this, triggerSource));
+                        }
                         targetPlayer.CardManager.AddNewCard(cloneCard, cloneCardEffect.CloneDestination);                            
                         var destinationZone = targetPlayer.CardManager.GetCardCollectionZone(cloneCardEffect.CloneDestination);
                         cardEffectEvents.Add(new CloneCardEvent(cloneCard, this, destinationZone));
@@ -728,16 +734,16 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 for(var i = 0; i < cards.Count; i++)
                 {   
                     var card = cards[i];
-                    var addCardBuffs = appendCardBuffEffect.AddCardBuffDatas
-                        .Select(addData => {
-                            var cardBuffData = _contextMgr.CardBuffLibrary.GetCardBuffData(addData.CardBuffId);
-                            return CardBuffEntity.CreateEntity(cardBuffData, this, triggerSource);
-                        });
-                    
-                    foreach(var addCardBuff in addCardBuffs)
+                    foreach(var addCardBuff in appendCardBuffEffect.AddCardBuffDatas)
                     {
-                        card.AddNewStatus(addCardBuff);
-                    }                            
+                        card.AddCardBuff(
+                            _contextMgr.CardBuffLibrary,
+                            this,
+                            triggerSource,
+                            actionSource,
+                            addCardBuff.CardBuffId,
+                            addCardBuff.Level.Eval(this, triggerSource));
+                    }                       
 
                     cardEffectEvents.Add(new AppendCardBuffEvent(card, this));
                 }
@@ -750,71 +756,20 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
 
     private void _UpdateTiming(UpdateTiming updateTiming)
     {
-        _gameStatus.Ally.BuffManager.UpdateTiming(this, updateTiming);
-
-        foreach(var character in _gameStatus.Ally.Characters)
-        {
-        }
-
-        foreach(var card in _gameStatus.Ally.CardManager.HandCard.Cards)
-        { 
-        }
-
-        _gameStatus.Enemy.BuffManager.UpdateTiming(this, updateTiming);
-
-        foreach(var character in _gameStatus.Enemy.Characters)
-        { 
-        }
-
-        foreach(var card in _gameStatus.Enemy.CardManager.HandCard.Cards)
-        { 
-        }
+        _gameStatus.Ally.UpdateTiming(this, updateTiming);
+        _gameStatus.Enemy.UpdateTiming(this, updateTiming);
     }
 
     private void _UpdateAction(IIntentAction intentAction)
     {
-        _gameStatus.Ally.BuffManager.UpdateIntent(this, intentAction);
-
-        foreach(var character in _gameStatus.Ally.Characters)
-        {
-        }
-
-        foreach(var card in _gameStatus.Ally.CardManager.HandCard.Cards)
-        { 
-        }
-
-        _gameStatus.Enemy.BuffManager.UpdateIntent(this, intentAction);
-
-        foreach(var character in _gameStatus.Enemy.Characters)
-        { 
-        }
-
-        foreach(var card in _gameStatus.Enemy.CardManager.HandCard.Cards)
-        { 
-        }
+        _gameStatus.Ally.UpdateIntent(this, intentAction);
+        _gameStatus.Enemy.UpdateIntent(this, intentAction);
     }
 
     private void _UpdateAction(IResultAction resulAction)
     {
-        _gameStatus.Ally.BuffManager.UpdateResult(this, resulAction);
-
-        foreach(var character in _gameStatus.Ally.Characters)
-        {
-        }
-
-        foreach(var card in _gameStatus.Ally.CardManager.HandCard.Cards)
-        { 
-        }
-
-        _gameStatus.Enemy.BuffManager.UpdateResult(this, resulAction);
-
-        foreach(var character in _gameStatus.Enemy.Characters)
-        { 
-        }
-
-        foreach(var card in _gameStatus.Enemy.CardManager.HandCard.Cards)
-        { 
-        }
+        _gameStatus.Ally.UpdateResult(this, resulAction);
+        _gameStatus.Enemy.UpdateResult(this, resulAction);
     }
 
     // TODO: collect reactionEffects created from reactionSessions
@@ -824,7 +779,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
         foreach(var buff in _gameStatus.Ally.BuffManager.Buffs)
         {
             var buffTrigger = new PlayerBuffTrigger(buff);
-            var conditionalEffectsOpt = _contextMgr.BuffLibrary.GetBuffEffects(buff.Id, timing);
+            var conditionalEffectsOpt = _contextMgr.BuffLibrary.GetBuffEffects(buff.PlayerBuffDataId, timing);
             conditionalEffectsOpt.MatchSome(conditionalEffects => 
             {
                 foreach(var conditionalEffect in conditionalEffects)
@@ -850,7 +805,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
         foreach(var buff in _gameStatus.Enemy.BuffManager.Buffs)
         {
             var buffTrigger = new PlayerBuffTrigger(buff);
-            var conditionalEffectsOpt = _contextMgr.BuffLibrary.GetBuffEffects(buff.Id, timing);
+            var conditionalEffectsOpt = _contextMgr.BuffLibrary.GetBuffEffects(buff.PlayerBuffDataId, timing);
 
             conditionalEffectsOpt.MatchSome(conditionalEffects => 
             {

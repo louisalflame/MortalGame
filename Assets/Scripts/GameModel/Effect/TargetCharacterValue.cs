@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Optional;
+using Sirenix.OdinInspector;
 using UniRx;
 using UnityEngine;
 
@@ -24,6 +25,7 @@ public class NoneCharacter : ITargetCharacterValue
 [Serializable]
 public class MainCharacterOfPlayer : ITargetCharacterValue
 {
+    [HorizontalGroup("1")]
     public ITargetPlayerValue Player;
 
     public Option<ICharacterEntity> Eval(
@@ -64,6 +66,7 @@ public class NoneCharacters : ITargetCharacterCollectionValue
 [Serializable]
 public class SingleCharacterCollection : ITargetCharacterCollectionValue
 {
+    [HorizontalGroup("1")]
     public ITargetCharacterValue Target;
 
     public IReadOnlyCollection<ICharacterEntity> Eval(

@@ -21,6 +21,10 @@ public interface IPlayerCardManager
     bool TryConsumeCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
     bool TryDisposeCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
     void AddNewCard(ICardEntity card, CardCollectionType cloneDestination);
+    
+    void UpdateTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing);
+    void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent);
+    void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result);
 }
 
 public class PlayerCardManager : IPlayerCardManager
@@ -44,7 +48,7 @@ public class PlayerCardManager : IPlayerCardManager
 
     public ICardColletionZone GetCardCollectionZone(CardCollectionType type)
     {
-        switch(type)
+        switch (type)
         {
             case CardCollectionType.Deck:
                 return Deck;
@@ -71,7 +75,8 @@ public class PlayerCardManager : IPlayerCardManager
 
         var recycleCards = nonePreservedCards.Except(excludeCards);
         Graveyard.AddCards(recycleCards);
-        events.Add(new RecycleHandCardEvent(){
+        events.Add(new RecycleHandCardEvent()
+        {
             Faction = this.Owner(gameWatcher).ValueOr(PlayerEntity.DummyPlayer).Faction,
             RecycledCardInfos = recycleCards.Select(c => new CardInfo(c, gameWatcher)).ToArray(),
             ExcludedCardInfos = excludeCards.Select(c => new CardInfo(c, gameWatcher)).ToArray(),
@@ -90,35 +95,35 @@ public class PlayerCardManager : IPlayerCardManager
         {
             return Option.Some(card);
         }
-        else if(Deck.TryGetCard(cardIdentity, out card))
+        else if (Deck.TryGetCard(cardIdentity, out card))
         {
             return Option.Some(card);
         }
-        else if(Graveyard.TryGetCard(cardIdentity, out card))
+        else if (Graveyard.TryGetCard(cardIdentity, out card))
         {
             return Option.Some(card);
         }
-        else if(ExclusionZone.TryGetCard(cardIdentity, out card))
+        else if (ExclusionZone.TryGetCard(cardIdentity, out card))
         {
             return Option.Some(card);
         }
-        else if(DisposeZone.TryGetCard(cardIdentity, out card))
+        else if (DisposeZone.TryGetCard(cardIdentity, out card))
         {
             return Option.Some(card);
         }
         else
         {
             return Option.None<ICardEntity>();
-        }        
+        }
     }
 
     public bool TryDiscardCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination)
     {
         CardCollectionType GetDiscardDestinationZone(ICardEntity card)
         {
-            if(card.IsConsumable())
+            if (card.IsConsumable())
                 return CardCollectionType.ExclusionZone;
-            else if(card.IsDisposable())
+            else if (card.IsDisposable())
                 return CardCollectionType.DisposeZone;
             else
                 return CardCollectionType.Graveyard;
@@ -154,7 +159,7 @@ public class PlayerCardManager : IPlayerCardManager
     {
         CardCollectionType GetConsumeDestinationZone(ICardEntity card)
         {
-            if(card.IsDisposable())
+            if (card.IsDisposable())
                 return CardCollectionType.DisposeZone;
             else
                 return CardCollectionType.ExclusionZone;
@@ -240,10 +245,10 @@ public class PlayerCardManager : IPlayerCardManager
         start = CardColletionZone.Dummy;
         return false;
     }
-    
+
     public void AddNewCard(ICardEntity newCard, CardCollectionType cloneDestination)
     {
-        switch(cloneDestination)
+        switch (cloneDestination)
         {
             case CardCollectionType.Deck:
                 Deck.EnqueueCardsThenShuffle(new[] { newCard });
@@ -262,6 +267,76 @@ public class PlayerCardManager : IPlayerCardManager
                 break;
             default:
                 break;
+        }
+    }
+
+    public void UpdateTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
+    {
+        var cards = HandCard.Cards
+            .Concat(Deck.Cards)
+            .Concat(Graveyard.Cards)
+            .Concat(ExclusionZone.Cards)
+            .Concat(DisposeZone.Cards);
+        foreach (var card in cards)
+        {
+            foreach (var cardBuff in card.BuffList.ToList())
+            {
+                var triggerBuff = new CardBuffTrigger(cardBuff);
+                foreach (var session in cardBuff.ReactionSessions)
+                {
+                    session.UpdateTiming(gameWatcher, triggerBuff, timing);
+                }
+
+                cardBuff.LifeTime.UpdateByTiming(gameWatcher, triggerBuff, timing);
+                if (cardBuff.IsExpired())
+                {
+                    card.RemoveCardBuff(cardBuff);
+                }
+            }
+        }
+    }
+
+    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent)
+    {
+        var cards = HandCard.Cards
+            .Concat(Deck.Cards)
+            .Concat(Graveyard.Cards)
+            .Concat(ExclusionZone.Cards)
+            .Concat(DisposeZone.Cards);
+        foreach (var card in cards)
+        {
+            foreach (var cardBuff in card.BuffList.ToList())
+            {
+                var triggerBuff = new CardBuffTrigger(cardBuff);
+                foreach (var session in cardBuff.ReactionSessions)
+                {
+                    session.UpdateIntent(gameWatcher, triggerBuff, intent);
+                }
+
+                cardBuff.LifeTime.UpdateIntent(gameWatcher, triggerBuff, intent);
+            }
+        }
+    }
+
+    public void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result)
+    {
+        var cards = HandCard.Cards
+            .Concat(Deck.Cards)
+            .Concat(Graveyard.Cards)
+            .Concat(ExclusionZone.Cards)
+            .Concat(DisposeZone.Cards);
+        foreach (var card in cards)
+        {
+            foreach (var cardBuff in card.BuffList.ToList())
+            {
+                var triggerBuff = new CardBuffTrigger(cardBuff);
+                foreach (var session in cardBuff.ReactionSessions)
+                {
+                    session.UpdateResult(gameWatcher, triggerBuff, result);
+                }
+
+                cardBuff.LifeTime.UpdateResult(gameWatcher, triggerBuff, result);
+            }
         }
     }
 }

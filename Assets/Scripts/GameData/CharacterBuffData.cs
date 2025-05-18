@@ -6,28 +6,6 @@ using UnityEngine;
 
 public class CharacterBuffData
 {
-    [Serializable]
-    public class BuffEffect
-    {
-        [TableColumnWidth(150, false)]
-        [ValueDropdown("_GetAllowedValues")]
-        public TriggerTiming Timing;
-
-        [ShowInInspector]
-        public ConditionalCharacterBuffEffect[] ConditionEffects = new ConditionalCharacterBuffEffect[0];
-
-        private static IEnumerable _GetAllowedValues()
-        {
-            return new[] { 
-                TriggerTiming.None,
-                TriggerTiming.TurnStart,
-                TriggerTiming.TurnEnd,
-                TriggerTiming.ExecuteStart,
-                TriggerTiming.ExecuteEnd,
-            };
-        }
-    }
-    
     [TitleGroup("BasicData")]
     public string ID;
 
@@ -40,9 +18,8 @@ public class CharacterBuffData
     
     [Space(20)]
     [ShowInInspector]
-    [TableList]
     [BoxGroup("Effects")]
-    public List<BuffEffect> BuffEffects = new();  
+    public Dictionary<TriggerTiming, ConditionalCharacterBuffEffect[]> BuffEffects = new();  
 
     [ShowInInspector]
     [BoxGroup("Properties")]
@@ -50,21 +27,4 @@ public class CharacterBuffData
 
     [BoxGroup("LifeTime")]
     public ICharacterBuffLifeTimeData LifeTimeData;
-
-    public void OnValidate()
-    {
-        if (BuffEffects == null) return;
-        
-        var keys = new HashSet<TriggerTiming>();
-        BuffEffects.RemoveAll(pair => 
-        {
-            if (keys.Contains(pair.Timing))
-            {
-                return true;
-            }
-
-            keys.Add(pair.Timing);
-            return false;
-        });
-    }
 }

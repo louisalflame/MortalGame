@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Optional;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 public interface ITargetCardValue
@@ -35,7 +36,7 @@ public class SelectedCard : ITargetCardValue
 public class PlayingCard : ITargetCardValue
 {
     public Option<ICardEntity> Eval(
-        IGameplayStatusWatcher gameWatcher, 
+        IGameplayStatusWatcher gameWatcher,
         ITriggerSource trigger)
     {
         return trigger switch
@@ -45,17 +46,38 @@ public class PlayingCard : ITargetCardValue
         };
     }
 }
+[Serializable]
+public class IndexOfCardCollection : ITargetCardValue
+{
+    [HorizontalGroup("1")]
+    public ITargetCardCollectionValue CardCollection;
+
+    [HorizontalGroup("2")]
+    public IIntegerValue Index;
+
+    public Option<ICardEntity> Eval(
+        IGameplayStatusWatcher gameWatcher,
+        ITriggerSource trigger)
+    {
+        var cards = CardCollection.Eval(gameWatcher, trigger);
+        var index = Index.Eval(gameWatcher, trigger);
+        return cards.Count > index && index >= 0 ?
+            cards.ElementAt(index).SomeNotNull() :
+            Option.None<ICardEntity>();
+    }
+}   
 
 public interface ITargetCardCollectionValue
 {
     IReadOnlyCollection<ICardEntity> Eval(
-        IGameplayStatusWatcher gameWatcher, 
+        IGameplayStatusWatcher gameWatcher,
         ITriggerSource trigger);
 }
 
 [Serializable]
 public class SingleCardCollection : ITargetCardCollectionValue
 {
+    [HorizontalGroup("1")]
     public ITargetCardValue TargetCard;
 
     public IReadOnlyCollection<ICardEntity> Eval(
@@ -68,6 +90,7 @@ public class SingleCardCollection : ITargetCardCollectionValue
 [Serializable]
 public class AllyHandCards : ITargetCardCollectionValue
 {
+    [HorizontalGroup("1")]
     public ITargetPlayerValue Player;
 
     public IReadOnlyCollection<ICardEntity> Eval(

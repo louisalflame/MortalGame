@@ -7,9 +7,11 @@ using UnityEngine;
 public class ConditionalCharacterBuffEffect
 {
     [ShowInInspector]
+    [HorizontalGroup("1")]
     public ICharacterBuffCondition[] Conditions = new ICharacterBuffCondition[0];
 
     [Space(20)]
+    [HorizontalGroup("2")]
     public ICharacterBuffEffect Effect;
 }
 

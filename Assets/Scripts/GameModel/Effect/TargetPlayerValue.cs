@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Optional;
+using Sirenix.OdinInspector;
 using UniRx;
 using UnityEngine;
 
@@ -35,6 +36,7 @@ public class CurrentPlayer : ITargetPlayerValue
 [Serializable]
 public class OppositePlayer : ITargetPlayerValue
 {    
+    [HorizontalGroup("1")]
     public ITargetPlayerValue Reference;
 
     public Option<IPlayerEntity> Eval(
@@ -52,6 +54,7 @@ public class OppositePlayer : ITargetPlayerValue
 [Serializable]
 public class CardOwner : ITargetPlayerValue
 {
+    [HorizontalGroup("1")]
     public ITargetCardValue Card;
 
     public Option<IPlayerEntity> Eval(
@@ -71,7 +74,9 @@ public class PlayerBuffContentPlayer : ITargetPlayerValue
         Caster,
     }
 
+    [HorizontalGroup("1")]
     public ITargetPlayerBuffValue PlayerBuff;
+    
     public PlayerType Type;
 
     public Option<IPlayerEntity> Eval(
@@ -90,6 +95,7 @@ public class PlayerBuffContentPlayer : ITargetPlayerValue
 [SerializeField]
 public class CharacterOwner : ITargetPlayerValue
 {
+    [HorizontalGroup("1")]
     public ITargetCharacterValue Character;
 
     public Option<IPlayerEntity> Eval(
@@ -120,6 +126,7 @@ public class NonePlayers : ITargetPlayerCollectionValue
 [Serializable]
 public class SinglePlayerCollection : ITargetPlayerCollectionValue
 {
+    [HorizontalGroup("1")]
     public ITargetPlayerValue Target;
 
     public IReadOnlyCollection<IPlayerEntity> Eval(

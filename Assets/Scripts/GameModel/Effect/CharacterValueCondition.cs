@@ -3,5 +3,5 @@ using UnityEngine;
 
 public interface ICharacterValueCondition
 {
-    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, Option<ICharacterEntity> character);
+    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, ICharacterEntity character);
 }

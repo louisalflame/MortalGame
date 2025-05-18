@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 83eaede4f22464d4bada69fdfa8c7b6f, type: 3}
-  m_Name: SealedOneTurn
+  m_Name: QuickPower
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -26,7 +26,7 @@ MonoBehaviour:
       Data: 0|CardBuffData, Assembly-CSharp
     - Name: ID
       Entry: 1
-      Data: SealedOneTurn
+      Data: QuickPower
     - Name: Sessions
       Entry: 7
       Data: 1|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[IReactionSessionData,
@@ -75,7 +75,22 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 7
-      Data: 5|SealedCardBuffPropertyData, Assembly-CSharp
+      Data: 5|PowerCardBuffPropertyData, Assembly-CSharp
+    - Name: Value
+      Entry: 7
+      Data: 6|CardBuffIntegerProperty, Assembly-CSharp
+    - Name: CardBuff
+      Entry: 7
+      Data: 7|TriggeredCardBuff, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Property
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -87,16 +102,7 @@ MonoBehaviour:
       Data: 
     - Name: LifeTimeData
       Entry: 7
-      Data: 6|TurnLifeTimeCardBuffData, Assembly-CSharp
-    - Name: Turn
-      Entry: 7
-      Data: 7|ConstInteger, Assembly-CSharp
-    - Name: Value
-      Entry: 3
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
+      Data: 8|HandCardLifeTimeCardBuffData, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 

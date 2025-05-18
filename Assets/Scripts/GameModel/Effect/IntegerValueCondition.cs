@@ -1,5 +1,6 @@
 using System;
 using Optional;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 public interface IIntegerValueCondition
@@ -11,6 +12,8 @@ public interface IIntegerValueCondition
 public class IntegerCompare : IIntegerValueCondition
 {
     public ArithmeticConditionType Arithmetic;
+
+    [HorizontalGroup("1")]
     public IIntegerValue CompareValue;
 
     public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, int value)

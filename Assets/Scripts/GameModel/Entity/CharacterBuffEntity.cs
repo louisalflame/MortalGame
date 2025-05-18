@@ -10,31 +10,29 @@ public interface ICharacterBuffEntity
     string Id { get; }
     Guid Identity { get; }
     int Level { get; }
-    Option<ICharacterEntity> Owner { get; }
     Option<IPlayerEntity> Caster { get; }
     IReadOnlyCollection<ICharacterBuffPropertyEntity> Properties { get; }
     ICharacterBuffLifeTimeEntity LifeTime { get; }
     IReadOnlyCollection<IReactionSessionEntity> ReactionSessions { get; }
 
+    bool IsExpired();
     void AddLevel(int level);
     PlayerBuffInfo ToInfo();
 }
 
 public class CharacterBuffEntity : ICharacterBuffEntity
 {
-    private string _id;
-    private Guid _identity;
+    private readonly string _id;
+    private readonly Guid _identity;
     private int _level;
-    private Option<ICharacterEntity> _owner;
-    private Option<IPlayerEntity> _caster;
-    private List<ICharacterBuffPropertyEntity> _properties;
-    private ICharacterBuffLifeTimeEntity _lifeTime;
-    private List<IReactionSessionEntity> _reactionSessions;
+    private readonly Option<IPlayerEntity> _caster;
+    private readonly IReadOnlyList<ICharacterBuffPropertyEntity> _properties;
+    private readonly ICharacterBuffLifeTimeEntity _lifeTime;
+    private readonly IReadOnlyList<IReactionSessionEntity> _reactionSessions;
 
     public string Id => _id;
     public Guid Identity => _identity;
     public int Level => _level;
-    public Option<ICharacterEntity> Owner => _owner;
     public Option<IPlayerEntity> Caster => _caster;
     public IReadOnlyCollection<ICharacterBuffPropertyEntity> Properties => _properties;
     public ICharacterBuffLifeTimeEntity LifeTime => _lifeTime;
@@ -47,7 +45,6 @@ public class CharacterBuffEntity : ICharacterBuffEntity
         string id,
         Guid identity,
         int level,
-        Option<ICharacterEntity> owner,
         Option<IPlayerEntity> caster,
         IEnumerable<ICharacterBuffPropertyEntity> properties,
         ICharacterBuffLifeTimeEntity lifeTime,
@@ -56,11 +53,15 @@ public class CharacterBuffEntity : ICharacterBuffEntity
         _id = id;
         _identity = identity;
         _level = level;
-        _owner = owner;
         _caster = caster;
         _properties = properties.ToList();
         _lifeTime = lifeTime;
         _reactionSessions = reactionSessions.ToList();
+    }
+
+    public bool IsExpired()
+    {
+        return _lifeTime.IsExpired();
     }
 
     public void AddLevel(int level)
@@ -84,7 +85,6 @@ public class DummyCharacterBuff : CharacterBuffEntity
         string.Empty,
         Guid.Empty,
         1,
-        Option.None<ICharacterEntity>(),
         Option.None<IPlayerEntity>(),
         Enumerable.Empty<ICharacterBuffPropertyEntity>(),
         new AlwaysLifeTimeCharacterBuffEntity(),

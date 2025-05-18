@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Optional;
@@ -17,23 +18,21 @@ public class PlayerBuffLibrary
     {
         if (!_buffs.ContainsKey(buffId))
         {
-            Debug.LogError($"Buff ID {buffId} not found in library.");
+            Debug.LogError($"PlayerBuff ID[{buffId}] not found in library.");
             return Option.None<ConditionalPlayerBuffEffect[]>();
         }
 
-        return LinqEnumerableExtensions.FirstOrNone(
-                _buffs[buffId].BuffEffects
-                    .Where(pair => pair.Timing == triggerTiming)
-                    .Select(pair => pair.ConditionEffects)
-            );
+        return _buffs[buffId].BuffEffects.TryGetValue(triggerTiming, out var effects)
+            ? effects.SomeNotNull()
+            : Option.None<ConditionalPlayerBuffEffect[]>();
     }
 
     public IReactionSessionData[] GetBuffSessions(string buffId)
     {
         if (!_buffs.ContainsKey(buffId))
         {
-            Debug.LogError($"Buff ID {buffId} not found in library.");
-            return null;
+            Debug.LogError($"PlayerBuff ID[{buffId}] not found in library.");
+            return Array.Empty<IReactionSessionData>();
         }
 
         return _buffs[buffId].Sessions.ToArray();
@@ -43,7 +42,7 @@ public class PlayerBuffLibrary
     {
         if (!_buffs.ContainsKey(buffId))
         {
-            Debug.LogError($"Buff ID {buffId} not found in library.");
+            Debug.LogError($"PlayerBuff ID[{buffId}] not found in library.");
             return null;
         }
 
@@ -54,8 +53,8 @@ public class PlayerBuffLibrary
     {
         if (!_buffs.ContainsKey(buffId))
         {
-            Debug.LogError($"Buff ID {buffId} not found in library.");
-            return new IPlayerBuffPropertyData[0];
+            Debug.LogError($"PlayerBuff ID[{buffId}] not found in library.");
+            return Array.Empty<IPlayerBuffPropertyData>();
         }
 
         return _buffs[buffId].PropertyDatas.ToArray();

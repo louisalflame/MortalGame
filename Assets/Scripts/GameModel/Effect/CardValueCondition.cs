@@ -1,34 +1,77 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Optional;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 public interface ICardValueCondition
 {
-    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, Option<ICardEntity> card);
+    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, ICardEntity card);
 }
 
 [Serializable]
 public class CardEqualCondition : ICardValueCondition
 {
+    [HorizontalGroup("1")]
     public ITargetCardValue CompareCard;
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, Option<ICardEntity> cardOpt)
+    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, ICardEntity card)
     {
-        return 
-            cardOpt.Match(
-                card => CompareCard
-                    .Eval(gameWatcher, source)
-                    .Match(
-                        compareCard => card.Identity == compareCard.Identity,
-                        ()          => false),
+        return CompareCard
+            .Eval(gameWatcher, source)
+            .Match(
+                compareCard => card.Identity == compareCard.Identity,
                 () => false);
     }
 }
 [Serializable]
-public class HandCardPositionCondition : ICardValueCondition
+public class CardTypesCondition : ICardValueCondition
 {
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, Option<ICardEntity> cardOpt)
+    [ShowInInspector]
+    [HorizontalGroup("1")]
+    public List<CardType> CardTypes = new();
+
+    public SetConditionType Condition;
+
+    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, ICardEntity card)
     {
-        return false;
+        return Condition switch
+        {
+            SetConditionType.AnyInside => CardTypes.Any(type => type == card.Type),
+            SetConditionType.AllInside => CardTypes.All(type => type == card.Type),
+            SetConditionType.AnyOutside => CardTypes.Any(type => type != card.Type),
+            SetConditionType.AllOutside => CardTypes.All(type => type != card.Type),
+            _ => false
+        };
+    }
+}
+
+public interface ICardPlayValueCondition
+{
+    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, CardPlayTrigger cardPlay);
+}
+[Serializable]
+public class CardPlayPositionCondition : ICardPlayValueCondition
+{
+    [ShowInInspector]
+    [HorizontalGroup("1")]
+    public IIntegerValueCondition[] Conditions = new IIntegerValueCondition[0];
+
+    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, CardPlayTrigger cardPlay)
+    {
+        return Conditions.All(c => c.Eval(gameWatcher, source, cardPlay.HandCardPosition));
+    }
+}
+[Serializable]
+public class CardPlayCardCondition : ICardPlayValueCondition
+{
+    [ShowInInspector]
+    [HorizontalGroup("1")]
+    public List<ICardValueCondition> Conditions = new();
+
+    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, CardPlayTrigger cardPlay)
+    {
+        return Conditions.All(c => c.Eval(gameWatcher, source, cardPlay.Card));
     }
 }

@@ -15,6 +15,10 @@ public interface IPlayerEntity
     IEnergyManager EnergyManager { get; }
     IPlayerBuffManager BuffManager { get; }
     ICharacterEntity MainCharacter { get; }
+
+    void UpdateTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing);
+    void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent);
+    void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result);
 }
 
 public abstract class PlayerEntity : IPlayerEntity
@@ -25,7 +29,7 @@ public abstract class PlayerEntity : IPlayerEntity
     protected Option<Guid> _originPlayerInstanceGuid;
     protected IPlayerCardManager _cardManager;
     protected IReadOnlyCollection<CharacterEntity> _characters;
-    
+
     public Faction Faction => _faction;
     public IEnergyManager EnergyManager => _energyManager;
     public IPlayerBuffManager BuffManager => _buffManager;
@@ -51,6 +55,37 @@ public abstract class PlayerEntity : IPlayerEntity
         _faction = faction;
         _energyManager = new EnergyManager(currentEnergy, maxEnergy);
         _buffManager = new PlayerBuffManager();
+    }
+
+    public void UpdateTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
+    {
+        _buffManager.UpdateTiming(gameWatcher, timing);
+        _cardManager.UpdateTiming(gameWatcher, timing);
+
+        foreach (var character in _characters.ToList())
+        {
+            character.BuffManager.UpdateTiming(gameWatcher, timing);
+        }
+    }
+    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent)
+    {
+        _buffManager.UpdateIntent(gameWatcher, intent);
+        _cardManager.UpdateIntent(gameWatcher, intent);
+
+        foreach (var character in _characters.ToList())
+        {
+            character.BuffManager.UpdateIntent(gameWatcher, intent);
+        }
+    }
+    public void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result)
+    {
+        _buffManager.UpdateResult(gameWatcher, result);
+        _cardManager.UpdateResult(gameWatcher, result);
+        
+        foreach (var character in _characters.ToList())
+        {
+            character.BuffManager.UpdateResult(gameWatcher, result);
+        }
     }
 }
 
