@@ -128,8 +128,6 @@ public enum UpdateAction
     GainEnergy,
     LoseEnergy,
     RecycleDeck,
-    Buff,
-    Debuff,
     DrawCard,
     DiscardCard,
     ConsumeCard,

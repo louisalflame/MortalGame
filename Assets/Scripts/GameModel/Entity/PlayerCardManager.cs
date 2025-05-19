@@ -272,71 +272,37 @@ public class PlayerCardManager : IPlayerCardManager
 
     public void UpdateTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
     {
-        var cards = HandCard.Cards
+        foreach (var card in HandCard.Cards
             .Concat(Deck.Cards)
             .Concat(Graveyard.Cards)
             .Concat(ExclusionZone.Cards)
-            .Concat(DisposeZone.Cards);
-        foreach (var card in cards)
+            .Concat(DisposeZone.Cards))
         {
-            foreach (var cardBuff in card.BuffList.ToList())
-            {
-                var triggerBuff = new CardBuffTrigger(cardBuff);
-                foreach (var session in cardBuff.ReactionSessions)
-                {
-                    session.UpdateTiming(gameWatcher, triggerBuff, timing);
-                }
-
-                cardBuff.LifeTime.UpdateByTiming(gameWatcher, triggerBuff, timing);
-                if (cardBuff.IsExpired())
-                {
-                    card.RemoveCardBuff(cardBuff);
-                }
-            }
+            card.BuffManager.UpdateTiming(gameWatcher, timing);
         }
     }
 
     public void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent)
     {
-        var cards = HandCard.Cards
+        foreach (var card in HandCard.Cards
             .Concat(Deck.Cards)
             .Concat(Graveyard.Cards)
             .Concat(ExclusionZone.Cards)
-            .Concat(DisposeZone.Cards);
-        foreach (var card in cards)
+            .Concat(DisposeZone.Cards))
         {
-            foreach (var cardBuff in card.BuffList.ToList())
-            {
-                var triggerBuff = new CardBuffTrigger(cardBuff);
-                foreach (var session in cardBuff.ReactionSessions)
-                {
-                    session.UpdateIntent(gameWatcher, triggerBuff, intent);
-                }
-
-                cardBuff.LifeTime.UpdateIntent(gameWatcher, triggerBuff, intent);
-            }
+            card.BuffManager.UpdateIntent(gameWatcher, intent);
         }
     }
 
     public void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result)
     {
-        var cards = HandCard.Cards
+        foreach (var card in HandCard.Cards
             .Concat(Deck.Cards)
             .Concat(Graveyard.Cards)
             .Concat(ExclusionZone.Cards)
-            .Concat(DisposeZone.Cards);
-        foreach (var card in cards)
+            .Concat(DisposeZone.Cards))
         {
-            foreach (var cardBuff in card.BuffList.ToList())
-            {
-                var triggerBuff = new CardBuffTrigger(cardBuff);
-                foreach (var session in cardBuff.ReactionSessions)
-                {
-                    session.UpdateResult(gameWatcher, triggerBuff, result);
-                }
-
-                cardBuff.LifeTime.UpdateResult(gameWatcher, triggerBuff, result);
-            }
+            card.BuffManager.UpdateResult(gameWatcher, result);
         }
     }
 }

@@ -115,7 +115,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 15
+      Data: 13
     - Name: $v
       Entry: 7
       Data: 10|ConditionIntegerUpdateRule[], Assembly-CSharp
@@ -133,53 +133,32 @@ MonoBehaviour:
       Data: 2
     - Name: 
       Entry: 7
-      Data: 13|IsSelfTurnCondition, Assembly-CSharp
-    - Name: TargetPlayer
-      Entry: 7
-      Data: 14|PlayerBuffContentPlayer, Assembly-CSharp
-    - Name: PlayerBuff
-      Entry: 7
-      Data: 15|TriggeredPlayerBuff, Assembly-CSharp
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: Type
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 16|CardPlayCondition, Assembly-CSharp
+      Data: 13|CardPlayCondition, Assembly-CSharp
     - Name: Conditions
       Entry: 7
-      Data: 17|System.Collections.Generic.List`1[[ICardPlayValueCondition, Assembly-CSharp]],
+      Data: 14|System.Collections.Generic.List`1[[ICardPlayValueCondition, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 18|CardPlayPositionCondition, Assembly-CSharp
+      Data: 15|CardPlayPositionCondition, Assembly-CSharp
     - Name: Conditions
       Entry: 7
-      Data: 19|IIntegerValueCondition[], Assembly-CSharp
+      Data: 16|IIntegerValueCondition[], Assembly-CSharp
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 20|IntegerCompare, Assembly-CSharp
+      Data: 17|IntegerCompare, Assembly-CSharp
     - Name: Arithmetic
       Entry: 3
       Data: 1
     - Name: CompareValue
       Entry: 7
-      Data: 21|ConstInteger, Assembly-CSharp
+      Data: 18|ConstInteger, Assembly-CSharp
     - Name: Value
       Entry: 3
       Data: 0
@@ -200,20 +179,20 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 22|CardPlayCardCondition, Assembly-CSharp
+      Data: 19|CardPlayCardCondition, Assembly-CSharp
     - Name: Conditions
       Entry: 7
-      Data: 23|System.Collections.Generic.List`1[[ICardValueCondition, Assembly-CSharp]],
+      Data: 20|System.Collections.Generic.List`1[[ICardValueCondition, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 24|CardTypesCondition, Assembly-CSharp
+      Data: 21|CardTypesCondition, Assembly-CSharp
     - Name: CardTypes
       Entry: 7
-      Data: 25|System.Collections.Generic.List`1[[CardType, Assembly-CSharp]], mscorlib
+      Data: 22|System.Collections.Generic.List`1[[CardType, Assembly-CSharp]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
@@ -250,6 +229,27 @@ MonoBehaviour:
     - Name: 
       Entry: 13
       Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 23|IsSelfTurnCondition, Assembly-CSharp
+    - Name: TargetPlayer
+      Entry: 7
+      Data: 24|PlayerBuffContentPlayer, Assembly-CSharp
+    - Name: PlayerBuff
+      Entry: 7
+      Data: 25|TriggeredPlayerBuff, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Type
+      Entry: 3
+      Data: 0
     - Name: 
       Entry: 8
       Data: 

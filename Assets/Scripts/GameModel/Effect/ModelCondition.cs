@@ -111,6 +111,8 @@ public class CardPlayCondition : ICardBuffCondition, IPlayerBuffCondition, IChar
     [HorizontalGroup("1")]
     public List<ICardPlayValueCondition> Conditions = new ();
 
+    // TODO: CardPlayTrigger is THIS_CARD, ITriggerSource here only get playerbuffTrigger
+    // TODO: need get IIntentAction to get playingCard
     public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
         return trigger switch

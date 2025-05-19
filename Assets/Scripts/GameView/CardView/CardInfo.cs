@@ -8,6 +8,9 @@ public class CardInfo
 {
     public Guid Identity { get; private set; }
     public string CardDataID { get; private set; }
+    public CardType Type { get; private set; }
+    public CardRarity Rarity { get; private set; }
+    public IEnumerable<CardTheme> Themes { get; private set; }
     public int OriginCost { get; private set; }
     public int Cost { get; private set; }
     public int OriginPower { get; private set; }
@@ -23,6 +26,9 @@ public class CardInfo
     {
         Identity = card.Identity;
         CardDataID = card.CardDataId;
+        Type = card.Type;
+        Rarity = card.Rarity;
+        Themes = card.Themes;
 
         OriginCost = card.Cost;
         Cost = card.EvalCost(gameWatcher);
@@ -32,9 +38,9 @@ public class CardInfo
         MainSelectable = new MainSelectableInfo(card.MainSelectable.SelectType);
         SubSelectables = card.SubSelectables.Select(s => new SubSelectableInfo(s.SelectType, s.TargetCount)).ToList();
 
-        StatusInfos = card.BuffList.Select(s => new CardBuffInfo(s)).ToList();
+        StatusInfos = card.BuffManager.Buffs.Select(s => new CardBuffInfo(s)).ToList();
         Properties = card.Properties.Select(p => p.Property)
-            .Concat(card.BuffList
+            .Concat(card.BuffManager.Buffs
                 .SelectMany(b => b.Properties.Select(p => p.Property)))
             .Distinct()
             .ToList();

@@ -268,7 +268,6 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
 
     private GameContextManager _SetUseCardSelectTarget(UseCardAction useCardAction)
     {
-        Debug.Log($"SetUseCardSelectTarget targettype:{useCardAction.TargetType}");
         switch(useCardAction.TargetType)
         { 
             case TargetType.AllyCharacter:
@@ -713,13 +712,14 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                         var cloneCard = card.Clone();
                         foreach(var addCardBuff in cloneCardEffect.AddCardBuffDatas)
                         {
-                            cloneCard.AddCardBuff(
+                            cloneCard.BuffManager.AddBuff(
                                 _contextMgr.CardBuffLibrary,
                                 this,
                                 triggerSource,
                                 actionSource,
                                 addCardBuff.CardBuffId,
-                                addCardBuff.Level.Eval(this, triggerSource));
+                                addCardBuff.Level.Eval(this, triggerSource),
+                                out ICardBuffEntity resultBuff);
                         }
                         targetPlayer.CardManager.AddNewCard(cloneCard, cloneCardEffect.CloneDestination);                            
                         var destinationZone = targetPlayer.CardManager.GetCardCollectionZone(cloneCardEffect.CloneDestination);
@@ -736,13 +736,14 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                     var card = cards[i];
                     foreach(var addCardBuff in appendCardBuffEffect.AddCardBuffDatas)
                     {
-                        card.AddCardBuff(
+                        card.BuffManager.AddBuff(
                             _contextMgr.CardBuffLibrary,
                             this,
                             triggerSource,
                             actionSource,
                             addCardBuff.CardBuffId,
-                            addCardBuff.Level.Eval(this, triggerSource));
+                            addCardBuff.Level.Eval(this, triggerSource),
+                            out ICardBuffEntity resultBuff);
                     }                       
 
                     cardEffectEvents.Add(new AppendCardBuffEvent(card, this));

@@ -23,20 +23,12 @@ public interface ICardEntity
     List<ICardEffect> Effects { get; }
     Dictionary<TriggerTiming, List<ICardEffect>> TriggeredEffects { get; }
     IEnumerable<ICardPropertyEntity> Properties { get; }
-    IEnumerable<ICardBuffEntity> BuffList { get; }
+    ICardBuffManager BuffManager { get; }
 
     int EvalCost(IGameplayStatusWatcher gameWatcher);
     int EvalPower(IGameplayStatusWatcher gameWatcher);
 
     ICardEntity Clone();
-    void AddCardBuff(
-        CardBuffLibrary cardBuffLibrary,
-        IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger,
-        IActionSource actionSource,
-        string cardBuffId,
-        int level);
-    void RemoveCardBuff(ICardBuffEntity cardBuff);
 }
 
 public class CardEntity : ICardEntity
@@ -54,7 +46,7 @@ public class CardEntity : ICardEntity
     private List<ICardEffect> _effects;
     private Dictionary<TriggerTiming, List<ICardEffect>> _triggeredEffects;
     private List<ICardPropertyEntity> _properties;
-    private List<ICardBuffEntity> _buffList;
+    private ICardBuffManager _buffManager;
 
     public Guid Identity => _indentity;
     public Option<Guid> OriginCardInstanceGuid => _originCardInstanceGuid;
@@ -69,7 +61,7 @@ public class CardEntity : ICardEntity
     public List<ICardEffect> Effects => _effects;
     public Dictionary<TriggerTiming, List<ICardEffect>> TriggeredEffects => _triggeredEffects;
     public IEnumerable<ICardPropertyEntity> Properties => _properties;
-    public IEnumerable<ICardBuffEntity> BuffList => _buffList;
+    public ICardBuffManager BuffManager => _buffManager;
     public bool IsDummy => this == DummyCard;
 
     public static ICardEntity DummyCard = new CardEntity(
@@ -120,7 +112,7 @@ public class CardEntity : ICardEntity
             pair => pair.Value.ToList()
         );
         _properties = properties.ToList();
-        _buffList = new List<ICardBuffEntity>();
+        _buffManager = new CardBuffManager();
     }
 
     public static ICardEntity CreateFromInstance(CardInstance cardInstance)
@@ -174,13 +166,14 @@ public class CardEntity : ICardEntity
 
         foreach (var addCardBuffData in addCardBuffDatas)
         {
-            card.AddCardBuff(
+            card.BuffManager.AddBuff(
                 cardBuffLibrary,
                 gameWatcher,
                 trigger,
                 actionSource,
                 addCardBuffData.CardBuffId,
-                addCardBuffData.Level.Eval(gameWatcher, trigger));
+                addCardBuffData.Level.Eval(gameWatcher, trigger),
+                out var cardBuff);
         }
 
         return card;
@@ -207,40 +200,6 @@ public class CardEntity : ICardEntity
         );
     }
 
-    public void AddCardBuff(
-        CardBuffLibrary cardBuffLibrary,
-        IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger,
-        IActionSource actionSource,
-        string cardBuffId,
-        int level)
-    {
-        var caster = actionSource switch
-        {
-            CardPlaySource cardSource => cardSource.Card.Owner(gameWatcher),
-            PlayerBuffSource playerBuffSource => playerBuffSource.Buff.Caster,
-            _ => Option.None<IPlayerEntity>()
-        };
-
-        var cardBuff = new CardBuffEntity(
-            cardBuffId,
-            new Guid(),
-            level,
-            caster,
-            cardBuffLibrary.GetCardBuffProperties(cardBuffId)
-                .Select(p => p.CreateEntity(gameWatcher, trigger)),
-            cardBuffLibrary.GetCardBuffLifeTime(cardBuffId)
-                .CreateEntity(gameWatcher, trigger),
-            cardBuffLibrary.GetCardBuffSessions(cardBuffId)
-                .Select(s => s.CreateEntity(gameWatcher, trigger)));
-        
-        _buffList.Add(cardBuff);
-    }    
-    public void RemoveCardBuff(ICardBuffEntity cardBuff)
-    {
-        _buffList.Remove(cardBuff);
-    }
-
     public int EvalCost(IGameplayStatusWatcher gameWatcher)
     {
         var cost = Cost;
@@ -249,7 +208,7 @@ public class CardEntity : ICardEntity
         {
             cost += property.Eval(gameWatcher, cardTrigger);
         }
-        foreach (var buff in BuffList)
+        foreach (var buff in BuffManager.Buffs)
         {
             foreach (var property in buff.Properties.Where(p => p.Property == CardProperty.CostAdjust))
             {
@@ -268,7 +227,7 @@ public class CardEntity : ICardEntity
         {
             power += property.Eval(gameWatcher, cardTrigger);
         }
-        foreach(var buff in BuffList)
+        foreach(var buff in BuffManager.Buffs)
         {
             foreach(var property in buff.Properties.Where(p => p.Property == CardProperty.PowerAdjust))
             {
@@ -310,6 +269,6 @@ public static class CardEntityExtensions
     {
         return
             card.Properties.Any(p => p.Property == property) ||
-            card.BuffList.Any(b => b.Properties.Any(p => p.Property == property));
+            card.BuffManager.Buffs.Any(b => b.Properties.Any(p => p.Property == property));
     }
 }

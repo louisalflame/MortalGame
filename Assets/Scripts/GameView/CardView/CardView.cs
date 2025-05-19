@@ -48,6 +48,8 @@ public class CardView : MonoBehaviour, ICardView
     [SerializeField]
     private TextMeshProUGUI _info;
     [SerializeField]
+    private TextMeshProUGUI _type;
+    [SerializeField]
     private TextMeshProUGUI _cost;
     [SerializeField]
     private IntValueSwitch _costColorSwitch;    
@@ -77,7 +79,6 @@ public class CardView : MonoBehaviour, ICardView
     public void Initialize(LocalizeLibrary localizeLibrary)
     {
         _localizeLibrary = localizeLibrary;
-        Reset();
     }
 
     public void SetCardInfo(CardInfo cardInfo)
@@ -103,6 +104,7 @@ public class CardView : MonoBehaviour, ICardView
 
         _title.text = cardLocalizeData.Title;
         _info.text = cardLocalizeData.Info.ReplaceTemplateKeys(templateValue);
+        _type.text = _localizeLibrary.Get(LocalizeTitleInfoType.GameKeyWord, cardInfo.Type.ToString()).Title;
 
         _sealedEffectObj.SetActive(cardInfo.Properties.Contains(CardProperty.Sealed));
     }

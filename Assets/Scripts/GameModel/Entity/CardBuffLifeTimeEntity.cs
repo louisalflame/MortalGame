@@ -88,7 +88,7 @@ public class HandCardLifeTimeCardBuffEntity : ICardBuffLifeTimeEntity
         foreach (var card in gameWatcher.GameStatus.Ally.CardManager.HandCard.Cards
             .Concat(gameWatcher.GameStatus.Enemy.CardManager.HandCard.Cards))
         {
-            foreach (var buff in card.BuffList)
+            foreach (var buff in card.BuffManager.Buffs)
             {
                 if (buff.LifeTime == this)
                     return true;

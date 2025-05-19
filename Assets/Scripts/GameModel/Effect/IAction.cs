@@ -1,14 +1,18 @@
 using Optional;
 using UnityEngine;
 
-public interface IIntentAction
+public interface IActionUnit
+{ 
+}
+
+public interface IIntentAction : IActionUnit
 {
     UpdateAction ActionType { get; }
     IActionSource Source { get; }
     IActionTarget Target { get; }
 }
 
-public interface IResultAction
+public interface IResultAction : IActionUnit
 {
     UpdateAction ActionType { get; }
     IActionSource Source { get; }

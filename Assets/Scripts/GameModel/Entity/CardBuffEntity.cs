@@ -10,11 +10,12 @@ public interface ICardBuffEntity
     Guid Identity { get; }
     int Level { get; }
     Option<IPlayerEntity> Caster { get; }
-    IReadOnlyCollection<ICardBuffPropertyEntity> Properties { get; }    
+    IReadOnlyCollection<ICardBuffPropertyEntity> Properties { get; }
     ICardBuffLifeTimeEntity LifeTime { get; }
     IReadOnlyCollection<IReactionSessionEntity> ReactionSessions { get; }
-    
+
     bool IsExpired();
+    void AddLevel(int level);
 }
 
 public class CardBuffEntity : ICardBuffEntity
@@ -56,5 +57,10 @@ public class CardBuffEntity : ICardBuffEntity
     public bool IsExpired()
     {
         return LifeTime.IsExpired();
+    }
+
+    public void AddLevel(int level)
+    {
+        _level += level;
     }
 }

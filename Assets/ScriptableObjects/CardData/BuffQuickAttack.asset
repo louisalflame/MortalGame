@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ce3be97fe6785cd4fbfc49b770ec0d97, type: 3}
-  m_Name: BuffFullAttack
+  m_Name: BuffQuickAttack
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -26,13 +26,13 @@ MonoBehaviour:
       Data: 0|CardData, Assembly-CSharp
     - Name: ID
       Entry: 1
-      Data: BuffFullAttack
+      Data: BuffQuickAttack
     - Name: Rarity
       Entry: 3
-      Data: 2
+      Data: 3
     - Name: Type
       Entry: 3
-      Data: 5
+      Data: 3
     - Name: Themes
       Entry: 7
       Data: 1|CardTheme[], Assembly-CSharp
@@ -50,7 +50,7 @@ MonoBehaviour:
       Data: 1
     - Name: Power
       Entry: 3
-      Data: 1
+      Data: 2
     - Name: MainSelectable
       Entry: 7
       Data: 2|NoneSelectable, Assembly-CSharp
@@ -94,7 +94,7 @@ MonoBehaviour:
       Data: 
     - Name: BuffId
       Entry: 1
-      Data: FullAttack
+      Data: QuickAttack
     - Name: Level
       Entry: 7
       Data: 8|CardIntegerProperty, Assembly-CSharp

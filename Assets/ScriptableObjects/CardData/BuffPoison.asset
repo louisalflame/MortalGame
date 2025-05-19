@@ -79,7 +79,7 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 7
-      Data: 5|AddBuffEffect, Assembly-CSharp
+      Data: 5|AddPlayerBuffEffect, Assembly-CSharp
     - Name: Targets
       Entry: 7
       Data: 6|SinglePlayerCollection, Assembly-CSharp
@@ -144,13 +144,7 @@ MonoBehaviour:
         mscorlib
     - Name: 
       Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 13|DisposePropertyData, Assembly-CSharp
-    - Name: 
-      Entry: 8
-      Data: 
+      Data: 0
     - Name: 
       Entry: 13
       Data: 

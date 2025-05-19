@@ -34,7 +34,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 11
+      Data: 12
     - Name: 
       Entry: 7
       Data: 
@@ -260,6 +260,27 @@ MonoBehaviour:
     - Name: Info
       Entry: 1
       Data: "\u7372\u5F97{:power}\u91CD\u64CA"
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: BuffQuickAttack
+    - Name: $v
+      Entry: 7
+      Data: 13|LocalizeTitleInfoData, Assembly-CSharp
+    - Name: Title
+      Entry: 1
+      Data: "\u8FC5\u64CA"
+    - Name: Info
+      Entry: 1
+      Data: "\u7372\u5F97{:power}\u8FC5\u64CA"
     - Name: 
       Entry: 8
       Data: 
