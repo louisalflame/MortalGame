@@ -7,7 +7,8 @@ public interface ITargetPlayerBuffValue
 {
     Option<IPlayerBuffEntity> Eval(
         IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger);
+        ITriggerSource trigger,
+        IActionUnit actionUnit);
 }
 
 [Serializable]
@@ -15,7 +16,8 @@ public class NoneBuff : ITargetPlayerBuffValue
 {
     public Option<IPlayerBuffEntity> Eval(
         IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger)
+        ITriggerSource trigger,
+        IActionUnit actionUnit)
     {
         return Option.None<IPlayerBuffEntity>();
     }
@@ -25,7 +27,8 @@ public class TriggeredPlayerBuff : ITargetPlayerBuffValue
 {
     public Option<IPlayerBuffEntity> Eval(
         IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger)
+        ITriggerSource trigger,
+        IActionUnit actionUnit)
     {
         return trigger switch
         {

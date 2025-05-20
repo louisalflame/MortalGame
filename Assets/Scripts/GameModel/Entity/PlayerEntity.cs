@@ -16,9 +16,7 @@ public interface IPlayerEntity
     IPlayerBuffManager BuffManager { get; }
     ICharacterEntity MainCharacter { get; }
 
-    void UpdateTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing);
-    void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent);
-    void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result);
+    void Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit);
 }
 
 public abstract class PlayerEntity : IPlayerEntity
@@ -57,34 +55,14 @@ public abstract class PlayerEntity : IPlayerEntity
         _buffManager = new PlayerBuffManager();
     }
 
-    public void UpdateTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
+    public void Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)
     {
-        _buffManager.UpdateTiming(gameWatcher, timing);
-        _cardManager.UpdateTiming(gameWatcher, timing);
+        _buffManager.Update(gameWatcher, actionUnit);
+        _cardManager.Update(gameWatcher, actionUnit);
 
         foreach (var character in _characters.ToList())
         {
-            character.BuffManager.UpdateTiming(gameWatcher, timing);
-        }
-    }
-    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent)
-    {
-        _buffManager.UpdateIntent(gameWatcher, intent);
-        _cardManager.UpdateIntent(gameWatcher, intent);
-
-        foreach (var character in _characters.ToList())
-        {
-            character.BuffManager.UpdateIntent(gameWatcher, intent);
-        }
-    }
-    public void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result)
-    {
-        _buffManager.UpdateResult(gameWatcher, result);
-        _cardManager.UpdateResult(gameWatcher, result);
-        
-        foreach (var character in _characters.ToList())
-        {
-            character.BuffManager.UpdateResult(gameWatcher, result);
+            character.BuffManager.Update(gameWatcher, actionUnit);
         }
     }
 }

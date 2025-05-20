@@ -5,7 +5,7 @@ using Sirenix.OdinInspector;
 
 public interface IIntegerValue
 {
-    int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource);
+    int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource, IActionUnit actionUnit);
 }
 
 [Serializable]
@@ -13,7 +13,7 @@ public class ConstInteger : IIntegerValue
 {
     public int Value;
 
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
+    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource, IActionUnit actionUnit)
     {
         return Value;
     }
@@ -32,10 +32,10 @@ public class CardIntegerProperty : IIntegerValue
     public ITargetCardValue Card;
     public CardIntegerValueType Property;
 
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
+    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource, IActionUnit actionUnit)
     {
         return Card
-            .Eval(gameWatcher, triggerSource)
+            .Eval(gameWatcher, triggerSource, actionUnit)
             .Map(
                 card => Property switch
                 {
@@ -60,11 +60,11 @@ public class PlayerIntegerProperty : IIntegerValue
     public ITargetPlayerValue Player;
     public PlayerIntegerValueType Property;
 
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
+    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource, IActionUnit actionUnit)
     {
-        var playerOpt = Player.Eval(gameWatcher, triggerSource);
+        var playerOpt = Player.Eval(gameWatcher, triggerSource, actionUnit);
         return Player
-            .Eval(gameWatcher, triggerSource)
+            .Eval(gameWatcher, triggerSource, actionUnit)
             .Map(
                 player => Property switch
                 {
@@ -88,9 +88,9 @@ public class CardBuffIntegerProperty : IIntegerValue
     public ITargetCardBuffValue CardBuff;
     public CardBuffIntegerValueType Property;
 
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
+    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource, IActionUnit actionUnit)
     {
-        var cardBuffOpt = CardBuff.Eval(gameWatcher, triggerSource);
+        var cardBuffOpt = CardBuff.Eval(gameWatcher, triggerSource, actionUnit);
         return cardBuffOpt
             .Map(
                 cardBuff => Property switch
@@ -114,10 +114,10 @@ public class PlayerBuffIntegerProperty : IIntegerValue
     public ITargetPlayerBuffValue PlayerBuff;
     public PlayerBuffIntegerValueType Property;
 
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
+    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource, IActionUnit actionUnit)
     {
         return PlayerBuff
-            .Eval(gameWatcher, triggerSource)
+            .Eval(gameWatcher, triggerSource, actionUnit)
             .Map(
                 playerBuff => Property switch
                 {
@@ -135,10 +135,10 @@ public class PlayerBuffSessionInteger : IIntegerValue
     public ITargetPlayerBuffValue PlayerBuff;
     public string SessionIntegerId;
 
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
+    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource, IActionUnit actionUnit)
     {
         return PlayerBuff
-            .Eval(gameWatcher, triggerSource)
+            .Eval(gameWatcher, triggerSource, actionUnit)
             .FlatMap(playerBuff => playerBuff.GetSessionInteger(SessionIntegerId))
             .ValueOr(0);
     }

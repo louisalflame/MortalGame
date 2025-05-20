@@ -10,7 +10,8 @@ public interface ITargetPlayerValue
 {
     Option<IPlayerEntity> Eval(
         IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger);
+        ITriggerSource trigger,
+        IActionUnit actionUnit);
 }
 
 [Serializable]
@@ -18,7 +19,8 @@ public class NonePlayer : ITargetPlayerValue
 {
     public Option<IPlayerEntity> Eval(
         IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger)
+        ITriggerSource trigger,
+        IActionUnit actionUnit)
     {
         return Option.None<IPlayerEntity>();
     }
@@ -28,7 +30,8 @@ public class CurrentPlayer : ITargetPlayerValue
 {
     public Option<IPlayerEntity> Eval(
         IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger)
+        ITriggerSource trigger,
+        IActionUnit actionUnit)
     {
         return gameWatcher.GameStatus.CurrentPlayer;
     }
@@ -41,9 +44,10 @@ public class OppositePlayer : ITargetPlayerValue
 
     public Option<IPlayerEntity> Eval(
         IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger)
+        ITriggerSource trigger,
+        IActionUnit actionUnit)
     {
-        var referenceOpt = Reference.Eval(gameWatcher, trigger);
+        var referenceOpt = Reference.Eval(gameWatcher, trigger, actionUnit);
         return
             referenceOpt.FlatMap(reference => 
                 reference.Faction == Faction.Ally ? (gameWatcher.GameStatus.Enemy as IPlayerEntity).Some() :
@@ -59,9 +63,10 @@ public class CardOwner : ITargetPlayerValue
 
     public Option<IPlayerEntity> Eval(
         IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger)
+        ITriggerSource trigger,
+        IActionUnit actionUnit)
     {
-        var cardOpt = Card.Eval(gameWatcher, trigger);
+        var cardOpt = Card.Eval(gameWatcher, trigger, actionUnit);
         return cardOpt.FlatMap(card => card.Owner(gameWatcher));
     }
 }
@@ -81,9 +86,10 @@ public class PlayerBuffContentPlayer : ITargetPlayerValue
 
     public Option<IPlayerEntity> Eval(
         IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger)
+        ITriggerSource trigger,
+        IActionUnit actionUnit)
     {
-        var playerBuffOpt = PlayerBuff.Eval(gameWatcher, trigger);
+        var playerBuffOpt = PlayerBuff.Eval(gameWatcher, trigger, actionUnit);
         return playerBuffOpt.FlatMap(playerBuff => Type switch
         {
             PlayerType.Owner => playerBuff.Owner(gameWatcher),
@@ -100,9 +106,10 @@ public class CharacterOwner : ITargetPlayerValue
 
     public Option<IPlayerEntity> Eval(
         IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger)
+        ITriggerSource trigger,
+        IActionUnit actionUnit)
     {
-        var characterOpt = Character.Eval(gameWatcher, trigger);
+        var characterOpt = Character.Eval(gameWatcher, trigger, actionUnit);
         return characterOpt.FlatMap(character => character.Owner(gameWatcher));
     }
 }
@@ -111,14 +118,16 @@ public interface ITargetPlayerCollectionValue
 {
     IReadOnlyCollection<IPlayerEntity> Eval(
         IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger);
+        ITriggerSource trigger,
+        IActionUnit actionUnit);
 }
 [Serializable]
 public class NonePlayers : ITargetPlayerCollectionValue
 {
     public IReadOnlyCollection<IPlayerEntity> Eval(
         IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger)
+        ITriggerSource trigger,
+        IActionUnit actionUnit)
     {
         return Array.Empty<IPlayerEntity>();
     }
@@ -131,8 +140,9 @@ public class SinglePlayerCollection : ITargetPlayerCollectionValue
 
     public IReadOnlyCollection<IPlayerEntity> Eval(
         IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger)
+        ITriggerSource trigger,
+        IActionUnit actionUnit)
     {
-        return Target.Eval(gameWatcher, trigger).ToEnumerable().ToList();
+        return Target.Eval(gameWatcher, trigger, actionUnit).ToEnumerable().ToList();
     }
 }

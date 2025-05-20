@@ -6,9 +6,7 @@ using System.Linq;
 public interface ISessionValueEntity
 {
     ISessionValueEntity Clone();
-    void UpdateByTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing);
-    void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent);
-    void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result);
+    void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit);
 }
 
 [Serializable]
@@ -45,13 +43,14 @@ public class SessionBooleanEntity : ISessionValueEntity
     private void _UpdateRules(
         IReadOnlyCollection<ConditionBooleanUpdateRule> rules,
         IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger)
+        ITriggerSource trigger,
+        IActionUnit actionUnit)
     {
         foreach (var rule in rules)
         {
-            if (rule.Conditions.All(condition => condition.Eval(gameWatcher, trigger)))
+            if (rule.Conditions.All(condition => condition.Eval(gameWatcher, trigger, actionUnit)))
             {
-                var newVal = rule.NewValue.Eval(gameWatcher, trigger);
+                var newVal = rule.NewValue.Eval(gameWatcher, trigger, actionUnit);
                 Value = rule.Operation switch
                 {
                     ConditionBooleanUpdateRule.UpdateType.AndOrigin => Value && newVal,
@@ -64,27 +63,30 @@ public class SessionBooleanEntity : ISessionValueEntity
         }
     }
 
-    public void UpdateByTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing)
+    public void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
     {
-        if (_timingRules.TryGetValue(timing, out var rules))
+        switch (actionUnit)
         {
-            _UpdateRules(rules, gameWatcher, trigger);
-        }
-    }
+            case UpdateTimingAction timingAction:
+                if (_timingRules.TryGetValue(timingAction.Timing, out var timingRules))
+                {
+                    _UpdateRules(timingRules, gameWatcher, trigger, timingAction);
+                }
+                break;
 
-    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent)
-    {
-        if (_intentRules.TryGetValue(intent.ActionType, out var rules))
-        {
-            _UpdateRules(rules, gameWatcher, trigger);
-        }
-    }
+            case IIntentTargetAction intentAction:
+                if (_intentRules.TryGetValue(intentAction.ActionType, out var intentRules))
+                {
+                    _UpdateRules(intentRules, gameWatcher, trigger, intentAction);
+                }
+                break;
 
-    public void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result)
-    {        
-        if (_resultRules.TryGetValue(result.ActionType, out var rules))
-        {
-            _UpdateRules(rules, gameWatcher, trigger);
+            case IResultTargetAction resultAction:
+                if (_resultRules.TryGetValue(resultAction.ActionType, out var resultRules))
+                {
+                    _UpdateRules(resultRules, gameWatcher, trigger, resultAction);
+                }
+                break;
         }
     }
 }
@@ -123,13 +125,14 @@ public class SessionIntegerEntity : ISessionValueEntity
     private void _UpdateRules(
         IReadOnlyCollection<ConditionIntegerUpdateRule> rules,
         IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger)
+        ITriggerSource trigger,
+        IActionUnit actionUnit)
     {
         foreach (var rule in rules)
         {
-            if (rule.Conditions.All(condition => condition.Eval(gameWatcher, trigger)))
+            if (rule.Conditions.All(condition => condition.Eval(gameWatcher, trigger, actionUnit)))
             {
-                var newVal = rule.NewValue.Eval(gameWatcher, trigger);
+                var newVal = rule.NewValue.Eval(gameWatcher, trigger, actionUnit);
                 Value = rule.Operation switch
                 {
                     ConditionIntegerUpdateRule.UpdateType.AddOrigin => Value + newVal,
@@ -141,27 +144,30 @@ public class SessionIntegerEntity : ISessionValueEntity
         }
     }
 
-    public void UpdateByTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing)
+    public void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
     {
-        if (_timingRules.TryGetValue(timing, out var rules))
+        switch (actionUnit)
         {
-            _UpdateRules(rules, gameWatcher, trigger);
-        }
-    }
+            case UpdateTimingAction timingAction:
+                if (_timingRules.TryGetValue(timingAction.Timing, out var timingRules))
+                {
+                    _UpdateRules(timingRules, gameWatcher, trigger, timingAction);
+                }
+                break;
 
-    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent)
-    {
-        if (_intentRules.TryGetValue(intent.ActionType, out var rules))
-        {
-            _UpdateRules(rules, gameWatcher, trigger);
-        }
-    }
+            case IIntentTargetAction intentAction:
+                if (_intentRules.TryGetValue(intentAction.ActionType, out var intentRules))
+                {
+                    _UpdateRules(intentRules, gameWatcher, trigger, intentAction);
+                }
+                break;
 
-    public void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result)
-    {
-        if (_resultRules.TryGetValue(result.ActionType, out var rules))
-        {
-            _UpdateRules(rules, gameWatcher, trigger);
+            case IResultTargetAction resultAction:
+                if (_resultRules.TryGetValue(resultAction.ActionType, out var resultRules))
+                {
+                    _UpdateRules(resultRules, gameWatcher, trigger, resultAction);
+                }
+                break;
         }
     }
 }

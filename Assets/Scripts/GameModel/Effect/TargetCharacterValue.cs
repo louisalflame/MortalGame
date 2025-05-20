@@ -10,14 +10,16 @@ public interface ITargetCharacterValue
 {
     Option<ICharacterEntity> Eval(
         IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger);
+        ITriggerSource trigger,
+        IActionUnit actionUnit);
 }
 
 [Serializable]
 public class NoneCharacter : ITargetCharacterValue
 {
     public Option<ICharacterEntity> Eval(IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger)
+        ITriggerSource trigger,
+        IActionUnit actionUnit)
     {
         return Option.None<ICharacterEntity>();
     }
@@ -30,9 +32,10 @@ public class MainCharacterOfPlayer : ITargetCharacterValue
 
     public Option<ICharacterEntity> Eval(
         IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger)
+        ITriggerSource trigger,
+        IActionUnit actionUnit)
     {
-        return Player.Eval(gameWatcher, trigger).Map(player => player.MainCharacter);
+        return Player.Eval(gameWatcher, trigger, actionUnit).Map(player => player.MainCharacter);
     }
 }
 [Serializable]
@@ -40,7 +43,8 @@ public class SelectedCharacter : ITargetCharacterValue
 {
     public Option<ICharacterEntity> Eval(
         IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger)
+        ITriggerSource trigger,
+        IActionUnit actionUnit)
     {
         return gameWatcher.GameContext.SelectedCharacter.SomeNotNull();
     }
@@ -50,7 +54,8 @@ public interface ITargetCharacterCollectionValue
 {
     IReadOnlyCollection<ICharacterEntity> Eval(
         IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger);
+        ITriggerSource trigger,
+        IActionUnit actionUnit);
 }
 
 [Serializable]
@@ -58,7 +63,8 @@ public class NoneCharacters : ITargetCharacterCollectionValue
 {
     public IReadOnlyCollection<ICharacterEntity> Eval(
         IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger)
+        ITriggerSource trigger,
+        IActionUnit actionUnit)
     {
         return  Array.Empty<ICharacterEntity>();
     }
@@ -71,8 +77,11 @@ public class SingleCharacterCollection : ITargetCharacterCollectionValue
 
     public IReadOnlyCollection<ICharacterEntity> Eval(
         IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger)
+        ITriggerSource trigger,
+        IActionUnit actionUnit)
     {
-        return Target.Eval(gameWatcher, trigger).ToEnumerable().ToList();
+        return Target
+            .Eval(gameWatcher, trigger, actionUnit)
+            .ToEnumerable().ToList();
     }
 }

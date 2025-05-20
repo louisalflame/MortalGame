@@ -1,20 +1,16 @@
 using UnityEngine;
 
 public interface ITriggerSource
-{ 
+{
 }
 
 public class CardPlayTrigger : ITriggerSource
 {
-    public ICardEntity Card { get; private set; }
-    public LoseEnergyResult LoseEnergy { get; private set; }
-    public int HandCardPosition { get; private set; }
+    public CardPlaySource CardPlay { get; private set; }
 
-    public CardPlayTrigger(ICardEntity card, LoseEnergyResult loseEnergy, int handCardPosition)
+    public CardPlayTrigger(CardPlaySource cardPlay)
     {
-        Card = card;
-        LoseEnergy = loseEnergy;
-        HandCardPosition = handCardPosition;
+        CardPlay = cardPlay;
     }
 }
 

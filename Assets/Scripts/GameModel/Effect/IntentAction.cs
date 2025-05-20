@@ -1,26 +1,144 @@
-using Optional;
 using UnityEngine;
 
 public abstract class BaseIntentAction : IIntentAction
 {
     public abstract UpdateAction ActionType { get; }
     public IActionSource Source { get; private set; }
-    public IActionTarget Target { get; private set; }
 
-    protected BaseIntentAction(IActionSource source, IActionTarget target)
+    protected BaseIntentAction(IActionSource source)
     {
         Source = source;
-        Target = target;
     }
 }
 
-public class PlayCardIntentAction : BaseIntentAction
+public class DamageIntentAction : BaseIntentAction
+{
+    public override UpdateAction ActionType => UpdateAction.Damage;
+    public DamageType Type { get; private set; }
+
+    public DamageIntentAction(IActionSource source, DamageType type) : base(source)
+    {
+        Type = type;
+    }
+}
+
+public class HealIntentAction : BaseIntentAction
+{
+    public override UpdateAction ActionType => UpdateAction.Heal;
+
+    public HealIntentAction(IActionSource source) : base(source)
+    { }
+}
+
+public class ShieldIntentAction : BaseIntentAction
+{
+    public override UpdateAction ActionType => UpdateAction.Shield;
+
+    public ShieldIntentAction(IActionSource source) : base(source)
+    { }
+}
+
+public class GainEnergyIntentAction : BaseIntentAction
+{
+    public override UpdateAction ActionType => UpdateAction.GainEnergy;
+
+    public GainEnergyIntentAction(IActionSource source) : base(source)
+    { }
+}
+public class LoseEnergyIntentAction : BaseIntentAction
+{
+    public override UpdateAction ActionType => UpdateAction.LoseEnergy;
+
+    public LoseEnergyIntentAction(IActionSource source) : base(source)
+    { }
+}
+
+public class CardPlayIntentAction : BaseIntentAction
 {
     public override UpdateAction ActionType => UpdateAction.PlayCard;
-    public ICardEntity Card { get; private set; }
+    public CardPlaySource CardPlay => Source as CardPlaySource;
 
-    public PlayCardIntentAction(IActionSource source, IActionTarget target, ICardEntity card) : base(source, target)
-    {
-        Card = card;
-    }
+    public CardPlayIntentAction(CardPlaySource source) : base(source)
+    { }
+}
+
+public class RecycleDeckIntentAction : BaseIntentAction
+{
+    public override UpdateAction ActionType => UpdateAction.RecycleDeck;
+    public RecycleDeckIntentAction() : base(new SystemSource())
+    { }
+}
+
+public class DrawCardIntentAction : BaseIntentAction
+{
+    public override UpdateAction ActionType => UpdateAction.DrawCard;
+
+    public DrawCardIntentAction(IActionSource source) : base(source)
+    { }
+}
+
+public class DiscardCardIntentAction : BaseIntentAction
+{
+    public override UpdateAction ActionType => UpdateAction.DiscardCard;
+
+    public DiscardCardIntentAction(IActionSource source) : base(source)
+    { }
+}
+public class ConsumeCardIntentAction : BaseIntentAction
+{
+    public override UpdateAction ActionType => UpdateAction.ConsumeCard;
+
+    public ConsumeCardIntentAction(IActionSource source) : base(source)
+    { }
+}
+public class DisposeCardIntentAction : BaseIntentAction
+{
+    public override UpdateAction ActionType => UpdateAction.DisposeCard;
+
+    public DisposeCardIntentAction(IActionSource source) : base(source)
+    { }
+}
+public class CreateCardIntentAction : BaseIntentAction
+{
+    public override UpdateAction ActionType => UpdateAction.CreateCard;
+
+    public CreateCardIntentAction(IActionSource source) : base(source)
+    { }
+}
+public class CloneCardIntentAction : BaseIntentAction
+{
+    public override UpdateAction ActionType => UpdateAction.CreateCard;
+
+    public CloneCardIntentAction(IActionSource source) : base(source)
+    { }
+}
+
+public class AddPlayerBuffIntentAction : BaseIntentAction
+{
+    public override UpdateAction ActionType => UpdateAction.AddPlayerBuff;
+
+    public AddPlayerBuffIntentAction(IActionSource source) : base(source)
+    { }
+}
+public class RemovePlayerBuffIntentAction : BaseIntentAction
+{
+    public override UpdateAction ActionType => UpdateAction.RemovePlayerBuff;
+
+    public RemovePlayerBuffIntentAction(IActionSource source) : base(source)
+    { }
+}
+
+public class AddCardBuffIntentAction : BaseIntentAction
+{
+    public override UpdateAction ActionType => UpdateAction.AddCardBuff;
+
+    public AddCardBuffIntentAction(IActionSource source) : base(source)
+    { }
+}
+public class RemoveCardBuffIntentAction : BaseIntentAction
+{
+    public override UpdateAction ActionType => UpdateAction.RemoveCardBuff;
+
+    public RemoveCardBuffIntentAction(IActionSource source) : base(source)
+    { }
 }

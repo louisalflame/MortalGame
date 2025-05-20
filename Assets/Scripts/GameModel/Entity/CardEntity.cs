@@ -137,15 +137,9 @@ public class CardEntity : ICardEntity
         );
     }
 
-    public static ICardEntity RuntimeCreateFromData(
-        CardData cardData,
-        CardBuffLibrary cardBuffLibrary,
-        IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger,
-        IActionSource actionSource,
-        IEnumerable<AddCardBuffData> addCardBuffDatas)
+    public static ICardEntity RuntimeCreateFromData(CardData cardData)
     {
-        var card = new CardEntity(
+        return new CardEntity(
             indentity: Guid.NewGuid(),
             originCardInstanceGuid: Option.None<Guid>(),
             cardDataId: cardData.ID,
@@ -163,20 +157,6 @@ public class CardEntity : ICardEntity
                 ),
             properties: cardData.PropertyDatas.Select(p => p.CreateEntity())
         );
-
-        foreach (var addCardBuffData in addCardBuffDatas)
-        {
-            card.BuffManager.AddBuff(
-                cardBuffLibrary,
-                gameWatcher,
-                trigger,
-                actionSource,
-                addCardBuffData.CardBuffId,
-                addCardBuffData.Level.Eval(gameWatcher, trigger),
-                out var cardBuff);
-        }
-
-        return card;
     }
 
     public ICardEntity Clone()
@@ -204,6 +184,7 @@ public class CardEntity : ICardEntity
     {
         var cost = Cost;
         var cardTrigger = new CardTrigger(this);
+        var systemAction = new SystemAction();
         foreach (var property in Properties.Where(p => p.Property == CardProperty.CostAdjust))
         {
             cost += property.Eval(gameWatcher, cardTrigger);

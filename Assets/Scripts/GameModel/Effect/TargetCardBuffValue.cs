@@ -6,7 +6,8 @@ public interface ITargetCardBuffValue
 {
     Option<ICardBuffEntity> Eval(
         IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger);
+        ITriggerSource trigger,
+        IActionUnit actionUnit);
 }
 
 [Serializable]
@@ -14,7 +15,8 @@ public class NoneCardBuff : ITargetCardBuffValue
 {
     public Option<ICardBuffEntity> Eval(
         IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger)
+        ITriggerSource trigger,
+        IActionUnit actionUnit)
     {
         return Option.None<ICardBuffEntity>();
     }
@@ -25,7 +27,8 @@ public class TriggeredCardBuff : ITargetCardBuffValue
 {
     public Option<ICardBuffEntity> Eval(
         IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger)
+        ITriggerSource trigger,
+        IActionUnit actionUnit)
     {
         return trigger switch
         {

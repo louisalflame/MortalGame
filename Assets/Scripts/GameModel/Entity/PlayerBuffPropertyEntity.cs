@@ -21,7 +21,7 @@ public class AttackPlayerBuffPropertyEntity : IPlayerBuffPropertyEntity
 
     public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
     {
-        return _value.Eval(gameWatcher, triggerSource);
+        return _value.Eval(gameWatcher, triggerSource,  SystemAction.Instance);
     }
 }
 

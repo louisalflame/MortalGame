@@ -132,10 +132,15 @@ public enum UpdateAction
     DiscardCard,
     ConsumeCard,
     DisposeCard,
+    CreateCard,
+    CloneCard,
     PlayCard,
     AddPlayerBuff,
-    StackPlayerBuff,
     RemovePlayerBuff,
+    AddCardBuff,
+    RemoveCardBuff,
+    AddCharacterBuff,
+    RemoveCharacterBuff,
 }
 public enum UpdateTiming
 {

@@ -7,30 +7,20 @@ using UnityEngine;
 public interface ICardBuffManager
 {
     IReadOnlyCollection<ICardBuffEntity> Buffs { get; }
-    bool AddBuff(
+    AddCardBuffResult AddBuff(
         CardBuffLibrary buffLibrary,
         IGameplayStatusWatcher gameWatcher,
         ITriggerSource triggerSource,
-        IActionSource actionSource,
+        IActionUnit actionUnit,
         string buffId,
-        int level,
-        out ICardBuffEntity resultBuff);
-    bool RemoveBuff(
+        int level);
+    RemoveCardBuffResult RemoveBuff(
         CardBuffLibrary buffLibrary,
         IGameplayStatusWatcher gameWatcher,
-        IActionSource actionSource,
-        string buffId,
-        out ICardBuffEntity resultBuff);
+        IActionUnit actionUnit,
+        string buffId);
 
-    void UpdateTiming(
-        IGameplayStatusWatcher gameWatcher,
-        UpdateTiming timing);
-    void UpdateIntent(
-        IGameplayStatusWatcher gameWatcher,
-        IIntentAction intent);
-    void UpdateResult(
-        IGameplayStatusWatcher gameWatcher,
-        IResultAction result);
+    void Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit);
 }
 
 public class CardBuffManager : ICardBuffManager
@@ -44,33 +34,36 @@ public class CardBuffManager : ICardBuffManager
         _buffs = new List<ICardBuffEntity>();
     }
 
-    public bool AddBuff(
+    public AddCardBuffResult AddBuff(
         CardBuffLibrary cardBuffLibrary,
         IGameplayStatusWatcher gameWatcher,
         ITriggerSource triggerSource,
-        IActionSource actionSource,
+        IActionUnit actionUnit,
         string buffId,
-        int level,
-        out ICardBuffEntity resultBuff)
+        int level)
     {
         foreach (var existBuff in _buffs)
         {
             if (existBuff.CardBuffDataID == buffId)
             {
                 existBuff.AddLevel(level);
-                resultBuff = existBuff;
-                return false;
+                return new AddCardBuffResult
+                {
+                    IsNewBuff = false,
+                    Buff = existBuff,
+                    DeltaLevel = level
+                };
             }
         }
 
-        var caster = actionSource switch
+        var caster = actionUnit switch
         {
             CardPlaySource cardSource => cardSource.Card.Owner(gameWatcher),
             PlayerBuffSource playerBuffSource => playerBuffSource.Buff.Caster,
             _ => Option.None<IPlayerEntity>()
         };
 
-        resultBuff = new CardBuffEntity(
+        var resultBuff = new CardBuffEntity(
             buffId,
             new Guid(),
             level,
@@ -78,92 +71,58 @@ public class CardBuffManager : ICardBuffManager
             cardBuffLibrary.GetCardBuffProperties(buffId)
                 .Select(p => p.CreateEntity(gameWatcher, triggerSource)),
             cardBuffLibrary.GetCardBuffLifeTime(buffId)
-                .CreateEntity(gameWatcher, triggerSource),
+                .CreateEntity(gameWatcher, triggerSource, actionUnit),
             cardBuffLibrary.GetCardBuffSessions(buffId)
                 .Select(s => s.CreateEntity(gameWatcher, triggerSource)));
 
         _buffs.Add(resultBuff);
-        return true;
+        return new AddCardBuffResult
+        {
+            IsNewBuff = true,
+            Buff = resultBuff,
+            DeltaLevel = level
+        };
     }
 
-    public bool RemoveBuff(
+    public RemoveCardBuffResult RemoveBuff(
         CardBuffLibrary buffLibrary,
         IGameplayStatusWatcher gameWatcher,
-        IActionSource actionSource,
-        string buffId,
-        out ICardBuffEntity resultBuff)
+        IActionUnit actionUnit,
+        string buffId)
     {
         foreach (var existBuff in _buffs)
         {
             if (existBuff.CardBuffDataID == buffId)
             {
                 _buffs.Remove(existBuff);
-                resultBuff = existBuff;
-                return true;
+                return new RemoveCardBuffResult
+                {
+                    Buff = existBuff.Some()
+                };
             }
         }
 
-        resultBuff = null;
-        return false;
+        return new RemoveCardBuffResult
+        {
+            Buff = Option.None<ICardBuffEntity>()
+        };
     }
 
-    public void UpdateTiming(
-        IGameplayStatusWatcher gameWatcher,
-        UpdateTiming timing)
+    public void Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)
     {
         foreach (var buff in _buffs.ToList())
         {
             var triggerBuff = new CardBuffTrigger(buff);
             foreach (var session in buff.ReactionSessions)
             {
-                session.UpdateTiming(gameWatcher, triggerBuff, timing);
+                session.Update(gameWatcher, triggerBuff, actionUnit);
             }
 
-            buff.LifeTime.UpdateByTiming(gameWatcher, triggerBuff, timing);
+            buff.LifeTime.Update(gameWatcher, triggerBuff, actionUnit);
             if (buff.IsExpired())
             {
                 _buffs.Remove(buff);
             }
         }
-    }
-    
-    public void UpdateIntent(
-        IGameplayStatusWatcher gameWatcher,
-        IIntentAction intent)
-    {
-        foreach (var buff in _buffs.ToList())
-        {
-            var triggerBuff = new CardBuffTrigger(buff);
-            foreach (var session in buff.ReactionSessions)
-            {
-                session.UpdateIntent(gameWatcher, triggerBuff, intent);
-            }
-
-            buff.LifeTime.UpdateIntent(gameWatcher, triggerBuff, intent);            
-            if (buff.IsExpired())
-            {
-                _buffs.Remove(buff);
-            }
-        }
-    }
-
-    public void UpdateResult(
-        IGameplayStatusWatcher gameWatcher,
-        IResultAction result)
-    {
-        foreach (var buff in _buffs.ToList())
-        {
-            var triggerBuff = new CardBuffTrigger(buff);
-            foreach (var session in buff.ReactionSessions)
-            {
-                session.UpdateResult(gameWatcher, triggerBuff, result);
-            }
-
-            buff.LifeTime.UpdateResult(gameWatcher, triggerBuff, result);            
-            if (buff.IsExpired())
-            {
-                _buffs.Remove(buff);
-            }
-        }
-    }
+    }    
 }

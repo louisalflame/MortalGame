@@ -124,7 +124,7 @@ public class CloneCardEffect : ICardEffect
     public CardCollectionType CloneDestination;
 }
 [Serializable]
-public class AppendCardBuffEffect : ICardEffect
+public class AddCardBuffEffect : ICardEffect
 {
     public ITargetCardCollectionValue TargetCards;
     [ShowInInspector]

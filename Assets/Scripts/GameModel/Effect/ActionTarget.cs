@@ -41,3 +41,15 @@ public class CardTarget : IActionTarget
         Card = card;
     }
 }
+
+public class PlayerAndCardTarget : IActionTarget
+{
+    public IPlayerEntity Player { get; private set; }
+    public ICardEntity Card { get; private set; }
+
+    public PlayerAndCardTarget(IPlayerEntity player, ICardEntity card)
+    {
+        Player = player;
+        Card = card;
+    }
+}

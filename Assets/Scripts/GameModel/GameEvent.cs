@@ -103,12 +103,12 @@ public class CloneCardEvent : AddCardEvent
     public CloneCardEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher, ICardColletionZone destination) :
         base(card, gameWatcher, destination) { }
 }
-public class AppendCardBuffEvent : IGameEvent
+public class AddCardBuffEvent : IGameEvent
 {
     public Faction Faction;
     public CardInfo CardInfo;
 
-    public AppendCardBuffEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher)
+    public AddCardBuffEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher)
     {
         Faction = card.Faction(gameWatcher);
         CardInfo = new CardInfo(card, gameWatcher);

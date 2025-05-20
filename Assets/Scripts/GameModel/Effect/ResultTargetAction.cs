@@ -1,7 +1,7 @@
 using Optional;
 using UnityEngine;
 
-public abstract class BaseResultAction : IResultAction
+public abstract class BaseResultAction : IResultTargetAction
 {
     public abstract UpdateAction ActionType { get; }
     public IActionSource Source { get; private set; }
@@ -167,37 +167,71 @@ public class DisposeCardResultAction : BaseResultAction
         Card = card;
     }
 }
+public class CreateCardResultAction : BaseResultAction
+{
+    public override UpdateAction ActionType => UpdateAction.CreateCard;
+    public CreateCardResult CreateResult { get; private set; }
+
+    public CreateCardResultAction(IActionSource source, IActionTarget target, CreateCardResult createResult) :
+        base(source, target)
+    {
+        CreateResult = createResult;
+    }
+}
+public class CloneCardResultAction : BaseResultAction
+{
+    public override UpdateAction ActionType => UpdateAction.CloneCard;
+    public CloneCardResult CloneResult { get; private set; }
+
+    public CloneCardResultAction(IActionSource source, IActionTarget target, CloneCardResult cloneResult) :
+        base(source, target)
+    {
+        CloneResult = cloneResult;
+    }
+}
 
 public class AddPlayerBuffResultAction : BaseResultAction
 {
     public override UpdateAction ActionType => UpdateAction.AddPlayerBuff;
-    public IPlayerBuffEntity Buff { get; private set; }
+    public AddPlayerBuffResult AddResult { get; private set; }
 
-    public AddPlayerBuffResultAction(IActionSource source, IActionTarget target, IPlayerBuffEntity buff) :
+    public AddPlayerBuffResultAction(IActionSource source, IActionTarget target, AddPlayerBuffResult addResult) :
         base(source, target)
     {
-        Buff = buff;
-    }
-}
-public class StackPlayerBuffResultAction : BaseResultAction
-{
-    public override UpdateAction ActionType => UpdateAction.StackPlayerBuff;
-    public IPlayerBuffEntity Buff { get; private set; }
-
-    public StackPlayerBuffResultAction(IActionSource source, IActionTarget target, IPlayerBuffEntity buff) :
-        base(source, target)
-    {
-        Buff = buff;
+        AddResult = addResult;
     }
 }
 public class RemovePlayerBuffResultAction : BaseResultAction
 {
     public override UpdateAction ActionType => UpdateAction.RemovePlayerBuff;
-    public IPlayerBuffEntity Buff { get; private set; }
+    public RemovePlayerBuffResult RemoveResult { get; private set; }
 
-    public RemovePlayerBuffResultAction(IActionSource source, IActionTarget target, IPlayerBuffEntity buff) :
+    public RemovePlayerBuffResultAction(IActionSource source, IActionTarget target, RemovePlayerBuffResult removeResult) :
         base(source, target)
     {
-        Buff = buff;
+        RemoveResult = removeResult;
+    }
+}
+
+public class AddCardBuffResultAction : BaseResultAction
+{
+    public override UpdateAction ActionType => UpdateAction.AddCardBuff;
+    public AddCardBuffResult AddResult { get; private set; }
+
+    public AddCardBuffResultAction(IActionSource source, IActionTarget target, AddCardBuffResult addResult) :
+        base(source, target)
+    {
+        AddResult = addResult;
+    }
+}
+public class RemoveCardBuffResultAction : BaseResultAction
+{
+    public override UpdateAction ActionType => UpdateAction.RemoveCardBuff;
+    public RemoveCardBuffResult RemoveResult { get; private set; }
+
+    public RemoveCardBuffResultAction(IActionSource source, IActionTarget target, RemoveCardBuffResult removeResult) :
+        base(source, target)
+    {
+        RemoveResult = removeResult;
     }
 }

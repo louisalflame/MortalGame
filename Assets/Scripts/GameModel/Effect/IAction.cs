@@ -2,17 +2,46 @@ using Optional;
 using UnityEngine;
 
 public interface IActionUnit
-{ 
+{
+}
+
+public class SystemAction : IActionUnit
+{
+    public static readonly SystemAction Instance = new SystemAction();
+}
+public class UpdateTimingAction : IActionUnit
+{
+    public UpdateTiming Timing { get; }
+
+    public UpdateTimingAction(UpdateTiming timing)
+    {
+        Timing = timing;
+    }
+}
+public class TriggerTimingAction : IActionUnit
+{
+    public TriggerTiming Timing { get; }
+
+    public TriggerTimingAction(TriggerTiming timing)
+    {
+        Timing = timing;
+    }
 }
 
 public interface IIntentAction : IActionUnit
 {
     UpdateAction ActionType { get; }
     IActionSource Source { get; }
+}
+
+public interface IIntentTargetAction : IActionUnit
+{
+    UpdateAction ActionType { get; }
+    IActionSource Source { get; }
     IActionTarget Target { get; }
 }
 
-public interface IResultAction : IActionUnit
+public interface IResultTargetAction : IActionUnit
 {
     UpdateAction ActionType { get; }
     IActionSource Source { get; }

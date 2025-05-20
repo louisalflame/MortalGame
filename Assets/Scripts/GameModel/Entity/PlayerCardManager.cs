@@ -20,11 +20,24 @@ public interface IPlayerCardManager
     bool TryDiscardCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
     bool TryConsumeCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
     bool TryDisposeCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
-    void AddNewCard(ICardEntity card, CardCollectionType cloneDestination);
+    CreateCardResult CreateNewCard(
+        IGameplayStatusWatcher gameWatcher,
+        ITriggerSource trigger,
+        IActionUnit actionUnit,
+        CardData cardData,
+        CardCollectionType cloneDestination,
+        CardBuffLibrary cardBuffLibrary,
+        IEnumerable<AddCardBuffData> addCardBuffDatas);
+    CloneCardResult CloneNewCard(
+        IGameplayStatusWatcher gameWatcher,
+        ITriggerSource trigger,
+        IActionUnit actionUnit,
+        ICardEntity originCard,
+        CardCollectionType cloneDestination,
+        CardBuffLibrary cardBuffLibrary,
+        IEnumerable<AddCardBuffData> addCardBuffDatas);
     
-    void UpdateTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing);
-    void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent);
-    void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result);
+    void Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit);
 }
 
 public class PlayerCardManager : IPlayerCardManager
@@ -246,31 +259,91 @@ public class PlayerCardManager : IPlayerCardManager
         return false;
     }
 
-    public void AddNewCard(ICardEntity newCard, CardCollectionType cloneDestination)
+    public CreateCardResult CreateNewCard(
+        IGameplayStatusWatcher gameWatcher,
+        ITriggerSource trigger,
+        IActionUnit actionUnit,
+        CardData cardData,
+        CardCollectionType cloneDestination,
+        CardBuffLibrary cardBuffLibrary,
+        IEnumerable<AddCardBuffData> addCardBuffDatas)
     {
-        switch (cloneDestination)
+        var newCard = CardEntity.RuntimeCreateFromData(cardData);
+
+        var addCardBuffResults = addCardBuffDatas
+            .Select(addCardBuffData => newCard.BuffManager
+                .AddBuff(
+                    cardBuffLibrary,
+                    gameWatcher,
+                    trigger,
+                    actionUnit,
+                    addCardBuffData.CardBuffId,
+                    addCardBuffData.Level.Eval(gameWatcher, trigger, actionUnit)))
+            .ToArray();
+        
+        _AddCard(newCard, cloneDestination);
+
+        return new CreateCardResult
+        {
+            Card = newCard,
+            Zone = GetCardCollectionZone(cloneDestination),
+            AddBuffs = addCardBuffResults
+        };
+    }
+    public CloneCardResult CloneNewCard(
+        IGameplayStatusWatcher gameWatcher,
+        ITriggerSource trigger,
+        IActionUnit actionUnit,
+        ICardEntity originCard,
+        CardCollectionType cloneDestination,
+        CardBuffLibrary cardBuffLibrary,
+        IEnumerable<AddCardBuffData> addCardBuffDatas)
+    {
+        var cloneCard = originCard.Clone();
+
+        var addCardBuffResults = addCardBuffDatas
+            .Select(addCardBuffData => cloneCard.BuffManager
+                .AddBuff(
+                    cardBuffLibrary,
+                    gameWatcher,
+                    trigger,
+                    actionUnit,
+                    addCardBuffData.CardBuffId,
+                    addCardBuffData.Level.Eval(gameWatcher, trigger, actionUnit)))
+            .ToArray();
+
+        _AddCard(cloneCard, cloneDestination);
+
+        return new CloneCardResult
+        {
+            Card = cloneCard,
+            Zone = GetCardCollectionZone(cloneDestination),
+            AddBuffs = addCardBuffResults
+        };
+    }
+    private void _AddCard(ICardEntity card, CardCollectionType type)
+    {
+        switch (type)
         {
             case CardCollectionType.Deck:
-                Deck.EnqueueCardsThenShuffle(new[] { newCard });
+                Deck.EnqueueCardsThenShuffle(new[] { card });
                 break;
             case CardCollectionType.HandCard:
-                HandCard.AddCard(newCard);
+                HandCard.AddCard(card);
                 break;
             case CardCollectionType.Graveyard:
-                Graveyard.AddCard(newCard);
+                Graveyard.AddCard(card);
                 break;
             case CardCollectionType.ExclusionZone:
-                ExclusionZone.AddCard(newCard);
+                ExclusionZone.AddCard(card);
                 break;
             case CardCollectionType.DisposeZone:
-                DisposeZone.AddCard(newCard);
-                break;
-            default:
+                DisposeZone.AddCard(card);
                 break;
         }
     }
 
-    public void UpdateTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
+    public void Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)
     {
         foreach (var card in HandCard.Cards
             .Concat(Deck.Cards)
@@ -278,33 +351,10 @@ public class PlayerCardManager : IPlayerCardManager
             .Concat(ExclusionZone.Cards)
             .Concat(DisposeZone.Cards))
         {
-            card.BuffManager.UpdateTiming(gameWatcher, timing);
+            card.BuffManager.Update(gameWatcher, actionUnit);
         }
     }
 
-    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent)
-    {
-        foreach (var card in HandCard.Cards
-            .Concat(Deck.Cards)
-            .Concat(Graveyard.Cards)
-            .Concat(ExclusionZone.Cards)
-            .Concat(DisposeZone.Cards))
-        {
-            card.BuffManager.UpdateIntent(gameWatcher, intent);
-        }
-    }
-
-    public void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result)
-    {
-        foreach (var card in HandCard.Cards
-            .Concat(Deck.Cards)
-            .Concat(Graveyard.Cards)
-            .Concat(ExclusionZone.Cards)
-            .Concat(DisposeZone.Cards))
-        {
-            card.BuffManager.UpdateResult(gameWatcher, result);
-        }
-    }
 }
 
 public static class PlayerCardManagerExtensions

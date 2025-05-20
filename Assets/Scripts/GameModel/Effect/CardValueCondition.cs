@@ -7,7 +7,7 @@ using UnityEngine;
 
 public interface ICardValueCondition
 {
-    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, ICardEntity card);
+    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, ICardEntity card);
 }
 
 [Serializable]
@@ -16,10 +16,10 @@ public class CardEqualCondition : ICardValueCondition
     [HorizontalGroup("1")]
     public ITargetCardValue CompareCard;
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, ICardEntity card)
+    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, ICardEntity card)
     {
         return CompareCard
-            .Eval(gameWatcher, source)
+            .Eval(gameWatcher, source, actionUnit)
             .Match(
                 compareCard => card.Identity == compareCard.Identity,
                 () => false);
@@ -34,7 +34,7 @@ public class CardTypesCondition : ICardValueCondition
 
     public SetConditionType Condition;
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, ICardEntity card)
+    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, ICardEntity card)
     {
         return Condition switch
         {
@@ -49,7 +49,7 @@ public class CardTypesCondition : ICardValueCondition
 
 public interface ICardPlayValueCondition
 {
-    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, CardPlayTrigger cardPlay);
+    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, CardPlaySource cardPlay);
 }
 [Serializable]
 public class CardPlayPositionCondition : ICardPlayValueCondition
@@ -58,9 +58,9 @@ public class CardPlayPositionCondition : ICardPlayValueCondition
     [HorizontalGroup("1")]
     public IIntegerValueCondition[] Conditions = new IIntegerValueCondition[0];
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, CardPlayTrigger cardPlay)
+    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, CardPlaySource cardPlay)
     {
-        return Conditions.All(c => c.Eval(gameWatcher, source, cardPlay.HandCardPosition));
+        return Conditions.All(c => c.Eval(gameWatcher, source, actionUnit, cardPlay.HandCardIndex));
     }
 }
 [Serializable]
@@ -70,8 +70,8 @@ public class CardPlayCardCondition : ICardPlayValueCondition
     [HorizontalGroup("1")]
     public List<ICardValueCondition> Conditions = new();
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, CardPlayTrigger cardPlay)
+    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, CardPlaySource cardPlay)
     {
-        return Conditions.All(c => c.Eval(gameWatcher, source, cardPlay.Card));
+        return Conditions.All(c => c.Eval(gameWatcher, source, actionUnit, cardPlay.Card));
     }
 }
