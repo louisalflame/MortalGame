@@ -45,8 +45,10 @@ public class PlayingCard : ITargetCardValue
     {
         return actionUnit switch
         {
-            CardPlayIntentAction cardPlayIntent => cardPlayIntent.CardPlay.Card.SomeNotNull(),
-            CardPlayIntentTargetAction cardPlayIntentTarget => cardPlayIntentTarget.CardPlay.Card.SomeNotNull(),
+            IIntentAction intentAction =>
+                intentAction.Source is CardPlaySource cardPlaySource ?
+                    cardPlaySource.Card.SomeNotNull() :
+                    Option.None<ICardEntity>(),
             _ => Option.None<ICardEntity>()
         };
     }

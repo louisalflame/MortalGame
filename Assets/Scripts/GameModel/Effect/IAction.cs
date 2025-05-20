@@ -34,10 +34,8 @@ public interface IIntentAction : IActionUnit
     IActionSource Source { get; }
 }
 
-public interface IIntentTargetAction : IActionUnit
+public interface IIntentTargetAction : IIntentAction
 {
-    UpdateAction ActionType { get; }
-    IActionSource Source { get; }
     IActionTarget Target { get; }
 }
 
