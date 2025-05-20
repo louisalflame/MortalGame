@@ -22,9 +22,7 @@ public interface IPlayerCardManager
     bool TryDisposeCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
     void AddNewCard(ICardEntity card, CardCollectionType cloneDestination);
     
-    void UpdateTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing);
-    void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent);
-    void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result);
+    void Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit);
 }
 
 public class PlayerCardManager : IPlayerCardManager
@@ -270,7 +268,7 @@ public class PlayerCardManager : IPlayerCardManager
         }
     }
 
-    public void UpdateTiming(IGameplayStatusWatcher gameWatcher, UpdateTiming timing)
+    public void Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)
     {
         foreach (var card in HandCard.Cards
             .Concat(Deck.Cards)
@@ -278,33 +276,10 @@ public class PlayerCardManager : IPlayerCardManager
             .Concat(ExclusionZone.Cards)
             .Concat(DisposeZone.Cards))
         {
-            card.BuffManager.UpdateTiming(gameWatcher, timing);
+            card.BuffManager.Update(gameWatcher, actionUnit);
         }
     }
 
-    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, IIntentAction intent)
-    {
-        foreach (var card in HandCard.Cards
-            .Concat(Deck.Cards)
-            .Concat(Graveyard.Cards)
-            .Concat(ExclusionZone.Cards)
-            .Concat(DisposeZone.Cards))
-        {
-            card.BuffManager.UpdateIntent(gameWatcher, intent);
-        }
-    }
-
-    public void UpdateResult(IGameplayStatusWatcher gameWatcher, IResultAction result)
-    {
-        foreach (var card in HandCard.Cards
-            .Concat(Deck.Cards)
-            .Concat(Graveyard.Cards)
-            .Concat(ExclusionZone.Cards)
-            .Concat(DisposeZone.Cards))
-        {
-            card.BuffManager.UpdateResult(gameWatcher, result);
-        }
-    }
 }
 
 public static class PlayerCardManagerExtensions

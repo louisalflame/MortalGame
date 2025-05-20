@@ -3,9 +3,7 @@ using UnityEngine;
 public interface IPlayerBuffLifeTimeEntity
 {
     bool IsExpired();
-    void UpdateByTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing);
-    void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent);
-    void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result);
+    void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit);
 }
 
 public class AlwaysLifeTimePlayerBuffEntity : IPlayerBuffLifeTimeEntity
@@ -15,9 +13,7 @@ public class AlwaysLifeTimePlayerBuffEntity : IPlayerBuffLifeTimeEntity
         return false;
     }
 
-    public void UpdateByTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing) { }
-    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent) { }
-    public void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result) { }
+    public void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit) { }
 }
 
 public class TurnLifeTimePlayerBuffEntity : IPlayerBuffLifeTimeEntity
@@ -34,13 +30,12 @@ public class TurnLifeTimePlayerBuffEntity : IPlayerBuffLifeTimeEntity
         return _turn <= 0;
     }
 
-    public void UpdateByTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing)
+    public void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
     {
-        if (timing == UpdateTiming.TurnEnd)
+        if (actionUnit is UpdateTimingAction timingAction &&
+            timingAction.Timing == UpdateTiming.TurnEnd)
         {
             _turn--;
         }
     }
-    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent) { }
-    public void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result) { }
 }

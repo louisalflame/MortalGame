@@ -8,7 +8,7 @@ using UnityEngine;
 
 public interface ICondition
 {
-    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source);
+    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit);
 }
 
 public interface ICardBuffCondition : ICondition { }

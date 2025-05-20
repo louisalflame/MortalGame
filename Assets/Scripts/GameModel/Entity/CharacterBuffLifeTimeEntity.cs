@@ -3,9 +3,7 @@ using UnityEngine;
 public interface ICharacterBuffLifeTimeEntity
 {
     bool IsExpired();
-    void UpdateTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing);
-    void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent);
-    void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result);
+    void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit);
 }
 
 public class AlwaysLifeTimeCharacterBuffEntity : ICharacterBuffLifeTimeEntity
@@ -15,11 +13,7 @@ public class AlwaysLifeTimeCharacterBuffEntity : ICharacterBuffLifeTimeEntity
         return false;
     }
 
-    public void UpdateTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing) { }
-
-    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent) { }
-
-    public void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result) { }
+    public void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit) { }
 }
 
 public class TurnLifeTimeCharacterBuffEntity : ICharacterBuffLifeTimeEntity
@@ -36,15 +30,12 @@ public class TurnLifeTimeCharacterBuffEntity : ICharacterBuffLifeTimeEntity
         return _turn <= 0;
     }
 
-    public void UpdateTiming(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, UpdateTiming timing) 
-    { 
-        if (timing == global::UpdateTiming.TurnEnd)
+    public void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    {
+        if (actionUnit is UpdateTimingAction timingAction &&
+            timingAction.Timing == UpdateTiming.TurnEnd)
         {
             _turn--;
         }
     }
-
-    public void UpdateIntent(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IIntentAction intent) { }
-
-    public void UpdateResult(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IResultAction result) { }
 }

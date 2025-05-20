@@ -5,7 +5,7 @@ using Sirenix.OdinInspector;
 
 public interface IIntegerValue
 {
-    int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource);
+    int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource, IActionUnit actionUnit);
 }
 
 [Serializable]

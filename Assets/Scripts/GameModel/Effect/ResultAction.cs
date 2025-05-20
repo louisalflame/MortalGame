@@ -1,7 +1,7 @@
 using Optional;
 using UnityEngine;
 
-public abstract class BaseResultAction : IResultAction
+public abstract class BaseResultAction : ITargetActionResult
 {
     public abstract UpdateAction ActionType { get; }
     public IActionSource Source { get; private set; }

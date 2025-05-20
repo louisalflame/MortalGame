@@ -338,7 +338,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
 
                     _TriggerTiming(TriggerTiming.PlayCardStart);
 
-                    var trigger = new CardPlayTrigger(usedCard, loseEnergyResult, playCardIndex);
+                    var trigger = new CardPlayTrigger(new CardPlayCommand(usedCard, loseEnergyResult, playCardIndex));
                     foreach(var effect in usedCard.Effects)
                     {
                         var applyCardEvents = _ApplyCardEffect(source, trigger, effect);
@@ -449,6 +449,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
         {
             case DamageEffect damageEffect:
             {
+                var damageIntent = new DamageIntent(actionSource, triggerSource, damageEffect);
                 var targets = damageEffect.Targets.Eval(this, triggerSource);
                 foreach(var target in targets)
                 {
@@ -757,20 +758,21 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
 
     private void _UpdateTiming(UpdateTiming updateTiming)
     {
-        _gameStatus.Ally.UpdateTiming(this, updateTiming);
-        _gameStatus.Enemy.UpdateTiming(this, updateTiming);
+        var timingAction = new UpdateTimingAction(updateTiming);
+        _gameStatus.Ally.Update(this, timingAction);
+        _gameStatus.Enemy.Update(this, timingAction);
     }
 
-    private void _UpdateAction(IIntentAction intentAction)
+    private void _UpdateAction(ITargetActionIntent intentAction)
     {
-        _gameStatus.Ally.UpdateIntent(this, intentAction);
-        _gameStatus.Enemy.UpdateIntent(this, intentAction);
+        _gameStatus.Ally.Update(this, intentAction);
+        _gameStatus.Enemy.Update(this, intentAction);
     }
 
-    private void _UpdateAction(IResultAction resulAction)
+    private void _UpdateAction(ITargetActionResult resulAction)
     {
-        _gameStatus.Ally.UpdateResult(this, resulAction);
-        _gameStatus.Enemy.UpdateResult(this, resulAction);
+        _gameStatus.Ally.Update(this, resulAction);
+        _gameStatus.Enemy.Update(this, resulAction);
     }
 
     // TODO: collect reactionEffects created from reactionSessions
