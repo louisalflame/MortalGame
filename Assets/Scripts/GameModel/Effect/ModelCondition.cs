@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Optional;
 using Sirenix.OdinInspector;
+using UniRx;
 using UnityEngine;
  
 
@@ -112,7 +113,7 @@ public class CardPlayCondition : ICardBuffCondition, IPlayerBuffCondition, IChar
     public List<ICardPlayValueCondition> Conditions = new ();
 
     public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
-    {
+    {        
         return actionUnit switch
         {
             CardPlayIntentAction cardPlayIntent =>

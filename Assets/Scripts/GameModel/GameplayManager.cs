@@ -887,6 +887,31 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 }
                 break;
             }
+            case AddCardBuffPlayerBuffEffect addCardBuffPlayerBuffEffect:
+            {
+                var intent = new AddCardBuffIntentAction(actionSource);
+                var cards = addCardBuffPlayerBuffEffect.Targets.Eval(this, triggerSource, intent);
+                foreach(var card in cards)
+                {
+                    var cardTarget = new CardTarget(card);
+                    var targetIntent = new AddCardBuffIntentTargetAction(actionSource, cardTarget);
+                    foreach(var addCardBuffData in addCardBuffPlayerBuffEffect.AddCardBuffDatas)
+                    {
+                        var addLevel = addCardBuffData.Level.Eval(this, triggerSource, targetIntent);
+                        var addResult = card.BuffManager.AddBuff(
+                            _contextMgr.CardBuffLibrary,
+                            this,
+                            triggerSource,
+                            targetIntent,
+                            addCardBuffData.CardBuffId,
+                            addLevel);
+
+                        _UpdateAction(new AddCardBuffResultAction(actionSource, cardTarget, addResult));
+                        appleBuffEffectEvents.Add(new AddCardBuffEvent(card, this));
+                    }
+                }
+                break;
+            }
         }
 
         var triggerEndEvents = _TriggerTiming(TriggerTiming.TriggerBuffEnd);

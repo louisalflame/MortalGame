@@ -74,7 +74,7 @@ public class SessionBooleanEntity : ISessionValueEntity
                 }
                 break;
 
-            case IIntentTargetAction intentAction:
+            case IIntentAction intentAction:
                 if (_intentRules.TryGetValue(intentAction.ActionType, out var intentRules))
                 {
                     _UpdateRules(intentRules, gameWatcher, trigger, intentAction);
@@ -155,7 +155,7 @@ public class SessionIntegerEntity : ISessionValueEntity
                 }
                 break;
 
-            case IIntentTargetAction intentAction:
+            case IIntentAction intentAction:
                 if (_intentRules.TryGetValue(intentAction.ActionType, out var intentRules))
                 {
                     _UpdateRules(intentRules, gameWatcher, trigger, intentAction);

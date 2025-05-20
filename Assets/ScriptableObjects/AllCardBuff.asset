@@ -23,3 +23,4 @@ MonoBehaviour:
     SerializationNodes: []
   AllCardBuffData:
   - {fileID: 11400000, guid: 18f35a8c78a2c9648a2aca1f8ef8b1d2, type: 2}
+  - {fileID: 11400000, guid: 39732c386e29f094fb8236b16d4abcfa, type: 2}
