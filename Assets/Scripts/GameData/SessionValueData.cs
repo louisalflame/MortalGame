@@ -11,8 +11,6 @@ public interface ISessionValueData
 [Serializable]
 public class SessionBoolean : ISessionValueData
 {
-    public bool Value;
-
     [ShowInInspector]
     public BooleanUpdateTimingRules TimingRules = new();
     [ShowInInspector]
@@ -22,15 +20,13 @@ public class SessionBoolean : ISessionValueData
     
     public ISessionValueEntity GetEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
-        return new SessionBooleanEntity(Value, TimingRules, IntentRules, ResultRules);
+        return new SessionBooleanEntity(TimingRules, IntentRules, ResultRules);
     }
 }
 
 [Serializable]
 public class SessionInteger : ISessionValueData
 {
-    public int Value;
-
     [ShowInInspector]
     public IntegerUpdateTimingRules TimingRules = new();
     [ShowInInspector]
@@ -40,6 +36,6 @@ public class SessionInteger : ISessionValueData
 
     public ISessionValueEntity GetEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
-        return new SessionIntegerEntity(Value, TimingRules, IntentRules, ResultRules);
+        return new SessionIntegerEntity(TimingRules, IntentRules, ResultRules);
     }
 }

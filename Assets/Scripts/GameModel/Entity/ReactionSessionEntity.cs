@@ -6,6 +6,7 @@ using Optional;
 
 public interface IReactionSessionEntity
 {
+    bool IsSessionValueUpdated(string key);
     Option<bool> GetSessionBoolean(string key);
     Option<int> GetSessionInteger(string key);
 
@@ -14,8 +15,8 @@ public interface IReactionSessionEntity
 
 public abstract class ReactionSessionEntity : IReactionSessionEntity
 {
-    protected Dictionary<string, ISessionValueEntity> _baseEntities;
-    protected Dictionary<string, ISessionValueEntity> _values;
+    protected readonly IReadOnlyDictionary<string, ISessionValueEntity> _baseEntities;
+    protected readonly Dictionary<string, ISessionValueEntity> _values;
 
     public ReactionSessionEntity(Dictionary<string, ISessionValueEntity> values)
     {
@@ -23,12 +24,18 @@ public abstract class ReactionSessionEntity : IReactionSessionEntity
         _values = new Dictionary<string, ISessionValueEntity>();
     }
 
+    public bool IsSessionValueUpdated(string key)
+    {
+        return
+            _values.TryGetValue(key, out var valueEntity) &&
+            valueEntity.IsUpdated;
+    }
     public Option<bool> GetSessionBoolean(string key)
     {
         if (_values.TryGetValue(key, out var valueEntity) &&
             valueEntity is SessionBooleanEntity booleanEntity)
         {
-            return booleanEntity.Value.SomeNotNull();
+            return booleanEntity.Value;
         }
         return Option.None<bool>();
     }
@@ -37,7 +44,7 @@ public abstract class ReactionSessionEntity : IReactionSessionEntity
         if (_values.TryGetValue(key, out var valueEntity) &&
             valueEntity is SessionIntegerEntity integerEntity)
         {
-            return integerEntity.Value.SomeNotNull();
+            return integerEntity.Value;
         }
         return Option.None<int>();
     }
