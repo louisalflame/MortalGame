@@ -30,9 +30,9 @@ public class CardInfo
         Rarity = card.Rarity;
         Themes = card.Themes;
 
-        OriginCost = card.Cost;
+        OriginCost = card.OriginCost;
         Cost = card.EvalCost(gameWatcher);
-        OriginPower = card.Power;
+        OriginPower = card.OriginPower;
         Power = card.EvalPower(gameWatcher);
 
         MainSelectable = new MainSelectableInfo(card.MainSelectable.SelectType);

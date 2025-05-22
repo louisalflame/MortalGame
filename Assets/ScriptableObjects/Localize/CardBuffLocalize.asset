@@ -70,7 +70,7 @@ MonoBehaviour:
       Data: "\u8FC5\u64CA"
     - Name: Info
       Entry: 1
-      Data: "\u63D0\u5347\u6700\u53F3\u5074\u5361\u724C\u7684\u6578\u503C"
+      Data: "\u5C64\u6578{:level}\n\u63D0\u5347\u6700\u53F3\u5074\u5361\u724C\u7684\u6578\u503C"
     - Name: 
       Entry: 8
       Data: 

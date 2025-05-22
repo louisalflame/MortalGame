@@ -39,8 +39,8 @@ public class CardIntegerProperty : IIntegerValue
             .Map(
                 card => Property switch
                 {
-                    CardIntegerValueType.Power => card.Power,
-                    CardIntegerValueType.Cost => card.Cost,
+                    CardIntegerValueType.Power => card.EvalPower(gameWatcher),
+                    CardIntegerValueType.Cost => card.EvalCost(gameWatcher),
                     _ => 0
                 })
             .ValueOr(0);

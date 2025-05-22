@@ -11,8 +11,10 @@ public class CardBuffInfoView : MonoBehaviour, IRecyclable
     public void SetInfo(CardBuffInfo info, LocalizeLibrary localizeLibrary)
     {
         var localizeData = localizeLibrary.Get(LocalizeTitleInfoType.CardBuff, info.CardBuffDataId);
+        var templateValue = info.GetTemplateValues();
+
         _cardBuffTitleText.text = localizeData.Title;
-        _cardBuffInfoText.text = localizeData.Info;
+        _cardBuffInfoText.text = localizeData.Info.ReplaceTemplateKeys(templateValue);
     }
 
     public void Reset()

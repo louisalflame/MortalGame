@@ -14,8 +14,6 @@ public interface ICardEntity
     CardType Type { get; }
     CardRarity Rarity { get; }
     IEnumerable<CardTheme> Themes { get; }
-    int Cost { get; }
-    int Power { get; }
 
     IMainTargetSelectable MainSelectable { get; }
     IEnumerable<ISubTargetSelectable> SubSelectables { get; }
@@ -25,6 +23,8 @@ public interface ICardEntity
     IEnumerable<ICardPropertyEntity> Properties { get; }
     ICardBuffManager BuffManager { get; }
 
+    int OriginCost { get; }
+    int OriginPower { get; }
     int EvalCost(IGameplayStatusWatcher gameWatcher);
     int EvalPower(IGameplayStatusWatcher gameWatcher);
 
@@ -53,9 +53,9 @@ public class CardEntity : ICardEntity
     public string CardDataId => _cardDataId;
     public CardType Type => _type;
     public CardRarity Rarity => _rarity;
+    public int OriginCost => _cost;
+    public int OriginPower => _power;
     public IEnumerable<CardTheme> Themes => _themes;
-    public int Cost => _cost;
-    public int Power => _power;
     public IMainTargetSelectable MainSelectable => _mainSelectable;
     public IEnumerable<ISubTargetSelectable> SubSelectables => _subSelectables;
     public List<ICardEffect> Effects => _effects;
@@ -182,7 +182,7 @@ public class CardEntity : ICardEntity
 
     public int EvalCost(IGameplayStatusWatcher gameWatcher)
     {
-        var cost = Cost;
+        var cost = _cost;
         var cardTrigger = new CardTrigger(this);
         var systemAction = new SystemAction();
         foreach (var property in Properties.Where(p => p.Property == CardProperty.CostAdjust))
@@ -202,17 +202,19 @@ public class CardEntity : ICardEntity
 
     public int EvalPower(IGameplayStatusWatcher gameWatcher)
     {
-        var power = Power;
+        var power = _power;
         var cardTrigger = new CardTrigger(this);
         foreach(var property in Properties.Where(p => p.Property == CardProperty.PowerAdjust))
         {
             power += property.Eval(gameWatcher, cardTrigger);
         }
-        foreach(var buff in BuffManager.Buffs)
+        
+        foreach (var buff in BuffManager.Buffs)
         {
-            foreach(var property in buff.Properties.Where(p => p.Property == CardProperty.PowerAdjust))
+            var cardBuffTrigger = new CardBuffTrigger(buff);
+            foreach (var property in buff.Properties.Where(p => p.Property == CardProperty.PowerAdjust))
             {
-                power += property.Eval(gameWatcher, cardTrigger);
+                power += property.Eval(gameWatcher, cardBuffTrigger);
             }
         }
 

@@ -63,9 +63,6 @@ MonoBehaviour:
     - Name: $v
       Entry: 7
       Data: 5|SessionInteger, Assembly-CSharp
-    - Name: Value
-      Entry: 3
-      Data: 0
     - Name: TimingRules
       Entry: 7
       Data: 6|IntegerUpdateTimingRules, Assembly-CSharp
@@ -375,7 +372,7 @@ MonoBehaviour:
         mscorlib
     - Name: 
       Entry: 12
-      Data: 2
+      Data: 3
     - Name: 
       Entry: 7
       Data: 34|IsSelfTurnCondition, Assembly-CSharp
@@ -450,6 +447,59 @@ MonoBehaviour:
       Entry: 8
       Data: 
     - Name: 
+      Entry: 7
+      Data: 43|PlayerBuffCondition, Assembly-CSharp
+    - Name: PlayerBuff
+      Entry: 7
+      Data: 44|TriggeredPlayerBuff, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Conditions
+      Entry: 7
+      Data: 45|System.Collections.Generic.List`1[[IPlayerBuffValueCondition, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 46|PlayerBuffSessionCondition, Assembly-CSharp
+    - Name: Conditions
+      Entry: 7
+      Data: 47|System.Collections.Generic.List`1[[IReactionSessionValueCondition,
+        Assembly-CSharp]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 48|ReactorSessionUpdatedCondition, Assembly-CSharp
+    - Name: SessionKey
+      Entry: 1
+      Data: addPower
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
       Entry: 13
       Data: 
     - Name: 
@@ -457,19 +507,19 @@ MonoBehaviour:
       Data: 
     - Name: Effect
       Entry: 7
-      Data: 43|AddCardBuffPlayerBuffEffect, Assembly-CSharp
+      Data: 49|AddCardBuffPlayerBuffEffect, Assembly-CSharp
     - Name: Targets
       Entry: 7
-      Data: 44|SingleCardCollection, Assembly-CSharp
+      Data: 50|SingleCardCollection, Assembly-CSharp
     - Name: TargetCard
       Entry: 7
-      Data: 45|IndexOfCardCollection, Assembly-CSharp
+      Data: 51|IndexOfCardCollection, Assembly-CSharp
     - Name: CardCollection
       Entry: 7
-      Data: 46|AllyHandCards, Assembly-CSharp
+      Data: 52|AllyHandCards, Assembly-CSharp
     - Name: Player
       Entry: 7
-      Data: 47|CurrentPlayer, Assembly-CSharp
+      Data: 53|CurrentPlayer, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -478,7 +528,7 @@ MonoBehaviour:
       Data: 
     - Name: Index
       Entry: 7
-      Data: 48|ConstInteger, Assembly-CSharp
+      Data: 54|ConstInteger, Assembly-CSharp
     - Name: Value
       Entry: 3
       Data: 0
@@ -493,23 +543,23 @@ MonoBehaviour:
       Data: 
     - Name: AddCardBuffDatas
       Entry: 7
-      Data: 49|System.Collections.Generic.List`1[[AddCardBuffData, Assembly-CSharp]],
+      Data: 55|System.Collections.Generic.List`1[[AddCardBuffData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 50|AddCardBuffData, Assembly-CSharp
+      Data: 56|AddCardBuffData, Assembly-CSharp
     - Name: CardBuffId
       Entry: 1
       Data: QuickPower
     - Name: Level
       Entry: 7
-      Data: 51|PlayerBuffSessionInteger, Assembly-CSharp
+      Data: 57|PlayerBuffSessionInteger, Assembly-CSharp
     - Name: PlayerBuff
       Entry: 7
-      Data: 52|TriggeredPlayerBuff, Assembly-CSharp
+      Data: 58|TriggeredPlayerBuff, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -551,7 +601,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 53|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
+      Data: 59|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -564,7 +614,7 @@ MonoBehaviour:
       Data: 
     - Name: LifeTimeData
       Entry: 7
-      Data: 54|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
+      Data: 60|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 

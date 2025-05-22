@@ -29,7 +29,6 @@ public interface IReactionSessionValueCondition
 public class ReactorSessionUpdatedCondition : IReactionSessionValueCondition
 {
     public string SessionKey;
-    public List<IReactionSessionValueCondition> Conditions = new();
 
     public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IReactionSessionEntity sessionEntity)
     {
