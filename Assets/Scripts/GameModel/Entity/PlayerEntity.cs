@@ -146,7 +146,7 @@ public class DummyPlayer : PlayerEntity
 
 public static class PlayerEntityExtensions
 {
-    public static int GetPlayerBuffProperty(this IPlayerEntity player, IGameplayStatusWatcher watcher, PlayerBuffProperty targetProperty)
+    public static int GetPlayerBuffProperty(this IPlayerEntity player, IGameplayStatusWatcher watcher, EffectAttributeType targetAttribute)
     {
         var value = 0;
         foreach(var playerBuff in player.BuffManager.Buffs)
@@ -154,9 +154,10 @@ public static class PlayerEntityExtensions
             var triggerBuff = new PlayerBuffTrigger(playerBuff);
             foreach(var property in playerBuff.Properties)
             {
-                if (property.Property == targetProperty)
+                if (property is EffectAttributePlayerBuffPropertyEntity attributeEntity &&
+                    attributeEntity.AttributeType == targetAttribute)
                 {
-                    value += property.Eval(watcher, triggerBuff);
+                    value += attributeEntity.Eval(watcher, triggerBuff);
                 }
             }
         }

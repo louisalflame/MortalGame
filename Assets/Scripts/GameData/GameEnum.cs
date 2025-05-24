@@ -25,6 +25,13 @@ public enum SetConditionType
     AnyOutside,
     AllOutside,
 }
+public enum OrderType
+{
+    None = 0,
+    Ascending,
+    Descending,
+    Random
+}
 
 public enum Faction
 {
@@ -73,26 +80,14 @@ public enum PlayerBuffPropertyDuration
 public enum PlayerBuffProperty
 {
     None = 0,
-    Attack,
-    PenetrateAttack,
-    AdditionalAttack,
-    EffectiveAttack,
-    Defense,
-    Heal,
-    EnergyGain,
+    EffectAttribute,
     MaxHealth,
     MaxEnergy,
 }
 public enum CharacterBuffProperty
 {
     None = 0,
-    Attack,
-    PenetrateAttackIncrease,
-    AdditionalAttack,
-    EffectiveAttack,
-    Defense,
-    Heal,
-    EnergyGain,
+    EffectAttribute,
     MaxHealth,
     MaxEnergy,
 }
@@ -171,3 +166,11 @@ public enum TriggerTiming
     TriggerBuffEnd,
 }
 
+public enum EffectAttributeType
+{
+    None = 0,
+    PowerAddition,
+    PowerRatio,
+    NormalDamageAddition,
+    NormalDamageRatio,
+}

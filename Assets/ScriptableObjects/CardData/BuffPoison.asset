@@ -32,7 +32,7 @@ MonoBehaviour:
       Data: 1
     - Name: Type
       Entry: 3
-      Data: 4
+      Data: 3
     - Name: Themes
       Entry: 7
       Data: 1|CardTheme[], Assembly-CSharp

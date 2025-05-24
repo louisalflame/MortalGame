@@ -56,11 +56,15 @@ public class PlayingCard : ITargetCardValue
 [Serializable]
 public class IndexOfCardCollection : ITargetCardValue
 {
+
+
     [HorizontalGroup("1")]
     public ITargetCardCollectionValue CardCollection;
 
     [HorizontalGroup("2")]
     public IIntegerValue Index;
+
+    public OrderType Order;
 
     public Option<ICardEntity> Eval(
         IGameplayStatusWatcher gameWatcher,
@@ -68,9 +72,15 @@ public class IndexOfCardCollection : ITargetCardValue
         IActionUnit actionUnit)
     {
         var cards = CardCollection.Eval(gameWatcher, trigger, actionUnit);
+        var orderedCards = Order switch
+        {
+            OrderType.Ascending => cards.ToList(),
+            OrderType.Descending => cards.Reverse().ToList(),
+            _ => cards.ToList()
+        };
         var index = Index.Eval(gameWatcher, trigger, actionUnit);
         return cards.Count > index && index >= 0 ?
-            cards.ElementAt(index).SomeNotNull() :
+            orderedCards.ElementAt(index).SomeNotNull() :
             Option.None<ICardEntity>();
     }
 }   

@@ -12,7 +12,7 @@ public interface ICardColletionZone
     bool TryGetCard(Guid cardIdentity, out ICardEntity card);
     void AddCard(ICardEntity card);
     void AddCards(IEnumerable<ICardEntity> cards);
-    bool TryRemoveCard(ICardEntity card, out int index);
+    bool TryRemoveCard(ICardEntity card, out int handCardIndex, out int handCardsCount);
     bool RemoveCard(ICardEntity card);
 }
 
@@ -45,8 +45,9 @@ public abstract class CardColletionZone : ICardColletionZone
     {
         _cards.AddRange(cards);
     }
-    public bool TryRemoveCard(ICardEntity card, out int index)
+    public bool TryRemoveCard(ICardEntity card, out int index, out int cardsCount)
     {
+        cardsCount = _cards.Count;
         index = _cards.IndexOf(card);
         if (index < 0)
         {

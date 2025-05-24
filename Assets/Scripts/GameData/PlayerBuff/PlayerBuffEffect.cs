@@ -15,6 +15,7 @@ public class ConditionalPlayerBuffEffect
     public IPlayerBuffEffect Effect;
 }
 
+[Serializable]
 public class EffectiveDamagePlayerBuffEffect : IPlayerBuffEffect
 {
     [HorizontalGroup("1")]
@@ -24,12 +25,14 @@ public class EffectiveDamagePlayerBuffEffect : IPlayerBuffEffect
     public IIntegerValue Value;
 }
 
+[Serializable]
 public class AddCardBuffPlayerBuffEffect : IPlayerBuffEffect
 {
     [HorizontalGroup("1")]
     public ITargetCardCollectionValue Targets;
-    
+
     [ShowInInspector]
     [HorizontalGroup("2")]
-    public List<AddCardBuffData> AddCardBuffDatas = new ();
+    public List<AddCardBuffData> AddCardBuffDatas = new();
 }
+

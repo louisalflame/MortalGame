@@ -46,32 +46,3 @@ public class CardTypesCondition : ICardValueCondition
         };
     }
 }
-
-public interface ICardPlayValueCondition
-{
-    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, CardPlaySource cardPlay);
-}
-[Serializable]
-public class CardPlayPositionCondition : ICardPlayValueCondition
-{
-    [ShowInInspector]
-    [HorizontalGroup("1")]
-    public IIntegerValueCondition[] Conditions = new IIntegerValueCondition[0];
-
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, CardPlaySource cardPlay)
-    {
-        return Conditions.All(c => c.Eval(gameWatcher, source, actionUnit, cardPlay.HandCardIndex));
-    }
-}
-[Serializable]
-public class CardPlayCardCondition : ICardPlayValueCondition
-{
-    [ShowInInspector]
-    [HorizontalGroup("1")]
-    public List<ICardValueCondition> Conditions = new();
-
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, CardPlaySource cardPlay)
-    {
-        return Conditions.All(c => c.Eval(gameWatcher, source, actionUnit, cardPlay.Card));
-    }
-}

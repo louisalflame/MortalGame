@@ -15,11 +15,15 @@ public class CardPlaySource : IActionSource
 {
     public ICardEntity Card { get; private set; }
     public int HandCardIndex { get; private set; }
+    public int HandCardsCount { get; private set; }
+    public IEffectAttribute Attribute { get; private set; }
 
-    public CardPlaySource(ICardEntity card, int handCardIndex)
+    public CardPlaySource(ICardEntity card, int handCardIndex, int handCardsCount)
     {
         Card = card;
         HandCardIndex = handCardIndex;
+        HandCardsCount = handCardsCount;
+        Attribute = new CardPlayAttributeEntity();
     }
 }
 

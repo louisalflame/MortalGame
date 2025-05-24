@@ -328,30 +328,32 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
                 var loseEnergyResult = player.EnergyManager.ConsumeEnergy(cardRuntimCost);
                 useCardEvents.Add(new LoseEnergyEvent(player, loseEnergyResult));
 
-                if (player.CardManager.HandCard.TryRemoveCard(usedCard, out int playCardIndex)) 
+                if (player.CardManager.HandCard.TryRemoveCard(usedCard, out int handCardIndex, out int handCardsCount))
                 {
+                    var cardPlaySource = new CardPlaySource(usedCard, handCardIndex, handCardsCount);
+                    var cardPlayTrigger = new CardPlayTrigger(cardPlaySource);
+
                     // Create PlayCardSession
                     _UpdateTiming(UpdateTiming.PlayCardStart);
 
-                    var cardPlaySource = new CardPlaySource(usedCard, playCardIndex);
                     _UpdateAction(new CardPlayIntentAction(cardPlaySource));
 
                     _TriggerTiming(TriggerTiming.PlayCardStart);
 
-                    var trigger = new CardPlayTrigger(cardPlaySource);
-                    foreach(var effect in usedCard.Effects)
+                    foreach (var effect in usedCard.Effects)
                     {
-                        var applyCardEvents = _ApplyCardEffect(cardPlaySource, trigger, effect);
+                        var applyCardEvents = _ApplyCardEffect(cardPlaySource, cardPlayTrigger, effect);
                         useCardEvents.AddRange(applyCardEvents);
                     }
-                
-                    ICardColletionZone destination =  
+
+                    ICardColletionZone destination =
                         (usedCard.HasProperty(CardProperty.Dispose) || usedCard.HasProperty(CardProperty.AutoDispose)) ?
                         player.CardManager.ExclusionZone : player.CardManager.Graveyard;
                     destination.AddCard(usedCard);
-                    
+
                     var usedCardInfo = new CardInfo(usedCard, this);
-                    var usedCardEvent = new UsedCardEvent() {
+                    var usedCardEvent = new UsedCardEvent()
+                    {
                         Faction = player.Faction,
                         UsedCardInfo = usedCardInfo,
                         HandCardInfo = player.CardManager.HandCard.ToCardCollectionInfo(this),
@@ -430,11 +432,11 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher
         switch(actionSource)
         {
             case CardPlaySource cardSource:
-                var playerBuffAttackIncrease = _gameStatus.CurrentPlayer
-                    .Map(player => player.GetPlayerBuffProperty(this, PlayerBuffProperty.Attack))
+                var powerAddition = _gameStatus.CurrentPlayer
+                    .Map(player => player.GetPlayerBuffProperty(this, EffectAttributeType.PowerAddition))
                     .ValueOr(0);
 
-                return rawDamagePoint + playerBuffAttackIncrease;
+                return rawDamagePoint + powerAddition;
             default:
                 return rawDamagePoint;
         }

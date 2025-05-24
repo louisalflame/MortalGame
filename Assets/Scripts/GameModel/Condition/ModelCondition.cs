@@ -176,7 +176,7 @@ public class PlayerBuffCondition : IPlayerBuffCondition
     {
         var playerBuffOpt = PlayerBuff.Eval(gameWatcher, trigger, actionUnit);
         return playerBuffOpt.Match(
-            playerBuff => Conditions.All(c => c.Eval(gameWatcher, trigger, playerBuff)),
+            playerBuff => Conditions.All(c => c.Eval(gameWatcher, trigger, actionUnit, playerBuff)),
             ()         => false
         );
     }
