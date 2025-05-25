@@ -67,7 +67,7 @@ public class CardOwner : ITargetPlayerValue
         IActionUnit actionUnit)
     {
         var cardOpt = Card.Eval(gameWatcher, trigger, actionUnit);
-        return cardOpt.FlatMap(card => card.Owner(gameWatcher));
+        return cardOpt.FlatMap(card => card.Owner(gameWatcher.GameStatus));
     }
 }
 [Serializable]

@@ -46,7 +46,7 @@ public class SelectedCharacter : ITargetCharacterValue
         ITriggerSource trigger,
         IActionUnit actionUnit)
     {
-        return gameWatcher.GameContext.SelectedCharacter.SomeNotNull();
+        return gameWatcher.ContextManager.Context.SelectedCharacter.SomeNotNull();
     }
 }
 

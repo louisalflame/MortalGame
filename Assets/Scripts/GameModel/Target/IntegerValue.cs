@@ -39,7 +39,9 @@ public class CardIntegerProperty : IIntegerValue
             .Map(
                 card => Property switch
                 {
+                    // TODO: Apply EffectAttribute.Power adjust
                     CardIntegerValueType.Power => card.EvalPower(gameWatcher),
+                    // TODO: Apply EffectAttribute.Cost adjust
                     CardIntegerValueType.Cost => card.EvalCost(gameWatcher),
                     _ => 0
                 })

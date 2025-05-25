@@ -59,7 +59,7 @@ public abstract class MoveCardEvent : IGameEvent
 
     public MoveCardEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher, ICardColletionZone start, ICardColletionZone destination)
     {
-        Faction = card.Faction(gameWatcher);
+        Faction = card.Faction(gameWatcher.GameStatus);
         CardInfo = new CardInfo(card, gameWatcher);
         StartZoneInfo = start.ToCardCollectionInfo(gameWatcher);
         DestinationZoneInfo = destination.ToCardCollectionInfo(gameWatcher);
@@ -73,7 +73,7 @@ public abstract class AddCardEvent : IGameEvent
 
     public AddCardEvent(ICardEntity card,IGameplayStatusWatcher gameWatcher, ICardColletionZone destination)
     {
-        Faction = card.Faction(gameWatcher);
+        Faction = card.Faction(gameWatcher.GameStatus);
         CardInfo = new CardInfo(card, gameWatcher);
         DestinationZoneInfo = destination.ToCardCollectionInfo(gameWatcher);
     }
@@ -110,7 +110,7 @@ public class AddCardBuffEvent : IGameEvent
 
     public AddCardBuffEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher)
     {
-        Faction = card.Faction(gameWatcher);
+        Faction = card.Faction(gameWatcher.GameStatus);
         CardInfo = new CardInfo(card, gameWatcher);
     }
 }

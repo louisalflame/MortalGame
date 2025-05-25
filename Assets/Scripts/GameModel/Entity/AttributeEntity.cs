@@ -2,14 +2,16 @@ using UnityEngine;
 
 public interface IEffectAttribute
 {
-    int Power { get; set; }
+    int PowerAddition { get; set; }
+    int PowerRatio { get; set; }
     int NormalDamageAddition { get; set; }
     int NormalDamageRatio { get; set; }
 }
 
 public class CardPlayAttributeEntity : IEffectAttribute
 {
-    public int Power { get; set; } = 0;
+    public int PowerAddition { get; set; } = 0;
+    public int PowerRatio { get; set; } = 0;
     public int NormalDamageAddition { get; set; } = 0;
     public int NormalDamageRatio { get; set; } = 0;
 

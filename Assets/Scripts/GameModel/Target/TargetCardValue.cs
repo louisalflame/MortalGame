@@ -32,7 +32,7 @@ public class SelectedCard : ITargetCardValue
         ITriggerSource trigger,
         IActionUnit actionUnit)
     {
-        return gameWatcher.GameContext.SelectedCard.SomeNotNull();
+        return gameWatcher.ContextManager.Context.SelectedCard.SomeNotNull();
     }
 }
 [Serializable]

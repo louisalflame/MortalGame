@@ -224,19 +224,19 @@ public class CardEntity : ICardEntity
 
 public static class CardEntityExtensions
 {
-    public static Option<IPlayerEntity> Owner(this ICardEntity card, IGameplayStatusWatcher watcher)
+    public static Option<IPlayerEntity> Owner(this ICardEntity card, GameStatus gameStatus)
     {
-        var allyCardOpt = watcher.GameStatus.Ally.CardManager.GetCard(card.Identity);
+        var allyCardOpt = gameStatus.Ally.CardManager.GetCard(card.Identity);
         if (allyCardOpt.HasValue)
-            return (watcher.GameStatus.Ally as IPlayerEntity).Some();
-        var enemyCardOpt = watcher.GameStatus.Enemy.CardManager.GetCard(card.Identity);
+            return (gameStatus.Ally as IPlayerEntity).Some();
+        var enemyCardOpt = gameStatus.Enemy.CardManager.GetCard(card.Identity);
         if (enemyCardOpt.HasValue)
-            return (watcher.GameStatus.Enemy as IPlayerEntity).Some();
+            return (gameStatus.Enemy as IPlayerEntity).Some();
         return Option.None<IPlayerEntity>();
     }
-    public static Faction Faction(this ICardEntity card, IGameplayStatusWatcher watcher)
+    public static Faction Faction(this ICardEntity card, GameStatus gameStatus)
     {
-        return card.Owner(watcher).ValueOr(PlayerEntity.DummyPlayer).Faction;
+        return card.Owner(gameStatus).ValueOr(PlayerEntity.DummyPlayer).Faction;
     }
 
     public static bool IsConsumable(this ICardEntity card)

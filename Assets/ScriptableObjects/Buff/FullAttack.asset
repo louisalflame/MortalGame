@@ -63,9 +63,6 @@ MonoBehaviour:
     - Name: $v
       Entry: 7
       Data: 5|SessionInteger, Assembly-CSharp
-    - Name: Value
-      Entry: 3
-      Data: 0
     - Name: TimingRules
       Entry: 7
       Data: 6|IntegerUpdateTimingRules, Assembly-CSharp
@@ -349,19 +346,22 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 7
-      Data: 31|AttackPlayerBuffPropertyData, Assembly-CSharp
+      Data: 31|EffectAttributePlayerBuffPropertyData, Assembly-CSharp
+    - Name: Type
+      Entry: 3
+      Data: 1
     - Name: Value
       Entry: 7
-      Data: 32|PlayerBuffSessionInteger, Assembly-CSharp
+      Data: 32|PlayerBuffIntegerProperty, Assembly-CSharp
     - Name: PlayerBuff
       Entry: 7
       Data: 33|TriggeredPlayerBuff, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
-    - Name: SessionIntegerId
-      Entry: 1
-      Data: atk
+    - Name: Property
+      Entry: 3
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
