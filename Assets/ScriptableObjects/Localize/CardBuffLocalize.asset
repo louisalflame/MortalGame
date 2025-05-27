@@ -34,7 +34,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 2
+      Data: 3
     - Name: 
       Entry: 7
       Data: 
@@ -71,6 +71,27 @@ MonoBehaviour:
     - Name: Info
       Entry: 1
       Data: "\u5C64\u6578{:level}\n\u63D0\u5347\u6700\u53F3\u5074\u5361\u724C\u7684\u6578\u503C"
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: ComboAttack
+    - Name: $v
+      Entry: 7
+      Data: 4|LocalizeTitleInfoData, Assembly-CSharp
+    - Name: Title
+      Entry: 1
+      Data: "\u9023\u64CA"
+    - Name: Info
+      Entry: 1
+      Data: "\u5C64\u6578{:level}\n\u63D0\u5347\u6B64\u56DE\u5408\u9023\u64CA\u6578\u7684\u50B7\u5BB3"
     - Name: 
       Entry: 8
       Data: 

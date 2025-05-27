@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Optional.Collections;
 using Sirenix.OdinInspector;
@@ -143,5 +144,36 @@ public class PlayerBuffSessionInteger : IIntegerValue
             .Eval(gameWatcher, triggerSource, actionUnit)
             .FlatMap(playerBuff => playerBuff.GetSessionInteger(SessionIntegerId))
             .ValueOr(0);
+    }
+}
+
+[Serializable]
+public class ConditionalValue : IIntegerValue
+{
+    [Serializable]
+    public class ConditionPair
+    {
+        [ShowInInspector]
+        [HorizontalGroup("1")]
+        public List<IPlayerBuffCondition> Conditions = new ();
+
+        [HorizontalGroup("2")]
+        public IIntegerValue Value;
+    }
+
+    [ShowInInspector]
+    [HorizontalGroup("1")]
+    public List<ConditionPair> Pairs = new ();
+
+    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource, IActionUnit actionUnit)
+    {
+        foreach (var pair in Pairs)
+        {
+            if (pair.Conditions.All(condition => condition.Eval(gameWatcher, triggerSource, actionUnit)))
+            {
+                return pair.Value.Eval(gameWatcher, triggerSource, actionUnit);
+            }
+        }
+        return 0;
     }
 }

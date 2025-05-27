@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public interface IActionSource
@@ -8,6 +9,23 @@ public class SystemSource : IActionSource
 {
     public SystemSource()
     {
+    }
+}
+
+public class SystemExectueStartSource : IActionSource
+{
+    public IPlayerEntity Player { get; private set; }
+    public SystemExectueStartSource(IPlayerEntity player)
+    {
+        Player = player;
+    }
+}
+public class SystemExectueEndSource : IActionSource
+{
+    public IPlayerEntity Player { get; private set; }
+    public SystemExectueEndSource(IPlayerEntity player)
+    {
+        Player = player;
     }
 }
 

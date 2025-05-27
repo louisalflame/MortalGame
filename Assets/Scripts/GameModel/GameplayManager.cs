@@ -15,8 +15,8 @@ public interface IGameplayStatusWatcher
 
 public interface IGameplayReactor
 {
-    void UpdateTiming(UpdateTiming updateTiming);
-    void UpdateAction(IActionUnit actionUnit);
+    void UpdateReactorSessionTiming(UpdateTiming updateTiming);
+    void UpdateReactorSessionAction(IActionUnit actionUnit);
 }
 
 public interface IGameEventWatcher : IGameplayStatusWatcher
@@ -79,17 +79,17 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
         switch(gameStatus.State)
         {
             case GameState.GameStart:
-                UpdateTiming(global::UpdateTiming.GameStart);
+                UpdateReactorSessionTiming(UpdateTiming.GameStart);
                 _GameStart();
                 _gameStatus.SetState(GameState.TurnStart);
                 break;
             case GameState.TurnStart:
-                UpdateTiming(global::UpdateTiming.TurnStart);
+                UpdateReactorSessionTiming(UpdateTiming.TurnStart);
                 _TurnStart();
                 _gameStatus.SetState(GameState.DrawCard);
                 break;
             case GameState.DrawCard:
-                UpdateTiming(global::UpdateTiming.DrawCard);
+                UpdateReactorSessionTiming(UpdateTiming.DrawCard);
                 _TurnDrawCard();
                 _gameStatus.SetState(GameState.EnemyPrepare);
                 break;
@@ -108,7 +108,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                 _EnemyExecute();
                 break;
             case GameState.TurnEnd:
-                UpdateTiming(global::UpdateTiming.TurnEnd);
+                UpdateReactorSessionTiming(UpdateTiming.TurnEnd);
                 _TurnEnd();
                 _gameStatus.SetState(GameState.TurnStart);
                 break;
@@ -156,7 +156,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
         var enemyDrawEvents = EffectExecutor.DrawCards(this, this, new SystemSource(), _gameStatus.Enemy, enemyDrawCount);
         _gameEvents.AddRange(enemyDrawEvents);
 
-        var triggerEvts = _TriggerTiming(TriggerTiming.DrawCard);
+        var triggerEvts = _TriggerTiming(TriggerTiming.DrawCard, new SystemSource());
         _gameEvents.AddRange(triggerEvts);
 
         _gameActions.Clear();
@@ -190,7 +190,9 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
     }
     private void _EnemyExecute()
     {
-        while(_gameStatus.Enemy.SelectedCards.TryDequeueCard(out ICardEntity selectedCard))
+        UpdateReactorSessionTiming(UpdateTiming.ExecuteStart);
+        
+        while (_gameStatus.Enemy.SelectedCards.TryDequeueCard(out ICardEntity selectedCard))
         {
             var cardRuntimCost = selectedCard.EvalCost(this);
             if (cardRuntimCost <= _gameStatus.Enemy.CurrentEnergy)
@@ -200,7 +202,8 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
             }
             else
             {
-                _gameEvents.Add(new EnemyUnselectedCardEvent(){
+                _gameEvents.Add(new EnemyUnselectedCardEvent()
+                {
                     SelectedCardInfo = new CardInfo(selectedCard, this),
                     SelectedCardInfos = _gameStatus.Enemy.SelectedCards.Cards.ToCardInfos(this)
                 });
@@ -244,18 +247,22 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
             HandCardInfo = _gameStatus.Ally.CardManager.HandCard.ToCardCollectionInfo(this)
         });
 
-        UpdateTiming(global::UpdateTiming.ExecuteEnd);
-        var triggerEvts = _TriggerTiming(TriggerTiming.ExecuteEnd);
+        var endTurnSource = new SystemExectueEndSource(_gameStatus.Ally);
+        var triggerEvts = _TriggerTiming(TriggerTiming.ExecuteEnd, endTurnSource);
         _gameEvents.AddRange(triggerEvts);
+
+        UpdateReactorSessionTiming(UpdateTiming.ExecuteEnd);
 
         _gameStatus.SetState(GameState.Enemy_Execute);
         _gameActions.Clear();
     }   
     private void _FinishEnemyExecuteTurn()
     {
-        UpdateTiming(global::UpdateTiming.ExecuteEnd);
-        var triggerEvts = _TriggerTiming(TriggerTiming.ExecuteEnd);
+        var endTurnSource = new SystemExectueEndSource(_gameStatus.Enemy);
+        var triggerEvts = _TriggerTiming(TriggerTiming.ExecuteEnd, endTurnSource);
         _gameEvents.AddRange(triggerEvts);
+
+        UpdateReactorSessionTiming(UpdateTiming.ExecuteEnd);
 
         _gameStatus.SetState(GameState.TurnEnd);
         _gameActions.Clear();
@@ -268,8 +275,9 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
         _gameEvents.AddRange(
             _gameStatus.Enemy.CardManager.ClearHandOnTurnEnd(this));
 
-        UpdateTiming(global::UpdateTiming.TurnEnd);
-        var triggerEvts = _TriggerTiming(TriggerTiming.TurnEnd);
+        UpdateReactorSessionTiming(UpdateTiming.TurnEnd);
+
+        var triggerEvts = _TriggerTiming(TriggerTiming.TurnEnd, new SystemSource());
         _gameEvents.AddRange(triggerEvts);
     }
 
@@ -335,18 +343,16 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                 var loseEnergyResult = player.EnergyManager.ConsumeEnergy(cardRuntimCost);
                 useCardEvents.Add(new LoseEnergyEvent(player, loseEnergyResult));
 
-                if (player.CardManager.HandCard.TryRemoveCard(usedCard, out int handCardIndex, out int handCardsCount))
+                if (player.CardManager.TryPlayCard(usedCard, out CardPlaySource cardPlaySource))
                 {
-                    var cardPlaySource = new CardPlaySource(usedCard, handCardIndex, handCardsCount);
                     var cardPlayTrigger = new CardPlayTrigger(cardPlaySource);
 
                     // Create PlayCardSession
-                    UpdateTiming(global::UpdateTiming.PlayCardStart);
+                    UpdateReactorSessionTiming(UpdateTiming.PlayCardStart);
 
-                    UpdateAction(new CardPlayIntentAction(cardPlaySource));
+                    UpdateReactorSessionAction(new CardPlayIntentAction(cardPlaySource));
 
-                    var triggerPlayCardStartEvts = _TriggerTiming(TriggerTiming.PlayCardStart);
-                    useCardEvents.AddRange(triggerPlayCardStartEvts);
+                    useCardEvents.AddRange(_TriggerTiming(TriggerTiming.PlayCardStart, cardPlaySource));
 
                     foreach (var effect in usedCard.Effects)
                     {
@@ -359,10 +365,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                         useCardEvents.AddRange(applyCardEvents);
                     }
 
-                    ICardColletionZone destination =
-                        (usedCard.HasProperty(CardProperty.Dispose) || usedCard.HasProperty(CardProperty.AutoDispose)) ?
-                        player.CardManager.ExclusionZone : player.CardManager.Graveyard;
-                    destination.AddCard(usedCard);
+                    player.CardManager.EndPlayCard();
 
                     var usedCardInfo = new CardInfo(usedCard, this);
                     var usedCardEvent = new UsedCardEvent()
@@ -374,11 +377,10 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                     };
                     useCardEvents.Add(usedCardEvent);
 
-                    // Close PlayCardSession
-                    UpdateTiming(global::UpdateTiming.PlayCardEnd);
+                    useCardEvents.AddRange(_TriggerTiming(TriggerTiming.PlayCardEnd, cardPlaySource));
 
-                    var triggerPlayCardEndEvts = _TriggerTiming(TriggerTiming.PlayCardEnd);
-                    useCardEvents.AddRange(triggerPlayCardEndEvts);
+                    // Close PlayCardSession
+                    UpdateReactorSessionTiming(UpdateTiming.PlayCardEnd);
                 }
             }
 
@@ -388,24 +390,24 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
         }
     }
 
-    public void UpdateTiming(UpdateTiming updateTiming)
+    public void UpdateReactorSessionTiming(UpdateTiming updateTiming)
     {
         var timingAction = new UpdateTimingAction(updateTiming);
         _gameStatus.Ally.Update(this, timingAction);
         _gameStatus.Enemy.Update(this, timingAction);
     }
 
-    public void UpdateAction(IActionUnit actionUnit)
+    public void UpdateReactorSessionAction(IActionUnit actionUnit)
     {
         _gameStatus.Ally.Update(this, actionUnit);
         _gameStatus.Enemy.Update(this, actionUnit);
     }
 
     // TODO: collect reactionEffects created from reactionSessions
-    private IEnumerable<IGameEvent> _TriggerTiming(TriggerTiming timing)
+    private IEnumerable<IGameEvent> _TriggerTiming(TriggerTiming timing, IActionSource actionSource)
     {
         var triggerBuffEvents = new List<IGameEvent>();
-        var timingAction = new TriggerTimingAction(timing);
+        var timingAction = new TriggerTimingAction(timing, actionSource);
         foreach (var buff in _gameStatus.Ally.BuffManager.Buffs)
         {
             var buffTrigger = new PlayerBuffTrigger(buff);
@@ -416,9 +418,13 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                 {
                     if (conditionalEffect.Conditions.All(c => c.Eval(this, buffTrigger, timingAction)))
                     {
-                        var applySource = new PlayerBuffSource(buff);
-                        var applyEvts = _ApplyBuffEffect(applySource, buffTrigger, conditionalEffect.Effect);
+                        var applyEvts = EffectExecutor.ApplyPlayerBuffEffect(
+                            this, this, actionSource, buffTrigger, conditionalEffect.Effect);
                         triggerBuffEvents.AddRange(applyEvts);
+
+                        var nextTriggerSource = new PlayerBuffSource(buff);
+                        var triggerEndEvents = _TriggerTiming(TriggerTiming.TriggerBuffEnd, nextTriggerSource);
+                        triggerBuffEvents.AddRange(triggerEndEvents);
                     }
                 }
             });
@@ -443,9 +449,13 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                 {
                     if (conditionalEffect.Conditions.All(c => c.Eval(this, buffTrigger, timingAction)))
                     {
-                        var applySource = new PlayerBuffSource(buff);
-                        var applyEvts = _ApplyBuffEffect(applySource, buffTrigger, conditionalEffect.Effect);
+                        var applyEvts = EffectExecutor.ApplyPlayerBuffEffect(
+                            this, this, actionSource, buffTrigger, conditionalEffect.Effect);
                         triggerBuffEvents.AddRange(applyEvts);
+
+                        var nextTriggerSource = new PlayerBuffSource(buff);
+                        var triggerEndEvents = _TriggerTiming(TriggerTiming.TriggerBuffEnd, nextTriggerSource);
+                        triggerBuffEvents.AddRange(triggerEndEvents);
                     }
                 }
             });
@@ -460,64 +470,5 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
         }
         
         return triggerBuffEvents;
-    }
-
-    // TODO: apply character buff <-> player buff
-    private IEnumerable<IGameEvent> _ApplyBuffEffect(
-        IActionSource actionSource, ITriggerSource triggerSource, IPlayerBuffEffect buffEffect)
-    {
-        var appleBuffEffectEvents = new List<IGameEvent>();
-        UpdateTiming(global::UpdateTiming.TriggerBuffStart);
-
-        switch(buffEffect)
-        {
-            case EffectiveDamagePlayerBuffEffect effectiveDamageBuffEffect:
-            {
-                var intent = new DamageIntentAction(actionSource, DamageType.Effective);
-                var targets = effectiveDamageBuffEffect.Targets.Eval(this, triggerSource, intent);
-                foreach(var target in targets)
-                {
-                    var characterTarget = new CharacterTarget(target);
-                    var targetIntent = new DamageIntentTargetAction(actionSource, characterTarget, DamageType.Effective);
-                    var damagePoint = effectiveDamageBuffEffect.Value.Eval(this, triggerSource, targetIntent);
-                    var damageResult = target.HealthManager.TakeEffectiveDamage(damagePoint, _contextMgr.Context);
-                    var damageStyle = DamageStyle.None;
-
-                    UpdateAction(new DamageResultAction(actionSource, characterTarget, damageResult, damageStyle));
-                    appleBuffEffectEvents.Add(new DamageEvent(target.Faction(this), target, damageResult, damageStyle));
-                }
-                break;
-            }
-            case AddCardBuffPlayerBuffEffect addCardBuffPlayerBuffEffect:
-            {
-                var intent = new AddCardBuffIntentAction(actionSource);
-                var cards = addCardBuffPlayerBuffEffect.Targets.Eval(this, triggerSource, intent);
-                foreach(var card in cards)
-                {
-                    var cardTarget = new CardTarget(card);
-                    var targetIntent = new AddCardBuffIntentTargetAction(actionSource, cardTarget);
-                    foreach(var addCardBuffData in addCardBuffPlayerBuffEffect.AddCardBuffDatas)
-                    {
-                        var addLevel = addCardBuffData.Level.Eval(this, triggerSource, targetIntent);
-                        var addResult = card.BuffManager.AddBuff(
-                            _contextMgr.CardBuffLibrary,
-                            this,
-                            triggerSource,
-                            targetIntent,
-                            addCardBuffData.CardBuffId,
-                            addLevel);
-
-                        UpdateAction(new AddCardBuffResultAction(actionSource, cardTarget, addResult));
-                        appleBuffEffectEvents.Add(new AddCardBuffEvent(card, this));
-                    }
-                }
-                break;
-            }
-        }
-
-        var triggerEndEvents = _TriggerTiming(TriggerTiming.TriggerBuffEnd);
-        appleBuffEffectEvents.AddRange(triggerEndEvents);
-
-        return appleBuffEffectEvents;
     }
 }

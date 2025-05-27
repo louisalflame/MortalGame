@@ -398,7 +398,28 @@ MonoBehaviour:
       Entry: 8
       Data: 
     - Name: Effect
-      Entry: 6
+      Entry: 7
+      Data: 35|CardPlayEffectAttributePlayerBuffEffect, Assembly-CSharp
+    - Name: Type
+      Entry: 3
+      Data: 3
+    - Name: Value
+      Entry: 7
+      Data: 36|PlayerBuffIntegerProperty, Assembly-CSharp
+    - Name: PlayerBuff
+      Entry: 7
+      Data: 37|TriggeredPlayerBuff, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Property
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
       Data: 
     - Name: 
       Entry: 8
@@ -420,7 +441,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 35|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
+      Data: 38|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -433,7 +454,7 @@ MonoBehaviour:
       Data: 
     - Name: LifeTimeData
       Entry: 7
-      Data: 36|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
+      Data: 39|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 

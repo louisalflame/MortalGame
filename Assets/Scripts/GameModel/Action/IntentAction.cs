@@ -142,3 +142,11 @@ public class RemoveCardBuffIntentAction : BaseIntentAction
     public RemoveCardBuffIntentAction(IActionSource source) : base(source)
     { }
 }
+
+public class CardPlayEffectAttributeIntentAction : BaseIntentAction
+{
+    public override UpdateAction ActionType => UpdateAction.CardPlayEffectAttribute;
+
+    public CardPlayEffectAttributeIntentAction(IActionSource source) : base(source)
+    { }
+}

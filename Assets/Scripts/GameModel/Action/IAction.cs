@@ -21,10 +21,12 @@ public class UpdateTimingAction : IActionUnit
 public class TriggerTimingAction : IActionUnit
 {
     public TriggerTiming Timing { get; }
+    public IActionSource Source { get; }
 
-    public TriggerTimingAction(TriggerTiming timing)
+    public TriggerTimingAction(TriggerTiming timing, IActionSource source)
     {
         Timing = timing;
+        Source = source;
     }
 }
 

@@ -136,6 +136,7 @@ public enum UpdateAction
     RemoveCardBuff,
     AddCharacterBuff,
     RemoveCharacterBuff,
+    CardPlayEffectAttribute,
 }
 public enum UpdateTiming
 {

@@ -113,7 +113,7 @@ public class CardPlayCondition : ICardBuffCondition, IPlayerBuffCondition, IChar
     public List<ICardPlayValueCondition> Conditions = new ();
 
     public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
-    {        
+    {
         return actionUnit switch
         {
             CardPlayIntentAction cardPlayIntent =>

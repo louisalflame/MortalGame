@@ -14,6 +14,8 @@ public interface IPlayerCardManager
     IDisposeZoneEntity DisposeZone { get; }
     ICardColletionZone GetCardCollectionZone(CardCollectionType type);
 
+    bool TryPlayCard(ICardEntity card, out CardPlaySource cardPlay);
+    void EndPlayCard();
     IEnumerable<IGameEvent> ClearHandOnTurnEnd(IGameplayStatusWatcher gameWatcher);
 
     Option<ICardEntity> GetCard(Guid cardIdentity);
@@ -47,6 +49,7 @@ public class PlayerCardManager : IPlayerCardManager
     public IGraveyardEntity Graveyard { get; }
     public IExclusionZoneEntity ExclusionZone { get; }
     public IDisposeZoneEntity DisposeZone { get; }
+    public Option<ICardEntity> PlayingCard { get; private set; }
 
     public PlayerCardManager(
         int handCardMaxCount,
@@ -57,6 +60,7 @@ public class PlayerCardManager : IPlayerCardManager
         Graveyard = new GraveyardEntity();
         ExclusionZone = new ExclusionZoneEntity();
         DisposeZone = new DisposeZoneEntity();
+        PlayingCard = Option.None<ICardEntity>();
     }
 
     public ICardColletionZone GetCardCollectionZone(CardCollectionType type)
@@ -76,6 +80,37 @@ public class PlayerCardManager : IPlayerCardManager
             default:
                 return CardColletionZone.Dummy;
         }
+    }
+
+    public bool TryPlayCard(ICardEntity card, out CardPlaySource cardPlay)
+    {
+        var cardsCount = HandCard.Cards.Count;
+        var index = HandCard.Cards.ToList().IndexOf(card);
+        if (index < 0)
+        {
+            cardPlay = null;
+            return false;
+        }
+        else
+        {
+            HandCard.RemoveCard(card);
+            PlayingCard = Option.Some(card);
+            cardPlay = new CardPlaySource(card, index, cardsCount);
+            return true;
+        }
+    }
+    public void EndPlayCard()
+    {
+        PlayingCard.MatchSome(
+            card =>
+            { 
+                ICardColletionZone destination =
+                    (card.HasProperty(CardProperty.Dispose) || card.HasProperty(CardProperty.AutoDispose)) ?
+                    ExclusionZone : Graveyard;
+                destination.AddCard(card);
+            }
+        );
+        PlayingCard = Option.None<ICardEntity>();                    
     }
 
     public IEnumerable<IGameEvent> ClearHandOnTurnEnd(IGameplayStatusWatcher gameWatcher)
@@ -123,6 +158,12 @@ public class PlayerCardManager : IPlayerCardManager
         else if (DisposeZone.TryGetCard(cardIdentity, out card))
         {
             return Option.Some(card);
+        }
+        else if (PlayingCard.Match(
+            card => card.Identity == cardIdentity, 
+            () => false))
+        { 
+            return PlayingCard;
         }
         else
         {

@@ -87,7 +87,10 @@ public class WholeGameSessionEntity : ReactionSessionEntity
 
 public class WholeTurnSessionEntity : ReactionSessionEntity
 {
-    public WholeTurnSessionEntity(Dictionary<string, ISessionValueEntity> values) : base(values) { }
+    public WholeTurnSessionEntity(Dictionary<string, ISessionValueEntity> values) : base(values)
+    { 
+        _Reset();
+    }
 
     public override void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
     {
@@ -109,7 +112,10 @@ public class WholeTurnSessionEntity : ReactionSessionEntity
 
 public class ExectueTurnSessionEntity : ReactionSessionEntity
 {
-    public ExectueTurnSessionEntity(Dictionary<string, ISessionValueEntity> values) : base(values) { }
+    public ExectueTurnSessionEntity(Dictionary<string, ISessionValueEntity> values) : base(values)
+    { 
+        _Reset();
+    }
 
     public override void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
     {
