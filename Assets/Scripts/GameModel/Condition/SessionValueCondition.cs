@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sirenix.OdinInspector;
-using UnityEngine;
 
 public interface IReactionSessionValueCondition
 {
@@ -12,18 +11,14 @@ public interface IReactionSessionValueCondition
 [Serializable]
 public class ReactorSessionUpdatedCondition : IReactionSessionValueCondition
 {
-    public string SessionKey;
-
     public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, IReactionSessionEntity sessionEntity)
     {
-        return sessionEntity.IsSessionValueUpdated(SessionKey);
+        return sessionEntity.IsSessionValueUpdated;
     }
 }
 [Serializable]
 public class ReactionSessionValueBooleanCondition : IReactionSessionValueCondition
 {
-    public string SessionKey;
-
     [ShowInInspector]
     [HorizontalGroup("1")]
     public List<IBooleanValueCondition> Conditions = new();
@@ -31,7 +26,7 @@ public class ReactionSessionValueBooleanCondition : IReactionSessionValueConditi
     public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, IReactionSessionEntity sessionEntity)
     {
         return sessionEntity
-            .GetSessionBoolean(SessionKey)
+            .BooleanValue
             .Match(
                 value => Conditions.All(condition => condition.Eval(gameWatcher, source, actionUnit, value)),
                 () => false);
@@ -41,8 +36,6 @@ public class ReactionSessionValueBooleanCondition : IReactionSessionValueConditi
 [Serializable]
 public class ReactionSessionValueIntegerCondition : IReactionSessionValueCondition
 {
-    public string SessionKey;
-
     [ShowInInspector]
     [HorizontalGroup("1")]
     public List<IIntegerValueCondition> Conditions = new();
@@ -50,7 +43,7 @@ public class ReactionSessionValueIntegerCondition : IReactionSessionValueConditi
     public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, IReactionSessionEntity sessionEntity)
     {
         return sessionEntity
-            .GetSessionInteger(SessionKey)
+            .IntegerValue
             .Match(
                 value => Conditions.All(condition => condition.Eval(gameWatcher, source, actionUnit, value)),
                 () => false);

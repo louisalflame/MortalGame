@@ -27,15 +27,15 @@ public class PlayerBuffLibrary
             : Option.None<ConditionalPlayerBuffEffect[]>();
     }
 
-    public IReactionSessionData[] GetBuffSessions(string buffId)
+    public IReadOnlyDictionary<string, IReactionSessionData> GetBuffSessions(string buffId)
     {
         if (!_buffs.ContainsKey(buffId))
         {
             Debug.LogError($"PlayerBuff ID[{buffId}] not found in library.");
-            return Array.Empty<IReactionSessionData>();
+            return new Dictionary<string, IReactionSessionData>();
         }
 
-        return _buffs[buffId].Sessions.ToArray();
+        return _buffs[buffId].Sessions;
     }
 
     public IPlayerBuffLifeTimeData GetBuffLifeTime(string buffId)

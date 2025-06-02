@@ -73,7 +73,9 @@ public class PlayerBuffManager : IPlayerBuffManager
             buffLibrary.GetBuffLifeTime(buffId)
                 .CreateEntity(gameWatcher, triggerSource, actionUnit),
             buffLibrary.GetBuffSessions(buffId)
-                .Select(s => s.CreateEntity(gameWatcher, triggerSource)));
+                .ToDictionary(
+                    kvp => kvp.Key, 
+                    kvp => kvp.Value.CreateEntity(gameWatcher, triggerSource)));
         _buffs.Add(resultBuff);
         return new AddPlayerBuffResult
         {
@@ -112,7 +114,7 @@ public class PlayerBuffManager : IPlayerBuffManager
         foreach (var buff in _buffs.ToList())
         {
             var triggerBuff = new PlayerBuffTrigger(buff);
-            foreach (var session in buff.ReactionSessions)
+            foreach (var session in buff.ReactionSessions.Values)
             {
                 session.Update(gameWatcher, triggerBuff, actionUnit);
             }

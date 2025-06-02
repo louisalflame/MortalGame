@@ -166,6 +166,13 @@ public enum TriggerTiming
     PlayCardEnd,
     TriggerBuffEnd,
 }
+public enum SessionLifeTime
+{
+    WholeGame,
+    WholeTurn,
+    ExecuteTurn,
+    PlayCard
+}
 
 public enum EffectAttributeType
 {

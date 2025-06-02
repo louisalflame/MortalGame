@@ -6,153 +6,71 @@ using Optional;
 
 public interface IReactionSessionEntity
 {
-    bool IsSessionValueUpdated(string key);
-    Option<bool> GetSessionBoolean(string key);
-    Option<int> GetSessionInteger(string key);
+    bool IsSessionValueUpdated { get; }
+    Option<bool> BooleanValue { get; }
+    Option<int> IntegerValue { get; }
 
     void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit);
 }
 
-public abstract class ReactionSessionEntity : IReactionSessionEntity
+public class ReactionSessionEntity : IReactionSessionEntity
 {
-    protected readonly IReadOnlyDictionary<string, ISessionValueEntity> _baseEntities;
-    protected readonly Dictionary<string, ISessionValueEntity> _values;
+    private readonly SessionLifeTime _lifeTime;
+    private readonly ISessionValueEntity _baseEntity;
+    private Option<ISessionValueEntity> _currentValue;
 
-    public ReactionSessionEntity(Dictionary<string, ISessionValueEntity> values)
-    {
-        _baseEntities = values;
-        _values = new Dictionary<string, ISessionValueEntity>();
-    }
+    public bool IsSessionValueUpdated => _currentValue.HasValue;
+    public Option<bool> BooleanValue => _currentValue.Match(
+        value =>
+            value is SessionBooleanEntity booleanEntity ?
+                booleanEntity.Value.Some() :
+                Option.None<bool>(),
+        () => Option.None<bool>());
+    public Option<int> IntegerValue => _currentValue.Match(
+        value =>
+            value is SessionIntegerEntity integerEntity ?
+                integerEntity.Value.Some() :
+                Option.None<int>(),
+        () => Option.None<int>());
 
-    public bool IsSessionValueUpdated(string key)
+    public ReactionSessionEntity(ISessionValueEntity entity, SessionLifeTime lifeTime)
     {
-        return
-            _values.TryGetValue(key, out var valueEntity) &&
-            valueEntity.IsUpdated;
-    }
-    public Option<bool> GetSessionBoolean(string key)
-    {
-        if (_values.TryGetValue(key, out var valueEntity) &&
-            valueEntity is SessionBooleanEntity booleanEntity)
-        {
-            return booleanEntity.Value;
-        }
-        return Option.None<bool>();
-    }
-    public Option<int> GetSessionInteger(string key)
-    {
-        if (_values.TryGetValue(key, out var valueEntity) &&
-            valueEntity is SessionIntegerEntity integerEntity)
-        {
-            return integerEntity.Value;
-        }
-        return Option.None<int>();
+        _baseEntity = entity;
+        _currentValue = Option.None<ISessionValueEntity>();
+        _lifeTime = lifeTime;
     }
 
-    public abstract void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit);
-
-    protected virtual void _Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
-    {
-        foreach (var kvp in _values)
-        {
-            kvp.Value.Update(gameWatcher, trigger, actionUnit);
-        }
-    }
-
-    protected void _Reset()
-    {
-        foreach (var kvp in _baseEntities)
-        {
-            _values[kvp.Key] = kvp.Value.Clone();
-        }
-    }
-    protected void _Clear()
-    {
-        _values.Clear();
-    }
-}
-
-public class WholeGameSessionEntity : ReactionSessionEntity
-{
-    public WholeGameSessionEntity(Dictionary<string, ISessionValueEntity> values) : base(values) 
-    {
-        _Reset();
-    }
-
-    public override void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
-    {
-        _Update(gameWatcher, trigger, actionUnit);
-    }
-}
-
-public class WholeTurnSessionEntity : ReactionSessionEntity
-{
-    public WholeTurnSessionEntity(Dictionary<string, ISessionValueEntity> values) : base(values)
-    { 
-        _Reset();
-    }
-
-    public override void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
     {
         if (actionUnit is UpdateTimingAction timingAction)
-        {
-            if (timingAction.Timing == UpdateTiming.TurnStart)
+        { 
+            switch (_lifeTime)
             {
-                _Reset();
-            }
-            else if (timingAction.Timing == UpdateTiming.TurnEnd)
-            {
-                _Clear();
+                case SessionLifeTime.WholeTurn:
+                    if (timingAction.Timing == UpdateTiming.TurnStart) _Reset();
+                    else if (timingAction.Timing == UpdateTiming.TurnEnd) _Clear();
+                    break;
+                case SessionLifeTime.ExecuteTurn:                
+                    if (timingAction.Timing == UpdateTiming.ExecuteStart) _Reset();
+                    else if (timingAction.Timing == UpdateTiming.ExecuteEnd) _Clear();
+                    break;
+                case SessionLifeTime.PlayCard:
+                    if (timingAction.Timing == UpdateTiming.PlayCardStart) _Reset();
+                    else if (timingAction.Timing == UpdateTiming.PlayCardEnd) _Clear();
+                    break;
             }
         }
 
-        _Update(gameWatcher, trigger, actionUnit);
-    }
-}
-
-public class ExectueTurnSessionEntity : ReactionSessionEntity
-{
-    public ExectueTurnSessionEntity(Dictionary<string, ISessionValueEntity> values) : base(values)
-    { 
-        _Reset();
+        _currentValue.MatchSome(value =>
+            value.Update(gameWatcher, trigger, actionUnit));
     }
 
-    public override void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    private void _Reset()
     {
-        if (actionUnit is UpdateTimingAction timingAction)
-        {
-            if (timingAction.Timing == UpdateTiming.ExecuteStart)
-            {
-                _Reset();
-            }
-            else if (timingAction.Timing == UpdateTiming.ExecuteEnd)
-            {
-                _Clear();
-            }
-        }
-
-        _Update(gameWatcher, trigger, actionUnit);
+        _currentValue = _baseEntity.Clone().Some();
     }
-}
-
-public class PlayCardSessionEntity : ReactionSessionEntity
-{
-    public PlayCardSessionEntity(Dictionary<string, ISessionValueEntity> values) : base(values) { }    
-
-    public override void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    private void _Clear()
     {
-        if (actionUnit is UpdateTimingAction timingAction)
-        {
-            if (timingAction.Timing == UpdateTiming.PlayCardStart)
-            {
-                _Reset();
-            }
-            else if (timingAction.Timing == UpdateTiming.PlayCardEnd)
-            {
-                _Clear();
-            }
-        }
-
-        _Update(gameWatcher, trigger, actionUnit);
+        _currentValue = Option.None<ISessionValueEntity>();
     }
 }

@@ -6,63 +6,47 @@ using UnityEngine;
 
 public interface IReactionSessionData
 {
-    Dictionary<string, ISessionValueData> SessionValueTable { get; }
     IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger);
 }
 
 [Serializable]
-public abstract class ReactionSessionData
-{    
+public class SessionBoolean : IReactionSessionData
+{
+    public bool InitialValue;
+    public SessionLifeTime LifeTime;
+
     [ShowInInspector]
-    [SerializeField]
-    protected Dictionary<string, ISessionValueData> _values = new();
-    public Dictionary<string, ISessionValueData> SessionValueTable => _values;
-}
-
-[Serializable]
-public class WholeGameSession : ReactionSessionData, IReactionSessionData
-{
+    public BooleanUpdateTimingRules TimingRules = new();
+    [ShowInInspector]
+    public BooleanUpdateIntentRules IntentRules = new();
+    [ShowInInspector]
+    public BooleanUpdateResultRules ResultRules = new();
+    
     public IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
-        return new WholeGameSessionEntity(
-            _values.ToDictionary(
-                kvp => kvp.Key,
-                kvp => kvp.Value.GetEntity(gameWatcher, trigger)));
+        return new ReactionSessionEntity(
+            new SessionBooleanEntity(InitialValue, TimingRules, IntentRules, ResultRules),
+            LifeTime);
     }
 }
 
 [Serializable]
-public class WholeTurnSession : ReactionSessionData, IReactionSessionData
+public class SessionInteger : IReactionSessionData
 {
-    public IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
-    {
-        return new WholeTurnSessionEntity(
-            _values.ToDictionary(
-                kvp => kvp.Key,
-                kvp => kvp.Value.GetEntity(gameWatcher, trigger)));
-    }
-}
+    public int InitialValue;
+    public SessionLifeTime LifeTime;
+    
+    [ShowInInspector]
+    public IntegerUpdateTimingRules TimingRules = new();
+    [ShowInInspector]
+    public IntegerUpdateIntentRules IntentRules = new();
+    [ShowInInspector]
+    public IntegerUpdateResultRules ResultRules = new();
 
-[Serializable]
-public class ExectueTurnSession : ReactionSessionData, IReactionSessionData
-{
     public IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
     {
-        return new ExectueTurnSessionEntity(
-            _values.ToDictionary(
-                kvp => kvp.Key,
-                kvp => kvp.Value.GetEntity(gameWatcher, trigger)));
-    }
-}
-
-[Serializable]
-public class PlayCardSession : ReactionSessionData, IReactionSessionData
-{
-    public IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
-    {
-        return new PlayCardSessionEntity(
-            _values.ToDictionary(
-                kvp => kvp.Key,
-                kvp => kvp.Value.GetEntity(gameWatcher, trigger)));
+        return new ReactionSessionEntity(
+            new SessionIntegerEntity(InitialValue, TimingRules, IntentRules, ResultRules),
+            LifeTime);
     }
 }

@@ -112,7 +112,7 @@ MonoBehaviour:
       Data: "\u9023\u64CA"
     - Name: Info
       Entry: 1
-      Data: "\u5C64\u6578 : {:level}\n\u672C\u56DE\u5408\u6345\u4EBA/\u7D55\u62DB\u7684\u50B7\u5BB3\u589E\u52A0"
+      Data: "\u5C64\u6578 : {:level}\n\u672C\u56DE\u5408\u6345\u4EBA/\u7D55\u62DB\u7684\u50B7\u5BB3\u589E\u52A0\u9023\u64CA\u6578{:combo}"
     - Name: 
       Entry: 8
       Data: 

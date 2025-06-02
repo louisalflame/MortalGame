@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8ac2a4fc9a196c14aae99eace03b0275, type: 3}
-  m_Name: Palsy
+  m_Name: CounterAttack
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -26,14 +26,21 @@ MonoBehaviour:
       Data: 0|PlayerBuffData, Assembly-CSharp
     - Name: ID
       Entry: 1
-      Data: Palsy
+      Data: CounterAttack
     - Name: MaxLevel
       Entry: 3
-      Data: 999
+      Data: 99
     - Name: Sessions
       Entry: 7
-      Data: 1|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[IReactionSessionData,
-        Assembly-CSharp]], Unity.Plastic.Antlr3.Runtime
+      Data: 1|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[IReactionSessionData,
+        Assembly-CSharp]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 2|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 12
       Data: 0
@@ -45,8 +52,21 @@ MonoBehaviour:
       Data: 
     - Name: BuffEffects
       Entry: 7
-      Data: 2|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[PlayerBuffData+BuffEffect,
-        Assembly-CSharp]], Unity.Plastic.Antlr3.Runtime
+      Data: 3|System.Collections.Generic.Dictionary`2[[TriggerTiming, Assembly-CSharp],[ConditionalPlayerBuffEffect[],
+        Assembly-CSharp]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 4|System.Collections.Generic.EnumEqualityComparer`1[[TriggerTiming, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 12
       Data: 0
@@ -58,7 +78,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 3|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
+      Data: 5|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -71,7 +91,7 @@ MonoBehaviour:
       Data: 
     - Name: LifeTimeData
       Entry: 7
-      Data: 4|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
+      Data: 6|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 

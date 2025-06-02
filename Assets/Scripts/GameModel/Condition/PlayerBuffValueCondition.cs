@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Optional;
 using Sirenix.OdinInspector;
-using UnityEngine;
 
 public interface IPlayerBuffValueCondition
 {
@@ -13,15 +11,15 @@ public interface IPlayerBuffValueCondition
 [Serializable]
 public class PlayerBuffSessionCondition : IPlayerBuffValueCondition
 {
-    [ShowInInspector]
     [HorizontalGroup("1")]
+    public string SessionKey;
+    [ShowInInspector]
+    [HorizontalGroup("2")]
     public List<IReactionSessionValueCondition> Conditions = new();
 
     public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, IPlayerBuffEntity playerBuff)
     {
-        return playerBuff
-            .ReactionSessions
-            .Any(session => Conditions
-                .Any(condition => condition.Eval(gameWatcher, source, actionUnit, session)));
+        return playerBuff.ReactionSessions.TryGetValue(SessionKey, out var session) &&
+            Conditions.All(condition => condition.Eval(gameWatcher, source, actionUnit, session));
     }
 }

@@ -42,13 +42,25 @@ public class AllCondition : ICardBuffCondition, IPlayerBuffCondition, ICharacter
 [Serializable]
 public class AnyCondition : ICardBuffCondition, IPlayerBuffCondition, ICharacterBuffCondition
 {
-    [ShowInInspector]    
+    [ShowInInspector]
     [HorizontalGroup("1")]
     public List<ICondition> Conditions = new();
 
     public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit)
     {
         return Conditions.Any(condition => condition.Eval(gameWatcher, source, actionUnit));
+    }
+}
+
+[Serializable]
+public class InverseCondition : ICardBuffCondition, IPlayerBuffCondition, ICharacterBuffCondition
+{
+    [HorizontalGroup("1")]
+    public ICondition Condition;
+
+    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit)
+    {
+        return !Condition.Eval(gameWatcher, source, actionUnit);
     }
 }
 

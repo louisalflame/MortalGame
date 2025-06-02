@@ -13,7 +13,7 @@ public interface IPlayerBuffEntity
     Option<IPlayerEntity> Caster { get; }
     IReadOnlyCollection<IPlayerBuffPropertyEntity> Properties { get; }
     IPlayerBuffLifeTimeEntity LifeTime { get; }
-    IReadOnlyCollection<IReactionSessionEntity> ReactionSessions { get; }
+    IReadOnlyDictionary<string, IReactionSessionEntity> ReactionSessions { get; }
 
     bool IsExpired();
     void AddLevel(int level);
@@ -28,7 +28,7 @@ public class PlayerBuffEntity : IPlayerBuffEntity
     private readonly Option<IPlayerEntity> _caster;
     private readonly IReadOnlyList<IPlayerBuffPropertyEntity> _properties;
     private readonly IPlayerBuffLifeTimeEntity _lifeTime;
-    private readonly IReadOnlyList<IReactionSessionEntity> _reactionSessions;
+    private readonly IReadOnlyDictionary<string, IReactionSessionEntity> _reactionSessions;
 
     public string PlayerBuffDataId => _playerBuffDataId;
     public Guid Identity => _identity;
@@ -36,7 +36,7 @@ public class PlayerBuffEntity : IPlayerBuffEntity
     public Option<IPlayerEntity> Caster => _caster;
     public IReadOnlyCollection<IPlayerBuffPropertyEntity> Properties => _properties;
     public IPlayerBuffLifeTimeEntity LifeTime => _lifeTime;
-    public IReadOnlyCollection<IReactionSessionEntity> ReactionSessions => _reactionSessions;
+    public IReadOnlyDictionary<string, IReactionSessionEntity> ReactionSessions => _reactionSessions;
 
     public bool IsDummy => this == DummyBuff;
     public static IPlayerBuffEntity DummyBuff = new DummyPlayerBuff();
@@ -48,7 +48,7 @@ public class PlayerBuffEntity : IPlayerBuffEntity
         Option<IPlayerEntity> caster,
         IEnumerable<IPlayerBuffPropertyEntity> properties,
         IPlayerBuffLifeTimeEntity lifeTime,
-        IEnumerable<IReactionSessionEntity> reactionSessions) 
+        IReadOnlyDictionary<string, IReactionSessionEntity> reactionSessions) 
     {
         _playerBuffDataId = playerBuffDataId;
         _identity = identity;
@@ -56,7 +56,7 @@ public class PlayerBuffEntity : IPlayerBuffEntity
         _caster = caster;
         _properties = properties.ToList();
         _lifeTime = lifeTime;
-        _reactionSessions = reactionSessions.ToList();
+        _reactionSessions = reactionSessions;
     }
 
     public bool IsExpired()
@@ -71,7 +71,8 @@ public class PlayerBuffEntity : IPlayerBuffEntity
     
     public PlayerBuffInfo ToInfo()
     {
-        return new PlayerBuffInfo() {
+        return new PlayerBuffInfo()
+        {
             Id = PlayerBuffDataId,
             Identity = Identity,
             Level = Level
@@ -88,7 +89,7 @@ public class DummyPlayerBuff : PlayerBuffEntity
         Option.None<IPlayerEntity>(),
         Enumerable.Empty<IPlayerBuffPropertyEntity>(),
         new AlwaysLifeTimePlayerBuffEntity(),
-        Enumerable.Empty<IReactionSessionEntity>())
+        new Dictionary<string, IReactionSessionEntity>())
     {
     }
 }
@@ -108,11 +109,9 @@ public static class PlayerBuffEntityExtensions
         this IPlayerBuffEntity playerBuffEntity,
         string key)
     {
-        foreach (var session in playerBuffEntity.ReactionSessions)
+        if (playerBuffEntity.ReactionSessions.TryGetValue(key, out var session))
         {
-            var result = session.GetSessionBoolean(key);
-            if (result.HasValue)
-                return result;
+            return session.BooleanValue;
         }
         return Option.None<bool>();
     }
@@ -120,11 +119,9 @@ public static class PlayerBuffEntityExtensions
         this IPlayerBuffEntity playerBuffEntity,
         string key)
     {
-        foreach (var session in playerBuffEntity.ReactionSessions)
+        if (playerBuffEntity.ReactionSessions.TryGetValue(key, out var session))
         {
-            var result = session.GetSessionInteger(key);
-            if (result.HasValue)
-                return result;
+            return session.IntegerValue;
         }
         return Option.None<int>();
     }
