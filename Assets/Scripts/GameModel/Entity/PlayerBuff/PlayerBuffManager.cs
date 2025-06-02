@@ -58,8 +58,12 @@ public class PlayerBuffManager : IPlayerBuffManager
 
         var caster = actionUnit switch
         {
-            CardPlaySource cardSource => cardSource.Card.Owner(gameWatcher.GameStatus),
-            PlayerBuffSource playerBuffSource => playerBuffSource.Buff.Caster,
+            IActionSourceUnit actionSourceUnit => actionSourceUnit.Source switch
+            {
+                PlayerBuffSource playerBuffSource => playerBuffSource.Buff.Caster,
+                CardPlaySource cardPlaySource => cardPlaySource.Card.Owner(gameWatcher.GameStatus),
+                _ => Option.None<IPlayerEntity>()
+            },
             _ => Option.None<IPlayerEntity>()
         };
 
@@ -75,7 +79,7 @@ public class PlayerBuffManager : IPlayerBuffManager
             buffLibrary.GetBuffSessions(buffId)
                 .ToDictionary(
                     kvp => kvp.Key, 
-                    kvp => kvp.Value.CreateEntity(gameWatcher, triggerSource)));
+                    kvp => kvp.Value.CreateEntity(gameWatcher, triggerSource, actionUnit)));
         _buffs.Add(resultBuff);
         return new AddPlayerBuffResult
         {

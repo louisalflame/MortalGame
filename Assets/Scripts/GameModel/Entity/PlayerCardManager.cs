@@ -14,7 +14,7 @@ public interface IPlayerCardManager
     IDisposeZoneEntity DisposeZone { get; }
     ICardColletionZone GetCardCollectionZone(CardCollectionType type);
 
-    bool TryPlayCard(ICardEntity card, out CardPlaySource cardPlay);
+    bool TryPlayCard(ICardEntity card, out int handCardIndex, out int handCardsCount);
     void EndPlayCard();
     IEnumerable<IGameEvent> ClearHandOnTurnEnd(IGameplayStatusWatcher gameWatcher);
 
@@ -82,20 +82,18 @@ public class PlayerCardManager : IPlayerCardManager
         }
     }
 
-    public bool TryPlayCard(ICardEntity card, out CardPlaySource cardPlay)
+    public bool TryPlayCard(ICardEntity card, out int index, out int cardsCount)
     {
-        var cardsCount = HandCard.Cards.Count;
-        var index = HandCard.Cards.ToList().IndexOf(card);
+        cardsCount = HandCard.Cards.Count;
+        index = HandCard.Cards.ToList().IndexOf(card);
         if (index < 0)
         {
-            cardPlay = null;
             return false;
         }
         else
         {
             HandCard.RemoveCard(card);
             PlayingCard = Option.Some(card);
-            cardPlay = new CardPlaySource(card, index, cardsCount);
             return true;
         }
     }

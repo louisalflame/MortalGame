@@ -10,7 +10,7 @@ public class CardBuffData
 
     [ShowInInspector]
     [BoxGroup("Effects")]
-    public List<IReactionSessionData> Sessions = new();
+    public Dictionary<string, IReactionSessionData> Sessions = new();
 
     [Space(20)]
     [ShowInInspector]

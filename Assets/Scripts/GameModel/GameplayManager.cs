@@ -343,8 +343,9 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                 var loseEnergyResult = player.EnergyManager.ConsumeEnergy(cardRuntimCost);
                 useCardEvents.Add(new LoseEnergyEvent(player, loseEnergyResult));
 
-                if (player.CardManager.TryPlayCard(usedCard, out CardPlaySource cardPlaySource))
+                if (player.CardManager.TryPlayCard(usedCard, out int handCardIndex, out int handCardsCount))
                 {
+                    var cardPlaySource = new CardPlaySource(usedCard, handCardIndex, handCardsCount, loseEnergyResult);
                     var cardPlayTrigger = new CardPlayTrigger(cardPlaySource);
 
                     // Create PlayCardSession

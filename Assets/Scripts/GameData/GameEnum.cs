@@ -170,7 +170,6 @@ public enum SessionLifeTime
 {
     WholeGame,
     WholeTurn,
-    ExecuteTurn,
     PlayCard
 }
 

@@ -29,8 +29,15 @@ MonoBehaviour:
       Data: QuickPower
     - Name: Sessions
       Entry: 7
-      Data: 1|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[IReactionSessionData,
-        Assembly-CSharp]], Unity.Plastic.Antlr3.Runtime
+      Data: 1|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[IReactionSessionData,
+        Assembly-CSharp]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 2|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 12
       Data: 0
@@ -42,11 +49,11 @@ MonoBehaviour:
       Data: 
     - Name: Effects
       Entry: 7
-      Data: 2|System.Collections.Generic.Dictionary`2[[TriggerTiming, Assembly-CSharp],[ConditionalCardBuffEffect[],
+      Data: 3|System.Collections.Generic.Dictionary`2[[TriggerTiming, Assembly-CSharp],[ConditionalCardBuffEffect[],
         Assembly-CSharp]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 3|System.Collections.Generic.EnumEqualityComparer`1[[TriggerTiming, Assembly-CSharp]],
+      Data: 4|System.Collections.Generic.EnumEqualityComparer`1[[TriggerTiming, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -68,20 +75,20 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 4|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[ICardBuffPropertyData,
+      Data: 5|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[ICardBuffPropertyData,
         Assembly-CSharp]], Unity.Plastic.Antlr3.Runtime
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 5|PowerCardBuffPropertyData, Assembly-CSharp
+      Data: 6|PowerCardBuffPropertyData, Assembly-CSharp
     - Name: Value
       Entry: 7
-      Data: 6|CardBuffIntegerProperty, Assembly-CSharp
+      Data: 7|CardBuffIntegerProperty, Assembly-CSharp
     - Name: CardBuff
       Entry: 7
-      Data: 7|TriggeredCardBuff, Assembly-CSharp
+      Data: 8|TriggeredCardBuff, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -102,7 +109,7 @@ MonoBehaviour:
       Data: 
     - Name: LifeTimeData
       Entry: 7
-      Data: 8|HandCardLifeTimeCardBuffData, Assembly-CSharp
+      Data: 9|HandCardLifeTimeCardBuffData, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 

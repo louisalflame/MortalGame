@@ -27,7 +27,7 @@ public class CharacterBuffLibrary
             : Option.None<ConditionalCharacterBuffEffect[]>();
     }
 
-    public IReactionSessionData[] GetBuffSessions(string buffId)
+    public IReadOnlyDictionary<string, IReactionSessionData> GetBuffSessions(string buffId)
     {
         if (!_buffs.ContainsKey(buffId))
         {
@@ -35,7 +35,7 @@ public class CharacterBuffLibrary
             return null;
         }
 
-        return _buffs[buffId].Sessions.ToArray();
+        return _buffs[buffId].Sessions;
     }
     
     public ICharacterBuffLifeTimeData GetBuffLifeTime(string buffId)

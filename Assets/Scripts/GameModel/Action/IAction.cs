@@ -5,6 +5,15 @@ public interface IActionUnit
 {
 }
 
+public interface IActionSourceUnit : IActionUnit
+{
+    IActionSource Source { get; }
+}
+public interface IActionTargetUnit : IActionUnit
+{
+    IActionTarget Target { get; }
+}
+
 public class SystemAction : IActionUnit
 {
     public static readonly SystemAction Instance = new SystemAction();
@@ -18,7 +27,7 @@ public class UpdateTimingAction : IActionUnit
         Timing = timing;
     }
 }
-public class TriggerTimingAction : IActionUnit
+public class TriggerTimingAction : IActionUnit, IActionSourceUnit
 {
     public TriggerTiming Timing { get; }
     public IActionSource Source { get; }
@@ -30,20 +39,16 @@ public class TriggerTimingAction : IActionUnit
     }
 }
 
-public interface IIntentAction : IActionUnit
+public interface IIntentAction : IActionSourceUnit
 {
     UpdateAction ActionType { get; }
-    IActionSource Source { get; }
 }
 
-public interface IIntentTargetAction : IIntentAction
+public interface IIntentTargetAction : IIntentAction, IActionTargetUnit
 {
-    IActionTarget Target { get; }
 }
 
-public interface IResultTargetAction : IActionUnit
+public interface IResultTargetAction : IActionSourceUnit, IActionTargetUnit
 {
     UpdateAction ActionType { get; }
-    IActionSource Source { get; }
-    IActionTarget Target { get; }
 }

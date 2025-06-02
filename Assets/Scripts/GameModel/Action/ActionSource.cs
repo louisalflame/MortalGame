@@ -14,7 +14,7 @@ public class SystemSource : IActionSource
 
 public class SystemExectueStartSource : IActionSource
 {
-    public IPlayerEntity Player { get; private set; }
+    public readonly IPlayerEntity Player;
     public SystemExectueStartSource(IPlayerEntity player)
     {
         Player = player;
@@ -22,7 +22,7 @@ public class SystemExectueStartSource : IActionSource
 }
 public class SystemExectueEndSource : IActionSource
 {
-    public IPlayerEntity Player { get; private set; }
+    public readonly IPlayerEntity Player;
     public SystemExectueEndSource(IPlayerEntity player)
     {
         Player = player;
@@ -31,23 +31,25 @@ public class SystemExectueEndSource : IActionSource
 
 public class CardPlaySource : IActionSource
 {
-    public ICardEntity Card { get; private set; }
-    public int HandCardIndex { get; private set; }
-    public int HandCardsCount { get; private set; }
-    public IEffectAttribute Attribute { get; private set; }
+    public readonly ICardEntity Card;
+    public readonly int HandCardIndex;
+    public readonly int HandCardsCount;
+    public readonly LoseEnergyResult CostEnergy;
+    public readonly IEffectAttribute Attribute;
 
-    public CardPlaySource(ICardEntity card, int handCardIndex, int handCardsCount)
+    public CardPlaySource(ICardEntity card, int handCardIndex, int handCardsCount, LoseEnergyResult costEnergy)
     {
         Card = card;
         HandCardIndex = handCardIndex;
         HandCardsCount = handCardsCount;
+        CostEnergy = costEnergy;
         Attribute = new CardPlayAttributeEntity();
     }
 }
 
 public class PlayerBuffSource : IActionSource
 {
-    public IPlayerBuffEntity Buff { get; private set; }
+    public readonly IPlayerBuffEntity Buff;
 
     public PlayerBuffSource(IPlayerBuffEntity buff)
     {
@@ -57,7 +59,7 @@ public class PlayerBuffSource : IActionSource
 
 public class CardBuffSource : IActionSource
 {
-    public ICardBuffEntity Buff { get; private set; }
+    public readonly ICardBuffEntity Buff;
 
     public CardBuffSource(ICardBuffEntity buff)
     {

@@ -38,6 +38,11 @@ public class ReactionSessionEntity : IReactionSessionEntity
         _baseEntity = entity;
         _currentValue = Option.None<ISessionValueEntity>();
         _lifeTime = lifeTime;
+
+        if (lifeTime != SessionLifeTime.PlayCard)
+        {
+            _Reset();
+        }
     }
 
     public void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
@@ -49,10 +54,6 @@ public class ReactionSessionEntity : IReactionSessionEntity
                 case SessionLifeTime.WholeTurn:
                     if (timingAction.Timing == UpdateTiming.TurnStart) _Reset();
                     else if (timingAction.Timing == UpdateTiming.TurnEnd) _Clear();
-                    break;
-                case SessionLifeTime.ExecuteTurn:                
-                    if (timingAction.Timing == UpdateTiming.ExecuteStart) _Reset();
-                    else if (timingAction.Timing == UpdateTiming.ExecuteEnd) _Clear();
                     break;
                 case SessionLifeTime.PlayCard:
                     if (timingAction.Timing == UpdateTiming.PlayCardStart) _Reset();

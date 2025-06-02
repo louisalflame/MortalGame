@@ -128,8 +128,12 @@ public class CardPlayCondition : ICardBuffCondition, IPlayerBuffCondition, IChar
     {
         return actionUnit switch
         {
-            CardPlayIntentAction cardPlayIntent =>
-                Conditions.All(c => c.Eval(gameWatcher, trigger, actionUnit, cardPlayIntent.CardPlay)),
+            IActionSourceUnit actionSourceUnit => actionSourceUnit.Source switch
+            {
+                CardPlaySource cardPlaySource =>
+                    Conditions.All(c => c.Eval(gameWatcher, trigger, actionUnit, cardPlaySource)),
+                _ => false
+            },
             _ => false,
         };
     }

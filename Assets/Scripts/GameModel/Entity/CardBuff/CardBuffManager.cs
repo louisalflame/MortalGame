@@ -73,7 +73,9 @@ public class CardBuffManager : ICardBuffManager
             cardBuffLibrary.GetCardBuffLifeTime(buffId)
                 .CreateEntity(gameWatcher, triggerSource, actionUnit),
             cardBuffLibrary.GetCardBuffSessions(buffId)
-                .Select(s => s.CreateEntity(gameWatcher, triggerSource)));
+                .ToDictionary(
+                    session => session.Key,
+                    session => session.Value.CreateEntity(gameWatcher, triggerSource, actionUnit)));
 
         _buffs.Add(resultBuff);
         return new AddCardBuffResult
@@ -113,7 +115,7 @@ public class CardBuffManager : ICardBuffManager
         foreach (var buff in _buffs.ToList())
         {
             var triggerBuff = new CardBuffTrigger(buff);
-            foreach (var session in buff.ReactionSessions)
+            foreach (var session in buff.ReactionSessions.Values)
             {
                 session.Update(gameWatcher, triggerBuff, actionUnit);
             }

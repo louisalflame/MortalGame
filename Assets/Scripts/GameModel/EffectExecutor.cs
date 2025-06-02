@@ -25,7 +25,7 @@ public static class EffectExecutor
                     var characterTarget = new CharacterTarget(target);
                     var targetIntent = new DamageIntentTargetAction(actionSource, characterTarget, DamageType.Normal);
                     var damagePoint = damageEffect.Value.Eval(gameplayWatcher, trigger, targetIntent);
-                    damagePoint = GameFormula.NormalDamagePoint(gameplayWatcher, damagePoint, actionSource, characterTarget);
+                    damagePoint = GameFormula.NormalDamagePoint(gameplayWatcher, damagePoint, targetIntent);
 
                     var damageResult = target.HealthManager.TakeDamage(damagePoint, gameplayWatcher.ContextManager.Context);
                     var damageStyle = DamageStyle.None; // TODO: pass style from action source

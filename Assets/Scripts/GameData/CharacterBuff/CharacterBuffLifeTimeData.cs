@@ -2,13 +2,13 @@ using System;
 
 public interface ICharacterBuffLifeTimeData
 {
-    ICharacterBuffLifeTimeEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger);
+    ICharacterBuffLifeTimeEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit);
 }
 
 [Serializable]
 public class AlwaysLifeTimeCharacterBuffData : ICharacterBuffLifeTimeData
 {
-    public ICharacterBuffLifeTimeEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
+    public ICharacterBuffLifeTimeEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
     {
         return new AlwaysLifeTimeCharacterBuffEntity();
     }
@@ -19,7 +19,7 @@ public class TurnLifeTimeCharacterBuffData : ICharacterBuffLifeTimeData
 {
     public int Turn;
 
-    public ICharacterBuffLifeTimeEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
+    public ICharacterBuffLifeTimeEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
     {
         return new TurnLifeTimeCharacterBuffEntity(Turn);
     }

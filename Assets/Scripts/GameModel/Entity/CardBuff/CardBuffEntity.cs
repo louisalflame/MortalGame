@@ -12,7 +12,7 @@ public interface ICardBuffEntity
     Option<IPlayerEntity> Caster { get; }
     IReadOnlyCollection<ICardBuffPropertyEntity> Properties { get; }
     ICardBuffLifeTimeEntity LifeTime { get; }
-    IReadOnlyCollection<IReactionSessionEntity> ReactionSessions { get; }
+    IReadOnlyDictionary<string, IReactionSessionEntity> ReactionSessions { get; }
 
     bool IsExpired();
     void AddLevel(int level);
@@ -26,7 +26,7 @@ public class CardBuffEntity : ICardBuffEntity
     private readonly Option<IPlayerEntity> _caster;
     private readonly IReadOnlyList<ICardBuffPropertyEntity> _properties;
     private readonly ICardBuffLifeTimeEntity _lifeTime;
-    private readonly IReadOnlyList<IReactionSessionEntity> _reactionSessions;
+    private readonly IReadOnlyDictionary<string, IReactionSessionEntity> _reactionSessions;
 
     public string CardBuffDataID => _cardBuffDataId;
     public Guid Identity => _identity;
@@ -34,7 +34,7 @@ public class CardBuffEntity : ICardBuffEntity
     public Option<IPlayerEntity> Caster => _caster;
     public IReadOnlyCollection<ICardBuffPropertyEntity> Properties => _properties;
     public ICardBuffLifeTimeEntity LifeTime => _lifeTime;
-    public IReadOnlyCollection<IReactionSessionEntity> ReactionSessions => _reactionSessions;
+    public IReadOnlyDictionary<string, IReactionSessionEntity> ReactionSessions => _reactionSessions;
 
     public CardBuffEntity(
         string cardBuffDataID,
@@ -43,7 +43,7 @@ public class CardBuffEntity : ICardBuffEntity
         Option<IPlayerEntity> caster,
         IEnumerable<ICardBuffPropertyEntity> properties,
         ICardBuffLifeTimeEntity lifeTime,
-        IEnumerable<IReactionSessionEntity> reactionSessions)
+        IReadOnlyDictionary<string, IReactionSessionEntity> reactionSessions)
     {
         _cardBuffDataId = cardBuffDataID;
         _identity = identity;
@@ -51,7 +51,7 @@ public class CardBuffEntity : ICardBuffEntity
         _caster = caster;
         _properties = properties.ToList();
         _lifeTime = lifeTime;
-        _reactionSessions = reactionSessions.ToList();
+        _reactionSessions = reactionSessions;
     }
 
     public bool IsExpired()

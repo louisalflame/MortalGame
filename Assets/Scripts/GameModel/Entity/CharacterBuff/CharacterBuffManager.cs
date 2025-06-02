@@ -11,16 +11,14 @@ public interface ICharacterBuffManager
         CharacterBuffLibrary buffLibrary,
         IGameplayStatusWatcher gameWatcher,
         ITriggerSource triggerSource,
-        IActionSource actionSource,
-        IActionTarget actionTarget,
+        IActionUnit actionUnit,
         string buffId,
         int level,
         out ICharacterBuffEntity resultBuff);
     bool RemoveBuff(
         CharacterBuffLibrary buffLibrary,
         IGameplayStatusWatcher gameWatcher,
-        IActionSource actionSource,
-        IActionTarget actionTarget,
+        IActionUnit actionUnit,
         string buffId,
         out ICharacterBuffEntity resultBuff);
     
@@ -42,8 +40,7 @@ public class CharacterBuffManager : ICharacterBuffManager
         CharacterBuffLibrary buffLibrary,
         IGameplayStatusWatcher gameWatcher,
         ITriggerSource triggerSource,
-        IActionSource actionSource,
-        IActionTarget actionTarget,
+        IActionUnit actionUnit,
         string buffId,
         int level,
         out ICharacterBuffEntity resultBuff)
@@ -58,15 +55,23 @@ public class CharacterBuffManager : ICharacterBuffManager
             }
         }
 
-        var owner = actionTarget switch
+        var owner = actionUnit switch
         {
-            CharacterTarget characterTarget => Option.Some(characterTarget.Character),
+            IActionTargetUnit actionTargetUnit => actionTargetUnit.Target switch
+            {
+                CharacterTarget characterTarget => Option.Some(characterTarget.Character),
+                _ => Option.None<ICharacterEntity>()
+            },
             _ => Option.None<ICharacterEntity>()
         };
-        var caster = actionSource switch
+        var caster = actionUnit switch
         {
-            CardPlaySource cardSource => cardSource.Card.Owner(gameWatcher.GameStatus),
-            PlayerBuffSource playerBuffSource => playerBuffSource.Buff.Caster,
+            IActionSourceUnit actionSourceUnit => actionSourceUnit.Source switch
+            {
+                CardPlaySource cardSource => cardSource.Card.Owner(gameWatcher.GameStatus),
+                PlayerBuffSource playerBuffSource => playerBuffSource.Buff.Caster,
+                _ => Option.None<IPlayerEntity>()
+            },
             _ => Option.None<IPlayerEntity>()
         };
 
@@ -78,9 +83,11 @@ public class CharacterBuffManager : ICharacterBuffManager
             buffLibrary.GetBuffProperties(buffId)
                 .Select(p => p.CreateEntity(gameWatcher, triggerSource)),
             buffLibrary.GetBuffLifeTime(buffId)
-                .CreateEntity(gameWatcher, triggerSource),
+                .CreateEntity(gameWatcher, triggerSource, actionUnit),
             buffLibrary.GetBuffSessions(buffId)
-                .Select(s => s.CreateEntity(gameWatcher, triggerSource)));
+                .ToDictionary(
+                    session => session.Key,
+                    session => session.Value.CreateEntity(gameWatcher, triggerSource, actionUnit)));
         _buffs.Add(resultBuff);
         return true;
     }
@@ -88,8 +95,7 @@ public class CharacterBuffManager : ICharacterBuffManager
     public bool RemoveBuff(
         CharacterBuffLibrary buffLibrary,
         IGameplayStatusWatcher gameWatcher,
-        IActionSource actionSource,
-        IActionTarget actionTarget,
+        IActionUnit actionUnit,
         string buffId,
         out ICharacterBuffEntity resultBuff)
     {
@@ -112,7 +118,7 @@ public class CharacterBuffManager : ICharacterBuffManager
         foreach (var buff in _buffs.ToList())
         {
             var triggeredBuff = new CharacterBuffTrigger(buff);
-            foreach (var session in buff.ReactionSessions)
+            foreach (var session in buff.ReactionSessions.Values)
             {
                 session.Update(gameWatcher, triggeredBuff, actionUnit);
             }
