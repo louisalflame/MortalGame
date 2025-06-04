@@ -80,7 +80,10 @@ public enum PlayerBuffPropertyDuration
 public enum PlayerBuffProperty
 {
     None = 0,
-    EffectAttribute,
+    AllCardPower,
+    AllCardCost,
+    NormalDamageAddition,
+    NormalDamageRatio,
     MaxHealth,
     MaxEnergy,
 }
@@ -116,6 +119,7 @@ public enum UpdateAction
 {
     None = 0,
     Summon,
+    PlayCard,
     Death,
     Damage,
     Heal,
@@ -129,7 +133,6 @@ public enum UpdateAction
     DisposeCard,
     CreateCard,
     CloneCard,
-    PlayCard,
     AddPlayerBuff,
     RemovePlayerBuff,
     AddCardBuff,
@@ -173,11 +176,15 @@ public enum SessionLifeTime
     PlayCard
 }
 
-public enum EffectAttributeType
+public enum EffectAttributeAdditionType
 {
     None = 0,
+    CostAddition,
     PowerAddition,
-    PowerRatio,
     NormalDamageAddition,
+}
+public enum EffectAttributeRatioType
+{
+    None = 0,
     NormalDamageRatio,
 }

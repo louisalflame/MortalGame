@@ -31,9 +31,9 @@ public class CardInfo
         Themes = card.Themes;
 
         OriginCost = card.OriginCost;
-        Cost = card.EvalCost(gameWatcher);
+        Cost = GameFormula.CardCost(gameWatcher, card, new CardLookIntentAction(card));
         OriginPower = card.OriginPower;
-        Power = card.EvalPower(gameWatcher);
+        Power = GameFormula.CardPower(gameWatcher, card, new CardLookIntentAction(card));
 
         MainSelectable = new MainSelectableInfo(card.MainSelectable.SelectType);
         SubSelectables = card.SubSelectables.Select(s => new SubSelectableInfo(s.SelectType, s.TargetCount)).ToList();

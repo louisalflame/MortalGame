@@ -1,44 +1,51 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public interface IEffectAttribute
 {
-    int PowerAddition { get; }
-    float PowerRatio { get; }
-    int NormalDamageAddition { get; }
-    float NormalDamageRatio { get; }
+    void ApplyModify(EffectAttributeAdditionType attribute, int value);
+    void ApplyModify(EffectAttributeRatioType attribute, float value);
 
-    void ApplyModify(EffectAttributeType type, float value);
+    IReadOnlyDictionary<EffectAttributeAdditionType, int> IntValues { get; }
+    IReadOnlyDictionary<EffectAttributeRatioType, float> FloatValues { get; }
 }
 
 public class CardPlayAttributeEntity : IEffectAttribute
 {
-    public int PowerAddition { get; private set; } = 0;
-    public float PowerRatio { get; private set; } = 0f;
-    public int NormalDamageAddition { get; private set; } = 0;
-    public float NormalDamageRatio { get; private set; } = 0f;
+    private readonly Dictionary<EffectAttributeAdditionType, int> _intValues;
+    private readonly Dictionary<EffectAttributeRatioType, float> _floatValues;
+
+    public IReadOnlyDictionary<EffectAttributeAdditionType, int> IntValues => _intValues;
+    public IReadOnlyDictionary<EffectAttributeRatioType, float> FloatValues => _floatValues;
 
     public CardPlayAttributeEntity()
     {
+        _intValues = new Dictionary<EffectAttributeAdditionType, int>
+        {
+            { EffectAttributeAdditionType.CostAddition, 0 },
+            { EffectAttributeAdditionType.PowerAddition, 0 },
+            { EffectAttributeAdditionType.NormalDamageAddition, 0 }
+        };
+
+        _floatValues = new Dictionary<EffectAttributeRatioType, float>
+        {
+            { EffectAttributeRatioType.NormalDamageRatio, 0f }
+        };
     }
 
-    public void ApplyModify(EffectAttributeType type, float value)
+    public void ApplyModify(EffectAttributeAdditionType attribute, int value)
     {
-        switch (type)
-        {
-            case EffectAttributeType.PowerAddition:
-                PowerAddition += (int)value;
-                break;
-            case EffectAttributeType.PowerRatio:
-                PowerRatio += value;
-                break;
-            case EffectAttributeType.NormalDamageAddition:
-                NormalDamageAddition += (int)value;
-                break;
-            case EffectAttributeType.NormalDamageRatio:
-                NormalDamageRatio += value;
-                break;
-            default:
-                break;
-        }
+        if (!_intValues.ContainsKey(attribute))
+            _intValues[attribute] = 0;
+
+        _intValues[attribute] += value;
+    }
+    public void ApplyModify(EffectAttributeRatioType attribute, float value)
+    {
+        if (!_floatValues.ContainsKey(attribute))
+            _floatValues[attribute] = 0f;
+
+        _floatValues[attribute] += value;
     }
 }

@@ -57,6 +57,8 @@ public abstract class PlayerEntity : IPlayerEntity
 
     public void Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)
     {
+        var gameEvts = new List<IGameEvent>();
+
         _buffManager.Update(gameWatcher, actionUnit);
         _cardManager.Update(gameWatcher, actionUnit);
 
@@ -146,21 +148,40 @@ public class DummyPlayer : PlayerEntity
 
 public static class PlayerEntityExtensions
 {
-    public static int GetPlayerBuffProperty(this IPlayerEntity player, IGameplayStatusWatcher watcher, EffectAttributeType targetAttribute)
+    public static int GetPlayerBuffAdditionProperty(
+        this IPlayerEntity player, IGameplayStatusWatcher watcher, PlayerBuffProperty targetProperty)
     {
         var value = 0;
-        foreach(var playerBuff in player.BuffManager.Buffs)
+        foreach (var playerBuff in player.BuffManager.Buffs)
         {
             var triggerBuff = new PlayerBuffTrigger(playerBuff);
-            foreach(var property in playerBuff.Properties)
+            foreach (var property in playerBuff.Properties)
             {
-                if (property is EffectAttributePlayerBuffPropertyEntity attributeEntity &&
-                    attributeEntity.AttributeType == targetAttribute)
+                if (property is IPlayerBuffIntegerPropertyEntity integerEntity &&
+                    property.Property == targetProperty)
                 {
-                    value += attributeEntity.Eval(watcher, triggerBuff);
+                    value += integerEntity.Eval(watcher, triggerBuff);
                 }
             }
         }
         return value;
+    }
+    public static float GetPlayerBuffRatioProperty(
+        this IPlayerEntity player, IGameplayStatusWatcher watcher, PlayerBuffProperty targetProperty)
+    {
+        float ratio = 0f;
+        foreach (var playerBuff in player.BuffManager.Buffs)
+        {
+            var triggerBuff = new PlayerBuffTrigger(playerBuff);
+            foreach (var property in playerBuff.Properties)
+            {
+                if (property is IPlayerBuffRatioPropertyEntity ratioEntity &&
+                    property.Property == targetProperty)
+                {
+                    ratio += ratioEntity.Eval(watcher, triggerBuff);
+                }
+            }
+        }
+        return ratio;
     }
 }

@@ -117,7 +117,7 @@ public class PlayCardResultAction : BaseResultAction
 public class RecycleDeckResultAction : BaseResultAction
 {
     public override UpdateAction ActionType => UpdateAction.RecycleDeck;
-    public RecycleDeckResultAction(IActionTarget target) : base(new SystemSource(), target)
+    public RecycleDeckResultAction(IActionTarget target) : base(SystemSource.Instance, target)
     {
     }
 }

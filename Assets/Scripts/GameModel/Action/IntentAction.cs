@@ -11,6 +11,25 @@ public abstract class BaseIntentAction : IIntentAction
     }
 }
 
+public class CardLookIntentAction : BaseIntentAction
+{
+    public override UpdateAction ActionType => UpdateAction.None;
+    public ICardEntity Card { get; private set; }
+
+    public CardLookIntentAction(ICardEntity card) : base(SystemSource.Instance)
+    { 
+        Card = card;
+    }
+}
+public class CardPlayIntentAction : BaseIntentAction
+{
+    public override UpdateAction ActionType => UpdateAction.PlayCard;
+    public CardPlaySource CardPlay => Source as CardPlaySource;
+
+    public CardPlayIntentAction(CardPlaySource source) : base(source)
+    { }
+}
+
 public class DamageIntentAction : BaseIntentAction
 {
     public override UpdateAction ActionType => UpdateAction.Damage;
@@ -53,19 +72,10 @@ public class LoseEnergyIntentAction : BaseIntentAction
     { }
 }
 
-public class CardPlayIntentAction : BaseIntentAction
-{
-    public override UpdateAction ActionType => UpdateAction.PlayCard;
-    public CardPlaySource CardPlay => Source as CardPlaySource;
-
-    public CardPlayIntentAction(CardPlaySource source) : base(source)
-    { }
-}
-
 public class RecycleDeckIntentAction : BaseIntentAction
 {
     public override UpdateAction ActionType => UpdateAction.RecycleDeck;
-    public RecycleDeckIntentAction() : base(new SystemSource())
+    public RecycleDeckIntentAction() : base(SystemSource.Instance)
     { }
 }
 

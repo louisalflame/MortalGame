@@ -1,71 +1,94 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class GameFormula
 {
     public static int NormalDamagePoint(
-        IGameplayStatusWatcher gameplayWatcher,
+        IGameplayStatusWatcher gameWatcher,
         int rawDamagePoint,
         IActionUnit actionUnit)
     {
-        switch (actionUnit)
-        {
-            case IActionSourceUnit actionSourceUnit:
-                switch (actionSourceUnit.Source)
-                {
-                    case CardPlaySource cardPlay:
-                        var cpNorDamAdd = cardPlay.Attribute.NormalDamageAddition;
+        var actionAddition = GetCardPlayAttributeAddition(
+            actionUnit, gameWatcher, EffectAttributeAdditionType.NormalDamageAddition, PlayerBuffProperty.NormalDamageAddition);
+        
+        var actionRatio = GetCardPlayAttributeRatio(
+            actionUnit, gameWatcher, EffectAttributeRatioType.NormalDamageRatio, PlayerBuffProperty.NormalDamageRatio);
 
-                        var pbuffNorDamAdd = gameplayWatcher.GameStatus.CurrentPlayer
-                            .Map(player => player.GetPlayerBuffProperty(gameplayWatcher, EffectAttributeType.NormalDamageAddition))
-                            .ValueOr(0);
-
-                        return rawDamagePoint + cpNorDamAdd + pbuffNorDamAdd;
-                }
-                break;
-        }
-
-        return rawDamagePoint;
+        return rawDamagePoint + actionAddition;
     }
 
     public static int CardPower(
-        IGameplayStatusWatcher gameplayWatcher,
+        IGameplayStatusWatcher gameWatcher,
         ICardEntity card,
         IActionUnit actionUnit)
     {
-        var basePower = card.EvalPower(gameplayWatcher);
+        var actionAddition = GetCardLookAttributeAddition(actionUnit, gameWatcher, PlayerBuffProperty.AllCardPower);
 
-        switch (actionUnit)
-        {
-            case IActionSourceUnit actionSourceUnit:
-                switch (actionSourceUnit.Source)
-                {
-                    case CardPlaySource cardPlay:
-                        var cpPowerAdd = cardPlay.Attribute.PowerAddition;
-                        var cpPowerRatio = cardPlay.Attribute.PowerRatio;
+        var cardAddition = card.GetCardProperty(gameWatcher, CardProperty.PowerAddition);
 
-                        var pbuffPowerAdd = gameplayWatcher.GameStatus.CurrentPlayer
-                            .Map(player => player.GetPlayerBuffProperty(gameplayWatcher, EffectAttributeType.PowerAddition))
-                            .ValueOr(0);
-
-                        var pbuffPowerRatio = gameplayWatcher.GameStatus.CurrentPlayer
-                            .Map(player => player.GetPlayerBuffProperty(gameplayWatcher, EffectAttributeType.PowerRatio))
-                            .ValueOr(0);
-
-                        return (int)((card.EvalPower(gameplayWatcher) + cpPowerAdd + pbuffPowerAdd) * (1 + cpPowerRatio + pbuffPowerRatio));
-                }
-                break;
-        }
-
-        return basePower;
+        return Math.Max(0, card.OriginPower + actionAddition + cardAddition);
     }
 
     public static int CardCost(
-        IGameplayStatusWatcher gameplayWatcher,
+        IGameplayStatusWatcher gameWatcher,
         ICardEntity card,
         IActionUnit actionUnit)
     {
-        var baseCost = card.EvalCost(gameplayWatcher);
+        var actionAddition = GetCardLookAttributeAddition(actionUnit, gameWatcher, PlayerBuffProperty.AllCardCost);
 
-        return baseCost;
+        var cardAddition = card.GetCardProperty(gameWatcher, CardProperty.CostAddition);
+
+        return Math.Max(0, card.OriginPower + actionAddition + cardAddition);
+    }
+
+    private static int GetCardLookAttributeAddition(
+        IActionUnit actionUnit, IGameplayStatusWatcher gameWatcher, PlayerBuffProperty playerBuffProperty)
+    {
+        if (actionUnit is CardLookIntentAction cardLookIntent)
+        {
+            var playerAttribute = cardLookIntent.Card.Owner(gameWatcher.GameStatus)
+                .Map(player => player.GetPlayerBuffAdditionProperty(gameWatcher, playerBuffProperty))
+                .ValueOr(0);
+            return playerAttribute;
+        }
+        return 0;
+    }
+
+    private static int GetCardPlayAttributeAddition(
+        IActionUnit actionUnit,
+        IGameplayStatusWatcher gameWatcher,
+        EffectAttributeAdditionType attribute,
+        PlayerBuffProperty playerBuffProperty)
+    {
+        if (actionUnit is IActionSourceUnit actionSourceUnit &&
+            actionSourceUnit.Source is CardPlaySource cardPlaySource)
+        {
+            var cardAttribute = cardPlaySource.Attribute.IntValues
+                .GetValueOrDefault(attribute, 0);
+            var playerAttribute = gameWatcher.GameStatus.CurrentPlayer
+                .Map(player => player.GetPlayerBuffAdditionProperty(gameWatcher, playerBuffProperty))
+                .ValueOr(0);
+            return cardAttribute + playerAttribute;
+        }
+        return 0;
+    }
+    private static float GetCardPlayAttributeRatio(
+        IActionUnit actionUnit,
+        IGameplayStatusWatcher gameWatcher,
+        EffectAttributeRatioType attribute,
+        PlayerBuffProperty playerBuffProperty)
+    {
+        if (actionUnit is IActionSourceUnit actionSourceUnit &&
+            actionSourceUnit.Source is CardPlaySource cardPlaySource)
+        {
+            var cardAttribute = cardPlaySource.Attribute.FloatValues
+                .GetValueOrDefault(attribute, 0);
+            var playerAttribute = gameWatcher.GameStatus.CurrentPlayer
+                .Map(player => player.GetPlayerBuffRatioProperty(gameWatcher, playerBuffProperty))
+                .ValueOr(0);
+            return cardAttribute + playerAttribute;
+        }
+        return 0f;
     }
 }

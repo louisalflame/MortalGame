@@ -418,7 +418,7 @@ public static class EffectExecutor
                 }
                 break;
             }
-            case CardPlayEffectAttributePlayerBuffEffect cardPlayEffectAttributeBuffEffect:
+            case CardPlayEffectAttributeAdditionPlayerBuffEffect cardPlayEffectAttributeBuffEffect:
             {
                 if (actionSource is CardPlaySource cardPlaySource)
                 {

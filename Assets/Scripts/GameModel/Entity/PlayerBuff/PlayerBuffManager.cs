@@ -115,18 +115,29 @@ public class PlayerBuffManager : IPlayerBuffManager
 
     public void Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)
     {
+        var gameEvts = new List<IGameEvent>();
         foreach (var buff in _buffs.ToList())
         {
+            var isChanged = false;
             var triggerBuff = new PlayerBuffTrigger(buff);
             foreach (var session in buff.ReactionSessions.Values)
             {
-                session.Update(gameWatcher, triggerBuff, actionUnit);
+                isChanged |= session.Update(gameWatcher, triggerBuff, actionUnit);
             }
 
             buff.LifeTime.Update(gameWatcher, triggerBuff, actionUnit);
             if (buff.IsExpired())
             {
                 _buffs.Remove(buff);
+            }
+
+            if (isChanged)
+            {
+                buff.Owner(gameWatcher)
+                    .MatchSome(owner =>
+                        gameEvts.Add(
+                            new UpdatePlayerBuffEvent(owner, buff.ToInfo()))
+                );
             }
         }
     }

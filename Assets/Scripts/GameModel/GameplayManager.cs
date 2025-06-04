@@ -150,13 +150,13 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
         var allyDrawCount = _contextMgr.DispositionLibrary.GetDrawCardCount(_gameStatus.Ally.DispositionManager.CurrentDisposition);
         var enemyDrawCount = _gameStatus.Enemy.TurnStartDrawCardCount;
 
-        var allyDrawEvents = EffectExecutor.DrawCards(this, this, new SystemSource(), _gameStatus.Ally, allyDrawCount);
+        var allyDrawEvents = EffectExecutor.DrawCards(this, this, SystemSource.Instance, _gameStatus.Ally, allyDrawCount);
         _gameEvents.AddRange(allyDrawEvents);
 
-        var enemyDrawEvents = EffectExecutor.DrawCards(this, this, new SystemSource(), _gameStatus.Enemy, enemyDrawCount);
+        var enemyDrawEvents = EffectExecutor.DrawCards(this, this, SystemSource.Instance, _gameStatus.Enemy, enemyDrawCount);
         _gameEvents.AddRange(enemyDrawEvents);
 
-        var triggerEvts = _TriggerTiming(TriggerTiming.DrawCard, new SystemSource());
+        var triggerEvts = _TriggerTiming(TriggerTiming.DrawCard, SystemSource.Instance);
         _gameEvents.AddRange(triggerEvts);
 
         _gameActions.Clear();
@@ -194,7 +194,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
         
         while (_gameStatus.Enemy.SelectedCards.TryDequeueCard(out ICardEntity selectedCard))
         {
-            var cardRuntimCost = selectedCard.EvalCost(this);
+            var cardRuntimCost = GameFormula.CardCost(this, selectedCard, new CardLookIntentAction(selectedCard));
             if (cardRuntimCost <= _gameStatus.Enemy.CurrentEnergy)
             {
                 _gameActions.Enqueue(new UseCardAction(selectedCard.Identity));
@@ -277,7 +277,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
 
         UpdateReactorSessionTiming(UpdateTiming.TurnEnd);
 
-        var triggerEvts = _TriggerTiming(TriggerTiming.TurnEnd, new SystemSource());
+        var triggerEvts = _TriggerTiming(TriggerTiming.TurnEnd, SystemSource.Instance);
         _gameEvents.AddRange(triggerEvts);
     }
 
@@ -337,7 +337,8 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
             !usedCard.HasProperty(CardProperty.Sealed))
         {
             var useCardEvents = new List<IGameEvent>();
-            var cardRuntimCost = usedCard.EvalCost(this);
+            
+            var cardRuntimCost = GameFormula.CardCost(this, usedCard, new CardLookIntentAction(usedCard));
             if (cardRuntimCost <= player.CurrentEnergy) 
             {
                 var loseEnergyResult = player.EnergyManager.ConsumeEnergy(cardRuntimCost);

@@ -71,12 +71,16 @@ public class PlayerBuffEntity : IPlayerBuffEntity
     
     public PlayerBuffInfo ToInfo()
     {
-        return new PlayerBuffInfo()
-        {
-            Id = PlayerBuffDataId,
-            Identity = Identity,
-            Level = Level
-        };
+        return new PlayerBuffInfo(
+            PlayerBuffDataId,
+            Identity,
+            Level,
+            ReactionSessions
+                .Where(kvp => kvp.Value.IntegerValue.HasValue)
+                .ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.IntegerValue.ValueOr(0))
+        );
     } 
 }
 

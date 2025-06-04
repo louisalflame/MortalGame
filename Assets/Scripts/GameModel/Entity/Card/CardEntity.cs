@@ -25,8 +25,6 @@ public interface ICardEntity
 
     int OriginCost { get; }
     int OriginPower { get; }
-    int EvalCost(IGameplayStatusWatcher gameWatcher);
-    int EvalPower(IGameplayStatusWatcher gameWatcher);
 
     ICardEntity Clone();
 }
@@ -185,40 +183,19 @@ public class CardEntity : ICardEntity
         var cost = _cost;
         var cardTrigger = new CardTrigger(this);
         var systemAction = new SystemAction();
-        foreach (var property in Properties.Where(p => p.Property == CardProperty.CostAdjust))
+        foreach (var property in Properties.Where(p => p.Property == CardProperty.CostAddition))
         {
             cost += property.Eval(gameWatcher, cardTrigger);
         }
         foreach (var buff in BuffManager.Buffs)
         {
-            foreach (var property in buff.Properties.Where(p => p.Property == CardProperty.CostAdjust))
+            foreach (var property in buff.Properties.Where(p => p.Property == CardProperty.CostAddition))
             {
                 cost += property.Eval(gameWatcher, cardTrigger);
             }
         }
 
         return cost;
-    }
-
-    public int EvalPower(IGameplayStatusWatcher gameWatcher)
-    {
-        var power = _power;
-        var cardTrigger = new CardTrigger(this);
-        foreach(var property in Properties.Where(p => p.Property == CardProperty.PowerAdjust))
-        {
-            power += property.Eval(gameWatcher, cardTrigger);
-        }
-        
-        foreach (var buff in BuffManager.Buffs)
-        {
-            var cardBuffTrigger = new CardBuffTrigger(buff);
-            foreach (var property in buff.Properties.Where(p => p.Property == CardProperty.PowerAdjust))
-            {
-                power += property.Eval(gameWatcher, cardBuffTrigger);
-            }
-        }
-
-        return power;
     }
 }
 
@@ -253,5 +230,28 @@ public static class CardEntityExtensions
         return
             card.Properties.Any(p => p.Property == property) ||
             card.BuffManager.Buffs.Any(b => b.Properties.Any(p => p.Property == property));
+    }
+    
+    public static int GetCardProperty(
+        this ICardEntity card, IGameplayStatusWatcher watcher, CardProperty targetProperty)
+    {
+        var value = 0;
+
+        var cardTrigger = new CardTrigger(card);
+        foreach (var property in card.Properties.Where(p => p.Property == targetProperty))
+        {
+            value += property.Eval(watcher, cardTrigger);
+        }
+
+        foreach (var buff in card.BuffManager.Buffs)
+        {
+            var cardBuffTrigger = new CardBuffTrigger(buff);
+            foreach (var property in buff.Properties.Where(p => p.Property == targetProperty))
+            {
+                value += property.Eval(watcher, cardBuffTrigger);
+            }
+        }
+
+        return value;
     }
 }

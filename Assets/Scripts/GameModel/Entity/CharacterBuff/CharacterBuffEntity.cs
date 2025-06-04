@@ -17,7 +17,7 @@ public interface ICharacterBuffEntity
 
     bool IsExpired();
     void AddLevel(int level);
-    PlayerBuffInfo ToInfo();
+    CharacterBuffInfo ToInfo();
 }
 
 public class CharacterBuffEntity : ICharacterBuffEntity
@@ -69,13 +69,17 @@ public class CharacterBuffEntity : ICharacterBuffEntity
         _level += level;
     }
     
-    public PlayerBuffInfo ToInfo()
+    public CharacterBuffInfo ToInfo()
     {
-        return new PlayerBuffInfo() {
-            Id = Id,
-            Identity = Identity,
-            Level = Level
-        };
+        return new CharacterBuffInfo(
+            Id,
+            Identity,
+            Level,
+            ReactionSessions
+                .Where(kvp => kvp.Value.IntegerValue.HasValue)
+                .ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.IntegerValue.ValueOr(0)));
     } 
 }
 

@@ -18,7 +18,9 @@ public class PlayerBuffView : MonoBehaviour, IRecyclable
     
     private CompositeDisposable _disposables = new CompositeDisposable();
 
-    public void SetBuffInfo(PlayerBuffInfo buffInfo, SimpleTitleIInfoHintView simpleHintView)
+    public void SetBuffInfo(
+        PlayerBuffInfo buffInfo,
+        SimpleTitleIInfoHintView simpleHintView)
     {
         _levelText.text = buffInfo.Level.ToString();
         

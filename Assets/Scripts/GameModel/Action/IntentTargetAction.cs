@@ -68,7 +68,7 @@ public class CardPlayIntentTargetAction : BaseIntentTargetAction
 public class RecycleDeckIntentTargetAction : BaseIntentTargetAction
 {
     public override UpdateAction ActionType => UpdateAction.RecycleDeck;
-    public RecycleDeckIntentTargetAction(IActionTarget target) : base(new SystemSource(), target)
+    public RecycleDeckIntentTargetAction(IActionTarget target) : base(SystemSource.Instance, target)
     { }
 }
 

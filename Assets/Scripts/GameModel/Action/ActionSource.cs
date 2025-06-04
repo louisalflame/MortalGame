@@ -7,9 +7,7 @@ public interface IActionSource
 
 public class SystemSource : IActionSource
 {
-    public SystemSource()
-    {
-    }
+    public static readonly SystemSource Instance = new();
 }
 
 public class SystemExectueStartSource : IActionSource

@@ -17,7 +17,7 @@ public class SealedCardBuffPropertyEntity : ICardBuffPropertyEntity
 
 public class PowerCardBuffPropertyEntity : ICardBuffPropertyEntity
 {
-    public CardProperty Property => CardProperty.PowerAdjust;
+    public CardProperty Property => CardProperty.PowerAddition;
     private readonly IIntegerValue _value;
 
     public PowerCardBuffPropertyEntity(IIntegerValue value)

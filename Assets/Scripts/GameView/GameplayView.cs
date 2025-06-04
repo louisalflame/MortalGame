@@ -108,7 +108,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
         LocalizeLibrary localizeLibrary, 
         DispositionLibrary dispositionLibrary)
     {
-        _allyInfoView.Init(statusWatcher, _topBarInfoView, _simpleHintView, localizeLibrary, dispositionLibrary);
+        _allyInfoView.Init(_topBarInfoView, _simpleHintView, localizeLibrary, dispositionLibrary);
         _allyHandCardView.Init(statusWatcher, reciever, this, localizeLibrary);
         _allyCharacterView.Init(statusWatcher);
 

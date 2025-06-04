@@ -10,7 +10,7 @@ public interface IReactionSessionEntity
     Option<bool> BooleanValue { get; }
     Option<int> IntegerValue { get; }
 
-    void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit);
+    bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit);
 }
 
 public class ReactionSessionEntity : IReactionSessionEntity
@@ -45,25 +45,45 @@ public class ReactionSessionEntity : IReactionSessionEntity
         }
     }
 
-    public void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
     {
+        bool isUpdated = false;
         if (actionUnit is UpdateTimingAction timingAction)
-        { 
+        {
             switch (_lifeTime)
             {
                 case SessionLifeTime.WholeTurn:
-                    if (timingAction.Timing == UpdateTiming.TurnStart) _Reset();
-                    else if (timingAction.Timing == UpdateTiming.TurnEnd) _Clear();
+                    if (timingAction.Timing == UpdateTiming.TurnStart)
+                    {
+                        isUpdated = true;
+                        _Reset();
+                    }
+                    else if (timingAction.Timing == UpdateTiming.TurnEnd)
+                    {
+                        isUpdated = true;
+                        _Clear();
+                    }
                     break;
                 case SessionLifeTime.PlayCard:
-                    if (timingAction.Timing == UpdateTiming.PlayCardStart) _Reset();
-                    else if (timingAction.Timing == UpdateTiming.PlayCardEnd) _Clear();
+                    if (timingAction.Timing == UpdateTiming.PlayCardStart)
+                    {
+                        isUpdated = true;
+                        _Reset();
+                    }
+                    else if (timingAction.Timing == UpdateTiming.PlayCardEnd)
+                    {
+                        isUpdated = true;
+                        _Clear();
+                    }
                     break;
             }
         }
 
-        _currentValue.MatchSome(value =>
-            value.Update(gameWatcher, trigger, actionUnit));
+        isUpdated |= _currentValue
+            .Match(value =>
+                value.Update(gameWatcher, trigger, actionUnit),
+                () => false);
+        return isUpdated;
     }
 
     private void _Reset()

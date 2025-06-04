@@ -19,18 +19,15 @@ public class AllyInfoView : MonoBehaviour
     [SerializeField]
     private PlayerBuffCollectionView _buffCollectionView;
     
-    private IGameplayStatusWatcher _statusWatcher;
     private TopBarInfoView _topBarInfoView;
     private LocalizeLibrary _localizeLibrary;
 
     public void Init(
-        IGameplayStatusWatcher statusWatcher, 
         TopBarInfoView topBarInfoView, 
         SimpleTitleIInfoHintView simpleHintView,
         LocalizeLibrary localizeLibrary, 
         DispositionLibrary dispositionLibrary)
     {
-        _statusWatcher = statusWatcher;
         _topBarInfoView = topBarInfoView;
         _localizeLibrary = localizeLibrary;
         _dispositionView.Init(localizeLibrary, dispositionLibrary);

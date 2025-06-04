@@ -112,18 +112,24 @@ public class CardBuffManager : ICardBuffManager
 
     public void Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)
     {
+        var gameEvts = new List<IGameEvent>();
         foreach (var buff in _buffs.ToList())
         {
+            var isChanged = false;
             var triggerBuff = new CardBuffTrigger(buff);
             foreach (var session in buff.ReactionSessions.Values)
             {
-                session.Update(gameWatcher, triggerBuff, actionUnit);
+                isChanged |= session.Update(gameWatcher, triggerBuff, actionUnit);
             }
 
             buff.LifeTime.Update(gameWatcher, triggerBuff, actionUnit);
             if (buff.IsExpired())
             {
                 _buffs.Remove(buff);
+            }
+
+            if (isChanged)
+            {
             }
         }
     }    

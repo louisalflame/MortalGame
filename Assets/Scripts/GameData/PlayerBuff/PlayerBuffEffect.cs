@@ -26,10 +26,10 @@ public class EffectiveDamagePlayerBuffEffect : IPlayerBuffEffect
 }
 
 [Serializable]
-public class CardPlayEffectAttributePlayerBuffEffect : IPlayerBuffEffect
+public class CardPlayEffectAttributeAdditionPlayerBuffEffect : IPlayerBuffEffect
 {
     [HorizontalGroup("1")]
-    public EffectAttributeType Type;
+    public EffectAttributeAdditionType Type;
 
     [HorizontalGroup("2")]
     public IIntegerValue Value;

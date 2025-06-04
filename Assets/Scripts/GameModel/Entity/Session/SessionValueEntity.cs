@@ -8,7 +8,7 @@ public interface ISessionValueEntity
 {
     ISessionValueEntity Clone();
 
-    void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit);
+    bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit);
 }
 
 public class SessionBooleanEntity : ISessionValueEntity
@@ -39,7 +39,7 @@ public class SessionBooleanEntity : ISessionValueEntity
             _resultRules);
     }
 
-    private void _UpdateRules(
+    private bool _UpdateRules(
         IReadOnlyCollection<ConditionBooleanUpdateRule> rules,
         IGameplayStatusWatcher gameWatcher,
         ITriggerSource trigger,
@@ -57,36 +57,39 @@ public class SessionBooleanEntity : ISessionValueEntity
                     ConditionBooleanUpdateRule.UpdateType.Overwrite => newVal,
                     _ => Value
                 };
+                return true;
             }
             break;
         }
+        return false;
     }
 
-    public void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
     {
         switch (actionUnit)
         {
             case UpdateTimingAction timingAction:
                 if (_timingRules.TryGetValue(timingAction.Timing, out var timingRules))
                 {
-                    _UpdateRules(timingRules, gameWatcher, trigger, timingAction);
+                    return _UpdateRules(timingRules, gameWatcher, trigger, timingAction);
                 }
                 break;
 
             case IIntentAction intentAction:
                 if (_intentRules.TryGetValue(intentAction.ActionType, out var intentRules))
                 {
-                    _UpdateRules(intentRules, gameWatcher, trigger, intentAction);
+                    return _UpdateRules(intentRules, gameWatcher, trigger, intentAction);
                 }
                 break;
 
             case IResultTargetAction resultAction:
                 if (_resultRules.TryGetValue(resultAction.ActionType, out var resultRules))
                 {
-                    _UpdateRules(resultRules, gameWatcher, trigger, resultAction);
+                    return _UpdateRules(resultRules, gameWatcher, trigger, resultAction);
                 }
                 break;
         }
+        return false;
     }
 }
 
@@ -118,9 +121,9 @@ public class SessionIntegerEntity : ISessionValueEntity
             _resultRules);
     }
 
-    private void _UpdateRules(
+    private bool _UpdateRules(
         IReadOnlyCollection<ConditionIntegerUpdateRule> rules,
-        IGameplayStatusWatcher gameWatcher, 
+        IGameplayStatusWatcher gameWatcher,
         ITriggerSource trigger,
         IActionUnit actionUnit)
     {
@@ -135,35 +138,38 @@ public class SessionIntegerEntity : ISessionValueEntity
                     ConditionIntegerUpdateRule.UpdateType.Overwrite => newVal,
                     _ => Value
                 };
+                return true;
             }
             break;
         }
+        return false;
     }
 
-    public void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
     {
         switch (actionUnit)
         {
             case UpdateTimingAction timingAction:
                 if (_timingRules.TryGetValue(timingAction.Timing, out var timingRules))
                 {
-                    _UpdateRules(timingRules, gameWatcher, trigger, timingAction);
+                    return _UpdateRules(timingRules, gameWatcher, trigger, timingAction);
                 }
                 break;
 
             case IIntentAction intentAction:
                 if (_intentRules.TryGetValue(intentAction.ActionType, out var intentRules))
                 {
-                    _UpdateRules(intentRules, gameWatcher, trigger, intentAction);
+                    return _UpdateRules(intentRules, gameWatcher, trigger, intentAction);
                 }
                 break;
 
             case IResultTargetAction resultAction:
                 if (_resultRules.TryGetValue(resultAction.ActionType, out var resultRules))
                 {
-                    _UpdateRules(resultRules, gameWatcher, trigger, resultAction);
+                    return _UpdateRules(resultRules, gameWatcher, trigger, resultAction);
                 }
                 break;
         }
+        return false;
     }
 }

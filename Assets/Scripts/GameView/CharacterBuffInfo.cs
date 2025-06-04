@@ -7,14 +7,14 @@ using UniRx.Triggers;
 using UnityEngine;
 using UnityEngine.UI;
 
-public struct PlayerBuffInfo
+public struct CharacterBuffInfo
 {
     public readonly string Id;
     public readonly Guid Identity;
     public readonly int Level;
     public IReadOnlyDictionary<string, int> SessionIntegers;
 
-    public PlayerBuffInfo(string id, Guid identity, int level, Dictionary<string, int> sessionIntegers)
+    public CharacterBuffInfo(string id, Guid identity, int level, Dictionary<string, int> sessionIntegers)
     {
         Id = id;
         Identity = identity;

@@ -8,20 +8,6 @@ public interface ICharacterBuffPropertyEntity
     int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource);
 }
 
-public class EffectAttributePropertyCharacterBuffEntity : ICharacterBuffPropertyEntity
-{
-    public CharacterBuffProperty Property => CharacterBuffProperty.EffectAttribute;
-
-    private readonly EffectAttributeType _type;
-    private readonly IIntegerValue _value;
-
-    public EffectAttributePropertyCharacterBuffEntity() { }
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
-    {
-        return _value.Eval(gameWatcher, triggerSource, SystemAction.Instance);
-    }
-}
-
 public class MaxHealthPropertyCharacterBuffEntity : ICharacterBuffPropertyEntity
 {
     public CharacterBuffProperty Property => CharacterBuffProperty.MaxHealth;
