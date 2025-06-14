@@ -20,7 +20,7 @@ public interface ICardBuffManager
         IActionUnit actionUnit,
         string buffId);
 
-    void Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit);
+    bool Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit);
 }
 
 public class CardBuffManager : ICardBuffManager
@@ -99,38 +99,30 @@ public class CardBuffManager : ICardBuffManager
                 _buffs.Remove(existBuff);
                 return new RemoveCardBuffResult
                 {
-                    Buff = existBuff.Some()
+                    Buff = new List<ICardBuffEntity>() { existBuff }
                 };
             }
         }
 
         return new RemoveCardBuffResult
         {
-            Buff = Option.None<ICardBuffEntity>()
+            Buff = Array.Empty<ICardBuffEntity>()
         };
     }
 
-    public void Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)
+    public bool Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)
     {
-        var gameEvts = new List<IGameEvent>();
+        var isUpdated = false;
         foreach (var buff in _buffs.ToList())
         {
-            var isChanged = false;
             var triggerBuff = new CardBuffTrigger(buff);
             foreach (var session in buff.ReactionSessions.Values)
             {
-                isChanged |= session.Update(gameWatcher, triggerBuff, actionUnit);
+                isUpdated |= session.Update(gameWatcher, triggerBuff, actionUnit);
             }
 
-            buff.LifeTime.Update(gameWatcher, triggerBuff, actionUnit);
-            if (buff.IsExpired())
-            {
-                _buffs.Remove(buff);
-            }
-
-            if (isChanged)
-            {
-            }
+            isUpdated |= buff.LifeTime.Update(gameWatcher, triggerBuff, actionUnit);
         }
+        return isUpdated;
     }    
 }

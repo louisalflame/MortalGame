@@ -20,14 +20,16 @@ public class SingleCardDetailPopupPanel : MonoBehaviour
     [SerializeField]
     private CardPropertyHint _cardPropertyHint;
 
+    private IGameInfoModel _gameInfoModel;
     private LocalizeLibrary _localizeLibrary;
     private SingleCardDetailPopupPanelState _state;
 
-    public void Init(LocalizeLibrary localizeLibrary)
+    public void Init(IGameInfoModel gameInfoModel, LocalizeLibrary localizeLibrary)
     {
+        _gameInfoModel = gameInfoModel;
         _localizeLibrary = localizeLibrary;
         _cardPropertyHint.Init(_localizeLibrary);
-        _cardView.Initialize(_localizeLibrary);
+        _cardView.Initialize(_gameInfoModel, _localizeLibrary);
     }
 
     public async UniTask Run(CardInfo cardInfo)

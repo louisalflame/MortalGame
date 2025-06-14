@@ -39,7 +39,7 @@ public static class GameFormula
 
         var cardAddition = card.GetCardProperty(gameWatcher, CardProperty.CostAddition);
 
-        return Math.Max(0, card.OriginPower + actionAddition + cardAddition);
+        return Math.Max(0, card.OriginCost + actionAddition + cardAddition);
     }
 
     private static int GetCardLookAttributeAddition(

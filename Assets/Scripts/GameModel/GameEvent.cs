@@ -60,7 +60,7 @@ public abstract class MoveCardEvent : IGameEvent
     public MoveCardEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher, ICardColletionZone start, ICardColletionZone destination)
     {
         Faction = card.Faction(gameWatcher.GameStatus);
-        CardInfo = new CardInfo(card, gameWatcher);
+        CardInfo = card.ToInfo(gameWatcher);
         StartZoneInfo = start.ToCardCollectionInfo(gameWatcher);
         DestinationZoneInfo = destination.ToCardCollectionInfo(gameWatcher);
     }
@@ -74,7 +74,7 @@ public abstract class AddCardEvent : IGameEvent
     public AddCardEvent(ICardEntity card,IGameplayStatusWatcher gameWatcher, ICardColletionZone destination)
     {
         Faction = card.Faction(gameWatcher.GameStatus);
-        CardInfo = new CardInfo(card, gameWatcher);
+        CardInfo = card.ToInfo(gameWatcher);
         DestinationZoneInfo = destination.ToCardCollectionInfo(gameWatcher);
     }
 }
@@ -103,6 +103,16 @@ public class CloneCardEvent : AddCardEvent
     public CloneCardEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher, ICardColletionZone destination) :
         base(card, gameWatcher, destination) { }
 }
+public class UpdateHandCardsEvent : IGameEvent
+{
+    public Faction Faction;
+    public CardInfo CardInfo;
+    public UpdateHandCardsEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher)
+    {
+        Faction = card.Faction(gameWatcher.GameStatus);
+        CardInfo = card.ToInfo(gameWatcher);
+    }
+}
 public class AddCardBuffEvent : IGameEvent
 {
     public Faction Faction;
@@ -111,7 +121,18 @@ public class AddCardBuffEvent : IGameEvent
     public AddCardBuffEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher)
     {
         Faction = card.Faction(gameWatcher.GameStatus);
-        CardInfo = new CardInfo(card, gameWatcher);
+        CardInfo = card.ToInfo(gameWatcher);
+    }
+}
+public class RemoveCardBuffEvent : IGameEvent
+{
+    public Faction Faction;
+    public CardInfo CardInfo;
+
+    public RemoveCardBuffEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher)
+    {
+        Faction = card.Faction(gameWatcher.GameStatus);
+        CardInfo = card.ToInfo(gameWatcher);
     }
 }
 
@@ -247,17 +268,6 @@ public class AddPlayerBuffEvent : IGameEvent
         Buff = buff;
     }
 }
-public class UpdatePlayerBuffEvent : IGameEvent
-{
-    public Faction Faction;
-    public PlayerBuffInfo Buff;
-
-    public UpdatePlayerBuffEvent(IPlayerEntity player, PlayerBuffInfo buff)
-    {
-        Faction = player.Faction;
-        Buff = buff;
-    }
-}
 public class RemovePlayerBuffEvent : IGameEvent
 {
     public Faction Faction;
@@ -267,5 +277,46 @@ public class RemovePlayerBuffEvent : IGameEvent
     {
         Faction = player.Faction;
         Buff = buff;
+    }
+}
+
+public class GeneralUpdateEvent : IGameEvent
+{
+    public Dictionary<Guid, PlayerBuffInfo> PlayerBuffInfos = new();
+    public Dictionary<Guid, CharacterBuffInfo> CharacterBuffInfos = new();
+    public Dictionary<Guid, CardInfo> CardInfos = new();
+
+    public GeneralUpdateEvent(
+        IReadOnlyCollection<PlayerBuffInfo> playerBuffInfos,
+        IReadOnlyCollection<CharacterBuffInfo> characterBuffInfos,
+        IReadOnlyCollection<CardInfo> cardInfos)
+    {
+        foreach (var buff in playerBuffInfos) PlayerBuffInfos[buff.Identity] = buff;
+        foreach (var buff in characterBuffInfos) CharacterBuffInfos[buff.Identity] = buff;
+        foreach (var card in cardInfos) CardInfos[card.Identity] = card;
+    }
+    public GeneralUpdateEvent(IReadOnlyCollection<PlayerBuffInfo> playerBuffInfos)
+    {
+        foreach (var buff in playerBuffInfos) PlayerBuffInfos[buff.Identity] = buff;
+    }
+    public GeneralUpdateEvent(IReadOnlyCollection<CharacterBuffInfo> characterBuffInfos)
+    {
+        foreach (var buff in characterBuffInfos) CharacterBuffInfos[buff.Identity] = buff;
+    }
+    public GeneralUpdateEvent(IReadOnlyCollection<CardInfo> cardInfos)
+    {
+        foreach (var buff in cardInfos) CardInfos[buff.Identity] = buff;
+    }
+    public GeneralUpdateEvent(PlayerBuffInfo playerBuffInfo)
+    {
+        PlayerBuffInfos[playerBuffInfo.Identity] = playerBuffInfo;
+    }
+    public GeneralUpdateEvent(CharacterBuffInfo characterBuffInfo)
+    {
+        CharacterBuffInfos[characterBuffInfo.Identity] = characterBuffInfo;
+    }
+    public GeneralUpdateEvent(CardInfo cardInfo)
+    {
+        CardInfos[cardInfo.Identity] = cardInfo;
     }
 }

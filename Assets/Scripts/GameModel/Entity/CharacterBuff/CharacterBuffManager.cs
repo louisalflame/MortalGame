@@ -22,7 +22,7 @@ public interface ICharacterBuffManager
         string buffId,
         out ICharacterBuffEntity resultBuff);
     
-    void Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit);
+    IEnumerable<ICharacterBuffEntity> Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit);
 }
 
 public class CharacterBuffManager : ICharacterBuffManager
@@ -113,20 +113,22 @@ public class CharacterBuffManager : ICharacterBuffManager
         return false;
     }
 
-    public void Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)
+    public IEnumerable<ICharacterBuffEntity> Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)
     {
         foreach (var buff in _buffs.ToList())
         {
+            var isUpdated = false;
             var triggeredBuff = new CharacterBuffTrigger(buff);
             foreach (var session in buff.ReactionSessions.Values)
             {
-                session.Update(gameWatcher, triggeredBuff, actionUnit);
+                isUpdated |= session.Update(gameWatcher, triggeredBuff, actionUnit);
             }
 
-            buff.LifeTime.Update(gameWatcher, triggeredBuff, actionUnit);
-            if (buff.IsExpired())
-            {
-                _buffs.Remove(buff);
+            isUpdated |= buff.LifeTime.Update(gameWatcher, triggeredBuff, actionUnit);
+
+            if (isUpdated)
+            { 
+                yield return buff;
             }
         }
     }

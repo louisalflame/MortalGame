@@ -20,7 +20,7 @@ public interface IPlayerBuffManager
         IActionUnit actionUnit,
         string buffId);
 
-    void Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit);
+    IEnumerable<IPlayerBuffEntity> Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit);
 }
 
 public class PlayerBuffManager : IPlayerBuffManager
@@ -102,42 +102,52 @@ public class PlayerBuffManager : IPlayerBuffManager
                 _buffs.Remove(existBuff);
                 return new RemovePlayerBuffResult
                 {
-                    Buff = existBuff.SomeNotNull()
+                    Buffs = new List<IPlayerBuffEntity> { existBuff }
                 };
             }
         }
 
         return new RemovePlayerBuffResult
         {
-            Buff = Option.None<IPlayerBuffEntity>()
+            Buffs = Array.Empty<IPlayerBuffEntity>()
         };   
     }
-
-    public void Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)
+    // TODO
+    public RemovePlayerBuffResult RemoveExpiredBuff(
+        IGameplayStatusWatcher gameWatcher)
     {
-        var gameEvts = new List<IGameEvent>();
+        var expiredBuffs = new List<IPlayerBuffEntity>();
+        foreach (var existBuff in _buffs)
+        {
+            if (existBuff.IsExpired())
+            {
+                expiredBuffs.Add(existBuff);
+                _buffs.Remove(existBuff);
+            }
+        }
+
+        return new RemovePlayerBuffResult
+        {
+            Buffs = expiredBuffs
+        };
+    }
+
+    public IEnumerable<IPlayerBuffEntity> Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)
+    {
         foreach (var buff in _buffs.ToList())
         {
-            var isChanged = false;
+            var isUpdated = false;
             var triggerBuff = new PlayerBuffTrigger(buff);
             foreach (var session in buff.ReactionSessions.Values)
             {
-                isChanged |= session.Update(gameWatcher, triggerBuff, actionUnit);
+                isUpdated |= session.Update(gameWatcher, triggerBuff, actionUnit);
             }
 
-            buff.LifeTime.Update(gameWatcher, triggerBuff, actionUnit);
-            if (buff.IsExpired())
-            {
-                _buffs.Remove(buff);
-            }
+            isUpdated |= buff.LifeTime.Update(gameWatcher, triggerBuff, actionUnit);
 
-            if (isChanged)
+            if (isUpdated)
             {
-                buff.Owner(gameWatcher)
-                    .MatchSome(owner =>
-                        gameEvts.Add(
-                            new UpdatePlayerBuffEvent(owner, buff.ToInfo()))
-                );
+                yield return buff;
             }
         }
     }

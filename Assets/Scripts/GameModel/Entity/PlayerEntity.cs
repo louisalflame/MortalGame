@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Optional;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public interface IPlayerEntity
@@ -16,7 +17,7 @@ public interface IPlayerEntity
     IPlayerBuffManager BuffManager { get; }
     ICharacterEntity MainCharacter { get; }
 
-    void Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit);
+    IGameEvent Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit);
 }
 
 public abstract class PlayerEntity : IPlayerEntity
@@ -55,17 +56,25 @@ public abstract class PlayerEntity : IPlayerEntity
         _buffManager = new PlayerBuffManager();
     }
 
-    public void Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)
+    public IGameEvent Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)
     {
-        var gameEvts = new List<IGameEvent>();
+        var updatedPlayerBuffInfos = _buffManager
+            .Update(gameWatcher, actionUnit)
+            .Select(buff => buff.ToInfo(gameWatcher));
 
-        _buffManager.Update(gameWatcher, actionUnit);
-        _cardManager.Update(gameWatcher, actionUnit);
+        var updatedCharacterBuffInfos = _characters
+            .Select(character => character.BuffManager)
+            .SelectMany(buffManager => buffManager.Update(gameWatcher, actionUnit))
+            .Select(buff => buff.ToInfo(gameWatcher));
 
-        foreach (var character in _characters.ToList())
-        {
-            character.BuffManager.Update(gameWatcher, actionUnit);
-        }
+        var updatedCardInfos = _cardManager
+            .Update(gameWatcher, actionUnit)
+            .Select(card => card.ToInfo(gameWatcher));
+
+        return new GeneralUpdateEvent(
+            updatedPlayerBuffInfos.ToList(),
+            updatedCharacterBuffInfos.ToList(),
+            updatedCardInfos.ToList());
     }
 }
 

@@ -39,7 +39,7 @@ public interface IPlayerCardManager
         CardBuffLibrary cardBuffLibrary,
         IEnumerable<AddCardBuffData> addCardBuffDatas);
     
-    void Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit);
+    IEnumerable<ICardEntity> Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit);
 }
 
 public class PlayerCardManager : IPlayerCardManager
@@ -124,8 +124,8 @@ public class PlayerCardManager : IPlayerCardManager
         events.Add(new RecycleHandCardEvent()
         {
             Faction = this.Owner(gameWatcher).ValueOr(PlayerEntity.DummyPlayer).Faction,
-            RecycledCardInfos = recycleCards.Select(c => new CardInfo(c, gameWatcher)).ToArray(),
-            ExcludedCardInfos = excludeCards.Select(c => new CardInfo(c, gameWatcher)).ToArray(),
+            RecycledCardInfos = recycleCards.Select(c => c.ToInfo(gameWatcher)).ToArray(),
+            ExcludedCardInfos = excludeCards.Select(c => c.ToInfo(gameWatcher)).ToArray(),
             HandCardInfo = HandCard.ToCardCollectionInfo(gameWatcher),
             GraveyardInfo = Graveyard.ToCardCollectionInfo(gameWatcher),
             ExclusionZoneInfo = ExclusionZone.ToCardCollectionInfo(gameWatcher),
@@ -382,7 +382,7 @@ public class PlayerCardManager : IPlayerCardManager
         }
     }
 
-    public void Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)
+    public IEnumerable<ICardEntity> Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)
     {
         foreach (var card in HandCard.Cards
             .Concat(Deck.Cards)
@@ -390,7 +390,10 @@ public class PlayerCardManager : IPlayerCardManager
             .Concat(ExclusionZone.Cards)
             .Concat(DisposeZone.Cards))
         {
-            card.BuffManager.Update(gameWatcher, actionUnit);
+            if (card.BuffManager.Update(gameWatcher, actionUnit))
+            { 
+                yield return card;
+            }
         }
     }
 

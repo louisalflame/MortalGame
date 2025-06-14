@@ -13,7 +13,7 @@ public interface ICardView : IRecyclable, ISelectableView
     Canvas Canvas { get; }
     RectTransform ParentRectTransform { get; }
 
-    void Initialize(LocalizeLibrary localizeLibrary);
+    void Initialize(IGameInfoModel gameInfoModel, LocalizeLibrary localizeLibrary);
     void SetCardInfo(CardInfo cardInfo);
 
     void SetPositionAndRotation(Vector3 position, Quaternion rotation);
@@ -68,21 +68,29 @@ public class CardView : MonoBehaviour, ICardView
     public Canvas Canvas => transform.GetComponentInParent<Canvas>();
 
     private CompositeDisposable _disposables = new CompositeDisposable();
+    private IDisposable _cardInfoSubscription;
     private Vector3 _localPosition;
     private Quaternion _localRotation; 
     private Dictionary<Guid, List<Vector3>> _offsets = new Dictionary<Guid, List<Vector3>>();
     private Tween _currentMoveTween;
 
+    private IGameInfoModel _gameInfoModel;
     private LocalizeLibrary _localizeLibrary;
     private Guid _cardIdentity;
 
-    public void Initialize(LocalizeLibrary localizeLibrary)
+    public void Initialize(
+        IGameInfoModel gameInfoModel,
+        LocalizeLibrary localizeLibrary)
     {
+        _gameInfoModel = gameInfoModel;
         _localizeLibrary = localizeLibrary;
     }
 
     public void SetCardInfo(CardInfo cardInfo)
     {
+        _cardInfoSubscription = _gameInfoModel.ObserveCardInfo(cardInfo.Identity)
+            .Where(info => info != null && info.Identity == cardInfo.Identity)
+            .Subscribe(info => _Render(info));
         _Render(cardInfo);
     }
     private void _Render(CardInfo cardInfo)
@@ -192,6 +200,7 @@ public class CardView : MonoBehaviour, ICardView
         _localRotation = Quaternion.identity;
         transform.localRotation = _localRotation;
         _UpdateLocalPosition();
+        _cardInfoSubscription?.Dispose();
         DisableCardAction();
     } 
 

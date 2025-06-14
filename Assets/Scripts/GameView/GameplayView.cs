@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
@@ -8,6 +9,7 @@ using UnityEngine;
 public interface IGameplayView : IAllCardDetailPanelView
 {
     void Init(
+        IGameInfoModel gameInfoModel,
         IGameplayActionReciever reciever, 
         IGameplayStatusWatcher statusWatcher, 
         LocalizeLibrary localizeLibrary,
@@ -84,11 +86,13 @@ public class GameplayView : MonoBehaviour, IGameplayView
     private FocusCardDetailView _focusCardDetailView;
     [BoxGroup("Popup")]
     [SerializeField]
-    private SimpleTitleIInfoHintView _simpleHintView;
+    private SimpleTitleInfoHintView _simpleHintView;
 
     public AllCardDetailPanel DetailPanel => _allCardDetailPanel;
     public SingleCardDetailPopupPanel SinglePopupPanel => _singleCardDetailPopupPanel;
     public FocusCardDetailView FocusCardDetailView => _focusCardDetailView;
+
+    private IGameInfoModel _gameInfoModel;
 
     public IEnumerable<ISelectableView> SelectableViews
     {
@@ -103,16 +107,19 @@ public class GameplayView : MonoBehaviour, IGameplayView
     public ISelectableView BasicSelectableView => _playGround;
 
     public void Init(
+        IGameInfoModel gameInfoModel,
         IGameplayActionReciever reciever, 
         IGameplayStatusWatcher statusWatcher,
         LocalizeLibrary localizeLibrary, 
         DispositionLibrary dispositionLibrary)
     {
-        _allyInfoView.Init(_topBarInfoView, _simpleHintView, localizeLibrary, dispositionLibrary);
-        _allyHandCardView.Init(statusWatcher, reciever, this, localizeLibrary);
+        _gameInfoModel = gameInfoModel;
+
+        _allyInfoView.Init(_gameInfoModel, _topBarInfoView, _simpleHintView, localizeLibrary, dispositionLibrary);
+        _allyHandCardView.Init(statusWatcher, reciever, _gameInfoModel, this, localizeLibrary);
         _allyCharacterView.Init(statusWatcher);
 
-        _enemyInfoView.Init(statusWatcher, _simpleHintView, localizeLibrary);
+        _enemyInfoView.Init(statusWatcher, _gameInfoModel, _simpleHintView, localizeLibrary);
         _enemySelectedCardView.Init(statusWatcher, reciever, localizeLibrary);
         _enemyCharacterView.Init(statusWatcher);
 
@@ -120,8 +127,8 @@ public class GameplayView : MonoBehaviour, IGameplayView
         _graveyardCardView.Init(statusWatcher, reciever);
         _submitView.Init(reciever);
 
-        _focusCardDetailView.Init(localizeLibrary);
-        _singleCardDetailPopupPanel.Init(localizeLibrary);
+        _focusCardDetailView.Init(_gameInfoModel, localizeLibrary);
+        _singleCardDetailPopupPanel.Init(_gameInfoModel, localizeLibrary);
         _simpleHintView.Init(localizeLibrary);
     }
 
@@ -132,6 +139,9 @@ public class GameplayView : MonoBehaviour, IGameplayView
             Debug.Log($"-- GameplayView.Render:[{gameEvent}] --");
             switch (gameEvent)
             {
+                case GeneralUpdateEvent updateEvent:
+                    _UpdateGeneralInfo(updateEvent);
+                    break;
                 case AllySummonEvent allySummonEvent:
                     _AllySummonEvent(allySummonEvent);
                     break;
@@ -189,8 +199,8 @@ public class GameplayView : MonoBehaviour, IGameplayView
                 case AddPlayerBuffEvent addBuffEvent:
                     _AddBuffView(addBuffEvent);
                     break;
-                case UpdatePlayerBuffEvent updateBuffEvent:
-                    _UpdateBuffView(updateBuffEvent);
+                case RemovePlayerBuffEvent removeBuffEvent:
+                    _RemoveBuffView(removeBuffEvent);
                     break;
             }
         }
@@ -199,6 +209,22 @@ public class GameplayView : MonoBehaviour, IGameplayView
     public void DisableAllHandCards()
     {
         _allyHandCardView.DisableAllHandCards();
+    }
+
+    private void _UpdateGeneralInfo(GeneralUpdateEvent updateEvent)
+    {
+        foreach (var kvp in updateEvent.PlayerBuffInfos)
+        {
+            _gameInfoModel.UpdatePlayerBuffInfo(kvp.Value);
+        }
+        foreach (var kvp in updateEvent.CharacterBuffInfos)
+        {
+            _gameInfoModel.UpdateCharacterBuffInfo(kvp.Value);
+        }
+        foreach (var kvp in updateEvent.CardInfos)
+        {
+            _gameInfoModel.UpdateCardInfo(kvp.Value);
+        }
     }
 
     private void _AllySummonEvent(AllySummonEvent allySummonEvent)
@@ -220,10 +246,12 @@ public class GameplayView : MonoBehaviour, IGameplayView
         switch (drawCardEvent.Faction)
         {
             case Faction.Ally:
+                _gameInfoModel.UpdateCardInfo(drawCardEvent.NewCardInfo);
                 _allyHandCardView.CreateCardView(drawCardEvent.NewCardInfo, drawCardEvent.HandCardInfo);
                 _deckCardView.UpdateDeckView(drawCardEvent);
                 break;
             case Faction.Enemy:
+                _gameInfoModel.UpdateCardInfo(drawCardEvent.NewCardInfo);
                 _enemySelectedCardView.UpdateDeckView(drawCardEvent);
                 break;
         }
@@ -427,22 +455,24 @@ public class GameplayView : MonoBehaviour, IGameplayView
         switch (addBuffEvent.Faction)
         {
             case Faction.Ally:
+                _gameInfoModel.UpdatePlayerBuffInfo(addBuffEvent.Buff);
                 _allyInfoView.AddBuff(addBuffEvent);
                 break;
             case Faction.Enemy:
+                _gameInfoModel.UpdatePlayerBuffInfo(addBuffEvent.Buff);
                 _enemyInfoView.AddBuff(addBuffEvent);
                 break;
         }
     }
-    private void _UpdateBuffView(UpdatePlayerBuffEvent updateBuffEvent)
+    private void _RemoveBuffView(RemovePlayerBuffEvent removeBuffEvent)
     {
-        switch (updateBuffEvent.Faction)
+        switch (removeBuffEvent.Faction)
         {
             case Faction.Ally:
-                _allyInfoView.UpdateBuff(updateBuffEvent);
+                _allyInfoView.RemoveBuff(removeBuffEvent);
                 break;
             case Faction.Enemy:
-                _enemyInfoView.UpdateBuff(updateBuffEvent);
+                _enemyInfoView.RemoveBuff(removeBuffEvent);
                 break;
         }
     }

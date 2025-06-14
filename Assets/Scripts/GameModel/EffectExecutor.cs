@@ -30,7 +30,9 @@ public static class EffectExecutor
                     var damageResult = target.HealthManager.TakeDamage(damagePoint, gameplayWatcher.ContextManager.Context);
                     var damageStyle = DamageStyle.None; // TODO: pass style from action source
 
-                    gameplayReactor.UpdateReactorSessionAction(new DamageResultAction(actionSource, characterTarget, damageResult, damageStyle));
+                    cardEffectEvents.AddRange(
+                        gameplayReactor.UpdateReactorSessionAction(
+                            new DamageResultAction(actionSource, characterTarget, damageResult, damageStyle)));
                     cardEffectEvents.Add(new DamageEvent(target.Faction(gameplayWatcher), target, damageResult, damageStyle));
                 }
                 break;
@@ -47,7 +49,9 @@ public static class EffectExecutor
                     var damageResult = target.HealthManager.TakePenetrateDamage(damagePoint, gameplayWatcher.ContextManager.Context);
                     var damageStyle = DamageStyle.None;
 
-                    gameplayReactor.UpdateReactorSessionAction(new DamageResultAction(actionSource, characterTarget, damageResult, damageStyle));
+                    cardEffectEvents.AddRange(
+                        gameplayReactor.UpdateReactorSessionAction(
+                            new DamageResultAction(actionSource, characterTarget, damageResult, damageStyle)));
                     cardEffectEvents.Add(new DamageEvent(target.Faction(gameplayWatcher), target, damageResult, damageStyle));
                 }
                 break;
@@ -64,7 +68,9 @@ public static class EffectExecutor
                     var damageResult = target.HealthManager.TakeAdditionalDamage(damagePoint, gameplayWatcher.ContextManager.Context);
                     var damageStyle = DamageStyle.None;
 
-                    gameplayReactor.UpdateReactorSessionAction(new DamageResultAction(actionSource, characterTarget, damageResult, damageStyle));
+                    cardEffectEvents.AddRange(
+                        gameplayReactor.UpdateReactorSessionAction(
+                            new DamageResultAction(actionSource, characterTarget, damageResult, damageStyle)));
                     cardEffectEvents.Add(new DamageEvent(target.Faction(gameplayWatcher), target, damageResult, damageStyle));
                 }
                 break;
@@ -81,7 +87,9 @@ public static class EffectExecutor
                     var damageResult = target.HealthManager.TakeEffectiveDamage(damagePoint, gameplayWatcher.ContextManager.Context);
                     var damageStyle = DamageStyle.None;
 
-                    gameplayReactor.UpdateReactorSessionAction(new DamageResultAction(actionSource, characterTarget, damageResult, damageStyle));
+                    cardEffectEvents.AddRange(
+                        gameplayReactor.UpdateReactorSessionAction(
+                            new DamageResultAction(actionSource, characterTarget, damageResult, damageStyle)));
                     cardEffectEvents.Add(new DamageEvent(target.Faction(gameplayWatcher), target, damageResult, damageStyle));
                 }
                 break;
@@ -97,7 +105,9 @@ public static class EffectExecutor
                     var healPoint = healEffect.Value.Eval(gameplayWatcher, trigger, targetIntent);
                     var healResult = target.HealthManager.GetHeal(healPoint, gameplayWatcher.ContextManager.Context);
 
-                    gameplayReactor.UpdateReactorSessionAction(new HealResultAction(actionSource, characterTarget, healResult));
+                    cardEffectEvents.AddRange(
+                        gameplayReactor.UpdateReactorSessionAction(
+                            new HealResultAction(actionSource, characterTarget, healResult)));
                     cardEffectEvents.Add(new GetHealEvent(target.Faction(gameplayWatcher), target, healResult));
                 }
                 break;
@@ -113,7 +123,9 @@ public static class EffectExecutor
                     var shieldPoint = shieldEffect.Value.Eval(gameplayWatcher, trigger, targetIntent);
                     var shieldResult = target.HealthManager.GetShield(shieldPoint, gameplayWatcher.ContextManager.Context);
 
-                    gameplayReactor.UpdateReactorSessionAction(new ShieldResultAction(actionSource, characterTarget, shieldResult));
+                    cardEffectEvents.AddRange(
+                        gameplayReactor.UpdateReactorSessionAction(
+                            new ShieldResultAction(actionSource, characterTarget, shieldResult)));
                     cardEffectEvents.Add(new GetShieldEvent(target.Faction(gameplayWatcher), target, shieldResult));
                 }
                 break;
@@ -129,7 +141,9 @@ public static class EffectExecutor
                     var gainEnergy = gainEnergyEffect.Value.Eval(gameplayWatcher, trigger, targetIntent);
                     var gainEnergyResult = target.EnergyManager.GainEnergy(gainEnergy);
 
-                    gameplayReactor.UpdateReactorSessionAction(new GainEnergyResultAction(actionSource, playerTarget, gainEnergyResult));
+                    cardEffectEvents.AddRange(
+                        gameplayReactor.UpdateReactorSessionAction(
+                            new GainEnergyResultAction(actionSource, playerTarget, gainEnergyResult)));
                     cardEffectEvents.Add(new GainEnergyEvent(target, gainEnergyResult));
                 }
                 break;
@@ -145,7 +159,9 @@ public static class EffectExecutor
                     var loseEnergy = loseEnegyEffect.Value.Eval(gameplayWatcher, trigger, targetIntent);
                     var loseEnergyResult = target.EnergyManager.LoseEnergy(loseEnergy);
 
-                    gameplayReactor.UpdateReactorSessionAction(new LoseEnergyResultAction(actionSource, playerTarget, loseEnergyResult));
+                    cardEffectEvents.AddRange(
+                        gameplayReactor.UpdateReactorSessionAction(
+                            new LoseEnergyResultAction(actionSource, playerTarget, loseEnergyResult)));
                     cardEffectEvents.Add(new LoseEnergyEvent(target, loseEnergyResult));
                 }
                 break;
@@ -169,10 +185,12 @@ public static class EffectExecutor
                         addBuffEffect.BuffId,
                         level);
 
-                    gameplayReactor.UpdateReactorSessionAction(new AddPlayerBuffResultAction(actionSource, playerTarget, addResult));
+                    cardEffectEvents.AddRange(
+                        gameplayReactor.UpdateReactorSessionAction(
+                            new AddPlayerBuffResultAction(actionSource, playerTarget, addResult)));
                     IGameEvent buffEvent = addResult.IsNewBuff ?
-                        new AddPlayerBuffEvent(target, addResult.Buff.ToInfo()) :
-                        new UpdatePlayerBuffEvent(target, addResult.Buff.ToInfo());
+                        new AddPlayerBuffEvent(target, addResult.Buff.ToInfo(gameplayWatcher)) :
+                        new GeneralUpdateEvent(addResult.Buff.ToInfo(gameplayWatcher));
                     cardEffectEvents.Add(buffEvent);
                 }
                 break;
@@ -191,11 +209,14 @@ public static class EffectExecutor
                         targetIntent,
                         removeBuffEffect.BuffId);
 
-                    removeResult.Buff.MatchSome(resultBuff =>
+                    if (removeResult.Buffs.Count > 0)
                     {
-                        gameplayReactor.UpdateReactorSessionAction(new RemovePlayerBuffResultAction(actionSource, playerTarget, removeResult));
-                        cardEffectEvents.Add(new RemovePlayerBuffEvent(target, resultBuff.ToInfo()));
-                    });
+                        cardEffectEvents.AddRange(
+                            gameplayReactor.UpdateReactorSessionAction(
+                                new RemovePlayerBuffResultAction(actionSource, playerTarget, removeResult)));
+                        foreach (var resultBuff in removeResult.Buffs)
+                            cardEffectEvents.Add(new RemovePlayerBuffEvent(target, resultBuff.ToInfo(gameplayWatcher)));
+                    };
                 }
                 break;
             }
@@ -227,8 +248,10 @@ public static class EffectExecutor
                         if (cardOwner.CardManager.TryDiscardCard(
                             card.Identity, out var discardedCard, out var start, out var destination))
                         {
-                            var cardTarget = new CardTarget(card);
-                            gameplayReactor.UpdateReactorSessionAction(new DiscardCardResultAction(actionSource, cardTarget, discardedCard));
+                            var cardTarget = new CardTarget(card);                            
+                            cardEffectEvents.AddRange(
+                                gameplayReactor.UpdateReactorSessionAction(
+                                    new DiscardCardResultAction(actionSource, cardTarget, discardedCard)));
                             cardEffectEvents.Add(new DiscardCardEvent(discardedCard, gameplayWatcher, start, destination));
                         }
                     });
@@ -248,7 +271,9 @@ public static class EffectExecutor
                             card.Identity, out var consumedCard, out var start, out var destination))
                         {
                             var cardTarget = new CardTarget(card);
-                            gameplayReactor.UpdateReactorSessionAction(new ConsumeCardResultAction(actionSource, cardTarget, consumedCard));
+                            cardEffectEvents.AddRange(
+                                gameplayReactor.UpdateReactorSessionAction(
+                                    new ConsumeCardResultAction(actionSource, cardTarget, consumedCard)));
                             cardEffectEvents.Add(new ConsumeCardEvent(consumedCard, gameplayWatcher, start, destination));
                         }
                     });
@@ -268,7 +293,9 @@ public static class EffectExecutor
                             card.Identity, out var disposedCard, out var start, out var destination))
                         {
                             var cardTarget = new CardTarget(card);
-                            gameplayReactor.UpdateReactorSessionAction(new DisposeCardResultAction(actionSource, cardTarget, disposedCard));
+                            cardEffectEvents.AddRange(
+                                gameplayReactor.UpdateReactorSessionAction(
+                                    new DisposeCardResultAction(actionSource, cardTarget, disposedCard)));
                             cardEffectEvents.Add(new DisposeCardEvent(disposedCard, gameplayWatcher, start, destination));
                         }
                     });
@@ -296,7 +323,9 @@ public static class EffectExecutor
                                 gameplayWatcher.ContextManager.CardBuffLibrary,
                                 createCardEffect.AddCardBuffDatas);
 
-                        gameplayReactor.UpdateReactorSessionAction(new CreateCardResultAction(actionSource, playerTarget, createResult));
+                        cardEffectEvents.AddRange(
+                            gameplayReactor.UpdateReactorSessionAction(
+                                new CreateCardResultAction(actionSource, playerTarget, createResult)));
                         cardEffectEvents.Add(new CreateCardEvent(createResult.Card, gameplayWatcher, createResult.Zone));
                     }
                 });
@@ -325,7 +354,9 @@ public static class EffectExecutor
                                 gameplayWatcher.ContextManager.CardBuffLibrary,
                                 cloneCardEffect.AddCardBuffDatas);
 
-                        gameplayReactor.UpdateReactorSessionAction(new CloneCardResultAction(actionSource, playerCardTarget, cloneResult));
+                        cardEffectEvents.AddRange(
+                            gameplayReactor.UpdateReactorSessionAction(
+                                new CloneCardResultAction(actionSource, playerCardTarget, cloneResult)));
                         cardEffectEvents.Add(new CloneCardEvent(cloneResult.Card, gameplayWatcher, cloneResult.Zone));
                     }
                 });
@@ -351,7 +382,9 @@ public static class EffectExecutor
                             addCardBuff.CardBuffId,
                             addLevel);
 
-                        gameplayReactor.UpdateReactorSessionAction(new AddCardBuffResultAction(actionSource, cardTarget, addBuffResult));
+                        cardEffectEvents.AddRange(
+                            gameplayReactor.UpdateReactorSessionAction(
+                                new AddCardBuffResultAction(actionSource, cardTarget, addBuffResult)));
                         cardEffectEvents.Add(new AddCardBuffEvent(card, gameplayWatcher));
                     }
                 }
@@ -372,7 +405,8 @@ public static class EffectExecutor
         IPlayerBuffEffect buffEffect)
     {
         var appleBuffEffectEvents = new List<IGameEvent>();
-        gameplayReactor.UpdateReactorSessionTiming(UpdateTiming.TriggerBuffStart);
+        appleBuffEffectEvents.AddRange(
+            gameplayReactor.UpdateReactorSessionAction(new UpdateTimingAction(UpdateTiming.TriggerBuffStart)));
 
         switch (buffEffect)
         {
@@ -388,7 +422,9 @@ public static class EffectExecutor
                     var damageResult = target.HealthManager.TakeEffectiveDamage(damagePoint, gameplayWatcher.ContextManager.Context);
                     var damageStyle = DamageStyle.None;
 
-                    gameplayReactor.UpdateReactorSessionAction(new DamageResultAction(actionSource, characterTarget, damageResult, damageStyle));
+                    appleBuffEffectEvents.AddRange(
+                        gameplayReactor.UpdateReactorSessionAction(
+                            new DamageResultAction(actionSource, characterTarget, damageResult, damageStyle)));
                     appleBuffEffectEvents.Add(new DamageEvent(target.Faction(gameplayWatcher), target, damageResult, damageStyle));
                 }
                 break;
@@ -412,7 +448,9 @@ public static class EffectExecutor
                             addCardBuffData.CardBuffId,
                             addLevel);
 
-                        gameplayReactor.UpdateReactorSessionAction(new AddCardBuffResultAction(actionSource, cardTarget, addResult));
+                        appleBuffEffectEvents.AddRange(
+                            gameplayReactor.UpdateReactorSessionAction(
+                                new AddCardBuffResultAction(actionSource, cardTarget, addResult)));
                         appleBuffEffectEvents.Add(new AddCardBuffEvent(card, gameplayWatcher));
                     }
                 }
@@ -452,7 +490,9 @@ public static class EffectExecutor
                 var graveyardCards = player.CardManager.Graveyard.PopAllCards();
                 player.CardManager.Deck.EnqueueCardsThenShuffle(graveyardCards);
 
-                gameplayReactor.UpdateReactorSessionAction(new RecycleDeckResultAction(new PlayerTarget(player)));
+                drawCardEvents.AddRange(
+                    gameplayReactor.UpdateReactorSessionAction(
+                        new RecycleDeckResultAction(new PlayerTarget(player))));
                 drawCardEvents.Add(new RecycleGraveyardEvent()
                 {
                     Faction = player.Faction,
@@ -463,38 +503,36 @@ public static class EffectExecutor
 
             if (player.CardManager.Deck.Cards.Count > 0)
             {
-                _DrawCard(gameplayWatcher, gameplayReactor, source, player)
-                    .MatchSome(drawCardEvent =>
-                    {
-                        drawCardEvents.Add(drawCardEvent);
-                    });
+                drawCardEvents.AddRange(
+                    _DrawCard(gameplayWatcher, gameplayReactor, source, player));
             }
         }
 
         return drawCardEvents;
     }
     
-    private static Option<IGameEvent> _DrawCard(
+    private static IEnumerable<IGameEvent> _DrawCard(
         IGameplayStatusWatcher gameplayWatcher,
         IGameplayReactor gameplayReactor,
         IActionSource source,
         IPlayerEntity player)
     {
+        var drawCardEvents = new List<IGameEvent>();
         if (player.CardManager.Deck.PopCard(out ICardEntity newCard))
         {
             player.CardManager.HandCard.AddCard(newCard);
-            gameplayReactor.UpdateReactorSessionAction(new DrawCardResultAction(source, new PlayerTarget(player), newCard));
 
-            var newCardInfo = new CardInfo(newCard, gameplayWatcher);
-            IGameEvent drawCardEvent = new DrawCardEvent()
-            {
+            drawCardEvents.AddRange(
+                gameplayReactor.UpdateReactorSessionAction(
+                    new DrawCardResultAction(source, new PlayerTarget(player), newCard)));
+
+            drawCardEvents.Add(new DrawCardEvent() {
                 Faction = player.Faction,
-                NewCardInfo = newCardInfo,
+                NewCardInfo = newCard.ToInfo(gameplayWatcher),
                 HandCardInfo = player.CardManager.HandCard.ToCardCollectionInfo(gameplayWatcher),
                 DeckInfo = player.CardManager.Deck.ToCardCollectionInfo(gameplayWatcher)
-            };
-            return drawCardEvent.Some();
+            });
         }
-        return Option.None<IGameEvent>();
+        return drawCardEvents;
     }
 }

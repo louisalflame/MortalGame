@@ -79,10 +79,9 @@ public class ReactionSessionEntity : IReactionSessionEntity
             }
         }
 
-        isUpdated |= _currentValue
-            .Match(value =>
-                value.Update(gameWatcher, trigger, actionUnit),
-                () => false);
+        isUpdated |= _currentValue.Match(
+            value => value.Update(gameWatcher, trigger, actionUnit),
+            () => false);
         return isUpdated;
     }
 

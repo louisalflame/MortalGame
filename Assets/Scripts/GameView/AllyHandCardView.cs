@@ -62,6 +62,7 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
     private List<ICardView> _cardViews = new List<ICardView>();
     private Dictionary<Guid, ICardView> _cardViewDict = new Dictionary<Guid, ICardView>();
     private IGameplayStatusWatcher _statusWatcher;
+    private IGameInfoModel _gameInfoModel;
     private IGameplayActionReciever _reciever;
     private LocalizeLibrary _localizeLibrary;
     private CardCollectionInfo _cardCollectionInfo;
@@ -80,11 +81,13 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
     public void Init(
         IGameplayStatusWatcher statusWatcher, 
         IGameplayActionReciever reciever, 
+        IGameInfoModel gameInfoModel,
         IAllCardDetailPanelView allCardDetailPanelView,
         LocalizeLibrary localizeLibrary)
     {
         _statusWatcher = statusWatcher;
         _reciever = reciever;
+        _gameInfoModel = gameInfoModel;
         _focusCardDetailView = allCardDetailPanelView.FocusCardDetailView;
         _localizeLibrary = localizeLibrary;
     }
@@ -93,7 +96,7 @@ public class AllyHandCardView : MonoBehaviour, IHandCardViewHandler
     {
         _cardCollectionInfo = handCardInfo;
         var cardView = _cardViewFactory.CreatePrefab();
-        cardView.Initialize(_localizeLibrary);
+        cardView.Initialize(_gameInfoModel, _localizeLibrary);
         cardView.transform.SetParent(_cardViewParent, false);
         cardView.SetCardInfo(newCardInfo);
         _cardViews.Add(cardView);

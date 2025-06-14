@@ -19,7 +19,7 @@ public class CardInfo
     public MainSelectableInfo MainSelectable;
     public List<SubSelectableInfo> SubSelectables;
 
-    public List<CardBuffInfo> StatusInfos { get; private set; }
+    public List<CardBuffInfo> BuffInfos { get; private set; }
     public List<CardProperty> Properties { get; private set; }
 
     public CardInfo(ICardEntity card, IGameplayStatusWatcher gameWatcher)
@@ -38,7 +38,7 @@ public class CardInfo
         MainSelectable = new MainSelectableInfo(card.MainSelectable.SelectType);
         SubSelectables = card.SubSelectables.Select(s => new SubSelectableInfo(s.SelectType, s.TargetCount)).ToList();
 
-        StatusInfos = card.BuffManager.Buffs.Select(s => new CardBuffInfo(s)).ToList();
+        BuffInfos = card.BuffManager.Buffs.Select(s => new CardBuffInfo(s)).ToList();
         Properties = card.Properties.Select(p => p.Property)
             .Concat(card.BuffManager.Buffs
                 .SelectMany(b => b.Properties.Select(p => p.Property)))
@@ -77,6 +77,12 @@ public class CardCollectionInfo
 
 public static class CardCollectionInfoUtility
 {
+    public static CardInfo ToInfo(
+        this ICardEntity card, IGameplayStatusWatcher gameWatcher)
+    {
+        return new CardInfo(card, gameWatcher);
+    }
+
     public static CardCollectionInfo ToCardCollectionInfo(this IReadOnlyCollection<CardInfo> cardInfos, CardCollectionType type)
     {
         return new CardCollectionInfo(
@@ -92,7 +98,7 @@ public static class CardCollectionInfoUtility
         this ICardColletionZone cardCollectionZone, IGameplayStatusWatcher gameWatcher)
     { 
         return cardCollectionZone.Cards
-            .Select(c => new CardInfo(c, gameWatcher))
+            .Select(c => c.ToInfo(gameWatcher))
             .ToArray()
             .ToCardCollectionInfo(cardCollectionZone.Type);
     }
@@ -100,6 +106,6 @@ public static class CardCollectionInfoUtility
     public static IReadOnlyCollection<CardInfo> ToCardInfos(
         this IReadOnlyCollection<ICardEntity> cards, IGameplayStatusWatcher gameWatcher)
     {
-        return cards.Select(c => new CardInfo(c, gameWatcher)).ToArray();
+        return cards.Select(c => c.ToInfo(gameWatcher)).ToArray();
     }
 }

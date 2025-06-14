@@ -17,7 +17,6 @@ public interface IPlayerBuffEntity
 
     bool IsExpired();
     void AddLevel(int level);
-    PlayerBuffInfo ToInfo();
 }
 
 public class PlayerBuffEntity : IPlayerBuffEntity
@@ -68,20 +67,6 @@ public class PlayerBuffEntity : IPlayerBuffEntity
     {
         _level += level;
     }
-    
-    public PlayerBuffInfo ToInfo()
-    {
-        return new PlayerBuffInfo(
-            PlayerBuffDataId,
-            Identity,
-            Level,
-            ReactionSessions
-                .Where(kvp => kvp.Value.IntegerValue.HasValue)
-                .ToDictionary(
-                    kvp => kvp.Key,
-                    kvp => kvp.Value.IntegerValue.ValueOr(0))
-        );
-    } 
 }
 
 public class DummyPlayerBuff : PlayerBuffEntity
@@ -99,7 +84,21 @@ public class DummyPlayerBuff : PlayerBuffEntity
 }
 
 public static class PlayerBuffEntityExtensions
-{
+{    
+    public static PlayerBuffInfo ToInfo(this IPlayerBuffEntity playerBuff, IGameplayStatusWatcher gameWatcher)
+    {
+        return new PlayerBuffInfo(
+            playerBuff.PlayerBuffDataId,
+            playerBuff.Identity,
+            playerBuff.Level,
+            playerBuff.ReactionSessions
+                .Where(kvp => kvp.Value.IntegerValue.HasValue)
+                .ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.IntegerValue.ValueOr(0))
+        );
+    } 
+
     public static Option<IPlayerEntity> Owner(this IPlayerBuffEntity playerBuffEntity, IGameplayStatusWatcher watcher)
     {
         if (watcher.GameStatus.Ally.BuffManager.Buffs.Contains(playerBuffEntity))

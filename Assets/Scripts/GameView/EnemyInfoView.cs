@@ -18,16 +18,19 @@ public class EnemyInfoView : MonoBehaviour
     
     
     private IGameplayStatusWatcher _statusWatcher;
+    private IGameInfoModel _gameInfoModel;
     private LocalizeLibrary _localizeLibrary;
 
     public void Init(
         IGameplayStatusWatcher statusWatcher,
-        SimpleTitleIInfoHintView simpleHintView,
+        IGameInfoModel gameInfoModel,
+        SimpleTitleInfoHintView simpleHintView,
         LocalizeLibrary localizeLibrary)
     {
         _statusWatcher = statusWatcher;
+        _gameInfoModel = gameInfoModel;
         _localizeLibrary = localizeLibrary;
-        _buffCollectionView.Init(simpleHintView);
+        _buffCollectionView.Init(_gameInfoModel, _localizeLibrary, simpleHintView);
     }
 
     public void SetPlayerInfo(EnemyEntity enemy)
@@ -60,9 +63,5 @@ public class EnemyInfoView : MonoBehaviour
     public void RemoveBuff(RemovePlayerBuffEvent removeBuffEvent)
     {
         _buffCollectionView.RemoveBuff(removeBuffEvent.Buff);
-    }
-    public void UpdateBuff(UpdatePlayerBuffEvent updateBuffEvent)
-    {
-        _buffCollectionView.UpdateBuff(updateBuffEvent.Buff);
     }
 }

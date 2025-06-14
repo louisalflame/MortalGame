@@ -4,7 +4,7 @@ using UnityEngine;
 public interface ICardBuffLifeTimeEntity
 {
     bool IsExpired();
-    void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit);
+    bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit);
 }
 
 public class AlwaysLifeTimeCardBuffEntity : ICardBuffLifeTimeEntity
@@ -14,7 +14,8 @@ public class AlwaysLifeTimeCardBuffEntity : ICardBuffLifeTimeEntity
         return false;
     }
 
-    public void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit) { }
+    public bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+        => false;
 }
 
 public class TurnLifeTimeCardBuffEntity : ICardBuffLifeTimeEntity
@@ -31,13 +32,15 @@ public class TurnLifeTimeCardBuffEntity : ICardBuffLifeTimeEntity
         return _turn <= 0;
     }
 
-    public void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
     {
         if (actionUnit is UpdateTimingAction timingAction &&
             timingAction.Timing == UpdateTiming.TurnEnd)
         {
             _turn--;
+            return true;
         }
+        return false;
     }
 }
 
@@ -54,12 +57,14 @@ public class HandCardLifeTimeCardBuffEntity : ICardBuffLifeTimeEntity
         return _expired;
     }
 
-    public void Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
-    { 
+    public bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    {
         if (!_CheckInHandCard(gameWatcher))
         {
             _expired = true;
+            return true;
         }
+        return false;
     }
 
     private bool _CheckInHandCard(IGameplayStatusWatcher gameWatcher)

@@ -26,14 +26,14 @@ public class CardPropertyHint : MonoBehaviour
 
     public void ShowHint(CardInfo cardInfo, bool smallDirection, RectTransform referenceRect)
     {
-        if(cardInfo.StatusInfos.Count == 0)
+        if(cardInfo.BuffInfos.Count == 0)
         {
             HideHint();
             return;
         }
 
         _content.gameObject.SetActive(true);
-        foreach(var statusInfo in cardInfo.StatusInfos)
+        foreach(var statusInfo in cardInfo.BuffInfos)
         {
             var cardBuffInfoView = _cardBuffInfoViewFactory.CreatePrefab();
             cardBuffInfoView.transform.SetParent(_layoutParent, false);

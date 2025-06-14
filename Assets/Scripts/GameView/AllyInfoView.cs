@@ -19,19 +19,22 @@ public class AllyInfoView : MonoBehaviour
     [SerializeField]
     private PlayerBuffCollectionView _buffCollectionView;
     
+    private IGameInfoModel _gameInfoModel;
     private TopBarInfoView _topBarInfoView;
     private LocalizeLibrary _localizeLibrary;
 
     public void Init(
+        IGameInfoModel gameInfoModel,
         TopBarInfoView topBarInfoView, 
-        SimpleTitleIInfoHintView simpleHintView,
+        SimpleTitleInfoHintView simpleHintView,
         LocalizeLibrary localizeLibrary, 
         DispositionLibrary dispositionLibrary)
     {
+        _gameInfoModel = gameInfoModel;
         _topBarInfoView = topBarInfoView;
         _localizeLibrary = localizeLibrary;
         _dispositionView.Init(localizeLibrary, dispositionLibrary);
-        _buffCollectionView.Init(simpleHintView);
+        _buffCollectionView.Init(_gameInfoModel, _localizeLibrary, simpleHintView);
     }
 
     public void SetPlayerInfo(int round, AllyEntity ally)
@@ -70,9 +73,5 @@ public class AllyInfoView : MonoBehaviour
     public void RemoveBuff(RemovePlayerBuffEvent removeBuffEvent)
     {
         _buffCollectionView.RemoveBuff(removeBuffEvent.Buff);
-    }
-    public void UpdateBuff(UpdatePlayerBuffEvent updateBuffEvent)
-    {
-        _buffCollectionView.UpdateBuff(updateBuffEvent.Buff);
     }
 }

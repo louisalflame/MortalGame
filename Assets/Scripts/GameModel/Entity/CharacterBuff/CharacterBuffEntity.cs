@@ -17,7 +17,6 @@ public interface ICharacterBuffEntity
 
     bool IsExpired();
     void AddLevel(int level);
-    CharacterBuffInfo ToInfo();
 }
 
 public class CharacterBuffEntity : ICharacterBuffEntity
@@ -67,19 +66,6 @@ public class CharacterBuffEntity : ICharacterBuffEntity
     public void AddLevel(int level)
     {
         _level += level;
-    }
-    
-    public CharacterBuffInfo ToInfo()
-    {
-        return new CharacterBuffInfo(
-            Id,
-            Identity,
-            Level,
-            ReactionSessions
-                .Where(kvp => kvp.Value.IntegerValue.HasValue)
-                .ToDictionary(
-                    kvp => kvp.Key,
-                    kvp => kvp.Value.IntegerValue.ValueOr(0)));
     } 
 }
 
@@ -94,5 +80,21 @@ public class DummyCharacterBuff : CharacterBuffEntity
         new AlwaysLifeTimeCharacterBuffEntity(),
         new Dictionary<string, IReactionSessionEntity>())
     {
+    }
+}
+
+public static class CharacterBuffEntityExtensions
+{
+    public static CharacterBuffInfo ToInfo(this ICharacterBuffEntity characterBuff, IGameplayStatusWatcher gameWatcher)
+    {
+        return new CharacterBuffInfo(
+            characterBuff.Id,
+            characterBuff.Identity,
+            characterBuff.Level,
+            characterBuff.ReactionSessions
+                .Where(kvp => kvp.Value.IntegerValue.HasValue)
+                .ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.IntegerValue.ValueOr(0)));
     }
 }

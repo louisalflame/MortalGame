@@ -1,7 +1,12 @@
+using System.Collections.Generic;
 using Optional;
 using UnityEngine;
 
-public class TakeDamageResult
+public interface IEffectResult
+{
+}
+
+public class TakeDamageResult : IEffectResult
 {
     public DamageType Type;
     public int DamagePoint;
@@ -9,27 +14,27 @@ public class TakeDamageResult
     public int DeltaDp;
     public int OverHp;
 }
-public class GetHealResult
+public class GetHealResult : IEffectResult
 {
     public int HealPoint;
     public int DeltaHp;
     public int OverHp;
 }
-public class GetShieldResult
+public class GetShieldResult : IEffectResult
 {
     public int ShieldPoint;
     public int DeltaDp;
     public int OverDp;
 }
 
-public class GetEnergyResult
+public class GetEnergyResult : IEffectResult
 {
     public EnergyGainType Type;
     public int EnergyPoint;
     public int DeltaEp;
     public int OverEp;
 }
-public class LoseEnergyResult
+public class LoseEnergyResult : IEffectResult
 {
     public EnergyLoseType Type;
     public int EnergyPoint;
@@ -37,46 +42,46 @@ public class LoseEnergyResult
     public int OverEp;
 }
 
-public class AddPlayerBuffResult
+public class AddPlayerBuffResult : IEffectResult
 {
     public bool IsNewBuff;
     public IPlayerBuffEntity Buff;
     public int DeltaLevel;
 }
-public class AddCharacterBuffResult
+public class AddCharacterBuffResult : IEffectResult
 {
     public bool IsNewBuff;
     public ICharacterBuffEntity Buff;
     public int DeltaLevel;
 }
-public class AddCardBuffResult
+public class AddCardBuffResult : IEffectResult
 {
     public bool IsNewBuff;
     public ICardBuffEntity Buff;
     public int DeltaLevel;
 }
 
-public class RemovePlayerBuffResult
+public class RemovePlayerBuffResult : IEffectResult
 {
-    public Option<IPlayerBuffEntity> Buff;
+    public IReadOnlyCollection<IPlayerBuffEntity> Buffs;
 }
-public class RemoveCharacterBuffResult
+public class RemoveCharacterBuffResult : IEffectResult
 {
-    public Option<ICharacterBuffEntity> Buff;
+    public IReadOnlyCollection<ICharacterBuffEntity> Buff;
 }
-public class RemoveCardBuffResult
+public class RemoveCardBuffResult : IEffectResult
 {
-    public Option<ICardBuffEntity> Buff;
+    public IReadOnlyCollection<ICardBuffEntity> Buff;
 }
 
 
-public class CreateCardResult
+public class CreateCardResult : IEffectResult
 {
     public ICardEntity Card;
     public ICardColletionZone Zone;
     public AddCardBuffResult[] AddBuffs;
 }
-public class CloneCardResult
+public class CloneCardResult : IEffectResult
 {
     public ICardEntity OriginCard;
     public ICardEntity Card;
