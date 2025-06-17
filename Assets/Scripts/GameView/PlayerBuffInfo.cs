@@ -7,7 +7,7 @@ using UniRx.Triggers;
 using UnityEngine;
 using UnityEngine.UI;
 
-public struct PlayerBuffInfo
+public class PlayerBuffInfo
 {
     public readonly string Id;
     public readonly Guid Identity;

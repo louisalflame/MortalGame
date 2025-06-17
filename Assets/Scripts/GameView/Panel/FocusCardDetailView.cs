@@ -12,12 +12,12 @@ public class FocusCardDetailView : MonoBehaviour
     [SerializeField]
     private CardPropertyHint _cardPropertyHint;
 
-    private IGameInfoModel _gameInfoModel;
+    private IGameViewModel _gameViewModel;
     private LocalizeLibrary _localizeLibrary;
 
-    public void Init(IGameInfoModel gameInfoModel, LocalizeLibrary localizeLibrary)
+    public void Init(IGameViewModel gameInfoModel, LocalizeLibrary localizeLibrary)
     {
-        _gameInfoModel = gameInfoModel;
+        _gameViewModel = gameInfoModel;
         _localizeLibrary = localizeLibrary;
         _cardPropertyHint.Init(localizeLibrary);
         _cardView.Initialize(gameInfoModel, localizeLibrary);

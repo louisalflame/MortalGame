@@ -12,8 +12,9 @@ public interface ICardView : IRecyclable, ISelectableView
 {
     Canvas Canvas { get; }
     RectTransform ParentRectTransform { get; }
+    Button Button { get; }
 
-    void Initialize(IGameInfoModel gameInfoModel, LocalizeLibrary localizeLibrary);
+    void Initialize(IGameViewModel gameInfoModel, LocalizeLibrary localizeLibrary);
     void SetCardInfo(CardInfo cardInfo);
 
     void SetPositionAndRotation(Vector3 position, Quaternion rotation);
@@ -26,9 +27,6 @@ public interface ICardView : IRecyclable, ISelectableView
     void BeginDrag(Vector2 dragPosition);
     void Drag(Vector2 dragPosition, SelectType selectType, bool isSelecting);
     void EndDrag(Vector2 beginDragPosition, int originSiblingIndex);
-
-    void EnableHandCardAction(CardInfo cardInfo, IHandCardViewHandler handler);
-    void DisableCardAction();
 }
 
 public class CardView : MonoBehaviour, ICardView
@@ -63,6 +61,7 @@ public class CardView : MonoBehaviour, ICardView
     public RectTransform RectTransform => _rectTransform;
     public TargetType TargetType => TargetType.AllyCard;
     public Guid TargetIdentity => _cardIdentity;
+    public Button Button => _button;
 
     public RectTransform ParentRectTransform => transform.parent.GetComponent<RectTransform>();
     public Canvas Canvas => transform.GetComponentInParent<Canvas>();
@@ -74,21 +73,21 @@ public class CardView : MonoBehaviour, ICardView
     private Dictionary<Guid, List<Vector3>> _offsets = new Dictionary<Guid, List<Vector3>>();
     private Tween _currentMoveTween;
 
-    private IGameInfoModel _gameInfoModel;
+    private IGameViewModel _gameViewModel;
     private LocalizeLibrary _localizeLibrary;
     private Guid _cardIdentity;
 
     public void Initialize(
-        IGameInfoModel gameInfoModel,
+        IGameViewModel gameInfoModel,
         LocalizeLibrary localizeLibrary)
     {
-        _gameInfoModel = gameInfoModel;
+        _gameViewModel = gameInfoModel;
         _localizeLibrary = localizeLibrary;
     }
 
     public void SetCardInfo(CardInfo cardInfo)
     {
-        _cardInfoSubscription = _gameInfoModel.ObserveCardInfo(cardInfo.Identity)
+        _cardInfoSubscription = _gameViewModel.ObservableCardInfo(cardInfo.Identity)
             .Where(info => info != null && info.Identity == cardInfo.Identity)
             .Subscribe(info => _Render(info));
         _Render(cardInfo);
@@ -122,44 +121,6 @@ public class CardView : MonoBehaviour, ICardView
     }
     public void OnDeselect()
     {
-    }
-
-    public void EnableHandCardAction(CardInfo cardInfo, IHandCardViewHandler handler)
-    {
-        _Render(cardInfo);
-        _button.interactable = true;
-        
-        _button.OnPointerEnterAsObservable()
-            .Subscribe(_ => handler.FocusStart(cardInfo.Identity)) 
-            .AddTo(_disposables);
-        _button.OnPointerExitAsObservable()
-            .Subscribe(_ => handler.FocusStop(cardInfo.Identity)) 
-            .AddTo(_disposables);
-        
-        _button.OnBeginDragAsObservable()
-            .Subscribe(pointerEventData => handler.BeginDrag(cardInfo.Identity, pointerEventData.position))
-            .AddTo(_disposables);
-        _button.OnDragAsObservable()
-            .Subscribe(pointerEventData => handler.Drag(cardInfo.Identity, pointerEventData.position))
-            .AddTo(_disposables);
-        _button.OnEndDragAsObservable()
-            .Subscribe(pointerEventData => handler.EndDrag(cardInfo.Identity, pointerEventData.position))
-            .AddTo(_disposables);
-    }
-    public void EnableSimpleCardAction(CardInfo cardInfo, IAllCardViewHandler handler)
-    {
-        _button.interactable = true;
-        _button.OnClickAsObservable()
-            .Subscribe(_ => handler.ReadCard(cardInfo.Identity))
-            .AddTo(_disposables);
-    }
-    public void DisableCardAction()
-    {
-        _button.interactable = false;
-        _disposables.Dispose();
-
-        // Disposed object can't be reused by same instance.
-        _disposables = new CompositeDisposable();
     }
 
     public void ShowHandCardFocusContent()
@@ -201,7 +162,7 @@ public class CardView : MonoBehaviour, ICardView
         transform.localRotation = _localRotation;
         _UpdateLocalPosition();
         _cardInfoSubscription?.Dispose();
-        DisableCardAction();
+        _button.interactable = false;
     } 
 
     public void SetPositionAndRotation(Vector3 position, Quaternion rotation)

@@ -63,6 +63,9 @@ public class CardCollectionInfo
 {
     public CardCollectionType Type { get; private set; }
     public IReadOnlyDictionary<CardInfo, int> CardInfos { get; private set; }
+    public static readonly CardCollectionInfo Empty = new CardCollectionInfo(
+        CardCollectionType.None,
+        new Dictionary<CardInfo, int>());
 
     public int Count => CardInfos.Count;
 

@@ -1,13 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public interface IGameplayActionReciever
 {
     void RecieveEvent(IGameAction gameplayAction);
-    void ShowDeckDetailPanel();
-    void ShowGraveyardDetailPanel();
 
     IEnumerable<ISelectableView> SelectableViews { get; }
     ISelectableView BasicSelectableView { get; }
@@ -16,8 +15,9 @@ public interface IGameplayActionReciever
 public class GameplayPresenter : IGameplayActionReciever
 {
     private IGameplayView _gameplayView;
+    private GameViewModel _gameInfoModel;
     private GameplayManager _gameplayManager;
-    private IAllCardDetailPresenter _allCardDetailPresenter;
+    private IUIPresenter _uiPresenter;
 
     public IEnumerable<ISelectableView> SelectableViews => _gameplayView.SelectableViews;
     public ISelectableView BasicSelectableView => _gameplayView.BasicSelectableView;
@@ -30,25 +30,34 @@ public class GameplayPresenter : IGameplayActionReciever
     {
         _gameplayView = gameplayView;
         _gameplayManager = new GameplayManager(gameStatus, gameContextManager);
-
-        _gameplayView.Init(this, _gameplayManager, gameContextManager.LocalizeLibrary, gameContextManager.DispositionLibrary);
-        _allCardDetailPresenter = new AllCardDetailPresenter(_gameplayView, _gameplayManager, gameContextManager.LocalizeLibrary);
+        
+        _gameInfoModel = new GameViewModel();
+        _gameplayView.Init(_gameInfoModel, this, _gameplayManager, gameContextManager.LocalizeLibrary, gameContextManager.DispositionLibrary);
+        _uiPresenter = new UIPresenter(_gameplayView, _gameplayView, _gameInfoModel, gameContextManager.LocalizeLibrary);
     }
 
     public async UniTask<GameResult> Run()
     {
-        _gameplayManager.Start();
-        _allCardDetailPresenter.Run();
+        var cts = new CancellationTokenSource();
+        
+        var gameplayLoopTask = _RunGameplayLoop(cts);
+        var cardPresenterTask = _uiPresenter.Run(cts.Token);
 
-        while(!_gameplayManager.IsEnd)
+        await UniTask.WhenAll(gameplayLoopTask, cardPresenterTask);
+
+        return _gameplayManager.GameResult;
+    }
+
+    private async UniTask _RunGameplayLoop(CancellationTokenSource cts)
+    {
+        _gameplayManager.Start();
+        while (!_gameplayManager.IsEnd)
         {
-            await UniTask.Yield();
-            
+            await UniTask.NextFrame();
+
             var events = _gameplayManager.PopAllEvents();
             _gameplayView.Render(events, this);
         }
-
-        return _gameplayManager.GameResult;
     }
 
     public void RecieveEvent(IGameAction gameAction)
@@ -56,14 +65,5 @@ public class GameplayPresenter : IGameplayActionReciever
         Debug.Log($"-- GameplayPresenter.RecieveEvent:[{gameAction}] --");
         _gameplayManager.EnqueueAction(gameAction);
         _gameplayView.DisableAllHandCards();
-    }
-
-    public void ShowDeckDetailPanel()
-    {
-        _allCardDetailPresenter.ShowDeckDetail();
-    }
-    public void ShowGraveyardDetailPanel()
-    {
-        _allCardDetailPresenter.ShowGraveyardDetail();
     }
 }

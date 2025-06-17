@@ -6,10 +6,10 @@ using Sirenix.OdinInspector;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public interface IGameplayView : IAllCardDetailPanelView
+public interface IGameplayView : IAllCardDetailPanelView, IInteractionButtonView
 {
     void Init(
-        IGameInfoModel gameInfoModel,
+        IGameViewModel gameInfoModel,
         IGameplayActionReciever reciever, 
         IGameplayStatusWatcher statusWatcher, 
         LocalizeLibrary localizeLibrary,
@@ -21,6 +21,11 @@ public interface IGameplayView : IAllCardDetailPanelView
     ISelectableView BasicSelectableView { get; }
 }
 
+public interface IInteractionButtonView
+{ 
+    DeckCardView DeckCardView { get; }
+    GraveyardCardView GraveyardCardView { get; }
+}
 public interface IAllCardDetailPanelView
 {
     AllCardDetailPanel DetailPanel { get; }
@@ -91,8 +96,10 @@ public class GameplayView : MonoBehaviour, IGameplayView
     public AllCardDetailPanel DetailPanel => _allCardDetailPanel;
     public SingleCardDetailPopupPanel SinglePopupPanel => _singleCardDetailPopupPanel;
     public FocusCardDetailView FocusCardDetailView => _focusCardDetailView;
+    public DeckCardView DeckCardView => _deckCardView;
+    public GraveyardCardView GraveyardCardView => _graveyardCardView;
 
-    private IGameInfoModel _gameInfoModel;
+    private IGameViewModel _gameViewModel;
 
     public IEnumerable<ISelectableView> SelectableViews
     {
@@ -107,28 +114,28 @@ public class GameplayView : MonoBehaviour, IGameplayView
     public ISelectableView BasicSelectableView => _playGround;
 
     public void Init(
-        IGameInfoModel gameInfoModel,
+        IGameViewModel gameInfoModel,
         IGameplayActionReciever reciever, 
         IGameplayStatusWatcher statusWatcher,
         LocalizeLibrary localizeLibrary, 
         DispositionLibrary dispositionLibrary)
     {
-        _gameInfoModel = gameInfoModel;
+        _gameViewModel = gameInfoModel;
 
-        _allyInfoView.Init(_gameInfoModel, _topBarInfoView, _simpleHintView, localizeLibrary, dispositionLibrary);
-        _allyHandCardView.Init(statusWatcher, reciever, _gameInfoModel, this, localizeLibrary);
+        _allyInfoView.Init(_gameViewModel, _topBarInfoView, _simpleHintView, localizeLibrary, dispositionLibrary);
+        _allyHandCardView.Init(statusWatcher, reciever, _gameViewModel, this, localizeLibrary);
         _allyCharacterView.Init(statusWatcher);
 
-        _enemyInfoView.Init(statusWatcher, _gameInfoModel, _simpleHintView, localizeLibrary);
+        _enemyInfoView.Init(statusWatcher, _gameViewModel, _simpleHintView, localizeLibrary);
         _enemySelectedCardView.Init(statusWatcher, reciever, localizeLibrary);
         _enemyCharacterView.Init(statusWatcher);
 
-        _deckCardView.Init(statusWatcher, reciever);
-        _graveyardCardView.Init(statusWatcher, reciever);
+        _deckCardView.Init(_gameViewModel);
+        _graveyardCardView.Init(_gameViewModel);
         _submitView.Init(reciever);
 
-        _focusCardDetailView.Init(_gameInfoModel, localizeLibrary);
-        _singleCardDetailPopupPanel.Init(_gameInfoModel, localizeLibrary);
+        _focusCardDetailView.Init(_gameViewModel, localizeLibrary);
+        _singleCardDetailPopupPanel.Init(_gameViewModel, localizeLibrary);
         _simpleHintView.Init(localizeLibrary);
     }
 
@@ -208,22 +215,23 @@ public class GameplayView : MonoBehaviour, IGameplayView
 
     public void DisableAllHandCards()
     {
-        _allyHandCardView.DisableAllHandCards();
+        _gameViewModel.DisableHandCardsAction();
+        _allyHandCardView.DisableAllHandCardsAction();
     }
 
     private void _UpdateGeneralInfo(GeneralUpdateEvent updateEvent)
     {
         foreach (var kvp in updateEvent.PlayerBuffInfos)
         {
-            _gameInfoModel.UpdatePlayerBuffInfo(kvp.Value);
+            _gameViewModel.UpdatePlayerBuffInfo(kvp.Value);
         }
         foreach (var kvp in updateEvent.CharacterBuffInfos)
         {
-            _gameInfoModel.UpdateCharacterBuffInfo(kvp.Value);
+            _gameViewModel.UpdateCharacterBuffInfo(kvp.Value);
         }
         foreach (var kvp in updateEvent.CardInfos)
         {
-            _gameInfoModel.UpdateCardInfo(kvp.Value);
+            _gameViewModel.UpdateCardInfo(kvp.Value);
         }
     }
 
@@ -243,15 +251,16 @@ public class GameplayView : MonoBehaviour, IGameplayView
 
     private void _DrawCardView(DrawCardEvent drawCardEvent, IGameplayActionReciever reciever)
     {
+        _gameViewModel.UpdateCardInfo(drawCardEvent.NewCardInfo);
+        _gameViewModel.UpdateCardCollectionInfo(drawCardEvent.Faction, drawCardEvent.HandCardInfo);
+        _gameViewModel.UpdateCardCollectionInfo(drawCardEvent.Faction, drawCardEvent.DeckInfo);
         switch (drawCardEvent.Faction)
         {
             case Faction.Ally:
-                _gameInfoModel.UpdateCardInfo(drawCardEvent.NewCardInfo);
                 _allyHandCardView.CreateCardView(drawCardEvent.NewCardInfo, drawCardEvent.HandCardInfo);
-                _deckCardView.UpdateDeckView(drawCardEvent);
                 break;
             case Faction.Enemy:
-                _gameInfoModel.UpdateCardInfo(drawCardEvent.NewCardInfo);
+                _gameViewModel.UpdateCardInfo(drawCardEvent.NewCardInfo);
                 _enemySelectedCardView.UpdateDeckView(drawCardEvent);
                 break;
         }
@@ -259,24 +268,20 @@ public class GameplayView : MonoBehaviour, IGameplayView
 
     private void _DiscardCardView(DiscardCardEvent discardCardEvent)
     {
+        _gameViewModel.UpdateCardCollectionInfo(discardCardEvent.Faction, discardCardEvent.StartZoneInfo);
+        _gameViewModel.UpdateCardCollectionInfo(discardCardEvent.Faction, discardCardEvent.DestinationZoneInfo);
         switch (discardCardEvent.Faction)
         {
             case Faction.Ally:
-                switch(discardCardEvent.StartZoneInfo.Type)
+                switch (discardCardEvent.StartZoneInfo.Type)
                 {
                     case CardCollectionType.HandCard:
                         _allyHandCardView.RemoveCardView(discardCardEvent);
                         break;
                 }
-                switch(discardCardEvent.DestinationZoneInfo.Type)
-                {
-                    case CardCollectionType.Graveyard:
-                        _graveyardCardView.UpdateDeckView(discardCardEvent);
-                        break;
-                }
                 break;
             case Faction.Enemy:
-                switch(discardCardEvent.StartZoneInfo.Type)
+                switch (discardCardEvent.StartZoneInfo.Type)
                 {
                     case CardCollectionType.HandCard:
                         _enemySelectedCardView.RemoveCardView(discardCardEvent);
@@ -287,10 +292,12 @@ public class GameplayView : MonoBehaviour, IGameplayView
     }
     private void _ConsumeCardView(ConsumeCardEvent consumeCardEvent)
     {
+        _gameViewModel.UpdateCardCollectionInfo(consumeCardEvent.Faction, consumeCardEvent.StartZoneInfo);
+        _gameViewModel.UpdateCardCollectionInfo(consumeCardEvent.Faction, consumeCardEvent.DestinationZoneInfo);
         switch (consumeCardEvent.Faction)
         {
             case Faction.Ally:
-                switch(consumeCardEvent.StartZoneInfo.Type)
+                switch (consumeCardEvent.StartZoneInfo.Type)
                 {
                     case CardCollectionType.HandCard:
                         _allyHandCardView.RemoveCardView(consumeCardEvent);
@@ -298,7 +305,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
                 }
                 break;
             case Faction.Enemy:
-                switch(consumeCardEvent.StartZoneInfo.Type)
+                switch (consumeCardEvent.StartZoneInfo.Type)
                 {
                     case CardCollectionType.HandCard:
                         _enemySelectedCardView.RemoveCardView(consumeCardEvent);
@@ -309,10 +316,12 @@ public class GameplayView : MonoBehaviour, IGameplayView
     }
     private void _DisposeCardView(DisposeCardEvent disposeCardEvent)
     {
+        _gameViewModel.UpdateCardCollectionInfo(disposeCardEvent.Faction, disposeCardEvent.StartZoneInfo);
+        _gameViewModel.UpdateCardCollectionInfo(disposeCardEvent.Faction, disposeCardEvent.DestinationZoneInfo);
         switch (disposeCardEvent.Faction)
         {
             case Faction.Ally:
-                switch(disposeCardEvent.StartZoneInfo.Type)
+                switch (disposeCardEvent.StartZoneInfo.Type)
                 {
                     case CardCollectionType.HandCard:
                         _allyHandCardView.RemoveCardView(disposeCardEvent);
@@ -320,7 +329,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
                 }
                 break;
             case Faction.Enemy:
-                switch(disposeCardEvent.StartZoneInfo.Type)
+                switch (disposeCardEvent.StartZoneInfo.Type)
                 {
                     case CardCollectionType.HandCard:
                         _enemySelectedCardView.RemoveCardView(disposeCardEvent);
@@ -332,10 +341,11 @@ public class GameplayView : MonoBehaviour, IGameplayView
 
     private void _CloneCardView(CloneCardEvent cloneCardEvent)
     {
+        _gameViewModel.UpdateCardCollectionInfo(cloneCardEvent.Faction, cloneCardEvent.DestinationZoneInfo);
         switch (cloneCardEvent.Faction)
         {
             case Faction.Ally:
-                switch(cloneCardEvent.DestinationZoneInfo.Type)
+                switch (cloneCardEvent.DestinationZoneInfo.Type)
                 {
                     case CardCollectionType.HandCard:
                         _allyHandCardView.CreateCardView(cloneCardEvent.CardInfo, cloneCardEvent.DestinationZoneInfo);
@@ -355,11 +365,11 @@ public class GameplayView : MonoBehaviour, IGameplayView
 
     private void _RecycleGraveyardEvent(RecycleGraveyardEvent recycleGraveyardEvent)
     {
+        _gameViewModel.UpdateCardCollectionInfo(recycleGraveyardEvent.Faction, recycleGraveyardEvent.DeckInfo);
+        _gameViewModel.UpdateCardCollectionInfo(recycleGraveyardEvent.Faction, recycleGraveyardEvent.GraveyardInfo);
         switch (recycleGraveyardEvent.Faction)
         {
             case Faction.Ally:
-                _deckCardView.UpdateDeckView(recycleGraveyardEvent);
-                _graveyardCardView.UpdateDeckView(recycleGraveyardEvent);
                 break;
             case Faction.Enemy:
                 _enemySelectedCardView.UpdateDeckView(recycleGraveyardEvent);
@@ -368,11 +378,14 @@ public class GameplayView : MonoBehaviour, IGameplayView
     }
     private void _RecycleHandCardEvent(RecycleHandCardEvent recycleHandCardEvent)
     {
+        _gameViewModel.UpdateCardCollectionInfo(recycleHandCardEvent.Faction, recycleHandCardEvent.HandCardInfo);
+        _gameViewModel.UpdateCardCollectionInfo(recycleHandCardEvent.Faction, recycleHandCardEvent.GraveyardInfo);
+        _gameViewModel.UpdateCardCollectionInfo(recycleHandCardEvent.Faction, recycleHandCardEvent.ExclusionZoneInfo);
+        _gameViewModel.UpdateCardCollectionInfo(recycleHandCardEvent.Faction, recycleHandCardEvent.DisposeZoneInfo);
         switch (recycleHandCardEvent.Faction)
         {
             case Faction.Ally:
                 _allyHandCardView.RecycleHandCards(recycleHandCardEvent);
-                _graveyardCardView.UpdateDeckView(recycleHandCardEvent);
                 break;
             case Faction.Enemy:
                 _enemySelectedCardView.RemoveCardView(recycleHandCardEvent);
@@ -391,18 +404,27 @@ public class GameplayView : MonoBehaviour, IGameplayView
 
     private void _PlayerExecuteStart(PlayerExecuteStartEvent playerExecuteStartEvent)
     {
+        _gameViewModel.EnableHandCardsAction(playerExecuteStartEvent.HandCardInfo);
+        _gameViewModel.UpdateCardCollectionInfo(playerExecuteStartEvent.Faction, playerExecuteStartEvent.GraveyardInfo);
+        _gameViewModel.UpdateCardCollectionInfo(playerExecuteStartEvent.Faction, playerExecuteStartEvent.ExclusionZoneInfo);
+        _gameViewModel.UpdateCardCollectionInfo(playerExecuteStartEvent.Faction, playerExecuteStartEvent.DisposeZoneInfo);
         _allyHandCardView.EnableHandCardsUseCardAction(playerExecuteStartEvent);
     }
     private void _PlayerExecuteEnd(PlayerExecuteEndEvent playerExecuteEndEvent)
     {
+        _gameViewModel.DisableHandCardsAction();
+        _gameViewModel.UpdateCardCollectionInfo(playerExecuteEndEvent.Faction, playerExecuteEndEvent.HandCardInfo);
     }
     private void _UsedCardView(UsedCardEvent usedCardEvent)
     {
+        _gameViewModel.UpdateCardCollectionInfo(usedCardEvent.Faction, usedCardEvent.HandCardInfo);
+        _gameViewModel.UpdateCardCollectionInfo(usedCardEvent.Faction, usedCardEvent.GraveyardInfo);
+        _gameViewModel.UpdateCardCollectionInfo(usedCardEvent.Faction, usedCardEvent.ExclusionZoneInfo);
+        _gameViewModel.UpdateCardCollectionInfo(usedCardEvent.Faction, usedCardEvent.DisposeZoneInfo);
         switch (usedCardEvent.Faction)
         {
             case Faction.Ally:
                 _allyHandCardView.RemoveCardView(usedCardEvent);
-                _graveyardCardView.UpdateDeckView(usedCardEvent);
                 break;
             case Faction.Enemy:
                 _enemySelectedCardView.RemoveCardView(usedCardEvent);
@@ -455,11 +477,11 @@ public class GameplayView : MonoBehaviour, IGameplayView
         switch (addBuffEvent.Faction)
         {
             case Faction.Ally:
-                _gameInfoModel.UpdatePlayerBuffInfo(addBuffEvent.Buff);
+                _gameViewModel.UpdatePlayerBuffInfo(addBuffEvent.Buff);
                 _allyInfoView.AddBuff(addBuffEvent);
                 break;
             case Faction.Enemy:
-                _gameInfoModel.UpdatePlayerBuffInfo(addBuffEvent.Buff);
+                _gameViewModel.UpdatePlayerBuffInfo(addBuffEvent.Buff);
                 _enemyInfoView.AddBuff(addBuffEvent);
                 break;
         }

@@ -3,28 +3,88 @@ using System.Collections.Generic;
 using UniRx;
 using UnityEngine;
 
-public interface IGameInfoModel
+public interface IGameViewModel
 {
+    void UpdateCardCollectionInfo(Faction faction, CardCollectionInfo cardCollectionInfo);
+    void EnableHandCardsAction(CardCollectionInfo handCardsInfod);
+    void DisableHandCardsAction();
+
+    IReadOnlyReactiveProperty<bool> IsHandCardsEnabled { get; }
+    IReadOnlyReactiveProperty<CardCollectionInfo> ObservableCardCollectionInfo(Faction faction, CardCollectionType type);
+
+
     void UpdateCardInfo(CardInfo cardInfo);
     void UpdatePlayerBuffInfo(PlayerBuffInfo playerBuffInfo);
     void UpdateCharacterBuffInfo(CharacterBuffInfo characterBuffInfo);
 
-    IReadOnlyReactiveProperty<CardInfo> ObserveCardInfo(Guid identity);
-    IReadOnlyReactiveProperty<PlayerBuffInfo> ObservePlayerBuffInfo(Guid identity);
-    IReadOnlyReactiveProperty<CharacterBuffInfo> ObserveCharacterBuffInfo(Guid identity);
+    IReadOnlyReactiveProperty<CardInfo> ObservableCardInfo(Guid identity);
+    IReadOnlyReactiveProperty<PlayerBuffInfo> ObservablePlayerBuffInfo(Guid identity);
+    IReadOnlyReactiveProperty<CharacterBuffInfo> ObservableCharacterBuffInfo(Guid identity);
 }
 
-public class GameInfoModel : IGameInfoModel
+public class GameViewModel : IGameViewModel
 {
     private Dictionary<Guid, ReactiveProperty<CardInfo>> _cardInfos;
     private Dictionary<Guid, ReactiveProperty<PlayerBuffInfo>> _playerBuffInfos;
     private Dictionary<Guid, ReactiveProperty<CharacterBuffInfo>> _characterBuffInfos;
+    private Dictionary<Faction, Dictionary<CardCollectionType, ReactiveProperty<CardCollectionInfo>>> _cardCollectionInfos;
 
-    public GameInfoModel()
+    private readonly ReactiveProperty<bool> _isHandCardsEnabled;
+    public IReadOnlyReactiveProperty<bool> IsHandCardsEnabled => _isHandCardsEnabled;
+
+    public GameViewModel()
     {
         _cardInfos = new Dictionary<Guid, ReactiveProperty<CardInfo>>();
         _playerBuffInfos = new Dictionary<Guid, ReactiveProperty<PlayerBuffInfo>>();
         _characterBuffInfos = new Dictionary<Guid, ReactiveProperty<CharacterBuffInfo>>();
+        _cardCollectionInfos = new Dictionary<Faction, Dictionary<CardCollectionType, ReactiveProperty<CardCollectionInfo>>>
+        {
+            { Faction.Ally, new Dictionary<CardCollectionType, ReactiveProperty<CardCollectionInfo>>
+                {
+                    { CardCollectionType.Deck, new ReactiveProperty<CardCollectionInfo>(CardCollectionInfo.Empty) },
+                    { CardCollectionType.HandCard, new ReactiveProperty<CardCollectionInfo>(CardCollectionInfo.Empty) },
+                    { CardCollectionType.Graveyard, new ReactiveProperty<CardCollectionInfo>(CardCollectionInfo.Empty) },
+                    { CardCollectionType.ExclusionZone, new ReactiveProperty<CardCollectionInfo>(CardCollectionInfo.Empty) },
+                    { CardCollectionType.DisposeZone, new ReactiveProperty<CardCollectionInfo>(CardCollectionInfo.Empty) }
+                }
+            },
+            { Faction.Enemy, new Dictionary<CardCollectionType, ReactiveProperty<CardCollectionInfo>>
+                {
+                    { CardCollectionType.Deck, new ReactiveProperty<CardCollectionInfo>(CardCollectionInfo.Empty) },
+                    { CardCollectionType.HandCard, new ReactiveProperty<CardCollectionInfo>(CardCollectionInfo.Empty) },
+                    { CardCollectionType.Graveyard, new ReactiveProperty<CardCollectionInfo>(CardCollectionInfo.Empty) },
+                    { CardCollectionType.ExclusionZone, new ReactiveProperty<CardCollectionInfo>(CardCollectionInfo.Empty) },
+                    { CardCollectionType.DisposeZone, new ReactiveProperty<CardCollectionInfo>(CardCollectionInfo.Empty) }
+                }
+            }
+        };
+        _isHandCardsEnabled = new ReactiveProperty<bool>(false);
+    }
+
+    public void EnableHandCardsAction(CardCollectionInfo handCardsInfo)
+    {
+        UpdateCardCollectionInfo(Faction.Ally, handCardsInfo);
+        _isHandCardsEnabled.Value = true;
+    }
+    public void DisableHandCardsAction()
+    {
+        _isHandCardsEnabled.Value = false;
+    }
+    public void UpdateCardCollectionInfo(Faction faction, CardCollectionInfo cardCollectionInfo)
+    {
+        if (!_cardCollectionInfos[faction].ContainsKey(cardCollectionInfo.Type))
+        {
+            _cardCollectionInfos[faction][cardCollectionInfo.Type] = new ReactiveProperty<CardCollectionInfo>(cardCollectionInfo);
+        }
+        else
+        {
+            _cardCollectionInfos[faction][cardCollectionInfo.Type].Value = cardCollectionInfo;
+        }
+
+        foreach (var cardInfo in cardCollectionInfo.CardInfos)
+        {
+            UpdateCardInfo(cardInfo.Key);
+        }
     }
 
     public void UpdateCardInfo(CardInfo cardInfo)
@@ -63,17 +123,23 @@ public class GameInfoModel : IGameInfoModel
         }
     }
 
-    public IReadOnlyReactiveProperty<CardInfo> ObserveCardInfo(Guid identity)
+    public IReadOnlyReactiveProperty<CardCollectionInfo> ObservableCardCollectionInfo(Faction faction, CardCollectionType type)
+    {
+        return _cardCollectionInfos[faction][type];
+    }
+
+
+    public IReadOnlyReactiveProperty<CardInfo> ObservableCardInfo(Guid identity)
     {
         return _cardInfos[identity];
     }
 
-    public IReadOnlyReactiveProperty<PlayerBuffInfo> ObservePlayerBuffInfo(Guid identity)
+    public IReadOnlyReactiveProperty<PlayerBuffInfo> ObservablePlayerBuffInfo(Guid identity)
     {
         return _playerBuffInfos[identity];
     }
 
-    public IReadOnlyReactiveProperty<CharacterBuffInfo> ObserveCharacterBuffInfo(Guid identity)
+    public IReadOnlyReactiveProperty<CharacterBuffInfo> ObservableCharacterBuffInfo(Guid identity)
     {
         return _characterBuffInfos[identity];
     }

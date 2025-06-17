@@ -3,12 +3,6 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum SingleCardDetailPopupPanelState
-{
-    Idle = 0,
-    Close,
-}
-
 public class SingleCardDetailPopupPanel : MonoBehaviour
 {
     [SerializeField]
@@ -20,16 +14,15 @@ public class SingleCardDetailPopupPanel : MonoBehaviour
     [SerializeField]
     private CardPropertyHint _cardPropertyHint;
 
-    private IGameInfoModel _gameInfoModel;
+    private IGameViewModel _gameViewModel;
     private LocalizeLibrary _localizeLibrary;
-    private SingleCardDetailPopupPanelState _state;
 
-    public void Init(IGameInfoModel gameInfoModel, LocalizeLibrary localizeLibrary)
+    public void Init(IGameViewModel gameInfoModel, LocalizeLibrary localizeLibrary)
     {
-        _gameInfoModel = gameInfoModel;
+        _gameViewModel = gameInfoModel;
         _localizeLibrary = localizeLibrary;
         _cardPropertyHint.Init(_localizeLibrary);
-        _cardView.Initialize(_gameInfoModel, _localizeLibrary);
+        _cardView.Initialize(_gameViewModel, _localizeLibrary);
     }
 
     public async UniTask Run(CardInfo cardInfo)
@@ -37,23 +30,23 @@ public class SingleCardDetailPopupPanel : MonoBehaviour
         _cardView.SetCardInfo(cardInfo);
 
         var disposables = new CompositeDisposable();
+        var isClose = false;
         foreach (var button in _closeButtons)
         {
             button.OnClickAsObservable()
-                .Subscribe(_ => _state = SingleCardDetailPopupPanelState.Close)
+                .Subscribe(_ => isClose = true)
                 .AddTo(disposables);
         }
         
         using (disposables)
         {
-            _state = SingleCardDetailPopupPanelState.Idle;
             _panel.SetActive(true);
 
             _cardPropertyHint.ShowHint(cardInfo, false, _cardView.RectTransform);
 
-            while (_state != SingleCardDetailPopupPanelState.Close)
+            while (!isClose)
             {
-                await UniTask.Yield();
+                await UniTask.NextFrame();
             }
 
             _panel.SetActive(false);

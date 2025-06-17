@@ -196,7 +196,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95496e0ee5d2acf4782e0fb9467746ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _deckButton: {fileID: 2487481360019567389}
+  _button: {fileID: 2487481360019567389}
   _graveyardCountText: {fileID: 7131007316469554370}
 --- !u!114 &7920050375639272717
 MonoBehaviour:

@@ -19,22 +19,22 @@ public class AllyInfoView : MonoBehaviour
     [SerializeField]
     private PlayerBuffCollectionView _buffCollectionView;
     
-    private IGameInfoModel _gameInfoModel;
+    private IGameViewModel _gameViewModel;
     private TopBarInfoView _topBarInfoView;
     private LocalizeLibrary _localizeLibrary;
 
     public void Init(
-        IGameInfoModel gameInfoModel,
+        IGameViewModel gameInfoModel,
         TopBarInfoView topBarInfoView, 
         SimpleTitleInfoHintView simpleHintView,
         LocalizeLibrary localizeLibrary, 
         DispositionLibrary dispositionLibrary)
     {
-        _gameInfoModel = gameInfoModel;
+        _gameViewModel = gameInfoModel;
         _topBarInfoView = topBarInfoView;
         _localizeLibrary = localizeLibrary;
         _dispositionView.Init(localizeLibrary, dispositionLibrary);
-        _buffCollectionView.Init(_gameInfoModel, _localizeLibrary, simpleHintView);
+        _buffCollectionView.Init(_gameViewModel, _localizeLibrary, simpleHintView);
     }
 
     public void SetPlayerInfo(int round, AllyEntity ally)

@@ -18,19 +18,19 @@ public class EnemyInfoView : MonoBehaviour
     
     
     private IGameplayStatusWatcher _statusWatcher;
-    private IGameInfoModel _gameInfoModel;
+    private IGameViewModel _gameViewModel;
     private LocalizeLibrary _localizeLibrary;
 
     public void Init(
         IGameplayStatusWatcher statusWatcher,
-        IGameInfoModel gameInfoModel,
+        IGameViewModel gameInfoModel,
         SimpleTitleInfoHintView simpleHintView,
         LocalizeLibrary localizeLibrary)
     {
         _statusWatcher = statusWatcher;
-        _gameInfoModel = gameInfoModel;
+        _gameViewModel = gameInfoModel;
         _localizeLibrary = localizeLibrary;
-        _buffCollectionView.Init(_gameInfoModel, _localizeLibrary, simpleHintView);
+        _buffCollectionView.Init(_gameViewModel, _localizeLibrary, simpleHintView);
     }
 
     public void SetPlayerInfo(EnemyEntity enemy)

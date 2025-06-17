@@ -9,10 +9,15 @@ using UnityEngine.UI;
 
 public interface IAllCardDetailPanel
 {
-    void Init(IAllCardViewHandler handler, IGameInfoModel gameInfoModel, LocalizeLibrary localizeLibrary);
-    void ShowCardInfoCollections(IAllCardViewHandler handler, IEnumerable<CardInfo> cardInfos);
+    void Init(IGameViewModel gameInfoModel, LocalizeLibrary localizeLibrary);
+    IReadOnlyDictionary<CardInfo, Button> ShowCardInfoCollections(IEnumerable<CardInfo> cardInfos);
     void Open();
     void Close();
+
+    Button DeckButton { get; }
+    Button HandCardButton { get; }
+    Button GraveyardButton { get; }
+    Button[] CloseButtons { get; }
 }
 
 public class AllCardDetailPanel : MonoBehaviour, IAllCardDetailPanel
@@ -32,49 +37,39 @@ public class AllCardDetailPanel : MonoBehaviour, IAllCardDetailPanel
     [SerializeField]
     private CardViewFactory _cardViewFactory;
 
-    private CompositeDisposable _disposables = new CompositeDisposable();
-    private CardInfo _selectedCardInfo;
-    private IGameInfoModel _gameInfoModel;
+    public Button DeckButton => _deckButton;
+    public Button HandCardButton => _handCardButton;
+    public Button GraveyardButton => _graveyardButton;
+    public Button[] CloseButtons => _closeButtons;
+
+    private IGameViewModel _gameViewModel;
     private LocalizeLibrary _localizeLibrary;
-    private Dictionary<Guid, CardView> _cardViewDict = new Dictionary<Guid, CardView>();
+    private List<CardView> _cardViews = new();
 
     public void Init(
-        IAllCardViewHandler handler,
-        IGameInfoModel gameInfoModel,
+        IGameViewModel gameInfoModel,
         LocalizeLibrary localizeLibrary)
     {
-        _gameInfoModel = gameInfoModel;
+        _gameViewModel = gameInfoModel;
         _localizeLibrary = localizeLibrary;
-        foreach (var button in _closeButtons)
-        {
-            button.OnClickAsObservable()
-                .Subscribe(_ => handler.Close())
-                .AddTo(_disposables);
-        }
-
-        _deckButton.OnClickAsObservable()
-            .Subscribe(_ => handler.ShowDeckDetail())
-            .AddTo(_disposables);
-        _handCardButton.OnClickAsObservable()
-            .Subscribe(_ => handler.ShowHandCardDetail())
-            .AddTo(_disposables);
-        _graveyardButton.OnClickAsObservable()
-            .Subscribe(_ => handler.ShowGraveyardDetail())
-            .AddTo(_disposables);
     }
 
-    public void ShowCardInfoCollections(IAllCardViewHandler handler, IEnumerable<CardInfo> cardInfos)
+    public IReadOnlyDictionary<CardInfo, Button> ShowCardInfoCollections(IEnumerable<CardInfo> cardInfos)
     {
         _Clear();
+
+        var cardInfoViewTable = new Dictionary<CardInfo, Button>();
         foreach (var cardInfo in cardInfos)
         {
             var cardView = _cardViewFactory.CreatePrefab();
             cardView.transform.SetParent(_cardViewParent, false);
-            cardView.Initialize(_gameInfoModel, _localizeLibrary);
+            cardView.Initialize(_gameViewModel, _localizeLibrary);
             cardView.SetCardInfo(cardInfo);
-            cardView.EnableSimpleCardAction(cardInfo, handler);
-            _cardViewDict.Add(cardInfo.Identity, cardView);
+            _cardViews.Add(cardView);
+            cardInfoViewTable[cardInfo] = cardView.Button;
         }
+
+        return cardInfoViewTable;
     }
 
     public void Open()
@@ -88,12 +83,11 @@ public class AllCardDetailPanel : MonoBehaviour, IAllCardDetailPanel
     }
 
     private void _Clear()
-    {
-        foreach (var cardView in _cardViewDict.Values)
+    {        
+        foreach (var cardView in _cardViews)
         {
-            cardView.DisableCardAction();
             _cardViewFactory.RecyclePrefab(cardView);
         }
-        _cardViewDict.Clear();
+        _cardViews.Clear();
     }
 }

@@ -9,26 +9,18 @@ public class DeckCardView : MonoBehaviour
     private Button _deckButton;
     [SerializeField]
     private TextMeshProUGUI _deckCountText;
+
+    public Button DeckButton => _deckButton;
     
-    private IGameplayStatusWatcher _statusWatcher;
+    private IGameViewModel _gameViewModel;
     private CompositeDisposable _disposables = new CompositeDisposable();
 
-    public void Init(IGameplayStatusWatcher statusWatcher, IGameplayActionReciever actionReciever)
+    public void Init(IGameViewModel gameViewModel)
     {
-        _statusWatcher = statusWatcher;
-        
-        _deckButton.OnClickAsObservable()
-            .Subscribe(_ => actionReciever.ShowDeckDetailPanel())
-            .AddTo(_disposables);
-        _deckCountText.text = _statusWatcher.GameStatus.Ally.CardManager.Deck.Cards.Count.ToString();
-    }
+        _gameViewModel = gameViewModel;
 
-    public void UpdateDeckView(DrawCardEvent drawCardEvent)
-    {
-        _deckCountText.text = drawCardEvent.DeckInfo.Count.ToString();
-    }
-    public void UpdateDeckView(RecycleGraveyardEvent recycleGraveyardEvent)
-    {
-        _deckCountText.text = recycleGraveyardEvent.DeckInfo.Count.ToString();
+        _gameViewModel.ObservableCardCollectionInfo(Faction.Ally, CardCollectionType.Deck)
+            .Subscribe(deckInfo => _deckCountText.text = deckInfo.Count.ToString())
+            .AddTo(_disposables);
     }
 }

@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SimpleTitleIInfoHintView : MonoBehaviour
+public class SimpleTitleInfoHintView : MonoBehaviour
 {    
     [SerializeField]
     private TextMeshProUGUI _titleText;

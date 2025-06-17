@@ -16,24 +16,45 @@ public class PlayerBuffView : MonoBehaviour, IRecyclable
     [SerializeField]
     private RectTransform _rectTransform;
     
-    private CompositeDisposable _disposables = new CompositeDisposable();
+    private CompositeDisposable _disposables = new();
+    
+    private IGameViewModel _gameViewModel;
+    private LocalizeLibrary _localizeLibrary;
+
+    public void Initialize(IGameViewModel gameInfoModel, LocalizeLibrary localizeLibrary)
+    {
+        _gameViewModel = gameInfoModel;
+        _localizeLibrary = localizeLibrary;
+    }
 
     public void SetBuffInfo(
         PlayerBuffInfo buffInfo,
-        SimpleTitleIInfoHintView simpleHintView)
+        SimpleTitleInfoHintView simpleHintView)
     {
-        _levelText.text = buffInfo.Level.ToString();
-        
+        _Render(buffInfo);
+
         _disposables.Dispose();
         // Disposed object can't be reused by same instance.
         _disposables = new CompositeDisposable();
 
+        _gameViewModel.ObservablePlayerBuffInfo(buffInfo.Identity)
+            .Where(info => info != null && info.Identity == buffInfo.Identity)
+            .Subscribe(info => _Render(info))
+            .AddTo(_disposables);
         _buffIcon.OnPointerEnterAsObservable()
-            .Subscribe(_ => simpleHintView.ShowBuffInfo(buffInfo, _rectTransform)) 
+            .WithLatestFrom(
+                _gameViewModel.ObservablePlayerBuffInfo(buffInfo.Identity),
+                (_, info) => info)
+            .Subscribe(info => simpleHintView.ShowBuffInfo(info, _rectTransform))
             .AddTo(_disposables);
         _buffIcon.OnPointerExitAsObservable()
             .Subscribe(_ => simpleHintView.Close())
             .AddTo(_disposables);
+    }
+
+    private void _Render(PlayerBuffInfo buffInfo)
+    { 
+        _levelText.text = buffInfo.Level.ToString();
     }
 
     public void Reset()

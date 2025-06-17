@@ -150,6 +150,9 @@ public class PlayerExecuteStartEvent : IGameEvent
 {
     public Faction Faction;
     public CardCollectionInfo HandCardInfo;
+    public CardCollectionInfo GraveyardInfo;
+    public CardCollectionInfo ExclusionZoneInfo;
+    public CardCollectionInfo DisposeZoneInfo;
 }
 public class PlayerExecuteEndEvent : IGameEvent
 {
@@ -162,6 +165,8 @@ public class UsedCardEvent : IGameEvent
     public CardInfo UsedCardInfo;
     public CardCollectionInfo HandCardInfo;
     public CardCollectionInfo GraveyardInfo;
+    public CardCollectionInfo ExclusionZoneInfo;
+    public CardCollectionInfo DisposeZoneInfo;
 }
 
 public abstract class EnergyEvent : IGameEvent

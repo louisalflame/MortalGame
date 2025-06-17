@@ -6,37 +6,21 @@ using UnityEngine.UI;
 public class GraveyardCardView : MonoBehaviour
 {
     [SerializeField]
-    private Button _deckButton;
+    private Button _button;
     [SerializeField]
     private TextMeshProUGUI _graveyardCountText;
-    
-    private IGameplayStatusWatcher _statusWatcher;
-    private CompositeDisposable _disposables = new CompositeDisposable();
 
-    public void Init(IGameplayStatusWatcher statusWatcher, IGameplayActionReciever actionReciever)
+    public Button GraveyardButton => _button;
+
+    private IGameViewModel _gameViewModel;
+    private CompositeDisposable _disposables = new();
+
+    public void Init(IGameViewModel gameViewModel)
     {
-        _statusWatcher = statusWatcher;
-        
-        _deckButton.OnClickAsObservable()
-            .Subscribe(_ => actionReciever.ShowGraveyardDetailPanel())
+        _gameViewModel = gameViewModel;
+
+        _gameViewModel.ObservableCardCollectionInfo(Faction.Ally, CardCollectionType.Graveyard)
+            .Subscribe(graveyardInfo => _graveyardCountText.text = graveyardInfo.Count.ToString())
             .AddTo(_disposables);
-        _graveyardCountText.text = _statusWatcher.GameStatus.Ally.CardManager.Graveyard.Cards.Count.ToString();
-    }
-
-    public void UpdateDeckView(UsedCardEvent usedCardEvent)
-    {
-        _graveyardCountText.text = usedCardEvent.GraveyardInfo.Count.ToString();
-    }
-    public void UpdateDeckView(DiscardCardEvent discardCardEvent)
-    {
-        _graveyardCountText.text = discardCardEvent.DestinationZoneInfo.Count.ToString();
-    }
-    public void UpdateDeckView(RecycleHandCardEvent recycleHandCardEvent)
-    {
-        _graveyardCountText.text = recycleHandCardEvent.GraveyardInfo.Count.ToString();
-    }
-    public void UpdateDeckView(RecycleGraveyardEvent recycleGraveyardEvent)
-    {
-        _graveyardCountText.text = recycleGraveyardEvent.GraveyardInfo.Count.ToString();
     }
 }

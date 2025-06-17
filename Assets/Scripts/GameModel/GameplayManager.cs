@@ -182,9 +182,13 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
 
     private void _PlayerPrepare()
     {
-        _gameEvents.Add(new PlayerExecuteStartEvent() {
+        _gameEvents.Add(new PlayerExecuteStartEvent()
+        {
             Faction = _gameStatus.Ally.Faction,
-            HandCardInfo = _gameStatus.Ally.CardManager.HandCard.ToCardCollectionInfo(this)
+            HandCardInfo = _gameStatus.Ally.CardManager.HandCard.ToCardCollectionInfo(this),
+            GraveyardInfo = _gameStatus.Ally.CardManager.Graveyard.ToCardCollectionInfo(this),
+            ExclusionZoneInfo = _gameStatus.Ally.CardManager.ExclusionZone.ToCardCollectionInfo(this),
+            DisposeZoneInfo = _gameStatus.Ally.CardManager.DisposeZone.ToCardCollectionInfo(this)
         });
     }
     public void _PlayerExecute()
@@ -229,7 +233,10 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                         _UseCard(player, useCardAction.CardIndentity);
                         _gameEvents.Add(new PlayerExecuteStartEvent(){
                             Faction = player.Faction,
-                            HandCardInfo = player.CardManager.HandCard.ToCardCollectionInfo(this)
+                            HandCardInfo = player.CardManager.HandCard.ToCardCollectionInfo(this),
+                            GraveyardInfo = player.CardManager.Graveyard.ToCardCollectionInfo(this),
+                            ExclusionZoneInfo = player.CardManager.ExclusionZone.ToCardCollectionInfo(this),
+                            DisposeZoneInfo = player.CardManager.DisposeZone.ToCardCollectionInfo(this)
                         });
                     }
                     break;
@@ -387,7 +394,9 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                         Faction = player.Faction,
                         UsedCardInfo = usedCardInfo,
                         HandCardInfo = player.CardManager.HandCard.ToCardCollectionInfo(this),
-                        GraveyardInfo = player.CardManager.Graveyard.ToCardCollectionInfo(this)
+                        GraveyardInfo = player.CardManager.Graveyard.ToCardCollectionInfo(this),
+                        ExclusionZoneInfo = player.CardManager.ExclusionZone.ToCardCollectionInfo(this),
+                        DisposeZoneInfo = player.CardManager.DisposeZone.ToCardCollectionInfo(this)
                     };
                     useCardEvents.Add(usedCardEvent);
 

@@ -1,126 +1,135 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
+using Optional;
 using UniRx;
 using UnityEngine;
-using UnityEngine.SocialPlatforms;
 
-public enum AllCardDetailPanelState
+public interface IAllCardDetailPresenter
 {
-    ShowDeck,
-    ShowGraveyard,
-    ShowHandCard,
-    Idle,
-    Close,
-    SinglePopup,
-}
-
-public interface IAllCardViewHandler
-{
-    void ReadCard(Guid cardIdentity);
-    void ShowDeckDetail();
-    void ShowGraveyardDetail();
-    void ShowHandCardDetail();
-    void Close();
-}
-
-public interface IAllCardDetailPresenter : IAllCardViewHandler
-{
-    UniTaskVoid Run();
+    UniTask Run(
+        Faction faction,
+        CardCollectionType type,
+        CancellationToken cancellationToken);
 }
 
 public class AllCardDetailPresenter : IAllCardDetailPresenter
 {
-    private IAllCardDetailPanel _detailPanel;
-    private SingleCardDetailPopupPanel _singlePopupPanel;
-    private IGameplayStatusWatcher _statusWatcher;
-    private AllCardDetailPanelState _state;
+    private readonly IAllCardDetailPanel _detailPanel;
+    private readonly SingleCardDetailPopupPanel _singlePopupPanel;
+    private readonly IGameViewModel _gameViewModel;
 
     private CardInfo _selectedCardInfo;
-    private IReadOnlyCollection<CardInfo> _cardInfos;
+    private CompositeDisposable _disposables = new CompositeDisposable();
+    private Option<UniTask> _currentTask = Option.None<UniTask>();
 
-    public AllCardDetailPresenter(IAllCardDetailPanelView view, IGameplayStatusWatcher statusWatcher, LocalizeLibrary localizeLibrary)
+    public AllCardDetailPresenter(
+        IAllCardDetailPanelView panelView,
+        IGameViewModel gameViewModel,
+        LocalizeLibrary localizeLibrary)
     {
-        _detailPanel = view.DetailPanel;
-        _singlePopupPanel = view.SinglePopupPanel;
-        _statusWatcher = statusWatcher;
+        _detailPanel = panelView.DetailPanel;
+        _singlePopupPanel = panelView.SinglePopupPanel;
+        _gameViewModel = gameViewModel;
 
-        _detailPanel.Init(this, localizeLibrary);
-
-        _state = AllCardDetailPanelState.Close;
+        _detailPanel.Init(_gameViewModel, localizeLibrary);
     }
 
-    public async UniTaskVoid Run()
+    public async UniTask Run(
+        Faction faction,
+        CardCollectionType type,
+        CancellationToken cancellationToken)
     {
-        while(true)
+        _detailPanel.Open();
+
+        var disposables = new CompositeDisposable();
+        var isClose = false;
+
+        _detailPanel.DeckButton.OnClickAsObservable()
+            .WithLatestFrom(
+                _gameViewModel.ObservableCardCollectionInfo(faction, CardCollectionType.Deck),
+                (_, deckInfo) => deckInfo)
+            .Subscribe(deckInfo => _TryEnqueueTask(_ShowCardCollectionInfos(deckInfo)))
+            .AddTo(disposables);
+        _detailPanel.HandCardButton.OnClickAsObservable()
+            .WithLatestFrom(
+                _gameViewModel.ObservableCardCollectionInfo(faction, CardCollectionType.HandCard),
+                (_, handCardsInfo) => handCardsInfo)
+            .Subscribe(handCardsInfo => _TryEnqueueTask(_ShowCardCollectionInfos(handCardsInfo)))
+            .AddTo(disposables);
+        _detailPanel.GraveyardButton.OnClickAsObservable()
+            .WithLatestFrom(
+                _gameViewModel.ObservableCardCollectionInfo(faction, CardCollectionType.Graveyard),
+                (_, graveyardInfo) => graveyardInfo)
+            .Subscribe(graveyardInfo => _TryEnqueueTask(_ShowCardCollectionInfos(graveyardInfo)))
+            .AddTo(disposables);
+        _detailPanel.CloseButtons
+            .Select(button => button.OnClickAsObservable())
+            .Merge()
+            .Subscribe(_ => isClose = true)
+            .AddTo(disposables);
+
+        var cardCollectionInfo = _gameViewModel.ObservableCardCollectionInfo(faction, type);
+        _TryEnqueueTask(_ShowCardCollectionInfos(cardCollectionInfo.Value));
+
+        while (!cancellationToken.IsCancellationRequested && !isClose)
         {
-            switch (_state)
+            if (_TryPopOutNextTask(out var task))
             {
-                case AllCardDetailPanelState.ShowDeck:
-                    _state = AllCardDetailPanelState.Idle;
-                    break;
-                case AllCardDetailPanelState.ShowGraveyard:
-                    _state = AllCardDetailPanelState.Idle;
-                    break;
-                case AllCardDetailPanelState.ShowHandCard:
-                    _state = AllCardDetailPanelState.Idle;
-                    break;
-                case AllCardDetailPanelState.SinglePopup:
-                    await _singlePopupPanel.Run(_selectedCardInfo);
-                    _state = AllCardDetailPanelState.Idle;
-                    _selectedCardInfo = null;
-                    break;
-                case AllCardDetailPanelState.Idle:
-                case AllCardDetailPanelState.Close:
-                    await UniTask.Yield();
-                    break;
+                await task;
+            }
+            else
+            {
+                await UniTask.NextFrame();
             }
         }
-    }
 
-    public void ShowDeckDetail()
-    {
-        if (_state == AllCardDetailPanelState.Close)
-            _detailPanel.Open();
-        _state = AllCardDetailPanelState.ShowDeck;
+        disposables.Dispose();
 
-        _cardInfos = _statusWatcher.GameStatus.Ally.CardManager.Deck.Cards
-            .ToCardInfos(_statusWatcher);
-        _detailPanel.ShowCardInfoCollections(this, _cardInfos);
-    }
-    public void ShowGraveyardDetail()
-    {
-        if (_state == AllCardDetailPanelState.Close)
-            _detailPanel.Open();
-        _state = AllCardDetailPanelState.ShowGraveyard;
-
-        _cardInfos = _statusWatcher.GameStatus.Ally.CardManager.Graveyard.Cards
-            .ToCardInfos(_statusWatcher);
-        _detailPanel.ShowCardInfoCollections(this, _cardInfos);
-    }
-    public void ShowHandCardDetail()
-    {
-        if (_state == AllCardDetailPanelState.Close)
-            _detailPanel.Open();
-        _state = AllCardDetailPanelState.ShowHandCard;
-
-        _cardInfos = _statusWatcher.GameStatus.Ally.CardManager.HandCard.Cards
-            .ToCardInfos(_statusWatcher);
-        _detailPanel.ShowCardInfoCollections(this, _cardInfos);
-    }
-    public void Close()
-    {
         _detailPanel.Close();
-        _state = AllCardDetailPanelState.Close;
+    }
+    
+    private bool _TryPopOutNextTask(out UniTask task)
+    {
+        if (_currentTask.HasValue)
+        {
+            task = _currentTask.ValueOr(UniTask.CompletedTask);
+            _currentTask = Option.None<UniTask>();
+            return true;
+        }
+
+        task = UniTask.CompletedTask;
+        return false;
+    }
+    private void _TryEnqueueTask(UniTask task)
+    {
+        if (!_currentTask.HasValue)
+        {
+            _currentTask = Option.Some(task);
+        }
     }
 
-    public void ReadCard(Guid cardIdentity)
+    private UniTask _ShowCardCollectionInfos(CardCollectionInfo cardCollectionInfo)
     {
-        if(_state == AllCardDetailPanelState.Idle)
+        _disposables?.Dispose();
+        _disposables = new CompositeDisposable();
+
+        foreach (var kvp in _detailPanel.ShowCardInfoCollections(cardCollectionInfo.CardInfos.Keys))
         {
-            _selectedCardInfo = _cardInfos.FirstOrDefault(x => x.Identity == cardIdentity);
-            _state = AllCardDetailPanelState.SinglePopup;
+            var cardInfo = kvp.Key;
+            var button = kvp.Value;
+            button.interactable = true;
+            button.OnClickAsObservable()
+                .Subscribe(_ =>
+                {
+                    _selectedCardInfo = cardInfo;
+                    _TryEnqueueTask(_singlePopupPanel.Run(cardInfo));
+                })
+                .AddTo(_disposables);
         }
+        
+        return UniTask.CompletedTask;
     }
 }

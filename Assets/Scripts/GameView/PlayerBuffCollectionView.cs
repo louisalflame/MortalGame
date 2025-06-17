@@ -12,16 +12,25 @@ public class PlayerBuffCollectionView : MonoBehaviour
 
     private List<PlayerBuffView> _buffViews = new List<PlayerBuffView>();
     private Dictionary<Guid, PlayerBuffView> _buffViewDict = new Dictionary<Guid, PlayerBuffView>();
-    private SimpleTitleIInfoHintView _simpleHintView;
+    private SimpleTitleInfoHintView _simpleHintView;
 
-    public void Init(SimpleTitleIInfoHintView simpleHintView)
+    private IGameViewModel _gameViewModel;
+    private LocalizeLibrary _localizeLibrary;
+
+    public void Init(
+        IGameViewModel gameInfoModel,
+        LocalizeLibrary localizeLibrary,
+        SimpleTitleInfoHintView simpleHintView)
     {
+        _gameViewModel = gameInfoModel;
+        _localizeLibrary = localizeLibrary;
         _simpleHintView = simpleHintView;
     }
 
     public void AddBuff(PlayerBuffInfo buffInfo)
     {
         var buffView = _buffViewFactory.CreatePrefab();
+        buffView.Initialize(_gameViewModel, _localizeLibrary);
         buffView.transform.SetParent(_buffViewParent, false);
         buffView.SetBuffInfo(buffInfo, _simpleHintView);
 
@@ -35,13 +44,6 @@ public class PlayerBuffCollectionView : MonoBehaviour
             _buffViews.Remove(buffView);
             _buffViewDict.Remove(buffInfo.Identity);
             _buffViewFactory.RecyclePrefab(buffView);
-        }
-    }
-    public void UpdateBuff(PlayerBuffInfo buffInfo)
-    {
-        if (_buffViewDict.TryGetValue(buffInfo.Identity, out var buffView))
-        {
-            buffView.SetBuffInfo(buffInfo, _simpleHintView);
         }
     }
 }
