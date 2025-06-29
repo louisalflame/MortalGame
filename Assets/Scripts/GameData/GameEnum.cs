@@ -119,7 +119,7 @@ public enum UpdateAction
 {
     None = 0,
     Summon,
-    PlayCard,
+    CardPlay,
     Death,
     Damage,
     Heal,

@@ -30,6 +30,14 @@ public class DeathResultAction : BaseResultAction
     }
 }
 
+public class CardPlayResultAction : BaseResultAction
+{ 
+    public override UpdateAction ActionType => UpdateAction.CardPlay;
+    public CardPlayResultAction(IActionSource source, IActionTarget target) : base(source, target)
+    {
+    }
+}
+
 public class DamageResultAction : BaseResultAction
 {
     public override UpdateAction ActionType => UpdateAction.Damage;
@@ -38,8 +46,8 @@ public class DamageResultAction : BaseResultAction
     public DamageType Type => DamageResult.Type;
 
     public DamageResultAction(
-        IActionSource source, 
-        IActionTarget target, 
+        IActionSource source,
+        IActionTarget target,
         TakeDamageResult damageResult,
         DamageStyle style) : base(source, target)
     {
@@ -104,7 +112,7 @@ public class LoseEnergyResultAction : BaseResultAction
 
 public class PlayCardResultAction : BaseResultAction
 {
-    public override UpdateAction ActionType => UpdateAction.PlayCard;
+    public override UpdateAction ActionType => UpdateAction.CardPlay;
     public ICardEntity Card { get; private set; }
 
     public PlayCardResultAction(IActionSource source, IActionTarget target, ICardEntity card) :

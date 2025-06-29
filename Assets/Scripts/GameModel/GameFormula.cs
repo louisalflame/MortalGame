@@ -9,10 +9,10 @@ public static class GameFormula
         int rawDamagePoint,
         IActionUnit actionUnit)
     {
-        var actionAddition = GetCardPlayAttributeAddition(
+        var actionAddition = GetAttributeAddition(
             actionUnit, gameWatcher, EffectAttributeAdditionType.NormalDamageAddition, PlayerBuffProperty.NormalDamageAddition);
         
-        var actionRatio = GetCardPlayAttributeRatio(
+        var actionRatio = GetAttributeRatio(
             actionUnit, gameWatcher, EffectAttributeRatioType.NormalDamageRatio, PlayerBuffProperty.NormalDamageRatio);
 
         return rawDamagePoint + actionAddition;
@@ -23,7 +23,8 @@ public static class GameFormula
         ICardEntity card,
         IActionUnit actionUnit)
     {
-        var actionAddition = GetCardLookAttributeAddition(actionUnit, gameWatcher, PlayerBuffProperty.AllCardPower);
+        var actionAddition = GetAttributeAddition(
+            actionUnit, gameWatcher, EffectAttributeAdditionType.PowerAddition, PlayerBuffProperty.AllCardPower);
 
         var cardAddition = card.GetCardProperty(gameWatcher, CardProperty.PowerAddition);
 
@@ -35,15 +36,19 @@ public static class GameFormula
         ICardEntity card,
         IActionUnit actionUnit)
     {
-        var actionAddition = GetCardLookAttributeAddition(actionUnit, gameWatcher, PlayerBuffProperty.AllCardCost);
+        var actionAddition = GetAttributeAddition(
+            actionUnit, gameWatcher, EffectAttributeAdditionType.CostAddition, PlayerBuffProperty.AllCardCost);
 
         var cardAddition = card.GetCardProperty(gameWatcher, CardProperty.CostAddition);
 
         return Math.Max(0, card.OriginCost + actionAddition + cardAddition);
     }
 
-    private static int GetCardLookAttributeAddition(
-        IActionUnit actionUnit, IGameplayStatusWatcher gameWatcher, PlayerBuffProperty playerBuffProperty)
+    private static int GetAttributeAddition(
+        IActionUnit actionUnit,
+        IGameplayStatusWatcher gameWatcher,
+        EffectAttributeAdditionType attribute,
+        PlayerBuffProperty playerBuffProperty)
     {
         if (actionUnit is CardLookIntentAction cardLookIntent)
         {
@@ -52,28 +57,20 @@ public static class GameFormula
                 .ValueOr(0);
             return playerAttribute;
         }
-        return 0;
-    }
-
-    private static int GetCardPlayAttributeAddition(
-        IActionUnit actionUnit,
-        IGameplayStatusWatcher gameWatcher,
-        EffectAttributeAdditionType attribute,
-        PlayerBuffProperty playerBuffProperty)
-    {
         if (actionUnit is IActionSourceUnit actionSourceUnit &&
             actionSourceUnit.Source is CardPlaySource cardPlaySource)
         {
-            var cardAttribute = cardPlaySource.Attribute.IntValues
+            var cardPlayAttribute = cardPlaySource.Attribute.IntValues
                 .GetValueOrDefault(attribute, 0);
             var playerAttribute = gameWatcher.GameStatus.CurrentPlayer
                 .Map(player => player.GetPlayerBuffAdditionProperty(gameWatcher, playerBuffProperty))
                 .ValueOr(0);
-            return cardAttribute + playerAttribute;
+
+            return cardPlayAttribute + playerAttribute;
         }
         return 0;
     }
-    private static float GetCardPlayAttributeRatio(
+    private static float GetAttributeRatio(
         IActionUnit actionUnit,
         IGameplayStatusWatcher gameWatcher,
         EffectAttributeRatioType attribute,
@@ -82,12 +79,13 @@ public static class GameFormula
         if (actionUnit is IActionSourceUnit actionSourceUnit &&
             actionSourceUnit.Source is CardPlaySource cardPlaySource)
         {
-            var cardAttribute = cardPlaySource.Attribute.FloatValues
+            var cardPlayAttribute = cardPlaySource.Attribute.FloatValues
                 .GetValueOrDefault(attribute, 0);
             var playerAttribute = gameWatcher.GameStatus.CurrentPlayer
                 .Map(player => player.GetPlayerBuffRatioProperty(gameWatcher, playerBuffProperty))
                 .ValueOr(0);
-            return cardAttribute + playerAttribute;
+
+            return cardPlayAttribute + playerAttribute;
         }
         return 0f;
     }

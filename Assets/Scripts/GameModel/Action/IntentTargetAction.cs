@@ -58,7 +58,7 @@ public class LoseEnergyIntentTargetAction : BaseIntentTargetAction
 
 public class CardPlayIntentTargetAction : BaseIntentTargetAction
 {
-    public override UpdateAction ActionType => UpdateAction.PlayCard;
+    public override UpdateAction ActionType => UpdateAction.CardPlay;
     public CardPlaySource CardPlay => Source as CardPlaySource;
 
     public CardPlayIntentTargetAction(CardPlaySource source, IActionTarget target) : base(source, target)

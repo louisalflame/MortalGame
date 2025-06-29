@@ -102,37 +102,52 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ResultRules
+      Entry: 7
+      Data: 8|IntegerUpdateResultRules, Assembly-CSharp
+    - Name: comparer
+      Entry: 9
+      Data: 7
+    - Name: 
+      Entry: 12
       Data: 1
     - Name: 
       Entry: 7
       Data: 
     - Name: $k
       Entry: 3
-      Data: 15
+      Data: 2
     - Name: $v
       Entry: 7
-      Data: 8|ConditionIntegerUpdateRule[], Assembly-CSharp
+      Data: 9|ConditionIntegerUpdateRule[], Assembly-CSharp
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 9|ConditionIntegerUpdateRule, Assembly-CSharp
+      Data: 10|ConditionIntegerUpdateRule, Assembly-CSharp
     - Name: Conditions
       Entry: 7
-      Data: 10|ICondition[], Assembly-CSharp
+      Data: 11|ICondition[], Assembly-CSharp
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 11|IsSelfTurnCondition, Assembly-CSharp
+      Data: 12|IsSelfTurnCondition, Assembly-CSharp
     - Name: TargetPlayer
       Entry: 7
-      Data: 12|PlayerBuffContentPlayer, Assembly-CSharp
+      Data: 13|PlayerBuffContentPlayer, Assembly-CSharp
     - Name: PlayerBuff
       Entry: 7
-      Data: 13|TriggeredPlayerBuff, Assembly-CSharp
+      Data: 14|TriggeredPlayerBuff, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -147,30 +162,30 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 14|CardPlayCondition, Assembly-CSharp
+      Data: 15|CardPlayCondition, Assembly-CSharp
     - Name: Conditions
       Entry: 7
-      Data: 15|System.Collections.Generic.List`1[[ICardPlayValueCondition, Assembly-CSharp]],
+      Data: 16|System.Collections.Generic.List`1[[ICardPlayValueCondition, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 16|CardPlayCardCondition, Assembly-CSharp
+      Data: 17|CardPlayCardCondition, Assembly-CSharp
     - Name: Conditions
       Entry: 7
-      Data: 17|System.Collections.Generic.List`1[[ICardValueCondition, Assembly-CSharp]],
+      Data: 18|System.Collections.Generic.List`1[[ICardValueCondition, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 18|CardTypesCondition, Assembly-CSharp
+      Data: 19|CardTypesCondition, Assembly-CSharp
     - Name: CardTypes
       Entry: 7
-      Data: 19|System.Collections.Generic.List`1[[CardType, Assembly-CSharp]], mscorlib
+      Data: 20|System.Collections.Generic.List`1[[CardType, Assembly-CSharp]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
@@ -218,7 +233,7 @@ MonoBehaviour:
       Data: 
     - Name: NewValue
       Entry: 7
-      Data: 20|ConstInteger, Assembly-CSharp
+      Data: 21|ConstInteger, Assembly-CSharp
     - Name: Value
       Entry: 3
       Data: 1
@@ -233,13 +248,124 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 21|ConditionIntegerUpdateRule, Assembly-CSharp
+      Data: 22|ConditionIntegerUpdateRule, Assembly-CSharp
     - Name: Conditions
       Entry: 7
-      Data: 22|ICondition[], Assembly-CSharp
+      Data: 23|ICondition[], Assembly-CSharp
     - Name: 
       Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 24|InverseCondition, Assembly-CSharp
+    - Name: Condition
+      Entry: 7
+      Data: 25|AllCondition, Assembly-CSharp
+    - Name: Conditions
+      Entry: 7
+      Data: 26|System.Collections.Generic.List`1[[ICondition, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 27|IsSelfTurnCondition, Assembly-CSharp
+    - Name: TargetPlayer
+      Entry: 7
+      Data: 28|PlayerBuffContentPlayer, Assembly-CSharp
+    - Name: PlayerBuff
+      Entry: 7
+      Data: 29|TriggeredPlayerBuff, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Type
+      Entry: 3
       Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 30|CardPlayCondition, Assembly-CSharp
+    - Name: Conditions
+      Entry: 7
+      Data: 31|System.Collections.Generic.List`1[[ICardPlayValueCondition, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 32|CardPlayCardCondition, Assembly-CSharp
+    - Name: Conditions
+      Entry: 7
+      Data: 33|System.Collections.Generic.List`1[[ICardValueCondition, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 34|CardTypesCondition, Assembly-CSharp
+    - Name: CardTypes
+      Entry: 7
+      Data: 35|System.Collections.Generic.List`1[[CardType, Assembly-CSharp]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 3
+      Data: 5
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Condition
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -248,7 +374,7 @@ MonoBehaviour:
       Data: 
     - Name: NewValue
       Entry: 7
-      Data: 23|ConstInteger, Assembly-CSharp
+      Data: 36|ConstInteger, Assembly-CSharp
     - Name: Value
       Entry: 3
       Data: 0
@@ -270,21 +396,6 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ResultRules
-      Entry: 7
-      Data: 24|IntegerUpdateResultRules, Assembly-CSharp
-    - Name: comparer
-      Entry: 9
-      Data: 7
-    - Name: 
-      Entry: 12
-      Data: 0
     - Name: 
       Entry: 13
       Data: 
@@ -305,11 +416,11 @@ MonoBehaviour:
       Data: 
     - Name: BuffEffects
       Entry: 7
-      Data: 25|System.Collections.Generic.Dictionary`2[[TriggerTiming, Assembly-CSharp],[ConditionalPlayerBuffEffect[],
+      Data: 37|System.Collections.Generic.Dictionary`2[[TriggerTiming, Assembly-CSharp],[ConditionalPlayerBuffEffect[],
         Assembly-CSharp]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 26|System.Collections.Generic.EnumEqualityComparer`1[[TriggerTiming,
+      Data: 38|System.Collections.Generic.EnumEqualityComparer`1[[TriggerTiming,
         Assembly-CSharp]], mscorlib
     - Name: 
       Entry: 12
@@ -331,68 +442,68 @@ MonoBehaviour:
       Data: 7
     - Name: $v
       Entry: 7
-      Data: 27|ConditionalPlayerBuffEffect[], Assembly-CSharp
+      Data: 39|ConditionalPlayerBuffEffect[], Assembly-CSharp
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 28|ConditionalPlayerBuffEffect, Assembly-CSharp
+      Data: 40|ConditionalPlayerBuffEffect, Assembly-CSharp
     - Name: Conditions
       Entry: 7
-      Data: 29|System.Collections.Generic.List`1[[IPlayerBuffCondition, Assembly-CSharp]],
+      Data: 41|System.Collections.Generic.List`1[[IPlayerBuffCondition, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 30|PlayerBuffCondition, Assembly-CSharp
+      Data: 42|PlayerBuffCondition, Assembly-CSharp
     - Name: PlayerBuff
       Entry: 7
-      Data: 31|TriggeredPlayerBuff, Assembly-CSharp
+      Data: 43|TriggeredPlayerBuff, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
     - Name: Conditions
       Entry: 7
-      Data: 32|System.Collections.Generic.List`1[[IPlayerBuffValueCondition, Assembly-CSharp]],
+      Data: 44|System.Collections.Generic.List`1[[IPlayerBuffValueCondition, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 33|PlayerBuffSessionCondition, Assembly-CSharp
+      Data: 45|PlayerBuffSessionCondition, Assembly-CSharp
     - Name: SessionKey
       Entry: 1
       Data: combo
     - Name: Conditions
       Entry: 7
-      Data: 34|System.Collections.Generic.List`1[[IReactionSessionValueCondition,
+      Data: 46|System.Collections.Generic.List`1[[IReactionSessionValueCondition,
         Assembly-CSharp]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 35|ReactionSessionValueIntegerCondition, Assembly-CSharp
+      Data: 47|ReactionSessionValueIntegerCondition, Assembly-CSharp
     - Name: Conditions
       Entry: 7
-      Data: 36|System.Collections.Generic.List`1[[IIntegerValueCondition, Assembly-CSharp]],
+      Data: 48|System.Collections.Generic.List`1[[IIntegerValueCondition, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 37|IntegerCompare, Assembly-CSharp
+      Data: 49|IntegerCompare, Assembly-CSharp
     - Name: Arithmetic
       Entry: 3
       Data: 3
     - Name: CompareValue
       Entry: 7
-      Data: 38|ConstInteger, Assembly-CSharp
+      Data: 50|ConstInteger, Assembly-CSharp
     - Name: Value
       Entry: 3
       Data: 1
@@ -437,22 +548,22 @@ MonoBehaviour:
       Data: 
     - Name: Effect
       Entry: 7
-      Data: 39|CardPlayEffectAttributePlayerBuffEffect, Assembly-CSharp
+      Data: 51|CardPlayEffectAttributeAdditionPlayerBuffEffect, Assembly-CSharp
     - Name: Type
       Entry: 3
-      Data: 3
+      Data: 2
     - Name: Value
       Entry: 7
-      Data: 40|PlayerBuffIntegerProperty, Assembly-CSharp
+      Data: 52|PlayerBuffSessionInteger, Assembly-CSharp
     - Name: PlayerBuff
       Entry: 7
-      Data: 41|TriggeredPlayerBuff, Assembly-CSharp
+      Data: 53|TriggeredPlayerBuff, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
-    - Name: Property
-      Entry: 3
-      Data: 0
+    - Name: SessionIntegerId
+      Entry: 1
+      Data: combo
     - Name: 
       Entry: 8
       Data: 
@@ -479,7 +590,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 42|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
+      Data: 54|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -492,7 +603,7 @@ MonoBehaviour:
       Data: 
     - Name: LifeTimeData
       Entry: 7
-      Data: 43|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
+      Data: 55|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 

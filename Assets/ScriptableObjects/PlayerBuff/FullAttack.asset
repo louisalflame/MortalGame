@@ -270,22 +270,46 @@ MonoBehaviour:
       Data: 
     - Name: Effect
       Entry: 7
-      Data: 26|CardPlayEffectAttributePlayerBuffEffect, Assembly-CSharp
+      Data: 26|CardPlayEffectAttributeAdditionPlayerBuffEffect, Assembly-CSharp
     - Name: Type
       Entry: 3
-      Data: 1
+      Data: 2
     - Name: Value
       Entry: 7
-      Data: 27|PlayerBuffIntegerProperty, Assembly-CSharp
+      Data: 27|ArithmeticInteger, Assembly-CSharp
+    - Name: Operation
+      Entry: 3
+      Data: 1
+    - Name: Left
+      Entry: 7
+      Data: 28|PlayerBuffIntegerProperty, Assembly-CSharp
     - Name: PlayerBuff
       Entry: 7
-      Data: 28|TriggeredPlayerBuff, Assembly-CSharp
+      Data: 29|TriggeredPlayerBuff, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
     - Name: Property
       Entry: 3
       Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Right
+      Entry: 7
+      Data: 30|CardIntegerProperty, Assembly-CSharp
+    - Name: Card
+      Entry: 7
+      Data: 31|PlayingCard, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Property
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -312,7 +336,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 29|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
+      Data: 32|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -325,7 +349,7 @@ MonoBehaviour:
       Data: 
     - Name: LifeTimeData
       Entry: 7
-      Data: 30|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
+      Data: 33|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 

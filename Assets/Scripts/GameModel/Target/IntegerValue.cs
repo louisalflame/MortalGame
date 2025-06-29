@@ -21,6 +21,27 @@ public class ConstInteger : IIntegerValue
 }
 
 [Serializable]
+public class ArithmeticInteger : IIntegerValue
+{
+    public ArithmeticType Operation;
+    public IIntegerValue Left;
+    public IIntegerValue Right;
+
+    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource, IActionUnit actionUnit)
+    {
+        var leftValue = Left.Eval(gameWatcher, triggerSource, actionUnit);
+        var rightValue = Right.Eval(gameWatcher, triggerSource, actionUnit);
+
+        return Operation switch
+        {
+            ArithmeticType.Add => leftValue + rightValue,
+            ArithmeticType.Multiply => leftValue * rightValue,
+            _ => 0
+        };
+    }
+}
+
+[Serializable]
 public class CardIntegerProperty : IIntegerValue
 {   
     public enum CardIntegerValueType
@@ -41,9 +62,9 @@ public class CardIntegerProperty : IIntegerValue
                 card => Property switch
                 {
                     // TODO: Apply EffectAttribute.Power adjust
-                    CardIntegerValueType.Power => GameFormula.CardPower(gameWatcher, card, new CardLookIntentAction(card)),
+                    CardIntegerValueType.Power => GameFormula.CardPower(gameWatcher, card, actionUnit),
                     // TODO: Apply EffectAttribute.Cost adjust
-                    CardIntegerValueType.Cost => GameFormula.CardCost(gameWatcher, card, new CardLookIntentAction(card)),
+                    CardIntegerValueType.Cost => GameFormula.CardCost(gameWatcher, card, actionUnit),
                     _ => 0
                 })
             .ValueOr(0);

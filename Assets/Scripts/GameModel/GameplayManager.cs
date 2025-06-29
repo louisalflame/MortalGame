@@ -402,6 +402,9 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
 
                     useCardEvents.AddRange(_TriggerTiming(TriggerTiming.PlayCardEnd, cardPlaySource));
 
+                    useCardEvents.AddRange(
+                        UpdateReactorSessionAction(new CardPlayResultAction(cardPlaySource, new CardTarget(usedCard))));
+
                     // Close PlayCardSession
                     useCardEvents.AddRange(
                         UpdateReactorSessionAction(new UpdateTimingAction(UpdateTiming.PlayCardEnd)));

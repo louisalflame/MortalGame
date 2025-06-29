@@ -23,7 +23,7 @@ public class CardLookIntentAction : BaseIntentAction
 }
 public class CardPlayIntentAction : BaseIntentAction
 {
-    public override UpdateAction ActionType => UpdateAction.PlayCard;
+    public override UpdateAction ActionType => UpdateAction.CardPlay;
     public CardPlaySource CardPlay => Source as CardPlaySource;
 
     public CardPlayIntentAction(CardPlaySource source) : base(source)
