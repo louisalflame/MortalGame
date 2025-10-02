@@ -24,6 +24,15 @@ public class EffectiveDamagePlayerBuffEffect : IPlayerBuffEffect
     [HorizontalGroup("2")]
     public IIntegerValue Value;
 }
+[Serializable]
+public class AdditionalDamagePlayerBuffEffect : IPlayerBuffEffect
+{
+    [HorizontalGroup("1")]
+    public ITargetCharacterCollectionValue Targets;
+    
+    [HorizontalGroup("2")]
+    public IIntegerValue Value;
+}
 
 [Serializable]
 public class CardPlayEffectAttributeAdditionPlayerBuffEffect : IPlayerBuffEffect

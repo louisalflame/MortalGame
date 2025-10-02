@@ -52,11 +52,11 @@ MonoBehaviour:
       Data: 
     - Name: BuffEffects
       Entry: 7
-      Data: 3|System.Collections.Generic.Dictionary`2[[TriggerTiming, Assembly-CSharp],[ConditionalPlayerBuffEffect[],
+      Data: 3|System.Collections.Generic.Dictionary`2[[GameTiming, Assembly-CSharp],[ConditionalPlayerBuffEffect[],
         Assembly-CSharp]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 4|System.Collections.Generic.EnumEqualityComparer`1[[TriggerTiming, Assembly-CSharp]],
+      Data: 4|System.Collections.Generic.EnumEqualityComparer`1[[GameTiming, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12

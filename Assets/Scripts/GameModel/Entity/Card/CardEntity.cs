@@ -19,7 +19,7 @@ public interface ICardEntity
     IEnumerable<ISubTargetSelectable> SubSelectables { get; }
 
     List<ICardEffect> Effects { get; }
-    Dictionary<TriggerTiming, List<ICardEffect>> TriggeredEffects { get; }
+    Dictionary<GameTiming, List<ICardEffect>> TriggeredEffects { get; }
     IEnumerable<ICardPropertyEntity> Properties { get; }
     ICardBuffManager BuffManager { get; }
 
@@ -42,7 +42,7 @@ public class CardEntity : ICardEntity
     private IMainTargetSelectable _mainSelectable;
     private List<ISubTargetSelectable> _subSelectables;
     private List<ICardEffect> _effects;
-    private Dictionary<TriggerTiming, List<ICardEffect>> _triggeredEffects;
+    private Dictionary<GameTiming, List<ICardEffect>> _triggeredEffects;
     private List<ICardPropertyEntity> _properties;
     private ICardBuffManager _buffManager;
 
@@ -57,7 +57,7 @@ public class CardEntity : ICardEntity
     public IMainTargetSelectable MainSelectable => _mainSelectable;
     public IEnumerable<ISubTargetSelectable> SubSelectables => _subSelectables;
     public List<ICardEffect> Effects => _effects;
-    public Dictionary<TriggerTiming, List<ICardEffect>> TriggeredEffects => _triggeredEffects;
+    public Dictionary<GameTiming, List<ICardEffect>> TriggeredEffects => _triggeredEffects;
     public IEnumerable<ICardPropertyEntity> Properties => _properties;
     public ICardBuffManager BuffManager => _buffManager;
     public bool IsDummy => this == DummyCard;
@@ -74,7 +74,7 @@ public class CardEntity : ICardEntity
         mainSelectable: new NoneSelectable(),
         subSelectables: new List<ISubTargetSelectable>(),
         effects: new List<ICardEffect>(),
-        triggeredEffects: new Dictionary<TriggerTiming, List<ICardEffect>>(),
+        triggeredEffects: new Dictionary<GameTiming, List<ICardEffect>>(),
         properties: new List<ICardPropertyEntity>()
     );
     
@@ -90,7 +90,7 @@ public class CardEntity : ICardEntity
         IMainTargetSelectable mainSelectable,
         IEnumerable<ISubTargetSelectable> subSelectables,
         List<ICardEffect> effects,
-        Dictionary<TriggerTiming, List<ICardEffect>> triggeredEffects,
+        Dictionary<GameTiming, List<ICardEffect>> triggeredEffects,
         IEnumerable<ICardPropertyEntity> properties
     )
     {
@@ -176,26 +176,6 @@ public class CardEntity : ICardEntity
                 pair => pair.Value.ToList()),
             properties: _properties.ToList()
         );
-    }
-
-    public int EvalCost(IGameplayStatusWatcher gameWatcher)
-    {
-        var cost = _cost;
-        var cardTrigger = new CardTrigger(this);
-        var systemAction = new SystemAction();
-        foreach (var property in Properties.Where(p => p.Property == CardProperty.CostAddition))
-        {
-            cost += property.Eval(gameWatcher, cardTrigger);
-        }
-        foreach (var buff in BuffManager.Buffs)
-        {
-            foreach (var property in buff.Properties.Where(p => p.Property == CardProperty.CostAddition))
-            {
-                cost += property.Eval(gameWatcher, cardTrigger);
-            }
-        }
-
-        return cost;
     }
 }
 

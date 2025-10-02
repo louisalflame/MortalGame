@@ -43,12 +43,10 @@ public class PlayingCard : ITargetCardValue
         ITriggerSource trigger,
         IActionUnit actionUnit)
     {
-        return actionUnit switch
+        return actionUnit.Source switch
         {
-            IIntentAction intentAction =>
-                intentAction.Source is CardPlaySource cardPlaySource ?
-                    cardPlaySource.Card.SomeNotNull() :
-                    Option.None<ICardEntity>(),
+            CardPlaySource cardPlaySource =>
+                cardPlaySource.Card.SomeNotNull(),
             _ => Option.None<ICardEntity>()
         };
     }

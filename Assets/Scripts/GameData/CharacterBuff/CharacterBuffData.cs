@@ -19,7 +19,7 @@ public class CharacterBuffData
     [Space(20)]
     [ShowInInspector]
     [BoxGroup("Effects")]
-    public Dictionary<TriggerTiming, ConditionalCharacterBuffEffect[]> BuffEffects = new();  
+    public Dictionary<GameTiming, ConditionalCharacterBuffEffect[]> BuffEffects = new();  
 
     [ShowInInspector]
     [BoxGroup("Properties")]

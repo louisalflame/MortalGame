@@ -53,24 +53,24 @@ public class ReactionSessionEntity : IReactionSessionEntity
             switch (_lifeTime)
             {
                 case SessionLifeTime.WholeTurn:
-                    if (timingAction.Timing == UpdateTiming.TurnStart)
+                    if (timingAction.Timing == GameTiming.TurnStart)
                     {
                         isUpdated = true;
                         _Reset();
                     }
-                    else if (timingAction.Timing == UpdateTiming.TurnEnd)
+                    else if (timingAction.Timing == GameTiming.TurnEnd)
                     {
                         isUpdated = true;
                         _Clear();
                     }
                     break;
                 case SessionLifeTime.PlayCard:
-                    if (timingAction.Timing == UpdateTiming.PlayCardStart)
+                    if (timingAction.Timing == GameTiming.PlayCardStart)
                     {
                         isUpdated = true;
                         _Reset();
                     }
-                    else if (timingAction.Timing == UpdateTiming.PlayCardEnd)
+                    else if (timingAction.Timing == GameTiming.PlayCardEnd)
                     {
                         isUpdated = true;
                         _Clear();

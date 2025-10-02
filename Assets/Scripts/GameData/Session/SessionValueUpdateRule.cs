@@ -40,24 +40,3 @@ public class ConditionIntegerUpdateRule : ConditionUpdateRule<IIntegerValue>
     [PropertyOrder(2)]
     public UpdateType Operation = UpdateType.Overwrite;
 }
-
-
-[Serializable]
-public class BooleanUpdateTimingRules : Dictionary<UpdateTiming, ConditionBooleanUpdateRule[]> 
-{ }
-[Serializable]
-public class BooleanUpdateIntentRules : Dictionary<UpdateAction, ConditionBooleanUpdateRule[]> 
-{ }
-[Serializable]
-public class BooleanUpdateResultRules : Dictionary<UpdateAction, ConditionBooleanUpdateRule[]> 
-{ }
-
-[Serializable]
-public class IntegerUpdateTimingRules : Dictionary<UpdateTiming, ConditionIntegerUpdateRule[]>
-{ }
-[Serializable]
-public class IntegerUpdateIntentRules : Dictionary<UpdateAction, ConditionIntegerUpdateRule[]>
-{ }
-[Serializable]
-public class IntegerUpdateResultRules : Dictionary<UpdateAction, ConditionIntegerUpdateRule[]>
-{ }

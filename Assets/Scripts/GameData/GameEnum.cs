@@ -83,7 +83,17 @@ public enum PlayerBuffProperty
     AllCardPower,
     AllCardCost,
     NormalDamageAddition,
+    PenetrateDamageAddition,
+    EffectiveDamageAddition,
+    AdditionalDamageAddition,
+    HealAddition,
+    ShieldAddition,
     NormalDamageRatio,
+    PenetrateDamageRatio,
+    EffectiveDamageRatio,
+    AdditionalDamageRatio,
+    HealRatio,
+    ShieldRatio,
     MaxHealth,
     MaxEnergy,
 }
@@ -115,12 +125,9 @@ public enum TargetType
     EnemyCharacter,
 }
 
-public enum UpdateAction
+public enum EffectType
 {
     None = 0,
-    Summon,
-    CardPlay,
-    Death,
     Damage,
     Heal,
     Shield,
@@ -141,7 +148,7 @@ public enum UpdateAction
     RemoveCharacterBuff,
     CardPlayEffectAttribute,
 }
-public enum UpdateTiming
+public enum GameTiming
 {
     None = 0,
     GameStart,
@@ -149,26 +156,18 @@ public enum UpdateTiming
     TurnEnd,
     ExecuteStart,
     ExecuteEnd,
+    CharacterSummon,
+    CharacterDeath,
     DrawCard,
     PlayCardStart,
     PlayCardEnd,
+    EffectIntent,
+    EffectTargetIntent,
+    EffectTargetResult,
     TriggerBuffStart,
     TriggerBuffEnd,
 }
 
-public enum TriggerTiming
-{
-    None = 0,
-    GameStart,
-    TurnStart,
-    TurnEnd,
-    ExecuteStart,
-    ExecuteEnd,
-    DrawCard,
-    PlayCardStart,
-    PlayCardEnd,
-    TriggerBuffEnd,
-}
 public enum SessionLifeTime
 {
     WholeGame,
@@ -182,9 +181,19 @@ public enum EffectAttributeAdditionType
     CostAddition,
     PowerAddition,
     NormalDamageAddition,
+    PenetrateDamageAddition,
+    EffectiveDamageAddition,
+    AdditionalDamageAddition,
+    HealAddition,
+    ShieldAddition,
 }
 public enum EffectAttributeRatioType
 {
     None = 0,
     NormalDamageRatio,
+    PenetrateDamageRatio,
+    EffectiveDamageRatio,
+    AdditionalDamageRatio,
+    HealRatio,
+    ShieldRatio,
 }

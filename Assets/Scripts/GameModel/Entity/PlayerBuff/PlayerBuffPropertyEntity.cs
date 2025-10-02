@@ -25,7 +25,7 @@ public class AllCardPowerPlayerBuffPropertyEntity : IPlayerBuffIntegerPropertyEn
     }
     
     public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
-        => _value.Eval(gameWatcher, triggerSource, SystemAction.Instance);
+        => _value.Eval(gameWatcher, triggerSource, new PlayerBuffPropertyLookAction(this));
 }
 
 public class AllCardCostPlayerBuffPropertyEntity : IPlayerBuffIntegerPropertyEntity
@@ -39,7 +39,7 @@ public class AllCardCostPlayerBuffPropertyEntity : IPlayerBuffIntegerPropertyEnt
     }
 
     public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
-        => _value.Eval(gameWatcher, triggerSource, SystemAction.Instance);
+        => _value.Eval(gameWatcher, triggerSource, new PlayerBuffPropertyLookAction(this));
 }
 public class NormalDamageAdditionPlayerBuffPropertyEntity : IPlayerBuffIntegerPropertyEntity
 {
@@ -52,7 +52,7 @@ public class NormalDamageAdditionPlayerBuffPropertyEntity : IPlayerBuffIntegerPr
     }
 
     public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
-        => _value.Eval(gameWatcher, triggerSource, SystemAction.Instance);
+        => _value.Eval(gameWatcher, triggerSource, new PlayerBuffPropertyLookAction(this));
 }
 public class NormalDamageRatioPlayerBuffPropertyEntity : IPlayerBuffRatioPropertyEntity
 {
@@ -77,7 +77,7 @@ public class MaxHealthPlayerBuffPropertyEntity : IPlayerBuffIntegerPropertyEntit
         _value = value;
     }
     public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
-        => _value.Eval(gameWatcher, triggerSource, SystemAction.Instance);
+        => _value.Eval(gameWatcher, triggerSource, new PlayerBuffPropertyLookAction(this));
 }
 public class MaxEnergyPlayerBuffPropertyEntity : IPlayerBuffIntegerPropertyEntity
 {
@@ -89,5 +89,5 @@ public class MaxEnergyPlayerBuffPropertyEntity : IPlayerBuffIntegerPropertyEntit
         _value = value;
     }
     public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
-        => _value.Eval(gameWatcher, triggerSource, SystemAction.Instance);
+        => _value.Eval(gameWatcher, triggerSource, new PlayerBuffPropertyLookAction(this));
 }

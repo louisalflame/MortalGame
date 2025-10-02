@@ -25,9 +25,9 @@ public static class EffectExecutor
                     var characterTarget = new CharacterTarget(target);
                     var targetIntent = new DamageIntentTargetAction(actionSource, characterTarget, DamageType.Normal);
                     var damagePoint = damageEffect.Value.Eval(gameplayWatcher, trigger, targetIntent);
-                    damagePoint = GameFormula.NormalDamagePoint(gameplayWatcher, damagePoint, targetIntent);
+                    var damageFormulaPoint = GameFormula.NormalDamagePoint(gameplayWatcher, damagePoint, targetIntent);
 
-                    var damageResult = target.HealthManager.TakeDamage(damagePoint, gameplayWatcher.ContextManager.Context);
+                    var damageResult = target.HealthManager.TakeDamage(damageFormulaPoint, gameplayWatcher.ContextManager.Context);
                     var damageStyle = DamageStyle.None; // TODO: pass style from action source
 
                     cardEffectEvents.AddRange(
@@ -46,7 +46,9 @@ public static class EffectExecutor
                     var characterTarget = new CharacterTarget(target);
                     var targetIntent = new DamageIntentTargetAction(actionSource, characterTarget, DamageType.Penetrate);
                     var damagePoint = penetrateDamageEffect.Value.Eval(gameplayWatcher, trigger, targetIntent);
-                    var damageResult = target.HealthManager.TakePenetrateDamage(damagePoint, gameplayWatcher.ContextManager.Context);
+                    var damageFormulaPoint = GameFormula.PenetrateDamagePoint(gameplayWatcher, damagePoint, targetIntent);
+
+                    var damageResult = target.HealthManager.TakePenetrateDamage(damageFormulaPoint, gameplayWatcher.ContextManager.Context);
                     var damageStyle = DamageStyle.None;
 
                     cardEffectEvents.AddRange(
@@ -65,7 +67,9 @@ public static class EffectExecutor
                     var characterTarget = new CharacterTarget(target);
                     var targetIntent = new DamageIntentTargetAction(actionSource, characterTarget, DamageType.Additional);
                     var damagePoint = additionalAttackEffect.Value.Eval(gameplayWatcher, trigger, targetIntent);
-                    var damageResult = target.HealthManager.TakeAdditionalDamage(damagePoint, gameplayWatcher.ContextManager.Context);
+                    var damageFormulaPoint = GameFormula.AdditionalDamagePoint(gameplayWatcher, damagePoint, targetIntent);
+
+                    var damageResult = target.HealthManager.TakeAdditionalDamage(damageFormulaPoint, gameplayWatcher.ContextManager.Context);
                     var damageStyle = DamageStyle.None;
 
                     cardEffectEvents.AddRange(
@@ -84,7 +88,9 @@ public static class EffectExecutor
                     var characterTarget = new CharacterTarget(target);
                     var targetIntent = new DamageIntentTargetAction(actionSource, characterTarget, DamageType.Effective);
                     var damagePoint = effectiveAttackEffect.Value.Eval(gameplayWatcher, trigger, targetIntent);
-                    var damageResult = target.HealthManager.TakeEffectiveDamage(damagePoint, gameplayWatcher.ContextManager.Context);
+                    var damageFormulaPoint = GameFormula.EffectiveDamagePoint(gameplayWatcher, damagePoint, targetIntent);
+
+                    var damageResult = target.HealthManager.TakeEffectiveDamage(damageFormulaPoint, gameplayWatcher.ContextManager.Context);
                     var damageStyle = DamageStyle.None;
 
                     cardEffectEvents.AddRange(
@@ -406,10 +412,31 @@ public static class EffectExecutor
     {
         var appleBuffEffectEvents = new List<IGameEvent>();
         appleBuffEffectEvents.AddRange(
-            gameplayReactor.UpdateReactorSessionAction(new UpdateTimingAction(UpdateTiming.TriggerBuffStart)));
+            gameplayReactor.UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.TriggerBuffStart, actionSource)));
 
         switch (buffEffect)
         {
+            case AdditionalDamagePlayerBuffEffect additionalDamageBuffEffect:
+            {
+                var intent = new DamageIntentAction(actionSource, DamageType.Additional);
+                var targets = additionalDamageBuffEffect.Targets.Eval(gameplayWatcher, triggerSource, intent);
+                foreach (var target in targets)
+                {
+                    var characterTarget = new CharacterTarget(target);
+                    var targetIntent = new DamageIntentTargetAction(actionSource, characterTarget, DamageType.Additional);
+                    var damagePoint = additionalDamageBuffEffect.Value.Eval(gameplayWatcher, triggerSource, targetIntent);
+                    var damageFormulaPoint = GameFormula.AdditionalDamagePoint(gameplayWatcher, damagePoint, targetIntent);
+
+                    var damageResult = target.HealthManager.TakeAdditionalDamage(damageFormulaPoint, gameplayWatcher.ContextManager.Context);
+                    var damageStyle = DamageStyle.None;
+
+                    appleBuffEffectEvents.AddRange(
+                        gameplayReactor.UpdateReactorSessionAction(
+                            new DamageResultAction(actionSource, characterTarget, damageResult, damageStyle)));
+                    appleBuffEffectEvents.Add(new DamageEvent(target.Faction(gameplayWatcher), target, damageResult, damageStyle));
+                }
+                break;
+            }
             case EffectiveDamagePlayerBuffEffect effectiveDamageBuffEffect:
             {
                 var intent = new DamageIntentAction(actionSource, DamageType.Effective);
@@ -419,7 +446,9 @@ public static class EffectExecutor
                     var characterTarget = new CharacterTarget(target);
                     var targetIntent = new DamageIntentTargetAction(actionSource, characterTarget, DamageType.Effective);
                     var damagePoint = effectiveDamageBuffEffect.Value.Eval(gameplayWatcher, triggerSource, targetIntent);
-                    var damageResult = target.HealthManager.TakeEffectiveDamage(damagePoint, gameplayWatcher.ContextManager.Context);
+                    var damageFormulaPoint = GameFormula.EffectiveDamagePoint(gameplayWatcher, damagePoint, targetIntent);
+
+                    var damageResult = target.HealthManager.TakeEffectiveDamage(damageFormulaPoint, gameplayWatcher.ContextManager.Context);
                     var damageStyle = DamageStyle.None;
 
                     appleBuffEffectEvents.AddRange(

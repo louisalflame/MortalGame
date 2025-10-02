@@ -64,14 +64,10 @@ public class CharacterBuffManager : ICharacterBuffManager
             },
             _ => Option.None<ICharacterEntity>()
         };
-        var caster = actionUnit switch
+        var caster = actionUnit.Source switch
         {
-            IActionSourceUnit actionSourceUnit => actionSourceUnit.Source switch
-            {
-                CardPlaySource cardSource => cardSource.Card.Owner(gameWatcher.GameStatus),
-                PlayerBuffSource playerBuffSource => playerBuffSource.Buff.Caster,
-                _ => Option.None<IPlayerEntity>()
-            },
+            CardPlaySource cardSource => cardSource.Card.Owner(gameWatcher.GameStatus),
+            PlayerBuffSource playerBuffSource => playerBuffSource.Buff.Caster,
             _ => Option.None<IPlayerEntity>()
         };
 

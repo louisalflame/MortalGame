@@ -13,7 +13,7 @@ public enum GameState
     EnemyPrepare,
     PlayerPrepare,
     PlayerExecute,
-    Enemy_Execute,
+    EnemyExecute,
     TurnEnd,
     GameEnd,
 }
@@ -49,7 +49,7 @@ public class GameStatus
             GameState.EnemyPrepare => (Enemy as IPlayerEntity).Some(),
             GameState.PlayerPrepare => (Ally as IPlayerEntity).Some(),
             GameState.PlayerExecute => (Ally as IPlayerEntity).Some(),
-            GameState.Enemy_Execute => (Enemy as IPlayerEntity).Some(),
+            GameState.EnemyExecute => (Enemy as IPlayerEntity).Some(),
             _ => Option.None<IPlayerEntity>()
         };
     }

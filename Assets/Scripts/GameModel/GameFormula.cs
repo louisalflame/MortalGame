@@ -18,6 +18,62 @@ public static class GameFormula
         return rawDamagePoint + actionAddition;
     }
 
+    public static int PenetrateDamagePoint(
+        IGameplayStatusWatcher gameWatcher,
+        int rawDamagePoint,
+        IActionUnit actionUnit)
+    {
+        var actionAddition = GetAttributeAddition(
+            actionUnit, gameWatcher, EffectAttributeAdditionType.PenetrateDamageAddition, PlayerBuffProperty.PenetrateDamageAddition);
+        
+        var actionRatio = GetAttributeRatio(
+            actionUnit, gameWatcher, EffectAttributeRatioType.PenetrateDamageRatio, PlayerBuffProperty.PenetrateDamageRatio);
+
+        return rawDamagePoint + actionAddition;
+    }
+
+    public static int AdditionalDamagePoint(
+        IGameplayStatusWatcher gameWatcher,
+        int rawDamagePoint,
+        IActionUnit actionUnit)
+    {
+        var actionAddition = GetAttributeAddition(
+            actionUnit, gameWatcher, EffectAttributeAdditionType.AdditionalDamageAddition, PlayerBuffProperty.AdditionalDamageAddition);
+        
+        var actionRatio = GetAttributeRatio(
+            actionUnit, gameWatcher, EffectAttributeRatioType.AdditionalDamageRatio, PlayerBuffProperty.AdditionalDamageRatio);
+
+        return rawDamagePoint + actionAddition;
+    }
+    
+    public static int EffectiveDamagePoint(
+        IGameplayStatusWatcher gameWatcher,
+        int rawDamagePoint,
+        IActionUnit actionUnit)
+    {
+        var actionAddition = GetAttributeAddition(
+            actionUnit, gameWatcher, EffectAttributeAdditionType.EffectiveDamageAddition, PlayerBuffProperty.EffectiveDamageAddition);
+        
+        var actionRatio = GetAttributeRatio(
+            actionUnit, gameWatcher, EffectAttributeRatioType.EffectiveDamageRatio, PlayerBuffProperty.EffectiveDamageRatio);
+
+        return rawDamagePoint + actionAddition;
+    }
+
+    public static int HealPoint(
+        IGameplayStatusWatcher gameWatcher,
+        int rawHealPoint,
+        IActionUnit actionUnit)
+    {
+        var actionAddition = GetAttributeAddition(
+            actionUnit, gameWatcher, EffectAttributeAdditionType.HealAddition, PlayerBuffProperty.HealAddition);
+
+        var actionRatio = GetAttributeRatio(
+            actionUnit, gameWatcher, EffectAttributeRatioType.HealRatio, PlayerBuffProperty.HealRatio);
+
+        return rawHealPoint + actionAddition;
+    }
+
     public static int CardPower(
         IGameplayStatusWatcher gameWatcher,
         ICardEntity card,
@@ -57,8 +113,7 @@ public static class GameFormula
                 .ValueOr(0);
             return playerAttribute;
         }
-        if (actionUnit is IActionSourceUnit actionSourceUnit &&
-            actionSourceUnit.Source is CardPlaySource cardPlaySource)
+        if (actionUnit.Source is CardPlaySource cardPlaySource)
         {
             var cardPlayAttribute = cardPlaySource.Attribute.IntValues
                 .GetValueOrDefault(attribute, 0);
@@ -76,8 +131,7 @@ public static class GameFormula
         EffectAttributeRatioType attribute,
         PlayerBuffProperty playerBuffProperty)
     {
-        if (actionUnit is IActionSourceUnit actionSourceUnit &&
-            actionSourceUnit.Source is CardPlaySource cardPlaySource)
+        if (actionUnit.Source is CardPlaySource cardPlaySource)
         {
             var cardPlayAttribute = cardPlaySource.Attribute.FloatValues
                 .GetValueOrDefault(attribute, 0);

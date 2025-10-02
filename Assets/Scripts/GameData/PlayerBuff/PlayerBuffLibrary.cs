@@ -14,7 +14,7 @@ public class PlayerBuffLibrary
         _buffs = new Dictionary<string, PlayerBuffData>(buffs);
     }
 
-    public Option<ConditionalPlayerBuffEffect[]> GetBuffEffects(string buffId, TriggerTiming triggerTiming)
+    public Option<ConditionalPlayerBuffEffect[]> GetBuffEffects(string buffId, GameTiming triggerTiming)
     {
         if (!_buffs.ContainsKey(buffId))
         {

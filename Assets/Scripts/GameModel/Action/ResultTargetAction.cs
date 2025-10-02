@@ -1,9 +1,10 @@
 using Optional;
 using UnityEngine;
 
-public abstract class BaseResultAction : IResultTargetAction
+public abstract class BaseResultAction : IEffectResultAction
 {
-    public abstract UpdateAction ActionType { get; }
+    public GameTiming Timing => GameTiming.EffectTargetResult;
+    public abstract EffectType EffectType { get; }
     public IActionSource Source { get; private set; }
     public IActionTarget Target { get; private set; }
 
@@ -14,33 +15,9 @@ public abstract class BaseResultAction : IResultTargetAction
     }
 }
 
-public class SummonResultAction : BaseResultAction
-{
-    public override UpdateAction ActionType => UpdateAction.Summon;
-    public SummonResultAction(IActionSource source, IActionTarget target) : base(source, target)
-    {
-    }
-}
-
-public class DeathResultAction : BaseResultAction
-{
-    public override UpdateAction ActionType => UpdateAction.Death;
-    public DeathResultAction(IActionSource source, IActionTarget target) : base(source, target)
-    {
-    }
-}
-
-public class CardPlayResultAction : BaseResultAction
-{ 
-    public override UpdateAction ActionType => UpdateAction.CardPlay;
-    public CardPlayResultAction(IActionSource source, IActionTarget target) : base(source, target)
-    {
-    }
-}
-
 public class DamageResultAction : BaseResultAction
 {
-    public override UpdateAction ActionType => UpdateAction.Damage;
+    public override EffectType EffectType => EffectType.Damage;
     public TakeDamageResult DamageResult { get; private set; }
     public DamageStyle Style { get; private set; }
     public DamageType Type => DamageResult.Type;
@@ -59,7 +36,7 @@ public class DamageResultAction : BaseResultAction
 public class HealResultAction : BaseResultAction
 {
     public GetHealResult HealResult { get; private set; }
-    public override UpdateAction ActionType => UpdateAction.Heal;
+    public override EffectType EffectType => EffectType.Heal;
 
     public HealResultAction(
         IActionSource source, 
@@ -71,7 +48,7 @@ public class HealResultAction : BaseResultAction
 }
 public class ShieldResultAction : BaseResultAction
 {
-    public override UpdateAction ActionType => UpdateAction.Shield;
+    public override EffectType EffectType => EffectType.Shield;
     public GetShieldResult ShieldResult { get; private set; }
 
     public ShieldResultAction(
@@ -85,7 +62,7 @@ public class ShieldResultAction : BaseResultAction
 
 public class GainEnergyResultAction : BaseResultAction
 {    
-    public override UpdateAction ActionType => UpdateAction.GainEnergy;
+    public override EffectType EffectType => EffectType.GainEnergy;
     public GetEnergyResult EnergyResult { get; private set; }
 
     public GainEnergyResultAction(
@@ -98,7 +75,7 @@ public class GainEnergyResultAction : BaseResultAction
 }
 public class LoseEnergyResultAction : BaseResultAction
 {
-    public override UpdateAction ActionType => UpdateAction.LoseEnergy;
+    public override EffectType EffectType => EffectType.LoseEnergy;
     public LoseEnergyResult EnergyResult { get; private set; }
 
     public LoseEnergyResultAction(
@@ -110,21 +87,9 @@ public class LoseEnergyResultAction : BaseResultAction
     }
 }
 
-public class PlayCardResultAction : BaseResultAction
-{
-    public override UpdateAction ActionType => UpdateAction.CardPlay;
-    public ICardEntity Card { get; private set; }
-
-    public PlayCardResultAction(IActionSource source, IActionTarget target, ICardEntity card) :
-        base(source, target)
-    {
-        Card = card;
-    }
-}
-
 public class RecycleDeckResultAction : BaseResultAction
 {
-    public override UpdateAction ActionType => UpdateAction.RecycleDeck;
+    public override EffectType EffectType => EffectType.RecycleDeck;
     public RecycleDeckResultAction(IActionTarget target) : base(SystemSource.Instance, target)
     {
     }
@@ -132,7 +97,7 @@ public class RecycleDeckResultAction : BaseResultAction
 
 public class DrawCardResultAction : BaseResultAction
 {
-    public override UpdateAction ActionType => UpdateAction.DrawCard;
+    public override EffectType EffectType => EffectType.DrawCard;
     public ICardEntity Card { get; private set; }
 
     public DrawCardResultAction(IActionSource source, IActionTarget target, ICardEntity card) :
@@ -144,7 +109,7 @@ public class DrawCardResultAction : BaseResultAction
 
 public class DiscardCardResultAction : BaseResultAction
 {
-    public override UpdateAction ActionType => UpdateAction.DiscardCard;
+    public override EffectType EffectType => EffectType.DiscardCard;
     public ICardEntity Card { get; private set; }
 
     public DiscardCardResultAction(IActionSource source, IActionTarget target, ICardEntity card) :
@@ -155,7 +120,7 @@ public class DiscardCardResultAction : BaseResultAction
 }
 public class ConsumeCardResultAction : BaseResultAction
 {
-    public override UpdateAction ActionType => UpdateAction.ConsumeCard;
+    public override EffectType EffectType => EffectType.ConsumeCard;
     public ICardEntity Card { get; private set; }
 
     public ConsumeCardResultAction(IActionSource source, IActionTarget target, ICardEntity card) :
@@ -166,7 +131,7 @@ public class ConsumeCardResultAction : BaseResultAction
 }
 public class DisposeCardResultAction : BaseResultAction
 {
-    public override UpdateAction ActionType => UpdateAction.DisposeCard;
+    public override EffectType EffectType => EffectType.DisposeCard;
     public ICardEntity Card { get; private set; }
 
     public DisposeCardResultAction(IActionSource source, IActionTarget target, ICardEntity card) :
@@ -177,7 +142,7 @@ public class DisposeCardResultAction : BaseResultAction
 }
 public class CreateCardResultAction : BaseResultAction
 {
-    public override UpdateAction ActionType => UpdateAction.CreateCard;
+    public override EffectType EffectType => EffectType.CreateCard;
     public CreateCardResult CreateResult { get; private set; }
 
     public CreateCardResultAction(IActionSource source, IActionTarget target, CreateCardResult createResult) :
@@ -188,7 +153,7 @@ public class CreateCardResultAction : BaseResultAction
 }
 public class CloneCardResultAction : BaseResultAction
 {
-    public override UpdateAction ActionType => UpdateAction.CloneCard;
+    public override EffectType EffectType => EffectType.CloneCard;
     public CloneCardResult CloneResult { get; private set; }
 
     public CloneCardResultAction(IActionSource source, IActionTarget target, CloneCardResult cloneResult) :
@@ -200,7 +165,7 @@ public class CloneCardResultAction : BaseResultAction
 
 public class AddPlayerBuffResultAction : BaseResultAction
 {
-    public override UpdateAction ActionType => UpdateAction.AddPlayerBuff;
+    public override EffectType EffectType => EffectType.AddPlayerBuff;
     public AddPlayerBuffResult AddResult { get; private set; }
 
     public AddPlayerBuffResultAction(IActionSource source, IActionTarget target, AddPlayerBuffResult addResult) :
@@ -211,7 +176,7 @@ public class AddPlayerBuffResultAction : BaseResultAction
 }
 public class RemovePlayerBuffResultAction : BaseResultAction
 {
-    public override UpdateAction ActionType => UpdateAction.RemovePlayerBuff;
+    public override EffectType EffectType => EffectType.RemovePlayerBuff;
     public RemovePlayerBuffResult RemoveResult { get; private set; }
 
     public RemovePlayerBuffResultAction(IActionSource source, IActionTarget target, RemovePlayerBuffResult removeResult) :
@@ -223,7 +188,7 @@ public class RemovePlayerBuffResultAction : BaseResultAction
 
 public class AddCardBuffResultAction : BaseResultAction
 {
-    public override UpdateAction ActionType => UpdateAction.AddCardBuff;
+    public override EffectType EffectType => EffectType.AddCardBuff;
     public AddCardBuffResult AddResult { get; private set; }
 
     public AddCardBuffResultAction(IActionSource source, IActionTarget target, AddCardBuffResult addResult) :
@@ -234,7 +199,7 @@ public class AddCardBuffResultAction : BaseResultAction
 }
 public class RemoveCardBuffResultAction : BaseResultAction
 {
-    public override UpdateAction ActionType => UpdateAction.RemoveCardBuff;
+    public override EffectType EffectType => EffectType.RemoveCardBuff;
     public RemoveCardBuffResult RemoveResult { get; private set; }
 
     public RemoveCardBuffResultAction(IActionSource source, IActionTarget target, RemoveCardBuffResult removeResult) :

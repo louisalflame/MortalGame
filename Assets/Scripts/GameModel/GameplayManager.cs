@@ -79,24 +79,24 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
         {
             case GameState.GameStart:
                 _gameEvents.AddRange(
-                    UpdateReactorSessionAction(new UpdateTimingAction(UpdateTiming.GameStart)));
+                    UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.GameStart, new SystemSource())));
                 _GameStart();
                 _gameStatus.SetState(GameState.TurnStart);
                 break;
             case GameState.TurnStart:
                 _gameEvents.AddRange(
-                    UpdateReactorSessionAction(new UpdateTimingAction(UpdateTiming.TurnStart)));
+                    UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.TurnStart, new SystemSource())));
                 _TurnStart();
                 _gameStatus.SetState(GameState.DrawCard);
                 break;
             case GameState.DrawCard:
                 _gameEvents.AddRange(
-                    UpdateReactorSessionAction(new UpdateTimingAction(UpdateTiming.DrawCard)));
+                    UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.DrawCard, new SystemSource())));
                 _TurnDrawCard();
                 _gameStatus.SetState(GameState.EnemyPrepare);
                 break;
-            case GameState.EnemyPrepare:     
-                _EnemyPreapre();
+            case GameState.EnemyPrepare:
+                _EnemyPrepare();
                 _gameStatus.SetState(GameState.PlayerPrepare);
                 break;
             case GameState.PlayerPrepare:
@@ -106,12 +106,12 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
             case GameState.PlayerExecute:
                 _PlayerExecute();
                 break;
-            case GameState.Enemy_Execute:
+            case GameState.EnemyExecute:
                 _EnemyExecute();
                 break;
             case GameState.TurnEnd:
                 _gameEvents.AddRange(
-                    UpdateReactorSessionAction(new UpdateTimingAction(UpdateTiming.TurnEnd)));
+                    UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.TurnEnd, new SystemSource())));
                 _TurnEnd();
                 _gameStatus.SetState(GameState.TurnStart);
                 break;
@@ -159,13 +159,13 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
         var enemyDrawEvents = EffectExecutor.DrawCards(this, this, SystemSource.Instance, _gameStatus.Enemy, enemyDrawCount);
         _gameEvents.AddRange(enemyDrawEvents);
 
-        var triggerEvts = _TriggerTiming(TriggerTiming.DrawCard, SystemSource.Instance);
+        var triggerEvts = _TriggerTiming(GameTiming.DrawCard, SystemSource.Instance);
         _gameEvents.AddRange(triggerEvts);
 
         _gameActions.Clear();
     }
 
-    private void _EnemyPreapre()
+    private void _EnemyPrepare()
     {
         var recommendCards = _gameStatus.Enemy.GetRecommendCards();
         foreach(var card in recommendCards)
@@ -198,8 +198,8 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
     private void _EnemyExecute()
     {
         _gameEvents.AddRange(
-            UpdateReactorSessionAction(new UpdateTimingAction(UpdateTiming.ExecuteStart)));
-        
+            UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.ExecuteStart, new SystemSource())));
+
         while (_gameStatus.Enemy.SelectedCards.TryDequeueCard(out ICardEntity selectedCard))
         {
             var cardRuntimCost = GameFormula.CardCost(this, selectedCard, new CardLookIntentAction(selectedCard));
@@ -259,23 +259,23 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
         });
 
         var endTurnSource = new SystemExectueEndSource(_gameStatus.Ally);
-        var triggerEvts = _TriggerTiming(TriggerTiming.ExecuteEnd, endTurnSource);
+        var triggerEvts = _TriggerTiming(GameTiming.ExecuteEnd, endTurnSource);
         _gameEvents.AddRange(triggerEvts);
         
         _gameEvents.AddRange(
-            UpdateReactorSessionAction(new UpdateTimingAction(UpdateTiming.ExecuteEnd)));
+            UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.ExecuteEnd, new SystemSource())));
 
-        _gameStatus.SetState(GameState.Enemy_Execute);
+        _gameStatus.SetState(GameState.EnemyExecute);
         _gameActions.Clear();
     }   
     private void _FinishEnemyExecuteTurn()
     {
         var endTurnSource = new SystemExectueEndSource(_gameStatus.Enemy);
-        var triggerEvts = _TriggerTiming(TriggerTiming.ExecuteEnd, endTurnSource);
+        var triggerEvts = _TriggerTiming(GameTiming.ExecuteEnd, endTurnSource);
         _gameEvents.AddRange(triggerEvts);
 
         _gameEvents.AddRange(
-            UpdateReactorSessionAction(new UpdateTimingAction(UpdateTiming.ExecuteEnd)));
+            UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.ExecuteEnd, new SystemSource())));
 
         _gameStatus.SetState(GameState.TurnEnd);
         _gameActions.Clear();
@@ -289,9 +289,9 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
             _gameStatus.Enemy.CardManager.ClearHandOnTurnEnd(this));
 
         _gameEvents.AddRange(
-            UpdateReactorSessionAction(new UpdateTimingAction(UpdateTiming.TurnEnd)));
+            UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.TurnEnd, new SystemSource())));
 
-        var triggerEvts = _TriggerTiming(TriggerTiming.TurnEnd, SystemSource.Instance);
+        var triggerEvts = _TriggerTiming(GameTiming.TurnEnd, SystemSource.Instance);
         _gameEvents.AddRange(triggerEvts);
     }
 
@@ -365,7 +365,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
 
                     // Create PlayCardSession
                     useCardEvents.AddRange(
-                        UpdateReactorSessionAction(new UpdateTimingAction(UpdateTiming.PlayCardStart)));
+                        UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.PlayCardStart, new SystemSource())));
 
                     useCardEvents.AddRange(
                         UpdateReactorSessionAction(new CardPlayIntentAction(cardPlaySource)));
@@ -373,7 +373,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                     //TODO: check and remove expired buffs
                     //      trigger events while remove buffs
 
-                    useCardEvents.AddRange(_TriggerTiming(TriggerTiming.PlayCardStart, cardPlaySource));
+                    useCardEvents.AddRange(_TriggerTiming(GameTiming.PlayCardStart, cardPlaySource));
 
                     foreach (var effect in usedCard.Effects)
                     {
@@ -400,14 +400,14 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                     };
                     useCardEvents.Add(usedCardEvent);
 
-                    useCardEvents.AddRange(_TriggerTiming(TriggerTiming.PlayCardEnd, cardPlaySource));
+                    useCardEvents.AddRange(_TriggerTiming(GameTiming.PlayCardEnd, cardPlaySource));
 
                     useCardEvents.AddRange(
-                        UpdateReactorSessionAction(new CardPlayResultAction(cardPlaySource, new CardTarget(usedCard))));
+                        UpdateReactorSessionAction(new CardPlayResultAction(cardPlaySource)));
 
                     // Close PlayCardSession
                     useCardEvents.AddRange(
-                        UpdateReactorSessionAction(new UpdateTimingAction(UpdateTiming.PlayCardEnd)));
+                        UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.PlayCardEnd, new SystemSource())));
                 }
             }
 
@@ -426,10 +426,10 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
     }
 
     // TODO: collect reactionEffects created from reactionSessions
-    private IEnumerable<IGameEvent> _TriggerTiming(TriggerTiming timing, IActionSource actionSource)
+    private IEnumerable<IGameEvent> _TriggerTiming(GameTiming timing, IActionSource actionSource)
     {
         var triggerBuffEvents = new List<IGameEvent>();
-        var timingAction = new TriggerTimingAction(timing, actionSource);
+        var timingAction = new UpdateTimingAction(timing, actionSource);
         foreach (var buff in _gameStatus.Ally.BuffManager.Buffs)
         {
             var buffTrigger = new PlayerBuffTrigger(buff);
@@ -445,7 +445,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                         triggerBuffEvents.AddRange(applyEvts);
 
                         var nextTriggerSource = new PlayerBuffSource(buff);
-                        var triggerEndEvents = _TriggerTiming(TriggerTiming.TriggerBuffEnd, nextTriggerSource);
+                        var triggerEndEvents = _TriggerTiming(GameTiming.TriggerBuffEnd, nextTriggerSource);
                         triggerBuffEvents.AddRange(triggerEndEvents);
                     }
                 }
@@ -476,7 +476,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                         triggerBuffEvents.AddRange(applyEvts);
 
                         var nextTriggerSource = new PlayerBuffSource(buff);
-                        var triggerEndEvents = _TriggerTiming(TriggerTiming.TriggerBuffEnd, nextTriggerSource);
+                        var triggerEndEvents = _TriggerTiming(GameTiming.TriggerBuffEnd, nextTriggerSource);
                         triggerBuffEvents.AddRange(triggerEndEvents);
                     }
                 }

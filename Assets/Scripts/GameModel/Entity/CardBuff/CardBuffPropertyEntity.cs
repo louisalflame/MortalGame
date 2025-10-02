@@ -26,6 +26,6 @@ public class PowerCardBuffPropertyEntity : ICardBuffPropertyEntity
     }
     public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
     {
-        return _value.Eval(gameWatcher, triggerSource, SystemAction.Instance);
+        return _value.Eval(gameWatcher, triggerSource, new CardBuffPropertyLookAction(this));
     }
 }

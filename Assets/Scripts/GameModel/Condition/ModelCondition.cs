@@ -126,15 +126,11 @@ public class CardPlayCondition : ICardBuffCondition, IPlayerBuffCondition, IChar
 
     public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
     {
-        return actionUnit switch
+        return actionUnit.Source switch
         {
-            IActionSourceUnit actionSourceUnit => actionSourceUnit.Source switch
-            {
-                CardPlaySource cardPlaySource =>
-                    Conditions.All(c => c.Eval(gameWatcher, trigger, actionUnit, cardPlaySource)),
-                _ => false
-            },
-            _ => false,
+            CardPlaySource cardPlaySource =>
+                Conditions.All(c => c.Eval(gameWatcher, trigger, actionUnit, cardPlaySource)),
+            _ => false
         };
     }
 }

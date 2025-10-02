@@ -36,7 +36,7 @@ public class TurnLifeTimePlayerBuffEntity : IPlayerBuffLifeTimeEntity
     public bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
     {
         if (actionUnit is UpdateTimingAction timingAction &&
-            timingAction.Timing == UpdateTiming.TurnEnd)
+            timingAction.Timing == GameTiming.TurnEnd)
         {
             _turn--;
             return true;

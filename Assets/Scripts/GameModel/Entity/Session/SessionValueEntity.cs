@@ -14,29 +14,19 @@ public interface ISessionValueEntity
 public class SessionBooleanEntity : ISessionValueEntity
 {
     public bool Value;
-    private readonly BooleanUpdateTimingRules _timingRules;
-    private readonly BooleanUpdateIntentRules _intentRules;
-    private readonly BooleanUpdateResultRules _resultRules;
+    private readonly List<SessionBoolean.TimingRule> _updateRules;
 
     public SessionBooleanEntity(
         bool initialValue,
-        BooleanUpdateTimingRules timingRules,
-        BooleanUpdateIntentRules intentRules,
-        BooleanUpdateResultRules resultRules)
+        List<SessionBoolean.TimingRule> updateRules)
     {
         Value = initialValue;
-        _timingRules = timingRules;
-        _intentRules = intentRules;
-        _resultRules = resultRules;
+        _updateRules = updateRules;
     }
 
     public ISessionValueEntity Clone()
     {
-        return new SessionBooleanEntity(
-            Value,
-            _timingRules,
-            _intentRules,
-            _resultRules);
+        return new SessionBooleanEntity(Value, _updateRules);
     }
 
     private bool _UpdateRules(
@@ -66,59 +56,31 @@ public class SessionBooleanEntity : ISessionValueEntity
 
     public bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
     {
-        switch (actionUnit)
+        var isChanged = false;
+        foreach (var rule in _updateRules.Where(r => r.Timing == actionUnit.Timing))
         {
-            case UpdateTimingAction timingAction:
-                if (_timingRules.TryGetValue(timingAction.Timing, out var timingRules))
-                {
-                    return _UpdateRules(timingRules, gameWatcher, trigger, timingAction);
-                }
-                break;
-
-            case IIntentAction intentAction:
-                if (_intentRules.TryGetValue(intentAction.ActionType, out var intentRules))
-                {
-                    return _UpdateRules(intentRules, gameWatcher, trigger, intentAction);
-                }
-                break;
-
-            case IResultTargetAction resultAction:
-                if (_resultRules.TryGetValue(resultAction.ActionType, out var resultRules))
-                {
-                    return _UpdateRules(resultRules, gameWatcher, trigger, resultAction);
-                }
-                break;
+            isChanged |= _UpdateRules(rule.Rules, gameWatcher, trigger, actionUnit);
         }
-        return false;
+        return isChanged;
     }
 }
 
 public class SessionIntegerEntity : ISessionValueEntity
 {
     public int Value;
-    private readonly IntegerUpdateTimingRules _timingRules;
-    private readonly IntegerUpdateIntentRules _intentRules;
-    private readonly IntegerUpdateResultRules _resultRules;
+    private readonly List<SessionInteger.TimingRule> _updateRules;
 
     public SessionIntegerEntity(
         int initialValue,
-        IntegerUpdateTimingRules timingRules,
-        IntegerUpdateIntentRules intentRules,
-        IntegerUpdateResultRules resultRules)
+        List<SessionInteger.TimingRule> updateRules)
     {
         Value = initialValue;
-        _timingRules = timingRules;
-        _intentRules = intentRules;
-        _resultRules = resultRules;
+        _updateRules = updateRules;
     }
 
     public ISessionValueEntity Clone()
     {
-        return new SessionIntegerEntity(
-            Value,
-            _timingRules,
-            _intentRules, 
-            _resultRules);
+        return new SessionIntegerEntity(Value, _updateRules);
     }
 
     private bool _UpdateRules(
@@ -147,29 +109,12 @@ public class SessionIntegerEntity : ISessionValueEntity
 
     public bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
     {
-        switch (actionUnit)
+        var isChanged = false;
+
+        foreach (var rule in _updateRules.Where(r => r.Timing == actionUnit.Timing))
         {
-            case UpdateTimingAction timingAction:
-                if (_timingRules.TryGetValue(timingAction.Timing, out var timingRules))
-                {
-                    return _UpdateRules(timingRules, gameWatcher, trigger, timingAction);
-                }
-                break;
-
-            case IIntentAction intentAction:
-                if (_intentRules.TryGetValue(intentAction.ActionType, out var intentRules))
-                {
-                    return _UpdateRules(intentRules, gameWatcher, trigger, intentAction);
-                }
-                break;
-
-            case IResultTargetAction resultAction:
-                if (_resultRules.TryGetValue(resultAction.ActionType, out var resultRules))
-                {
-                    return _UpdateRules(resultRules, gameWatcher, trigger, resultAction);
-                }
-                break;
+            isChanged |= _UpdateRules(rule.Rules, gameWatcher, trigger, actionUnit);
         }
-        return false;
+        return isChanged;
     }
 }

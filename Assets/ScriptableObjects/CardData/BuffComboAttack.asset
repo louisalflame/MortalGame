@@ -47,7 +47,7 @@ MonoBehaviour:
       Data: 
     - Name: Cost
       Entry: 3
-      Data: 1
+      Data: 2
     - Name: Power
       Entry: 3
       Data: 1

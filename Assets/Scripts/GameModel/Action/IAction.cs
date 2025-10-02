@@ -3,52 +3,97 @@ using UnityEngine;
 
 public interface IActionUnit
 {
-}
-
-public interface IActionSourceUnit : IActionUnit
-{
+    GameTiming Timing { get; }
     IActionSource Source { get; }
 }
+
 public interface IActionTargetUnit : IActionUnit
 {
     IActionTarget Target { get; }
 }
 
-public class SystemAction : IActionUnit
-{
-    public static readonly SystemAction Instance = new SystemAction();
-}
 public class UpdateTimingAction : IActionUnit
 {
-    public UpdateTiming Timing { get; }
-
-    public UpdateTimingAction(UpdateTiming timing)
-    {
-        Timing = timing;
-    }
-}
-public class TriggerTimingAction : IActionUnit, IActionSourceUnit
-{
-    public TriggerTiming Timing { get; }
+    public GameTiming Timing { get; }
     public IActionSource Source { get; }
 
-    public TriggerTimingAction(TriggerTiming timing, IActionSource source)
+    public UpdateTimingAction(GameTiming timing, IActionSource source)
     {
         Timing = timing;
         Source = source;
     }
 }
 
-public interface IIntentAction : IActionSourceUnit
+// EffectAction
+public interface IEffectAction : IActionUnit
 {
-    UpdateAction ActionType { get; }
+    EffectType EffectType { get; }
 }
 
-public interface IIntentTargetAction : IIntentAction, IActionTargetUnit
+public interface IEffectTargetAction : IEffectAction, IActionTargetUnit
 {
 }
 
-public interface IResultTargetAction : IActionSourceUnit, IActionTargetUnit
+public interface IEffectResultAction : IEffectAction, IActionTargetUnit
 {
-    UpdateAction ActionType { get; }
+}
+
+// LookAction
+public class CardLookIntentAction : IActionUnit
+{
+    public GameTiming Timing => GameTiming.None;
+    public IActionSource Source => SystemSource.Instance;
+    public ICardEntity Card { get; private set; }
+
+    public CardLookIntentAction(ICardEntity card)
+    {
+        Card = card;
+    }
+}
+public class CardBuffPropertyLookAction : IActionUnit
+{
+    public GameTiming Timing => GameTiming.None;
+    public IActionSource Source => SystemSource.Instance;
+    public ICardBuffPropertyEntity Property { get; private set; }
+
+    public CardBuffPropertyLookAction(ICardBuffPropertyEntity property)
+    {
+        Property = property;
+    }
+}
+public class PlayerBuffPropertyLookAction : IActionUnit
+{
+    public GameTiming Timing => GameTiming.None;
+    public IActionSource Source => SystemSource.Instance;
+    public IPlayerBuffPropertyEntity Property { get; private set; }
+
+    public PlayerBuffPropertyLookAction(IPlayerBuffPropertyEntity property)
+    {
+        Property = property;
+    }
+}
+
+//===
+
+public class CardPlayIntentAction : IActionUnit
+{
+    public GameTiming Timing => GameTiming.PlayCardStart;
+    public IActionSource Source => CardPlaySource;
+    public CardPlaySource CardPlaySource { get; private set; }
+
+    public CardPlayIntentAction(CardPlaySource cardPlaySource)
+    {
+        CardPlaySource = cardPlaySource;
+    }
+}
+public class CardPlayResultAction : IActionUnit
+{
+    public GameTiming Timing => GameTiming.PlayCardEnd;
+    public IActionSource Source => CardPlaySource;
+    public CardPlaySource CardPlaySource { get; private set; }
+
+    public CardPlayResultAction(CardPlaySource cardPlaySource)
+    {
+        CardPlaySource = cardPlaySource;
+    }
 }

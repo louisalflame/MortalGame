@@ -9,23 +9,30 @@ public interface IReactionSessionData
     IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit);
 }
 
+
 [Serializable]
 public class SessionBoolean : IReactionSessionData
 {
+    [Serializable]
+    public class TimingRule
+    {
+        [ValueDropdown("@DropdownHelper.UpdateTimings")]
+        public GameTiming Timing;
+
+        public ConditionBooleanUpdateRule[] Rules;
+    }
+
     public bool InitialValue;
     public SessionLifeTime LifeTime;
 
     [ShowInInspector]
-    public BooleanUpdateTimingRules TimingRules = new();
-    [ShowInInspector]
-    public BooleanUpdateIntentRules IntentRules = new();
-    [ShowInInspector]
-    public BooleanUpdateResultRules ResultRules = new();
+    [TableList]
+    public List<TimingRule> UpdateRules = new ();
     
     public IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
     {
         return new ReactionSessionEntity(
-            new SessionBooleanEntity(InitialValue, TimingRules, IntentRules, ResultRules),
+            new SessionBooleanEntity(InitialValue, UpdateRules),
             LifeTime);
     }
 }
@@ -33,20 +40,26 @@ public class SessionBoolean : IReactionSessionData
 [Serializable]
 public class SessionInteger : IReactionSessionData
 {
+    [Serializable]
+    public class TimingRule
+    {
+        [ValueDropdown("@DropdownHelper.UpdateTimings")]
+        public GameTiming Timing;
+
+        public ConditionIntegerUpdateRule[] Rules;
+    }
+
     public int InitialValue;
     public SessionLifeTime LifeTime;
     
     [ShowInInspector]
-    public IntegerUpdateTimingRules TimingRules = new();
-    [ShowInInspector]
-    public IntegerUpdateIntentRules IntentRules = new();
-    [ShowInInspector]
-    public IntegerUpdateResultRules ResultRules = new();
+    [TableList]
+    public List<TimingRule> UpdateRules = new ();
 
     public IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
     {
         return new ReactionSessionEntity(
-            new SessionIntegerEntity(InitialValue, TimingRules, IntentRules, ResultRules),
+            new SessionIntegerEntity(InitialValue, UpdateRules),
             LifeTime);
     }
 }

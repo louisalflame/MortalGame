@@ -17,7 +17,7 @@ public class CardInstance
     public IMainTargetSelectable MainSelectable;
     public List<ISubTargetSelectable> SubSelectables;
     public List<ICardEffect> Effects;
-    public IReadOnlyDictionary<TriggerTiming, ICardEffect[]> TriggeredEffects;
+    public IReadOnlyDictionary<GameTiming, ICardEffect[]> TriggeredEffects;
     public List<ICardPropertyData> PropertyDatas;
 
     public static CardInstance Create(CardData cardData)

@@ -47,10 +47,10 @@ MonoBehaviour:
       Data: 
     - Name: Cost
       Entry: 3
-      Data: 1
+      Data: 2
     - Name: Power
       Entry: 3
-      Data: 2
+      Data: 1
     - Name: MainSelectable
       Entry: 7
       Data: 2|NoneSelectable, Assembly-CSharp
