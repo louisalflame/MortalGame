@@ -9,11 +9,11 @@ using UnityEngine;
 
 public static class DropdownHelper
 {
-    const string BuffFolderPath = "Assets/ScriptableObjects/Buff";
+    const string BuffFolderPath = "Assets/ScriptableObjects/PlayerBuff";
     const string CardBuffFolderPath = "Assets/ScriptableObjects/CardBuff";
     const string AssetExtension = "*.asset";
 
-    public static IEnumerable<ValueDropdownItem> BuffNames
+    public static IEnumerable<ValueDropdownItem> PlayerBuffNames
     {
         get
         {

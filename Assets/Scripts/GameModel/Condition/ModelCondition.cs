@@ -122,7 +122,7 @@ public class CardPlayCondition : ICardBuffCondition, IPlayerBuffCondition, IChar
 {
     [ShowInInspector]
     [HorizontalGroup("1")]
-    public List<ICardPlayValueCondition> Conditions = new ();
+    public List<ICardPlayValueCondition> Conditions = new();
 
     public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
     {
@@ -130,6 +130,26 @@ public class CardPlayCondition : ICardBuffCondition, IPlayerBuffCondition, IChar
         {
             CardPlaySource cardPlaySource =>
                 Conditions.All(c => c.Eval(gameWatcher, trigger, actionUnit, cardPlaySource)),
+            CardPlayResultSource cardPlayResultSource =>
+                Conditions.All(c => c.Eval(gameWatcher, trigger, actionUnit, cardPlayResultSource.CardPlaySource)),
+            _ => false
+        };
+    }
+}
+
+[SerializeField]
+public class CardPlayResultCondition : ICardBuffCondition, IPlayerBuffCondition, ICharacterBuffCondition
+{
+    [ShowInInspector]
+    [HorizontalGroup("1")]
+    public List<ICardPlayResultValueCondition> Conditions = new();
+
+    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    {
+        return actionUnit.Source switch
+        {
+            CardPlayResultSource cardPlayResultSource =>
+                Conditions.All(c => c.Eval(gameWatcher, trigger, cardPlayResultSource)),
             _ => false
         };
     }

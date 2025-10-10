@@ -154,10 +154,10 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
         var enemyDrawCount = _gameStatus.Enemy.TurnStartDrawCardCount;
 
         var allyDrawEvents = EffectExecutor.DrawCards(this, this, SystemSource.Instance, _gameStatus.Ally, allyDrawCount);
-        _gameEvents.AddRange(allyDrawEvents);
+        _gameEvents.AddRange(allyDrawEvents.Events);
 
         var enemyDrawEvents = EffectExecutor.DrawCards(this, this, SystemSource.Instance, _gameStatus.Enemy, enemyDrawCount);
-        _gameEvents.AddRange(enemyDrawEvents);
+        _gameEvents.AddRange(enemyDrawEvents.Events);
 
         var triggerEvts = _TriggerTiming(GameTiming.DrawCard, SystemSource.Instance);
         _gameEvents.AddRange(triggerEvts);
@@ -360,7 +360,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
 
                 if (player.CardManager.TryPlayCard(usedCard, out int handCardIndex, out int handCardsCount))
                 {
-                    var cardPlaySource = new CardPlaySource(usedCard, handCardIndex, handCardsCount, loseEnergyResult);
+                    var cardPlaySource = new CardPlaySource(usedCard, handCardIndex, handCardsCount, loseEnergyResult, new CardPlayAttributeEntity());
                     var cardPlayTrigger = new CardPlayTrigger(cardPlaySource);
 
                     // Create PlayCardSession
@@ -375,16 +375,19 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
 
                     useCardEvents.AddRange(_TriggerTiming(GameTiming.PlayCardStart, cardPlaySource));
 
+                    var effectActionResults = new List<BaseResultAction>();
                     foreach (var effect in usedCard.Effects)
                     {
-                        var applyCardEvents = EffectExecutor.ApplyCardEffect(
+                        var effectResult = EffectExecutor.ApplyCardEffect(
                             this,
                             this,
                             cardPlaySource,
                             cardPlayTrigger,
                             effect);
-                        useCardEvents.AddRange(applyCardEvents);
+                        useCardEvents.AddRange(effectResult.Events);
+                        effectActionResults.AddRange(effectResult.ResultActions);
                     }
+                    var cardPlayResultSource = cardPlaySource.CreateResultSource(effectActionResults);                   
 
                     player.CardManager.EndPlayCard();
 
@@ -400,10 +403,10 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                     };
                     useCardEvents.Add(usedCardEvent);
 
-                    useCardEvents.AddRange(_TriggerTiming(GameTiming.PlayCardEnd, cardPlaySource));
+                    useCardEvents.AddRange(_TriggerTiming(GameTiming.PlayCardEnd, cardPlayResultSource));
 
                     useCardEvents.AddRange(
-                        UpdateReactorSessionAction(new CardPlayResultAction(cardPlaySource)));
+                        UpdateReactorSessionAction(new CardPlayResultAction(cardPlayResultSource)));
 
                     // Close PlayCardSession
                     useCardEvents.AddRange(
@@ -442,7 +445,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                     {
                         var applyEvts = EffectExecutor.ApplyPlayerBuffEffect(
                             this, this, actionSource, buffTrigger, conditionalEffect.Effect);
-                        triggerBuffEvents.AddRange(applyEvts);
+                        triggerBuffEvents.AddRange(applyEvts.Events);
 
                         var nextTriggerSource = new PlayerBuffSource(buff);
                         var triggerEndEvents = _TriggerTiming(GameTiming.TriggerBuffEnd, nextTriggerSource);
@@ -473,7 +476,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                     {
                         var applyEvts = EffectExecutor.ApplyPlayerBuffEffect(
                             this, this, actionSource, buffTrigger, conditionalEffect.Effect);
-                        triggerBuffEvents.AddRange(applyEvts);
+                        triggerBuffEvents.AddRange(applyEvts.Events);
 
                         var nextTriggerSource = new PlayerBuffSource(buff);
                         var triggerEndEvents = _TriggerTiming(GameTiming.TriggerBuffEnd, nextTriggerSource);

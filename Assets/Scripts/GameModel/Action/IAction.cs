@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using Optional;
 using UnityEngine;
 
@@ -12,17 +14,7 @@ public interface IActionTargetUnit : IActionUnit
     IActionTarget Target { get; }
 }
 
-public class UpdateTimingAction : IActionUnit
-{
-    public GameTiming Timing { get; }
-    public IActionSource Source { get; }
-
-    public UpdateTimingAction(GameTiming timing, IActionSource source)
-    {
-        Timing = timing;
-        Source = source;
-    }
-}
+public record UpdateTimingAction(GameTiming Timing, IActionSource Source) : IActionUnit;
 
 // EffectAction
 public interface IEffectAction : IActionUnit
@@ -39,61 +31,34 @@ public interface IEffectResultAction : IEffectAction, IActionTargetUnit
 }
 
 // LookAction
-public class CardLookIntentAction : IActionUnit
+public record CardLookIntentAction(ICardEntity Card) : IActionUnit
 {
     public GameTiming Timing => GameTiming.None;
     public IActionSource Source => SystemSource.Instance;
-    public ICardEntity Card { get; private set; }
-
-    public CardLookIntentAction(ICardEntity card)
-    {
-        Card = card;
-    }
-}
-public class CardBuffPropertyLookAction : IActionUnit
+};
+    
+public record CardBuffPropertyLookAction(ICardBuffPropertyEntity Property) : IActionUnit
 {
     public GameTiming Timing => GameTiming.None;
     public IActionSource Source => SystemSource.Instance;
-    public ICardBuffPropertyEntity Property { get; private set; }
+};
 
-    public CardBuffPropertyLookAction(ICardBuffPropertyEntity property)
-    {
-        Property = property;
-    }
-}
-public class PlayerBuffPropertyLookAction : IActionUnit
+public record PlayerBuffPropertyLookAction(IPlayerBuffPropertyEntity Property) : IActionUnit
 {
     public GameTiming Timing => GameTiming.None;
     public IActionSource Source => SystemSource.Instance;
-    public IPlayerBuffPropertyEntity Property { get; private set; }
-
-    public PlayerBuffPropertyLookAction(IPlayerBuffPropertyEntity property)
-    {
-        Property = property;
-    }
-}
+};
 
 //===
 
-public class CardPlayIntentAction : IActionUnit
+public record CardPlayIntentAction(CardPlaySource CardPlaySource) : IActionUnit
 {
     public GameTiming Timing => GameTiming.PlayCardStart;
     public IActionSource Source => CardPlaySource;
-    public CardPlaySource CardPlaySource { get; private set; }
+};
 
-    public CardPlayIntentAction(CardPlaySource cardPlaySource)
-    {
-        CardPlaySource = cardPlaySource;
-    }
-}
-public class CardPlayResultAction : IActionUnit
+public record CardPlayResultAction(CardPlayResultSource CardPlayResultSource) : IActionUnit
 {
     public GameTiming Timing => GameTiming.PlayCardEnd;
-    public IActionSource Source => CardPlaySource;
-    public CardPlaySource CardPlaySource { get; private set; }
-
-    public CardPlayResultAction(CardPlaySource cardPlaySource)
-    {
-        CardPlaySource = cardPlaySource;
-    }
-}
+    public IActionSource Source => CardPlayResultSource;
+};

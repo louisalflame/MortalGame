@@ -10,57 +10,27 @@ public class SystemSource : IActionSource
     public static readonly SystemSource Instance = new();
 }
 
-public class SystemExectueStartSource : IActionSource
-{
-    public readonly IPlayerEntity Player;
-    public SystemExectueStartSource(IPlayerEntity player)
-    {
-        Player = player;
-    }
-}
-public class SystemExectueEndSource : IActionSource
-{
-    public readonly IPlayerEntity Player;
-    public SystemExectueEndSource(IPlayerEntity player)
-    {
-        Player = player;
-    }
-}
+public record SystemExectueStartSource(IPlayerEntity Player) : IActionSource;
 
-public class CardPlaySource : IActionSource
-{
-    public readonly ICardEntity Card;
-    public readonly int HandCardIndex;
-    public readonly int HandCardsCount;
-    public readonly LoseEnergyResult CostEnergy;
-    public readonly IEffectAttribute Attribute;
+public record SystemExectueEndSource(IPlayerEntity Player) : IActionSource;
 
-    public CardPlaySource(ICardEntity card, int handCardIndex, int handCardsCount, LoseEnergyResult costEnergy)
+public record CardPlaySource(
+    ICardEntity Card,
+    int HandCardIndex,
+    int HandCardsCount,
+    LoseEnergyResult CostEnergy,
+    IEffectAttribute Attribute) : IActionSource
+{ 
+    public CardPlayResultSource CreateResultSource(IReadOnlyList<IEffectResultAction> effectResults)
     {
-        Card = card;
-        HandCardIndex = handCardIndex;
-        HandCardsCount = handCardsCount;
-        CostEnergy = costEnergy;
-        Attribute = new CardPlayAttributeEntity();
+        return new CardPlayResultSource(this, effectResults);
     }
 }
 
-public class PlayerBuffSource : IActionSource
-{
-    public readonly IPlayerBuffEntity Buff;
+public record CardPlayResultSource(
+    CardPlaySource CardPlaySource,
+    IReadOnlyList<IEffectResultAction> EffectResults) : IActionSource;
 
-    public PlayerBuffSource(IPlayerBuffEntity buff)
-    {
-        Buff = buff;
-    }
-}
+public record PlayerBuffSource(IPlayerBuffEntity Buff) : IActionSource;
 
-public class CardBuffSource : IActionSource
-{
-    public readonly ICardBuffEntity Buff;
-
-    public CardBuffSource(ICardBuffEntity buff)
-    {
-        Buff = buff;
-    }
-}
+public record CardBuffSource(ICardBuffEntity Buff) : IActionSource;

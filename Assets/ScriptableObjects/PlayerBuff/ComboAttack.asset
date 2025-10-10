@@ -502,16 +502,40 @@ MonoBehaviour:
       Data: 2
     - Name: Value
       Entry: 7
-      Data: 49|PlayerBuffSessionInteger, Assembly-CSharp
+      Data: 49|ArithmeticInteger, Assembly-CSharp
+    - Name: Operation
+      Entry: 3
+      Data: 1
+    - Name: Left
+      Entry: 7
+      Data: 50|PlayerBuffIntegerProperty, Assembly-CSharp
     - Name: PlayerBuff
       Entry: 7
-      Data: 50|TriggeredPlayerBuff, Assembly-CSharp
+      Data: 51|TriggeredPlayerBuff, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Property
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Right
+      Entry: 7
+      Data: 52|PlayerBuffSessionInteger, Assembly-CSharp
+    - Name: PlayerBuff
+      Entry: 7
+      Data: 53|TriggeredPlayerBuff, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
     - Name: SessionIntegerId
       Entry: 1
       Data: combo
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -538,7 +562,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 51|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
+      Data: 54|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -551,7 +575,7 @@ MonoBehaviour:
       Data: 
     - Name: LifeTimeData
       Entry: 7
-      Data: 52|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
+      Data: 55|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 

@@ -6,10 +6,7 @@ public interface IHealthManager
     int Hp { get; }
     int MaxHp { get; }
     int Dp { get; }
-    TakeDamageResult TakeDamage(int amount, GameContext context);
-    TakeDamageResult TakePenetrateDamage(int amount, GameContext context);
-    TakeDamageResult TakeAdditionalDamage(int amount, GameContext context);
-    TakeDamageResult TakeEffectiveDamage(int amount, GameContext context);
+    TakeDamageResult TakeDamage(int amount, GameContext context, DamageType damageType);
     GetHealResult GetHeal(int amount, GameContext context);
     GetShieldResult GetShield(int amount, GameContext context);
 }
@@ -30,57 +27,41 @@ public class HealthManager : IHealthManager
         _dp = 0;
     }
 
-    public TakeDamageResult TakeDamage(int amount, GameContext context)
+    public TakeDamageResult TakeDamage(int amount, GameContext context, DamageType damageType)
     {
-        var deltaDp = _AcceptArmorDamage(amount, out var damageRemain);
-        var deltaHp = _AcceptHealthDamage(damageRemain, out var damageOver);
+        int deltaDp = 0;
+        int deltaHp = 0;
+        int damageOver = 0;
+
+        switch (damageType)
+        {
+            case DamageType.Normal:
+            case DamageType.Additional:
+                // Normal and Additional damage: first apply to armor, then to health
+                deltaDp = _AcceptArmorDamage(amount, out var damageRemain);
+                deltaHp = _AcceptHealthDamage(damageRemain, out damageOver);
+                break;
+
+            case DamageType.Penetrate:
+            case DamageType.Effective:
+                // Penetrate and Effective damage: directly apply to health, bypassing armor
+                deltaHp = _AcceptHealthDamage(amount, out damageOver);
+                deltaDp = 0;
+                break;
+
+            default:
+                // Default to normal damage behavior
+                deltaDp = _AcceptArmorDamage(amount, out var remainingDamage);
+                deltaHp = _AcceptHealthDamage(remainingDamage, out damageOver);
+                break;
+        }
 
         return new TakeDamageResult()
         {
-            Type = DamageType.Normal,
+            Type = damageType,
             DamagePoint = amount,
             DeltaHp = deltaHp,
             DeltaDp = deltaDp,
-            OverHp = damageOver
-        };
-    }
-    public TakeDamageResult TakePenetrateDamage(int amount, GameContext context)
-    {
-        var deltaHp = _AcceptHealthDamage(amount, out var damageOver);
-
-        return new TakeDamageResult()
-        {
-            Type = DamageType.Penetrate,
-            DamagePoint = amount,
-            DeltaHp = deltaHp,
-            DeltaDp = 0,
-            OverHp = damageOver
-        };
-    }
-    public TakeDamageResult TakeAdditionalDamage(int amount, GameContext context)
-    {
-        var deltaDp = _AcceptArmorDamage(amount, out var damageRemain);
-        var deltaHp = _AcceptHealthDamage(damageRemain, out var damageOver);
-
-        return new TakeDamageResult()
-        {
-            Type = DamageType.Additional,
-            DamagePoint = amount,
-            DeltaHp = deltaHp,
-            DeltaDp = deltaDp,
-            OverHp = damageOver
-        };
-    }
-    public TakeDamageResult TakeEffectiveDamage(int amount, GameContext context)
-    { 
-        var deltaHp = _AcceptHealthDamage(amount, out var damageOver);
-
-        return new TakeDamageResult()
-        {
-            Type = DamageType.Effective,
-            DamagePoint = amount,
-            DeltaHp = deltaHp,
-            DeltaDp = 0,
             OverHp = damageOver
         };
     }

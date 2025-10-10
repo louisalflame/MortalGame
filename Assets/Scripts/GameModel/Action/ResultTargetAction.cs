@@ -20,16 +20,13 @@ public class DamageResultAction : BaseResultAction
     public override EffectType EffectType => EffectType.Damage;
     public TakeDamageResult DamageResult { get; private set; }
     public DamageStyle Style { get; private set; }
-    public DamageType Type => DamageResult.Type;
 
     public DamageResultAction(
         IActionSource source,
         IActionTarget target,
-        TakeDamageResult damageResult,
-        DamageStyle style) : base(source, target)
+        TakeDamageResult damageResult) : base(source, target)
     {
         DamageResult = damageResult;
-        Style = style;
     }
 }
 

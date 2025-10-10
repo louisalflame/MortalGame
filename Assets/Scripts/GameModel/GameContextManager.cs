@@ -45,64 +45,43 @@ public class GameContextManager : IDisposable, IGameContextManager
         _buffLibrary = buffLibrary;
         _dispositionLibrary = dispositionLibrary;
         _localizeLibrary = localizeLibrary;
-        _contextStack.Push(new GameContext());
+        _contextStack.Push(GameContext.EMPTY);
     }
 
     public void Dispose()
     {
         if (_contextStack.Count > 1)
         {
-            var context = _contextStack.Pop();
-            context.Dispose();
+            _contextStack.Pop();
         }
     }
 
     public GameContextManager SetClone()
     {
-        _contextStack.Push(Context.With());
+        _contextStack.Push(Context with { });
         return this;
     }
     public GameContextManager SetSelectedPlayer(IPlayerEntity selectedPlayer)
     {
-        _contextStack.Push(Context.With(selectedPlayer: selectedPlayer));
+        _contextStack.Push(Context with { SelectedPlayer = selectedPlayer });
         return this;
     }
     public GameContextManager SetSelectedCharacter(ICharacterEntity selectedCharacter)
     {
-        _contextStack.Push(Context.With(selectedCharacter: selectedCharacter));
+        _contextStack.Push(Context with { SelectedCharacter = selectedCharacter });
         return this;
     }
     public GameContextManager SetSelectedCard(ICardEntity selectedCard)
     {
-        _contextStack.Push(Context.With(selectedCard: selectedCard));
+        _contextStack.Push(Context with { SelectedCard = selectedCard });
         return this;
     }
 }
 
-public class GameContext : IDisposable
-{
-    public IPlayerEntity        SelectedPlayer;
-    public ICharacterEntity     SelectedCharacter;
-    public ICardEntity          SelectedCard;
-    
-    public GameContext() { }
-    public GameContext With(
-        IPlayerEntity       selectedPlayer = null,
-        ICharacterEntity    selectedCharacter = null,
-        ICardEntity         selectedCard = null)
-    {
-        return new GameContext() 
-        {
-            SelectedPlayer          = selectedPlayer ?? SelectedPlayer,
-            SelectedCharacter       = selectedCharacter ?? SelectedCharacter,
-            SelectedCard            = selectedCard ?? SelectedCard
-        };
-    }
-
-    public void Dispose() 
-    {
-        SelectedPlayer = null;
-        SelectedCharacter = null;
-        SelectedCard = null;
-    }
+public record GameContext(
+    IPlayerEntity SelectedPlayer,
+    ICharacterEntity SelectedCharacter,
+    ICardEntity SelectedCard)
+{ 
+    public static GameContext EMPTY => new(null, null, null);
 }

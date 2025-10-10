@@ -13,3 +13,8 @@ public static class Utility
         return opt.HasValue;
     }
 }
+
+namespace System.Runtime.CompilerServices
+{
+    internal static class IsExternalInit { }
+}
