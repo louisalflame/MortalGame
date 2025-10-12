@@ -143,7 +143,6 @@ public class GameplayView : MonoBehaviour, IGameplayView
     {
         foreach (var gameEvent in events)
         {
-            Debug.Log($"-- GameplayView.Render:[{gameEvent}] --");
             switch (gameEvent)
             {
                 case GeneralUpdateEvent updateEvent:

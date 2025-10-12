@@ -59,7 +59,7 @@ public class PlayerBuffManager : IPlayerBuffManager
         var caster = actionUnit.Source switch
         {
             PlayerBuffSource playerBuffSource => playerBuffSource.Buff.Caster,
-            CardPlaySource cardPlaySource => cardPlaySource.Card.Owner(gameWatcher.GameStatus),
+            CardPlaySource cardPlaySource => cardPlaySource.Card.Owner(gameWatcher),
             _ => Option.None<IPlayerEntity>()
         };
 

@@ -137,15 +137,28 @@ public class EnemyEntity : PlayerEntity
         EnergyRecoverPoint = energyRecoverPoint;
     }
 
-    public IReadOnlyCollection<ICardEntity> GetRecommendCards()
+    public bool TryGetRecommandSelectCard(IGameplayStatusWatcher gameplayWatcher, out ICardEntity cardEntity)
     {
-        // TODO: Implement AI logic
-        var cardList = new List<ICardEntity>();
-        if(CardManager.HandCard.Cards.Count > 0) 
-            cardList.Add(CardManager.HandCard.Cards.ElementAt(0));
-        if(CardManager.HandCard.Cards.Count > 1) 
-            cardList.Add(CardManager.HandCard.Cards.ElementAt(1));
-        return cardList;
+        if (UseCardLogic.TryGetRecommandSelectCard(gameplayWatcher, this, out cardEntity))
+        {
+            return SelectedCards.TryAddCard(cardEntity);
+        }
+        
+        cardEntity = null;
+        return false;
+    }
+
+    public bool TryGetNextUseCardAction(IGameplayStatusWatcher gameplayWatcher, out UseCardAction useCardAction)
+    {
+        if (UseCardLogic.TryGetNextUseCardAction(gameplayWatcher, this, out useCardAction))
+        {
+            return CardManager.GetCard(useCardAction.CardIndentity)
+                .Map(card => SelectedCards.RemoveCard(card))
+                .ValueOr(false);
+        }
+
+        useCardAction = null;
+        return false;
     }
 }
 

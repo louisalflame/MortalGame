@@ -5,8 +5,6 @@ using UnityEngine;
 
 public static class EffectExecutor
 {
-    public record A(int x);
-
     public record EffectResult(
         List<IGameEvent> Events,
         List<BaseResultAction> ResultActions
@@ -334,7 +332,7 @@ public static class EffectExecutor
 
         foreach (var card in cards)
         {
-            card.Owner(context.GameplayWatcher.GameStatus).MatchSome(cardOwner =>
+            card.Owner(context.GameplayWatcher).MatchSome(cardOwner =>
             {
                 if (cardOwner.CardManager.TryDiscardCard(
                     card.Identity, out var discardedCard, out var start, out var destination))
@@ -362,7 +360,7 @@ public static class EffectExecutor
 
         foreach (var card in cards)
         {
-            card.Owner(context.GameplayWatcher.GameStatus).MatchSome(cardOwner =>
+            card.Owner(context.GameplayWatcher).MatchSome(cardOwner =>
             {
                 if (cardOwner.CardManager.TryConsumeCard(
                     card.Identity, out var consumedCard, out var start, out var destination))
@@ -390,7 +388,7 @@ public static class EffectExecutor
 
         foreach (var card in cards)
         {
-            card.Owner(context.GameplayWatcher.GameStatus).MatchSome(cardOwner =>
+            card.Owner(context.GameplayWatcher).MatchSome(cardOwner =>
             {
                 if (cardOwner.CardManager.TryDisposeCard(
                     card.Identity, out var disposedCard, out var start, out var destination))

@@ -1,29 +1,27 @@
 using UnityEngine;
 
-public class MainSelectableInfo
-{
-    public SelectType SelectType { get; private set; }   
-
-    public MainSelectableInfo(SelectType selectType)
-    {
-        SelectType = selectType;
-    }
-}
-
-public class SubSelectableInfo
-{
-    public SelectType SelectType { get; private set; }   
-    public int SelectCount { get; private set; }
-
-    public SubSelectableInfo(SelectType selectType, int selectCount)
-    {
-        SelectType = selectType;
-        SelectCount = selectCount;
-    }
-}
+public record MainSelectableInfo(
+    SelectType SelectType,
+    TargetLogicTag LogicTag);
+public record SubSelectableInfo(
+    SelectType SelectType,
+    int SelectCount,
+    TargetLogicTag LogicTag);
 
 public static class SelectableInfoUtility
 {
+    public static MainSelectableInfo ToInfo(this MainTargetSelectLogic mainTargetLogic)
+    {
+        return new MainSelectableInfo(
+            mainTargetLogic.MainSelectable.SelectType, mainTargetLogic.LogicTag);
+    } 
+
+    public static SubSelectableInfo ToInfo(this SubTargetSelectLogic subTargetLogic)
+    {
+        return new SubSelectableInfo(
+            subTargetLogic.SubSelectable.SelectType, subTargetLogic.SubSelectable.TargetCount, subTargetLogic.LogicTag);
+    }
+
     public static bool IsSelectable(this SelectType selectType, TargetType targetType)
     {
         switch(selectType)

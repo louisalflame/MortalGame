@@ -167,16 +167,13 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
 
     private void _EnemyPrepare()
     {
-        var recommendCards = _gameStatus.Enemy.GetRecommendCards();
-        foreach(var card in recommendCards)
+        while (_gameStatus.Enemy.TryGetRecommandSelectCard(this, out var recommendCard))
         {
-            if(_gameStatus.Enemy.SelectedCards.TryEnqueueCard(card))
+            _gameEvents.Add(new EnemySelectCardEvent()
             {
-                _gameEvents.Add(new EnemySelectCardEvent(){
-                    SelectedCardInfo = card.ToInfo(this),
-                    SelectedCardInfos = _gameStatus.Enemy.SelectedCards.Cards.ToCardInfos(this)
-                });
-            }
+                SelectedCardInfo = recommendCard.ToInfo(this),
+                SelectedCardInfos = _gameStatus.Enemy.SelectedCards.Cards.ToCardInfos(this)
+            });
         }
     }
 
@@ -200,23 +197,14 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
         _gameEvents.AddRange(
             UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.ExecuteStart, new SystemSource())));
 
-        while (_gameStatus.Enemy.SelectedCards.TryDequeueCard(out ICardEntity selectedCard))
+        while (_gameStatus.Enemy.TryGetNextUseCardAction(this, out var useCardAction))
         {
-            var cardRuntimCost = GameFormula.CardCost(this, selectedCard, new CardLookIntentAction(selectedCard));
-            if (cardRuntimCost <= _gameStatus.Enemy.CurrentEnergy)
-            {
-                _gameActions.Enqueue(new UseCardAction(selectedCard.Identity));
-                _TurnExecute(_gameStatus.Enemy);
-            }
-            else
-            {
-                _gameEvents.Add(new EnemyUnselectedCardEvent()
-                {
-                    SelectedCardInfo = selectedCard.ToInfo(this),
-                    SelectedCardInfos = _gameStatus.Enemy.SelectedCards.Cards.ToCardInfos(this)
-                });
-            }
+            _gameActions.Enqueue(useCardAction);
+            _TurnExecute(_gameStatus.Enemy);
         }
+
+        var unselectedCards = _gameStatus.Enemy.SelectedCards.UnSelectAllCards();
+        _gameEvents.Add(new EnemyUnselectedCardEvent() { UnselectedCardInfos = unselectedCards.ToCardInfos(this) });
         
         _FinishEnemyExecuteTurn();
     }
@@ -298,47 +286,17 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
     private GameContextManager _SetUseCardSelectTarget(UseCardAction useCardAction)
     {
         switch(useCardAction.TargetType)
-        { 
+        {
             case TargetType.AllyCharacter:
-                return useCardAction.SelectedTarget.Match(
-                    allyCharacterIdentity => {
-                        var allyCharacterOpt = _gameStatus.GetAllyCharacter(allyCharacterIdentity);
-                        return allyCharacterOpt.Match(
-                            allyCharacter => _contextMgr.SetSelectedCharacter(allyCharacter),
-                            () => _contextMgr.SetClone()
-                        );
-                    },
-                    () => _contextMgr.SetClone());
             case TargetType.EnemyCharacter:
-                return useCardAction.SelectedTarget.Match(
-                    enemyCharacterIdentity => {
-                        var enemyCharacterOpt = _gameStatus.GetEnemyCharacter(enemyCharacterIdentity);
-                        return enemyCharacterOpt.Match(
-                            enemyCharacter => _contextMgr.SetSelectedCharacter(enemyCharacter),
-                            () => _contextMgr.SetClone()
-                        );
-                    },
-                    () => _contextMgr.SetClone());
+                var enemyCharacterOpt = useCardAction.SelectedTarget
+                    .FlatMap(enemyCharacterIdentity => this.GetCharacter(enemyCharacterIdentity));
+                return _contextMgr.SetSelectedCharacter(enemyCharacterOpt);
             case TargetType.AllyCard:
-                return useCardAction.SelectedTarget.Match(
-                    allyCardIndentity => {                        
-                        var allyCardOpt = _gameStatus.Ally.CardManager.GetCard(allyCardIndentity);
-                        return allyCardOpt.Match(
-                            allyCard => _contextMgr.SetSelectedCard(allyCard),
-                            () => _contextMgr.SetClone()
-                        );
-                    },
-                    () => _contextMgr.SetClone());
             case TargetType.EnemyCard:
-                return useCardAction.SelectedTarget.Match(
-                    enemyCardIndentity => {
-                        var enemyCardOpt = _gameStatus.Enemy.CardManager.GetCard(enemyCardIndentity);
-                        return enemyCardOpt.Match(
-                            enemyCard => _contextMgr.SetSelectedCard(enemyCard),
-                            () => _contextMgr.SetClone()
-                        );
-                    },
-                    () => _contextMgr.SetClone());
+                var enemyCardOpt = useCardAction.SelectedTarget
+                    .FlatMap(enemyCardIndentity => this.GetCard(enemyCardIndentity));
+                return _contextMgr.SetSelectedCard(enemyCardOpt);
             default:
             case TargetType.None:
                 return _contextMgr.SetClone();      

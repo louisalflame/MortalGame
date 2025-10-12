@@ -12,9 +12,10 @@ public interface ISubTargetSelectable : ITargetSelectable
     int TargetCount { get; }
 }
 
-public class NoneSelectable : IMainTargetSelectable
+public class NoneSelectable : IMainTargetSelectable, ISubTargetSelectable
 {
     public SelectType SelectType => SelectType.None;
+    public int TargetCount => 0;
 }
 
 public class CharacterSelectable : IMainTargetSelectable

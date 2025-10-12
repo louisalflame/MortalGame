@@ -59,7 +59,7 @@ public abstract class MoveCardEvent : IGameEvent
 
     public MoveCardEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher, ICardColletionZone start, ICardColletionZone destination)
     {
-        Faction = card.Faction(gameWatcher.GameStatus);
+        Faction = card.Faction(gameWatcher);
         CardInfo = card.ToInfo(gameWatcher);
         StartZoneInfo = start.ToCardCollectionInfo(gameWatcher);
         DestinationZoneInfo = destination.ToCardCollectionInfo(gameWatcher);
@@ -73,7 +73,7 @@ public abstract class AddCardEvent : IGameEvent
 
     public AddCardEvent(ICardEntity card,IGameplayStatusWatcher gameWatcher, ICardColletionZone destination)
     {
-        Faction = card.Faction(gameWatcher.GameStatus);
+        Faction = card.Faction(gameWatcher);
         CardInfo = card.ToInfo(gameWatcher);
         DestinationZoneInfo = destination.ToCardCollectionInfo(gameWatcher);
     }
@@ -109,7 +109,7 @@ public class UpdateHandCardsEvent : IGameEvent
     public CardInfo CardInfo;
     public UpdateHandCardsEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher)
     {
-        Faction = card.Faction(gameWatcher.GameStatus);
+        Faction = card.Faction(gameWatcher);
         CardInfo = card.ToInfo(gameWatcher);
     }
 }
@@ -120,7 +120,7 @@ public class AddCardBuffEvent : IGameEvent
 
     public AddCardBuffEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher)
     {
-        Faction = card.Faction(gameWatcher.GameStatus);
+        Faction = card.Faction(gameWatcher);
         CardInfo = card.ToInfo(gameWatcher);
     }
 }
@@ -131,7 +131,7 @@ public class RemoveCardBuffEvent : IGameEvent
 
     public RemoveCardBuffEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher)
     {
-        Faction = card.Faction(gameWatcher.GameStatus);
+        Faction = card.Faction(gameWatcher);
         CardInfo = card.ToInfo(gameWatcher);
     }
 }
@@ -142,9 +142,8 @@ public class EnemySelectCardEvent : IGameEvent
     public IReadOnlyCollection<CardInfo> SelectedCardInfos;
 }
 public class EnemyUnselectedCardEvent : IGameEvent
-{ 
-    public CardInfo SelectedCardInfo;
-    public IReadOnlyCollection<CardInfo> SelectedCardInfos;
+{
+    public IReadOnlyCollection<CardInfo> UnselectedCardInfos;
 }
 public class PlayerExecuteStartEvent : IGameEvent
 {

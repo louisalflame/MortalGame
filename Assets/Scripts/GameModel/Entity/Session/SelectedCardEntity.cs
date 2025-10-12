@@ -1,12 +1,15 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 public interface ISelectedCardEntity
 {
     IReadOnlyCollection<ICardEntity> Cards { get; }
-    bool TryEnqueueCard(ICardEntity card);
-    bool TryDequeueCard(out ICardEntity card);
+    bool TryGetCard(Guid cardIdentity, out ICardEntity card);
+    bool TryAddCard(ICardEntity card);
+    bool RemoveCard(ICardEntity card);
+
+    IReadOnlyCollection<ICardEntity> UnSelectAllCards();
 }
 
 public class SelectedCardEntity : ISelectedCardEntity
@@ -14,33 +17,40 @@ public class SelectedCardEntity : ISelectedCardEntity
     public IReadOnlyCollection<ICardEntity> Cards => _cards;
 
     private int _maxCount;
-    private Queue<ICardEntity> _cards;
+    private List<ICardEntity> _cards;
 
     public SelectedCardEntity(int selectedCardMaxCount, IEnumerable<ICardEntity> cards)
     {
         _maxCount = selectedCardMaxCount;
-        _cards = new Queue<ICardEntity>(cards); 
+        _cards = new List<ICardEntity>(cards);
     }
- 
-    public bool TryEnqueueCard(ICardEntity card)
+
+    public bool TryGetCard(Guid cardIdentity, out ICardEntity card)
     {
-        if (Cards.Count < _maxCount)
+        card = _cards.FirstOrDefault(c => c.Identity == cardIdentity);
+        return card != null;
+    }
+
+    public bool TryAddCard(ICardEntity card)
+    {
+        if (_cards.Count < _maxCount) 
         {
-            _cards.Enqueue(card);
+            _cards.Add(card);
             return true;
         }
         return false;
     }
 
-    public bool TryDequeueCard(out ICardEntity card)
-    { 
-        if (Cards.Count > 0)
-        {
-            card = _cards.Dequeue();
-            return true;
-        }
-        card = null;
-        return false;
+    public bool RemoveCard(ICardEntity card)
+    {
+        return _cards.Remove(card);
+    }
+
+    public IReadOnlyCollection<ICardEntity> UnSelectAllCards()
+    {
+        var removedCards = _cards.ToList();
+        _cards.Clear();
+        return removedCards;
     }
 }
 

@@ -60,6 +60,14 @@ public enum CardCollectionType
     DisposeZone,
 }
 
+public enum TargetLogicTag
+{
+    None = 0,
+    ToEnemy,
+    ToAlly,
+    ToRandom,
+}
+
 public enum GameKeyWord
 {
     None = 0,

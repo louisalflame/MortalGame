@@ -26,6 +26,8 @@ public class GameStatus
     public EnemyEntity Enemy { get; private set; }
     public TurnStatus TurnStatus { get; private set; }
     public Option<IPlayerEntity> CurrentPlayer { get; private set; } = Option.None<IPlayerEntity>();
+    public Option<IPlayerEntity> OppositePlayer => CurrentPlayer
+        .Map(current => current.Faction == Faction.Ally ? (IPlayerEntity)Enemy : (IPlayerEntity)Ally);
 
     public GameStatus(
         int turnCount,

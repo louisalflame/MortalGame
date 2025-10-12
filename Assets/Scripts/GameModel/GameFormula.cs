@@ -108,7 +108,7 @@ public static class GameFormula
     {
         if (actionUnit is CardLookIntentAction cardLookIntent)
         {
-            var playerAttribute = cardLookIntent.Card.Owner(gameWatcher.GameStatus)
+            var playerAttribute = cardLookIntent.Card.Owner(gameWatcher)
                 .Map(player => player.GetPlayerBuffAdditionProperty(gameWatcher, playerBuffProperty))
                 .ValueOr(0);
             return playerAttribute;

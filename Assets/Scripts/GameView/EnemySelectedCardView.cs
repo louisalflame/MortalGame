@@ -119,14 +119,17 @@ public class EnemySelectedCardView : MonoBehaviour
 
     public void RemoveCardView(EnemyUnselectedCardEvent enemyUnselectedCardEvent)
     {
-        if(_cardViewDict.TryGetValue(enemyUnselectedCardEvent.SelectedCardInfo.Identity, out var cardView))
+        foreach (var cardInfo in enemyUnselectedCardEvent.UnselectedCardInfos)
         {
-            _cardViews.Remove(cardView);
-            _cardViewDict.Remove(enemyUnselectedCardEvent.SelectedCardInfo.Identity);
-            _cardViewFactory.RecyclePrefab(cardView as AiCardView);
-
-            _RearrangeCardViews();
+            if (_cardViewDict.TryGetValue(cardInfo.Identity, out var cardView))
+            {
+                _cardViews.Remove(cardView);
+                _cardViewDict.Remove(cardInfo.Identity);
+                _cardViewFactory.RecyclePrefab(cardView as AiCardView);
+            }
         }
+        
+        _RearrangeCardViews();
     }
     public void RemoveCardView(RecycleHandCardEvent recycleHandCardEvent)
     {

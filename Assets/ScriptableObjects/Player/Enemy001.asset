@@ -39,7 +39,7 @@ MonoBehaviour:
       Data: 3
     - Name: EnergyRecoverPoint
       Entry: 3
-      Data: 2
+      Data: 3
     - Name: PlayerData
       Entry: 7
       Data: 1|PlayerData, Assembly-CSharp

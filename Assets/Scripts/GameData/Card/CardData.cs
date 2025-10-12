@@ -19,7 +19,7 @@ public class CardData
 
         private static IEnumerable _GetAllowedValues()
         {
-            return new[] { 
+            return new[] {
                 GameTiming.TurnStart,
                 GameTiming.TurnEnd,
                 GameTiming.DrawCard,
@@ -44,18 +44,17 @@ public class CardData
     [TitleGroup("BasicData")]
     [Range(0, 20)]
     public int Power;
-    
+
     [ShowInInspector]
     [BoxGroup("Target")]
-    [PropertySpace(SpaceBefore = 0, SpaceAfter = 10)]
-    public IMainTargetSelectable MainSelectable = new NoneSelectable();
+    public MainTargetSelectLogic MainSelect = new ();
     [ShowInInspector]
     [BoxGroup("Target")]
-    public List<ISubTargetSelectable> SubSelectables = new();
- 
+    public List<SubTargetSelectLogic> SubSelects = new();
+
     [BoxGroup("Effects")]
     [ShowInInspector]
-    public List<ICardEffect> Effects = new();    
+    public List<ICardEffect> Effects = new();
     [BoxGroup("Effects")]
     [ShowInInspector]
     [TableList]
@@ -68,9 +67,9 @@ public class CardData
     public void OnValidate()
     {
         if (TriggeredEffects == null) return;
-        
+
         var keys = new HashSet<GameTiming>();
-        TriggeredEffects.RemoveAll(pair => 
+        TriggeredEffects.RemoveAll(pair =>
         {
             if (keys.Contains(pair.Timing))
             {
@@ -81,4 +80,17 @@ public class CardData
             return false;
         });
     }
+}
+
+[Serializable]
+public class MainTargetSelectLogic
+{
+    public IMainTargetSelectable MainSelectable = new NoneSelectable();
+    public TargetLogicTag LogicTag = TargetLogicTag.None;
+}
+[Serializable]
+public class SubTargetSelectLogic
+{ 
+    public ISubTargetSelectable SubSelectable = new NoneSelectable();
+    public TargetLogicTag LogicTag = TargetLogicTag.None;
 }

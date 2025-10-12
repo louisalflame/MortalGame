@@ -15,11 +15,11 @@ public interface ICardEntity
     CardRarity Rarity { get; }
     IEnumerable<CardTheme> Themes { get; }
 
-    IMainTargetSelectable MainSelectable { get; }
-    IEnumerable<ISubTargetSelectable> SubSelectables { get; }
+    MainTargetSelectLogic MainSelect { get; }
+    IEnumerable<SubTargetSelectLogic> SubSelects { get; }
 
-    List<ICardEffect> Effects { get; }
-    Dictionary<GameTiming, List<ICardEffect>> TriggeredEffects { get; }
+    IEnumerable<ICardEffect> Effects { get; }
+    IReadOnlyDictionary<GameTiming, List<ICardEffect>> TriggeredEffects { get; }
     IEnumerable<ICardPropertyEntity> Properties { get; }
     ICardBuffManager BuffManager { get; }
 
@@ -31,20 +31,20 @@ public interface ICardEntity
 
 public class CardEntity : ICardEntity
 {
-    private Guid _indentity;
-    private Option<Guid> _originCardInstanceGuid;
-    private string _cardDataId;
-    private CardType _type;
-    private CardRarity _rarity;
-    private CardTheme[] _themes;
-    private int _cost;
-    private int _power;    
-    private IMainTargetSelectable _mainSelectable;
-    private List<ISubTargetSelectable> _subSelectables;
-    private List<ICardEffect> _effects;
-    private Dictionary<GameTiming, List<ICardEffect>> _triggeredEffects;
-    private List<ICardPropertyEntity> _properties;
-    private ICardBuffManager _buffManager;
+    private readonly Guid _indentity;
+    private readonly Option<Guid> _originCardInstanceGuid;
+    private readonly string _cardDataId;
+    private readonly CardType _type;
+    private readonly CardRarity _rarity;
+    private readonly CardTheme[] _themes;
+    private readonly int _cost;
+    private readonly int _power;
+    private readonly MainTargetSelectLogic _mainSelect;
+    private readonly IReadOnlyList<SubTargetSelectLogic> _subSelects;
+    private readonly IReadOnlyList<ICardEffect> _effects;
+    private readonly IReadOnlyDictionary<GameTiming, List<ICardEffect>> _triggeredEffects;
+    private readonly IReadOnlyList<ICardPropertyEntity> _properties;
+    private readonly ICardBuffManager _buffManager;
 
     public Guid Identity => _indentity;
     public Option<Guid> OriginCardInstanceGuid => _originCardInstanceGuid;
@@ -54,10 +54,10 @@ public class CardEntity : ICardEntity
     public int OriginCost => _cost;
     public int OriginPower => _power;
     public IEnumerable<CardTheme> Themes => _themes;
-    public IMainTargetSelectable MainSelectable => _mainSelectable;
-    public IEnumerable<ISubTargetSelectable> SubSelectables => _subSelectables;
-    public List<ICardEffect> Effects => _effects;
-    public Dictionary<GameTiming, List<ICardEffect>> TriggeredEffects => _triggeredEffects;
+    public MainTargetSelectLogic MainSelect => _mainSelect;
+    public IEnumerable<SubTargetSelectLogic> SubSelects => _subSelects;
+    public IEnumerable<ICardEffect> Effects => _effects;
+    public IReadOnlyDictionary<GameTiming, List<ICardEffect>> TriggeredEffects => _triggeredEffects;
     public IEnumerable<ICardPropertyEntity> Properties => _properties;
     public ICardBuffManager BuffManager => _buffManager;
     public bool IsDummy => this == DummyCard;
@@ -71,8 +71,8 @@ public class CardEntity : ICardEntity
         themes: new CardTheme[0],
         cost: 0,
         power: 0,
-        mainSelectable: new NoneSelectable(),
-        subSelectables: new List<ISubTargetSelectable>(),
+        mainSelect: new (),
+        subSelects: new List<SubTargetSelectLogic>(),
         effects: new List<ICardEffect>(),
         triggeredEffects: new Dictionary<GameTiming, List<ICardEffect>>(),
         properties: new List<ICardPropertyEntity>()
@@ -87,8 +87,8 @@ public class CardEntity : ICardEntity
         IEnumerable<CardTheme> themes,
         int cost,
         int power,
-        IMainTargetSelectable mainSelectable,
-        IEnumerable<ISubTargetSelectable> subSelectables,
+        MainTargetSelectLogic mainSelect,
+        IEnumerable<SubTargetSelectLogic> subSelects,
         List<ICardEffect> effects,
         Dictionary<GameTiming, List<ICardEffect>> triggeredEffects,
         IEnumerable<ICardPropertyEntity> properties
@@ -102,8 +102,8 @@ public class CardEntity : ICardEntity
         _themes = themes.ToArray();
         _cost = cost;
         _power = power;
-        _mainSelectable = mainSelectable;
-        _subSelectables = subSelectables.ToList();
+        _mainSelect = mainSelect;
+        _subSelects = subSelects.ToList();
         _effects = effects.ToList();
         _triggeredEffects = triggeredEffects.ToDictionary(
             pair => pair.Key,
@@ -124,8 +124,8 @@ public class CardEntity : ICardEntity
             themes: cardInstance.Themes,
             cost: cardInstance.Cost,
             power: cardInstance.Power,
-            mainSelectable: cardInstance.MainSelectable,
-            subSelectables: cardInstance.SubSelectables,
+            mainSelect: cardInstance.MainSelect,
+            subSelects: cardInstance.SubSelects,
             effects: cardInstance.Effects.ToList(),
             triggeredEffects: cardInstance.TriggeredEffects.ToDictionary(
                     pair => pair.Key,
@@ -146,8 +146,8 @@ public class CardEntity : ICardEntity
             themes: cardData.Themes,
             cost: cardData.Cost,
             power: cardData.Power,
-            mainSelectable: cardData.MainSelectable,
-            subSelectables: cardData.SubSelectables,
+            mainSelect: cardData.MainSelect,
+            subSelects: cardData.SubSelects,
             effects: cardData.Effects.ToList(),
             triggeredEffects: cardData.TriggeredEffects.ToDictionary(
                     pair => pair.Timing,
@@ -168,8 +168,8 @@ public class CardEntity : ICardEntity
             themes: _themes,
             cost: _cost,
             power: _power,
-            mainSelectable: _mainSelectable,
-            subSelectables: _subSelectables,
+            mainSelect: _mainSelect,
+            subSelects: _subSelects,
             effects: _effects.ToList(),
             triggeredEffects: _triggeredEffects.ToDictionary(
                 pair => pair.Key,
@@ -181,8 +181,20 @@ public class CardEntity : ICardEntity
 
 public static class CardEntityExtensions
 {
-    public static Option<IPlayerEntity> Owner(this ICardEntity card, GameStatus gameStatus)
+    public static Option<ICardEntity> GetCard(this IGameplayStatusWatcher gameplayWatcher, Guid identity)
     {
+        var allyCardOpt = gameplayWatcher.GameStatus.Ally.CardManager.GetCard(identity);
+        if (allyCardOpt.HasValue)
+            return allyCardOpt;
+        var enemyCardOpt = gameplayWatcher.GameStatus.Enemy.CardManager.GetCard(identity);
+        if (enemyCardOpt.HasValue)
+            return enemyCardOpt;
+        return Option.None<ICardEntity>();
+    }
+
+    public static Option<IPlayerEntity> Owner(this ICardEntity card, IGameplayStatusWatcher gameplayWatcher)
+    {
+        var gameStatus = gameplayWatcher.GameStatus;
         var allyCardOpt = gameStatus.Ally.CardManager.GetCard(card.Identity);
         if (allyCardOpt.HasValue)
             return (gameStatus.Ally as IPlayerEntity).Some();
@@ -191,9 +203,9 @@ public static class CardEntityExtensions
             return (gameStatus.Enemy as IPlayerEntity).Some();
         return Option.None<IPlayerEntity>();
     }
-    public static Faction Faction(this ICardEntity card, GameStatus gameStatus)
+    public static Faction Faction(this ICardEntity card, IGameplayStatusWatcher gameplayWatcher)
     {
-        return card.Owner(gameStatus).ValueOr(PlayerEntity.DummyPlayer).Faction;
+        return card.Owner(gameplayWatcher).ValueOr(PlayerEntity.DummyPlayer).Faction;
     }
 
     public static bool IsConsumable(this ICardEntity card)

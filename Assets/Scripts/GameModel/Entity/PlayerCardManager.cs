@@ -116,10 +116,10 @@ public class PlayerCardManager : IPlayerCardManager
         var events = new List<IGameEvent>();
 
         var nonePreservedCards = HandCard.ClearHand();
-        var excludeCards = nonePreservedCards.Where(c => c.HasProperty(CardProperty.AutoDispose));
+        var excludeCards = nonePreservedCards.Where(c => c.HasProperty(CardProperty.AutoDispose)).ToArray();
         ExclusionZone.AddCards(excludeCards);
 
-        var recycleCards = nonePreservedCards.Except(excludeCards);
+        var recycleCards = nonePreservedCards.Except(excludeCards).ToArray();
         Graveyard.AddCards(recycleCards);
         events.Add(new RecycleHandCardEvent()
         {
