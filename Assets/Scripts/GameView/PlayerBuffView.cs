@@ -38,15 +38,18 @@ public class PlayerBuffView : MonoBehaviour, IRecyclable
         _disposables = new CompositeDisposable();
 
         _gameViewModel.ObservablePlayerBuffInfo(buffInfo.Identity)
-            .Where(info => info != null && info.Identity == buffInfo.Identity)
-            .Subscribe(info => _Render(info))
-            .AddTo(_disposables);
-        _buffIcon.OnPointerEnterAsObservable()
-            .WithLatestFrom(
-                _gameViewModel.ObservablePlayerBuffInfo(buffInfo.Identity),
-                (_, info) => info)
-            .Subscribe(info => simpleHintView.ShowBuffInfo(info, _rectTransform))
-            .AddTo(_disposables);
+            .MatchSome(reactiveProp =>
+            {
+                reactiveProp
+                    .Subscribe(info => _Render(info))
+                    .AddTo(_disposables);
+
+                _buffIcon.OnPointerEnterAsObservable()
+                    .WithLatestFrom(reactiveProp, (_, info) => info)
+                    .Subscribe(info => simpleHintView.ShowBuffInfo(info, _rectTransform))
+                    .AddTo(_disposables);
+            });        
+        
         _buffIcon.OnPointerExitAsObservable()
             .Subscribe(_ => simpleHintView.Close())
             .AddTo(_disposables);

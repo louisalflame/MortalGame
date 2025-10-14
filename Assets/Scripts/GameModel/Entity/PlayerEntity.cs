@@ -12,6 +12,7 @@ public interface IPlayerEntity
     IPlayerCardManager CardManager { get; }
     int CurrentEnergy { get; }
     int MaxEnergy { get; }
+    bool IsDead { get; }
 
     IEnergyManager EnergyManager { get; }
     IPlayerBuffManager BuffManager { get; }
@@ -38,6 +39,7 @@ public abstract class PlayerEntity : IPlayerEntity
     public IReadOnlyCollection<ICharacterEntity> Characters => _characters;
     public IPlayerCardManager CardManager => _cardManager;
 
+    public bool IsDead => Characters.All(character => character.IsDead);
 
     // TODO: Implement main character with skills/assistant character
     public ICharacterEntity MainCharacter => Characters.First();

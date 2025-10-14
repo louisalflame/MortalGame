@@ -8,7 +8,7 @@ using UniRx;
 using UnityEngine;
 public interface IUIPresenter
 {
-    UniTask Run(CancellationToken cancellationToken);
+    UniTask<bool> Run(CancellationToken cancellationToken);
 }
 
 public class UIPresenter : IUIPresenter
@@ -34,7 +34,7 @@ public class UIPresenter : IUIPresenter
         _allCardDetailPresenter = new AllCardDetailPresenter(panelView, gameViewModel, localizeLibrary);
     }
 
-    public async UniTask Run(CancellationToken cancellationToken)
+    public async UniTask<bool> Run(CancellationToken cancellationToken)
     {
         var disposables = new CompositeDisposable();
         _deckCardView.DeckButton.OnClickAsObservable()
@@ -59,6 +59,8 @@ public class UIPresenter : IUIPresenter
         }
 
         disposables.Dispose();
+
+        return true;
     }
     
     private bool _TryPopOutNextTask(out UniTask task)

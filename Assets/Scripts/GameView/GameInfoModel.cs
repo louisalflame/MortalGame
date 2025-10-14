@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Optional;
+using Optional.Collections;
 using UniRx;
 using UnityEngine;
 
@@ -17,9 +19,9 @@ public interface IGameViewModel
     void UpdatePlayerBuffInfo(PlayerBuffInfo playerBuffInfo);
     void UpdateCharacterBuffInfo(CharacterBuffInfo characterBuffInfo);
 
-    IReadOnlyReactiveProperty<CardInfo> ObservableCardInfo(Guid identity);
-    IReadOnlyReactiveProperty<PlayerBuffInfo> ObservablePlayerBuffInfo(Guid identity);
-    IReadOnlyReactiveProperty<CharacterBuffInfo> ObservableCharacterBuffInfo(Guid identity);
+    Option<IReadOnlyReactiveProperty<CardInfo>> ObservableCardInfo(Guid identity);
+    Option<IReadOnlyReactiveProperty<PlayerBuffInfo>> ObservablePlayerBuffInfo(Guid identity);
+    Option<IReadOnlyReactiveProperty<CharacterBuffInfo>> ObservableCharacterBuffInfo(Guid identity);
 }
 
 public class GameViewModel : IGameViewModel
@@ -129,18 +131,21 @@ public class GameViewModel : IGameViewModel
     }
 
 
-    public IReadOnlyReactiveProperty<CardInfo> ObservableCardInfo(Guid identity)
+    public Option<IReadOnlyReactiveProperty<CardInfo>> ObservableCardInfo(Guid identity)
     {
-        return _cardInfos[identity];
+        return OptionCollectionExtensions.GetValueOrNone(_cardInfos, identity)
+            .Map(prop => (IReadOnlyReactiveProperty<CardInfo>)prop);
     }
 
-    public IReadOnlyReactiveProperty<PlayerBuffInfo> ObservablePlayerBuffInfo(Guid identity)
+    public Option<IReadOnlyReactiveProperty<PlayerBuffInfo>> ObservablePlayerBuffInfo(Guid identity)
     {
-        return _playerBuffInfos[identity];
+        return OptionCollectionExtensions.GetValueOrNone(_playerBuffInfos, identity)
+            .Map(prop => (IReadOnlyReactiveProperty<PlayerBuffInfo>)prop);
     }
 
-    public IReadOnlyReactiveProperty<CharacterBuffInfo> ObservableCharacterBuffInfo(Guid identity)
+    public Option<IReadOnlyReactiveProperty<CharacterBuffInfo>> ObservableCharacterBuffInfo(Guid identity)
     {
-        return _characterBuffInfos[identity];
+        return OptionCollectionExtensions.GetValueOrNone(_characterBuffInfos, identity)
+            .Map(prop => (IReadOnlyReactiveProperty<CharacterBuffInfo>)prop);
     }
 }

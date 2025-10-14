@@ -32,14 +32,13 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
     public event Action OnTurnEnd;
 
     private GameStatus _gameStatus;
-    private GameResult _gameResult;
+    private Option<GameResult> _gameResult;
     private List<IGameEvent> _gameEvents;
     private Queue<IGameAction> _gameActions;
     private IGameContextManager _contextMgr;
     private GameHistory _gameHistory;
 
-    public bool IsEnd { get{ return _gameResult != null; } }
-    public GameResult GameResult { get{ return _gameResult; } }
+    public Option<GameResult> GameResult { get { return _gameResult; } }
     GameStatus IGameplayStatusWatcher.GameStatus { get{ return _gameStatus; } }
     IGameContextManager IGameplayStatusWatcher.ContextManager { get{ return _contextMgr; } }
 
@@ -55,7 +54,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
     {
         _gameEvents = new List<IGameEvent>();
         _gameActions = new Queue<IGameAction>();
-        _gameResult = null;
+        _gameResult = Option.None<GameResult>();
 
         _NextState(_gameStatus);
     }
@@ -75,7 +74,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
 
     private void _NextState(GameStatus gameStatus)
     {
-        switch(gameStatus.State)
+        switch (gameStatus.State)
         {
             case GameState.GameStart:
                 _gameEvents.AddRange(
@@ -117,6 +116,11 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                 break;
             case GameState.GameEnd:
                 break;
+        }
+
+        if (_IsGameEnd())
+        {
+            _gameStatus.SetState(GameState.GameEnd);
         }
     }
 
@@ -413,22 +417,22 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
             });
         }
 
-        foreach(var character in _gameStatus.Ally.Characters)
-        { 
+        foreach (var character in _gameStatus.Ally.Characters)
+        {
         }
 
-        foreach(var card in _gameStatus.Ally.CardManager.HandCard.Cards)
-        { 
+        foreach (var card in _gameStatus.Ally.CardManager.HandCard.Cards)
+        {
         }
 
-        foreach(var buff in _gameStatus.Enemy.BuffManager.Buffs)
+        foreach (var buff in _gameStatus.Enemy.BuffManager.Buffs)
         {
             var buffTrigger = new PlayerBuffTrigger(buff);
             var conditionalEffectsOpt = _contextMgr.BuffLibrary.GetBuffEffects(buff.PlayerBuffDataId, timing);
 
-            conditionalEffectsOpt.MatchSome(conditionalEffects => 
+            conditionalEffectsOpt.MatchSome(conditionalEffects =>
             {
-                foreach(var conditionalEffect in conditionalEffects)
+                foreach (var conditionalEffect in conditionalEffects)
                 {
                     if (conditionalEffect.Conditions.All(c => c.Eval(this, buffTrigger, timingAction)))
                     {
@@ -444,14 +448,29 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
             });
         }
 
-        foreach(var character in _gameStatus.Enemy.Characters)
-        { 
+        foreach (var character in _gameStatus.Enemy.Characters)
+        {
         }
 
-        foreach(var card in _gameStatus.Enemy.CardManager.HandCard.Cards)
-        { 
+        foreach (var card in _gameStatus.Enemy.CardManager.HandCard.Cards)
+        {
         }
-        
+
         return triggerBuffEvents;
+    }
+    
+    private bool _IsGameEnd()
+    {
+        if (_gameStatus.Ally.IsDead)
+        {
+            _gameResult = new GameResult(false).Some();
+            return true;
+        }
+        else if (_gameStatus.Enemy.IsDead)
+        {
+            _gameResult = new GameResult(true).Some();
+            return true;
+        }
+        return false;
     }
 }

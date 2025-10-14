@@ -63,12 +63,4 @@ public class GameStatus
     }
 }
 
-public class GameResult
-{
-    public bool IsWin { get; }
-
-    public GameResult(bool isWin)
-    {
-        IsWin = isWin;
-    }
-}
+public record GameResult(bool IsAllyWin);

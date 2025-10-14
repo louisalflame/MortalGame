@@ -88,9 +88,13 @@ public class CardView : MonoBehaviour, ICardView
 
     public void SetCardInfo(CardInfo cardInfo)
     {
-        _cardInfoSubscription = _gameViewModel.ObservableCardInfo(cardInfo.Identity)
-            .Where(info => info != null && info.Identity == cardInfo.Identity)
-            .Subscribe(info => _Render(info));
+        _gameViewModel.ObservableCardInfo(cardInfo.Identity)
+            .MatchSome(reactiveProp =>
+            {
+                _cardInfoSubscription?.Dispose();
+                _cardInfoSubscription = reactiveProp
+                    .Subscribe(info => _Render(info));
+            });
         _Render(cardInfo);
     }
     private void _Render(CardInfo cardInfo)

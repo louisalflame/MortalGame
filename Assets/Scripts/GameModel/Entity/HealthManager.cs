@@ -22,8 +22,8 @@ public class HealthManager : IHealthManager
 
     public HealthManager(int currentHealth, int maxHealth)
     {
-        _maxHp = currentHealth;
-        _hp = maxHealth;
+        _maxHp = maxHealth;
+        _hp = currentHealth;
         _dp = 0;
     }
 

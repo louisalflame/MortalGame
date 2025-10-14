@@ -16,6 +16,7 @@ public interface IGameplayView : IAllCardDetailPanelView, IInteractionButtonView
         DispositionLibrary dispositionLibrary);
     void Render(IReadOnlyCollection<IGameEvent> events, IGameplayActionReciever reciever);
     void DisableAllHandCards();
+    void DisableAllInteraction();
 
     IEnumerable<ISelectableView> SelectableViews { get; }
     ISelectableView BasicSelectableView { get; }
@@ -216,6 +217,11 @@ public class GameplayView : MonoBehaviour, IGameplayView
     {
         _gameViewModel.DisableHandCardsAction();
         _allyHandCardView.DisableAllHandCardsAction();
+    }
+    public void DisableAllInteraction()
+    {
+        DisableAllHandCards();
+        // TODO: disable other interaction
     }
 
     private void _UpdateGeneralInfo(GeneralUpdateEvent updateEvent)

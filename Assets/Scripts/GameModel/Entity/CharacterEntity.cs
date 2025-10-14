@@ -13,6 +13,7 @@ public interface ICharacterEntity
     int CurrentHealth { get; }
     int MaxHealth { get; }
     int CurrentArmor { get; }
+    bool IsDead { get; }
 }
 
 public record CharacterParameter
@@ -36,6 +37,7 @@ public class CharacterEntity : ICharacterEntity
     public int CurrentHealth => HealthManager.Hp;
     public int MaxHealth => HealthManager.MaxHp;
     public int CurrentArmor => HealthManager.Dp;
+    public bool IsDead => CurrentHealth <= 0;
     
     public bool IsDummy => this == DummyCharacter;
     public static ICharacterEntity DummyCharacter = new DummyCharacter();

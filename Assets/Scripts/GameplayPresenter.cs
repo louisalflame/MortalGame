@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Rayark.Mast;
 using UnityEngine;
 
 public interface IGameplayActionReciever
@@ -43,21 +44,29 @@ public class GameplayPresenter : IGameplayActionReciever
         var gameplayLoopTask = _RunGameplayLoop(cts);
         var cardPresenterTask = _uiPresenter.Run(cts.Token);
 
-        await UniTask.WhenAll(gameplayLoopTask, cardPresenterTask);
+        var (gameplayResult, _) = await UniTask.WhenAll(gameplayLoopTask, cardPresenterTask);
 
-        return _gameplayManager.GameResult;
+        Debug.Log($"-- GameplayPresenter.Run: GameResult[{gameplayResult}] --");
+        return gameplayResult;
     }
 
-    private async UniTask _RunGameplayLoop(CancellationTokenSource cts)
+    private async UniTask<GameResult> _RunGameplayLoop(CancellationTokenSource cts)
     {
         _gameplayManager.Start();
-        while (!_gameplayManager.IsEnd)
+
+        GameResult gameResult;
+        while (!_gameplayManager.GameResult.TryGetValue(out gameResult))
         {
             await UniTask.NextFrame();
 
             var events = _gameplayManager.PopAllEvents();
             _gameplayView.Render(events, this);
         }
+
+        cts.Cancel();
+        _gameplayView.DisableAllHandCards();
+
+        return gameResult;
     }
 
     public void RecieveEvent(IGameAction gameAction)
