@@ -32,9 +32,34 @@ public class Main : MonoBehaviour
 
         await menuScene.Run();
 
-        var gameplayScene = await _sceneLoadManager.LoadGameplayScene();
+        var restart = false;
+        do
+        {
 
-        gameplayScene.Initialize(_context);
-        await gameplayScene.Run();
+            var retry = false;
+            do
+            {
+                var gameplayScene = await _sceneLoadManager.LoadGameplayScene();
+
+                gameplayScene.Initialize(_context);
+                var gameplayResult = await gameplayScene.Run();
+
+                if (gameplayResult.Result is GameplayLoseResult loseResult)
+                {
+                    if (loseResult.ReactionType == LoseReactionType.Retry)
+                    {
+                        retry = true;
+                    }
+                    else if (loseResult.ReactionType == LoseReactionType.Restart)
+                    {
+                        restart = true;
+                        break;
+                    }
+                }
+            }
+            while (retry);
+        }
+        while (restart);
+
     }
 }

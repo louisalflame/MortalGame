@@ -19,12 +19,16 @@ public class GameplayPresenter : IGameplayActionReciever
     private GameViewModel _gameInfoModel;
     private GameplayManager _gameplayManager;
     private IUIPresenter _uiPresenter;
+    private IGameResultLosePresenter _gameResultLosePresenter;
+    private IGameResultWinPresenter _gameResultWinPresenter;
 
     public IEnumerable<ISelectableView> SelectableViews => _gameplayView.SelectableViews;
     public ISelectableView BasicSelectableView => _gameplayView.BasicSelectableView;
 
     public GameplayPresenter(
         GameplayView gameplayView,
+        IGameResultWinPanel gameResultWinPanel,
+        IGameResultLosePanel gameResultLosePanel,
         GameStatus gameStatus,
         GameContextManager gameContextManager
     )
@@ -35,27 +39,41 @@ public class GameplayPresenter : IGameplayActionReciever
         _gameInfoModel = new GameViewModel();
         _gameplayView.Init(_gameInfoModel, this, _gameplayManager, gameContextManager.LocalizeLibrary, gameContextManager.DispositionLibrary);
         _uiPresenter = new UIPresenter(_gameplayView, _gameplayView, _gameInfoModel, gameContextManager.LocalizeLibrary);
+        _gameResultWinPresenter = new GameResultWinPresenter(gameResultWinPanel);
+        _gameResultLosePresenter = new GameResultLosePresenter(gameResultLosePanel);
     }
 
-    public async UniTask<GameResult> Run()
+    public async UniTask<GameplayResultCommand> Run()
     {
         var cts = new CancellationTokenSource();
         
         var gameplayLoopTask = _RunGameplayLoop(cts);
         var cardPresenterTask = _uiPresenter.Run(cts.Token);
 
-        var (gameplayResult, _) = await UniTask.WhenAll(gameplayLoopTask, cardPresenterTask);
+        var (battleResult, _) = await UniTask.WhenAll(gameplayLoopTask, cardPresenterTask);
 
-        Debug.Log($"-- GameplayPresenter.Run: GameResult[{gameplayResult}] --");
-        return gameplayResult;
+        if (battleResult.IsAllyWin)
+        {
+            await _gameResultWinPresenter.Run();
+            return new GameplayResultCommand(new GameplayWinResult());
+        }
+        else
+        {
+            var battleLoseReaction = await _gameResultLosePresenter.Run();
+            return new GameplayResultCommand(
+                new GameplayLoseResult(
+                    battleLoseReaction.ReactionType
+                )
+            );
+        }
     }
 
-    private async UniTask<GameResult> _RunGameplayLoop(CancellationTokenSource cts)
+    private async UniTask<BattleResult> _RunGameplayLoop(CancellationTokenSource cts)
     {
         _gameplayManager.Start();
 
-        GameResult gameResult;
-        while (!_gameplayManager.GameResult.TryGetValue(out gameResult))
+        BattleResult result;
+        while (!_gameplayManager.BattleResult.TryGetValue(out result))
         {
             await UniTask.NextFrame();
 
@@ -64,9 +82,10 @@ public class GameplayPresenter : IGameplayActionReciever
         }
 
         cts.Cancel();
-        _gameplayView.DisableAllHandCards();
+        _gameplayView.DisableAllInteraction();
 
-        return gameResult;
+        Debug.Log($"-- GameplayPresenter.Run: GameResult[{result}] --");
+        return result;
     }
 
     public void RecieveEvent(IGameAction gameAction)

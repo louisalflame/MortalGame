@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Optional;
-using Unity.VisualScripting;
-using UnityEngine;
 
 public enum GameState
 {
@@ -63,4 +61,12 @@ public class GameStatus
     }
 }
 
-public record GameResult(bool IsAllyWin);
+public record BattleResult(bool IsAllyWin);
+
+public record GameplayResultCommand(
+    GameplayResult Result);
+
+public abstract record GameplayResult;
+public record GameplayWinResult() : GameplayResult;
+public record GameplayLoseResult(
+    LoseReactionType ReactionType) : GameplayResult;

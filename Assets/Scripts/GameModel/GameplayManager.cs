@@ -32,13 +32,13 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
     public event Action OnTurnEnd;
 
     private GameStatus _gameStatus;
-    private Option<GameResult> _gameResult;
+    private Option<BattleResult> _battleResult;
     private List<IGameEvent> _gameEvents;
     private Queue<IGameAction> _gameActions;
     private IGameContextManager _contextMgr;
     private GameHistory _gameHistory;
 
-    public Option<GameResult> GameResult { get { return _gameResult; } }
+    public Option<BattleResult> BattleResult { get { return _battleResult; } }
     GameStatus IGameplayStatusWatcher.GameStatus { get{ return _gameStatus; } }
     IGameContextManager IGameplayStatusWatcher.ContextManager { get{ return _contextMgr; } }
 
@@ -54,7 +54,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
     {
         _gameEvents = new List<IGameEvent>();
         _gameActions = new Queue<IGameAction>();
-        _gameResult = Option.None<GameResult>();
+        _battleResult = Option.None<BattleResult>();
 
         _NextState(_gameStatus);
     }
@@ -463,12 +463,12 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
     {
         if (_gameStatus.Ally.IsDead)
         {
-            _gameResult = new GameResult(false).Some();
+            _battleResult = new BattleResult(false).Some();
             return true;
         }
         else if (_gameStatus.Enemy.IsDead)
         {
-            _gameResult = new GameResult(true).Some();
+            _battleResult = new BattleResult(true).Some();
             return true;
         }
         return false;

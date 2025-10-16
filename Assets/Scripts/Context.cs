@@ -28,7 +28,7 @@ public class Context
             Identity = Guid.NewGuid(),
             NameKey = scriptableDataLoader.Ally.PlayerData.NameKey,
             CurrentDisposition = scriptableDataLoader.Ally.InitialDisposition,
-            CurrentHealth = scriptableDataLoader.Ally.PlayerData.MaxHealth,
+            CurrentHealth = scriptableDataLoader.Ally.PlayerData.InitialHealth,
             MaxHealth = scriptableDataLoader.Ally.PlayerData.MaxHealth,
             CurrentEnergy = scriptableDataLoader.Ally.PlayerData.MaxEnergy,
             MaxEnergy = scriptableDataLoader.Ally.PlayerData.MaxEnergy,

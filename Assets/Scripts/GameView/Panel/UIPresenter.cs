@@ -38,11 +38,11 @@ public class UIPresenter : IUIPresenter
     {
         var disposables = new CompositeDisposable();
         _deckCardView.DeckButton.OnClickAsObservable()
-            .Subscribe(deckInfo => _TryEnqueueTask(
+            .Subscribe(_ => _TryEnqueueTask(
                 _allCardDetailPresenter.Run(Faction.Ally, CardCollectionType.Deck, CancellationToken.None)))
             .AddTo(disposables);
         _graveyardCardView.GraveyardButton.OnClickAsObservable()
-            .Subscribe(deckInfo => _TryEnqueueTask(
+            .Subscribe(_ => _TryEnqueueTask(
                 _allCardDetailPresenter.Run(Faction.Ally, CardCollectionType.Graveyard, CancellationToken.None)))
             .AddTo(disposables);
 
