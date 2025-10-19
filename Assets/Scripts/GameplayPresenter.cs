@@ -54,17 +54,13 @@ public class GameplayPresenter : IGameplayActionReciever
 
         if (battleResult.IsAllyWin)
         {
-            await _gameResultWinPresenter.Run();
-            return new GameplayResultCommand(new GameplayWinResult());
+            var winResult = await _gameResultWinPresenter.Run();
+            return new GameplayResultCommand(winResult);
         }
         else
         {
-            var battleLoseReaction = await _gameResultLosePresenter.Run();
-            return new GameplayResultCommand(
-                new GameplayLoseResult(
-                    battleLoseReaction.ReactionType
-                )
-            );
+            var loseResult = await _gameResultLosePresenter.Run();
+            return new GameplayResultCommand(loseResult);
         }
     }
 

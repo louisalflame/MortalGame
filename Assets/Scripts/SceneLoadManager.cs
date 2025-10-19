@@ -6,18 +6,32 @@ using UnityEngine.SceneManagement;
 
 public class SceneLoadManager
 {
+    public const string MenuSceneName = "Menu";
+    public const string LevelMapSceneName = "LevelMap";
+    public const string GameplaySceneName = "Gameplay";
+    public const string LoadingSceneName = "Loading";
+
     public async UniTask<MenuScene> LoadMenuScene()
-    { 
-        await SceneManager.LoadSceneAsync("Menu");
+    {
+        await SceneManager.LoadSceneAsync(MenuSceneName);
 
         var menuScene = Object.FindFirstObjectByType<MenuScene>();
 
         return menuScene;
     }
 
+    public async UniTask<LevelMapScene> LoadLevelMapScene()
+    {
+        await SceneManager.LoadSceneAsync(LevelMapSceneName);
+
+        var levelMapScene = Object.FindFirstObjectByType<LevelMapScene>();
+
+        return levelMapScene;
+    }
+
     public async UniTask<GameplayScene> LoadGameplayScene()
     {
-        await SceneManager.LoadSceneAsync("Gameplay");
+        await SceneManager.LoadSceneAsync(GameplaySceneName);
 
         var gameplayScene = Object.FindFirstObjectByType<GameplayScene>();
 
@@ -26,7 +40,7 @@ public class SceneLoadManager
 
     public async UniTask<LoadingScene> LoadLoadingScene()
     {
-        await SceneManager.LoadSceneAsync("Loading");
+        await SceneManager.LoadSceneAsync(LoadingSceneName);
 
         var loadingScene = Object.FindFirstObjectByType<LoadingScene>();
 

@@ -4,11 +4,8 @@ using UnityEngine;
 
 public interface IGameResultLosePresenter
 {
-    UniTask<BattleLoseReaction> Run();
+    UniTask<GameplayLoseResult> Run();
 }
-
-public record BattleLoseReaction(
-    LoseReactionType ReactionType);
 
 public class GameResultLosePresenter : IGameResultLosePresenter
 {
@@ -19,7 +16,7 @@ public class GameResultLosePresenter : IGameResultLosePresenter
         _losePanel = losePanel;
     }
 
-    public async UniTask<BattleLoseReaction> Run()
+    public async UniTask<GameplayLoseResult> Run()
     {
         var reactionType = LoseReactionType.Quit;
         var isClose = false;
@@ -53,6 +50,6 @@ public class GameResultLosePresenter : IGameResultLosePresenter
         _losePanel.Close();
         disposables.Dispose();
 
-        return new BattleLoseReaction(reactionType);
+        return new GameplayLoseResult(reactionType);
     }
 }

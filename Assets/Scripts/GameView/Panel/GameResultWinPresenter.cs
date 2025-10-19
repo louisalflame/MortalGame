@@ -3,7 +3,7 @@ using UnityEngine;
 
 public interface IGameResultWinPresenter
 {
-    UniTask Run();
+    UniTask<GameplayWinResult> Run();
 }
 
 public class GameResultWinPresenter : IGameResultWinPresenter
@@ -15,12 +15,14 @@ public class GameResultWinPresenter : IGameResultWinPresenter
         _winPanel = winPanel;
     }
 
-    public async UniTask Run()
+    public async UniTask<GameplayWinResult> Run()
     {
         var isClose = false;
         while (!isClose)
         {
             await UniTask.NextFrame();
         }
+
+        return new GameplayWinResult();
     }
 }

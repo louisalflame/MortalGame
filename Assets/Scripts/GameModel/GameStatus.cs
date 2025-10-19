@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Optional;
+using Rayark.Mast;
 
 public enum GameState
 {
@@ -61,6 +62,30 @@ public class GameStatus
     }
 }
 
+public enum LevelMapStatus
+{
+    None,
+    Walk,
+    Battle,
+    Shop,
+    Leave
+}
+public enum LevelMapReactionType
+{
+    StartGamePlay,
+    Finish,
+    Fail,
+    Restart
+}
+
+public enum LoseReactionType
+{
+    Quit,
+    Restart,
+    Retry
+}
+
+
 public record BattleResult(bool IsAllyWin);
 
 public record GameplayResultCommand(
@@ -70,3 +95,6 @@ public abstract record GameplayResult;
 public record GameplayWinResult() : GameplayResult;
 public record GameplayLoseResult(
     LoseReactionType ReactionType) : GameplayResult;
+
+public record LevelMapCommand(
+    LevelMapReactionType ReactionType);

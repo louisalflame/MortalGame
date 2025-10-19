@@ -10,19 +10,12 @@ public class GameplayScene : MonoBehaviour
     [SerializeField]
     private GameResultLosePanel _gameResultLosePanel;
 
-    private Context _context;
-    private BattleBuidler _battleBuidler;
-
-    public void Initialize(Context context)
+    public async UniTask<GameplayResultCommand> Run(Context context)
     {
-        _context = context;
-        _battleBuidler = new BattleBuidler(_context);
-    }
+        var battleBuilder = new BattleBuidler(context);
 
-    public async UniTask<GameplayResultCommand> Run()
-    {
-        var gameContextManager = _battleBuidler.ConstructGameContextManager();
-        var initialState = _battleBuidler.ConstructBattle(gameContextManager);
+        var gameContextManager = battleBuilder.ConstructGameContextManager();
+        var initialState = battleBuilder.ConstructBattle(gameContextManager);
         var gameplayPresenter = new GameplayPresenter(
             _gameplayView,
             _gameResultWinPanel,

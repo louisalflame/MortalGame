@@ -1,12 +1,5 @@
 using UnityEngine;
 
-public enum LoseReactionType
-{
-    Quit,
-    Restart,
-    Retry
-}
-
 public enum ArithmeticType
 {
     None = 0,

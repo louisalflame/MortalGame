@@ -28,38 +28,54 @@ public class Main : MonoBehaviour
 
     private async UniTask _Gameloop()
     {
-        var menuScene = await _sceneLoadManager.LoadMenuScene();
-
-        await menuScene.Run();
-
-        var restart = false;
-        do
+        while (true)
         {
+            var menuScene = await _sceneLoadManager.LoadMenuScene();
+            await menuScene.Run();
 
-            var retry = false;
+            var restart = false;
             do
             {
-                var gameplayScene = await _sceneLoadManager.LoadGameplayScene();
+                var levelMapScene = await _sceneLoadManager.LoadLevelMapScene();
+                var levelMapCommand = await levelMapScene.Run();
 
-                gameplayScene.Initialize(_context);
-                var gameplayResult = await gameplayScene.Run();
-
-                if (gameplayResult.Result is GameplayLoseResult loseResult)
+                switch (levelMapCommand.ReactionType)
                 {
-                    if (loseResult.ReactionType == LoseReactionType.Retry)
-                    {
-                        retry = true;
-                    }
-                    else if (loseResult.ReactionType == LoseReactionType.Restart)
-                    {
+                    case LevelMapReactionType.Fail:
+                        return;
+                    case LevelMapReactionType.Finish:
+                        return;
+                    case LevelMapReactionType.Restart:
                         restart = true;
                         break;
-                    }
+
+                    case LevelMapReactionType.StartGamePlay:
+                        
+                        var retry = false;
+                        do
+                        {
+                            var gameplayScene = await _sceneLoadManager.LoadGameplayScene();
+                            var gameplayResult = await gameplayScene.Run(_context);
+
+                            if (gameplayResult.Result is GameplayLoseResult loseResult)
+                            {
+                                if (loseResult.ReactionType == LoseReactionType.Retry)
+                                {
+                                    retry = true;
+                                }
+                                else if (loseResult.ReactionType == LoseReactionType.Restart)
+                                {
+                                    restart = true;
+                                    break;
+                                }
+                            }
+                        }
+                        while (retry);
+                
+                        break;
                 }
             }
-            while (retry);
+            while (restart);
         }
-        while (restart);
-
     }
 }
