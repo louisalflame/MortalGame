@@ -149,7 +149,7 @@ public class CardPlayResultCondition : ICardBuffCondition, IPlayerBuffCondition,
         return actionUnit.Source switch
         {
             CardPlayResultSource cardPlayResultSource =>
-                Conditions.All(c => c.Eval(gameWatcher, trigger, cardPlayResultSource)),
+                Conditions.All(c => c.Eval(gameWatcher, trigger, actionUnit, cardPlayResultSource)),
             _ => false
         };
     }
@@ -189,7 +189,7 @@ public class CharacterCondition : ICardBuffCondition, IPlayerBuffCondition, ICha
     {
         var characterOpt = Character.Eval(gameWatcher, trigger, actionUnit);
         return characterOpt.Match(
-            character => Conditions.All(c => c.Eval(gameWatcher, trigger, character)),
+            character => Conditions.All(c => c.Eval(gameWatcher, trigger, actionUnit, character)),
             ()        => false
         );
     }

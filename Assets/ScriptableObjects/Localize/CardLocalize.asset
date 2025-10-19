@@ -20,318 +20,47 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
-    SerializationNodes:
-    - Name: Data
-      Entry: 7
-      Data: 0|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[LocalizeTitleInfoData,
-        Assembly-CSharp]], mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 1|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 14
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Attack
-    - Name: $v
-      Entry: 7
-      Data: 2|LocalizeTitleInfoData, Assembly-CSharp
-    - Name: Title
-      Entry: 1
-      Data: "\u653B\u64CA"
-    - Name: Info
-      Entry: 1
-      Data: "{:power}\u57FA\u790E\u50B7\u5BB3"
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: BuffPoison
-    - Name: $v
-      Entry: 7
-      Data: 3|LocalizeTitleInfoData, Assembly-CSharp
-    - Name: Title
-      Entry: 1
-      Data: "\u4E0A\u6BD2"
-    - Name: Info
-      Entry: 1
-      Data: "\u8CE6\u4E88{:power}\u4E2D\u6BD2"
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Defense
-    - Name: $v
-      Entry: 7
-      Data: 4|LocalizeTitleInfoData, Assembly-CSharp
-    - Name: Title
-      Entry: 1
-      Data: "\u9632\u79A6"
-    - Name: Info
-      Entry: 1
-      Data: "\u7372\u5F97{:power}\u8B77\u76FE"
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Heal
-    - Name: $v
-      Entry: 7
-      Data: 5|LocalizeTitleInfoData, Assembly-CSharp
-    - Name: Title
-      Entry: 1
-      Data: "\u4F11\u606F"
-    - Name: Info
-      Entry: 1
-      Data: "\u6062\u5FA9{:power}\u8840\u91CF"
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: PenetrateAttack001
-    - Name: $v
-      Entry: 7
-      Data: 6|LocalizeTitleInfoData, Assembly-CSharp
-    - Name: Title
-      Entry: 1
-      Data: "\u7A7F\u900F"
-    - Name: Info
-      Entry: 1
-      Data: "{:power}\u7A7F\u900F\u50B7\u5BB3"
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: DrawCard
-    - Name: $v
-      Entry: 7
-      Data: 7|LocalizeTitleInfoData, Assembly-CSharp
-    - Name: Title
-      Entry: 1
-      Data: "\u62BD\u5361"
-    - Name: Info
-      Entry: 1
-      Data: "\u62BD{:power}\u5F35\u5361"
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: CloneCard
-    - Name: $v
-      Entry: 7
-      Data: 8|LocalizeTitleInfoData, Assembly-CSharp
-    - Name: Title
-      Entry: 1
-      Data: "\u8907\u88FD"
-    - Name: Info
-      Entry: 1
-      Data: "\u8907\u88FD{:power}\u5F35\u624B\u724C"
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: DiscardCard
-    - Name: $v
-      Entry: 7
-      Data: 9|LocalizeTitleInfoData, Assembly-CSharp
-    - Name: Title
-      Entry: 1
-      Data: "\u4E1F\u5361"
-    - Name: Info
-      Entry: 1
-      Data: "\u4E1F1\u5361\u81F3\u5893\u5730"
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: ConsumeCard
-    - Name: $v
-      Entry: 7
-      Data: 10|LocalizeTitleInfoData, Assembly-CSharp
-    - Name: Title
-      Entry: 1
-      Data: "\u6D88\u8017\u5361"
-    - Name: Info
-      Entry: 1
-      Data: "\u6D88\u80171\u5361\u81F3\u6230\u9B25\u7D50\u675F"
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: DisposeCard
-    - Name: $v
-      Entry: 7
-      Data: 11|LocalizeTitleInfoData, Assembly-CSharp
-    - Name: Title
-      Entry: 1
-      Data: "\u79FB\u9664\u5361"
-    - Name: Info
-      Entry: 1
-      Data: "\u6C38\u4E45\u79FB\u96641\u5361\u4E14\u6230\u9B25\u5F8C\u4E0D\u6703\u6062\u5FA9"
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: BuffFullAttack
-    - Name: $v
-      Entry: 7
-      Data: 12|LocalizeTitleInfoData, Assembly-CSharp
-    - Name: Title
-      Entry: 1
-      Data: "\u91CD\u64CA"
-    - Name: Info
-      Entry: 1
-      Data: "\u7372\u5F97{:power}\u91CD\u64CA"
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: BuffQuickAttack
-    - Name: $v
-      Entry: 7
-      Data: 13|LocalizeTitleInfoData, Assembly-CSharp
-    - Name: Title
-      Entry: 1
-      Data: "\u8FC5\u64CA"
-    - Name: Info
-      Entry: 1
-      Data: "\u7372\u5F97{:power}\u8FC5\u64CA"
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: BuffComboAttack
-    - Name: $v
-      Entry: 7
-      Data: 14|LocalizeTitleInfoData, Assembly-CSharp
-    - Name: Title
-      Entry: 1
-      Data: "\u9023\u64CA"
-    - Name: Info
-      Entry: 1
-      Data: "\u7372\u5F97{:power}\u9023\u64CA"
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: BuffFollowAttack
-    - Name: $v
-      Entry: 7
-      Data: 15|LocalizeTitleInfoData, Assembly-CSharp
-    - Name: Title
-      Entry: 1
-      Data: "\u8FFD\u64CA"
-    - Name: Info
-      Entry: 1
-      Data: "\u7372\u5F97{:power}\u8FFD\u64CA"
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+    SerializationNodes: []
+  DataList:
+  - Key: Attack
+    Title: "\u653B\u64CA"
+    Info: "{:power}\u57FA\u790E\u50B7\u5BB3"
+  - Key: BuffPoison
+    Title: "\u4E0A\u6BD2"
+    Info: "\u8CE6\u4E88{:power}\u4E2D\u6BD2"
+  - Key: Defense
+    Title: "\u9632\u79A6"
+    Info: "\u7372\u5F97{:power}\u8B77\u76FE"
+  - Key: Heal
+    Title: "\u4F11\u606F"
+    Info: "\u6062\u5FA9{:power}\u8840\u91CF"
+  - Key: PenetrateAttack001
+    Title: "\u7A7F\u900F"
+    Info: "{:power}\u7A7F\u900F\u50B7\u5BB3"
+  - Key: DrawCard
+    Title: "\u62BD\u5361"
+    Info: "\u62BD{:power}\u5F35\u5361"
+  - Key: CloneCard
+    Title: "\u8907\u88FD"
+    Info: "\u8907\u88FD{:power}\u5F35\u624B\u724C"
+  - Key: DiscardCard
+    Title: "\u4E1F\u5361"
+    Info: "\u4E1F1\u5361\u81F3\u5893\u5730"
+  - Key: ConsumeCard
+    Title: "\u6D88\u8017\u5361"
+    Info: "\u6D88\u80171\u5361\u81F3\u6230\u9B25\u7D50\u675F"
+  - Key: DisposeCard
+    Title: "\u79FB\u9664\u5361"
+    Info: "\u6C38\u4E45\u79FB\u96641\u5361\u4E14\u6230\u9B25\u5F8C\u4E0D\u6703\u6062\u5FA9"
+  - Key: BuffFullAttack
+    Title: "\u91CD\u64CA"
+    Info: "\u7372\u5F97{:power}\u91CD\u64CA"
+  - Key: BuffQuickAttack
+    Title: "\u8FC5\u64CA"
+    Info: "\u7372\u5F97{:power}\u8FC5\u64CA"
+  - Key: BuffComboAttack
+    Title: "\u9023\u64CA"
+    Info: "\u7372\u5F97{:power}\u9023\u64CA"
+  - Key: BuffFollowAttack
+    Title: "\u8FFD\u64CA"
+    Info: "\u7372\u5F97{:power}\u8FFD\u64CA"

@@ -36,13 +36,6 @@ public class CardTypesCondition : ICardValueCondition
 
     public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, ICardEntity card)
     {
-        return Condition switch
-        {
-            SetConditionType.AnyInside => CardTypes.Any(type => type == card.Type),
-            SetConditionType.AllInside => CardTypes.All(type => type == card.Type),
-            SetConditionType.AnyOutside => CardTypes.Any(type => type != card.Type),
-            SetConditionType.AllOutside => CardTypes.All(type => type != card.Type),
-            _ => false
-        };
+        return Condition.Eval(CardTypes, type => type == card.Type);
     }
 }

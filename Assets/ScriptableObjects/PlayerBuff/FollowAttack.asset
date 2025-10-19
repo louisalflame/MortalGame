@@ -204,9 +204,24 @@ MonoBehaviour:
     - Name: 
       Entry: 7
       Data: 21|EffectResultTypeCondition, Assembly-CSharp
-    - Name: Type
+    - Name: EffectTypes
+      Entry: 7
+      Data: 22|EffectResultTypeCondition+EffectType[], Assembly-CSharp
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
       Entry: 3
       Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Condition
+      Entry: 3
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -236,13 +251,13 @@ MonoBehaviour:
       Data: 
     - Name: Effect
       Entry: 7
-      Data: 22|EffectiveDamagePlayerBuffEffect, Assembly-CSharp
+      Data: 23|EffectiveDamagePlayerBuffEffect, Assembly-CSharp
     - Name: Targets
       Entry: 7
-      Data: 23|SingleCharacterCollection, Assembly-CSharp
+      Data: 24|SingleCharacterCollection, Assembly-CSharp
     - Name: Target
       Entry: 7
-      Data: 24|SelectedCharacter, Assembly-CSharp
+      Data: 25|SelectedCharacter, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -251,10 +266,10 @@ MonoBehaviour:
       Data: 
     - Name: Value
       Entry: 7
-      Data: 25|PlayerBuffIntegerProperty, Assembly-CSharp
+      Data: 26|PlayerBuffIntegerProperty, Assembly-CSharp
     - Name: PlayerBuff
       Entry: 7
-      Data: 26|TriggeredPlayerBuff, Assembly-CSharp
+      Data: 27|TriggeredPlayerBuff, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -287,7 +302,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 27|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
+      Data: 28|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -300,7 +315,7 @@ MonoBehaviour:
       Data: 
     - Name: LifeTimeData
       Entry: 7
-      Data: 28|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
+      Data: 29|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 

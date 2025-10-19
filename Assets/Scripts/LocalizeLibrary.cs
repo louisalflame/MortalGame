@@ -53,10 +53,8 @@ public class LocalizeLibrary
             }
         }
 
-        return new LocalizeTitleInfoData
-        {
-            Title = $"{localizeType}|{key}_Title",
-            Info = $"{localizeType}|{key}_Info",
-        };
+        return new LocalizeTitleInfoData(
+            $"{localizeType}|{key}_Title",
+            $"{localizeType}|{key}_Info");
     }
 }

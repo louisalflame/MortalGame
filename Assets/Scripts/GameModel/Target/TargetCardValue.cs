@@ -47,6 +47,8 @@ public class PlayingCard : ITargetCardValue
         {
             CardPlaySource cardPlaySource =>
                 cardPlaySource.Card.SomeNotNull(),
+            CardPlayResultSource cardPlayResultSource =>
+                cardPlayResultSource.CardPlaySource.Card.SomeNotNull(),
             _ => Option.None<ICardEntity>()
         };
     }

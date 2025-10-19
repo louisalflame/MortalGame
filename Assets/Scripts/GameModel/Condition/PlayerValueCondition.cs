@@ -11,17 +11,30 @@ public interface IPlayerValueCondition
 }
 
 [Serializable]
-public class PlayerEqualCondition : IPlayerValueCondition
+public class PlayerFactionCondition : IPlayerValueCondition
 {
+    public enum FactionCondition
+    {
+        Same,
+        Opposite
+    }
+
     [HorizontalGroup("1")]
+
     public ITargetPlayerValue ComparePlayer;
+    public FactionCondition Faction;
 
     public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, IPlayerEntity player)
     {
         return ComparePlayer
             .Eval(gameWatcher, source, actionUnit)
             .Match(
-                comparePlayer => player == comparePlayer,
+                comparePlayer => Faction switch
+                {
+                    FactionCondition.Same     => player.Faction == comparePlayer.Faction,
+                    FactionCondition.Opposite => player.Faction != comparePlayer.Faction,
+                    _                          => false
+                },
                 () => false);
     }
 }
