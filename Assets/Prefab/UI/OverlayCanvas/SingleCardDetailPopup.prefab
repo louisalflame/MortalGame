@@ -223,7 +223,7 @@ CanvasGroup:
   m_Enabled: 1
   m_Alpha: 1
   m_Interactable: 0
-  m_BlocksRaycasts: 0
+  m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
 --- !u!1001 &664775240748634317
 PrefabInstance:
@@ -239,7 +239,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4500874271476905821, guid: f74c84df152a41e44a4dd4c2941fe3b9, type: 3}
       propertyPath: m_Pivot.x
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 4500874271476905821, guid: f74c84df152a41e44a4dd4c2941fe3b9, type: 3}
       propertyPath: m_Pivot.y
@@ -299,7 +299,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4500874271476905821, guid: f74c84df152a41e44a4dd4c2941fe3b9, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 80
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4500874271476905821, guid: f74c84df152a41e44a4dd4c2941fe3b9, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -346,6 +346,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3989692393264613042}
     m_Modifications:
+    - target: {fileID: 572021892186726750, guid: bdab98a1511fd8448bf0b9b4b3a157eb, type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 572021892186726750, guid: bdab98a1511fd8448bf0b9b4b3a157eb, type: 3}
     - target: {fileID: 1827428045161050801, guid: bdab98a1511fd8448bf0b9b4b3a157eb, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -430,6 +434,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Card
       objectReference: {fileID: 0}
+    - target: {fileID: 4363737896662661795, guid: bdab98a1511fd8448bf0b9b4b3a157eb, type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 4363737896662661795, guid: bdab98a1511fd8448bf0b9b4b3a157eb, type: 3}
+    - target: {fileID: 5721869865830623745, guid: bdab98a1511fd8448bf0b9b4b3a157eb, type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 5721869865830623745, guid: bdab98a1511fd8448bf0b9b4b3a157eb, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
