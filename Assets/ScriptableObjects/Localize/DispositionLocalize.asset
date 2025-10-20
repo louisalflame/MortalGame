@@ -20,129 +20,20 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
-    SerializationNodes:
-    - Name: Data
-      Entry: 7
-      Data: 0|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[LocalizeTitleInfoData,
-        Assembly-CSharp]], mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 1|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 5
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Coward
-    - Name: $v
-      Entry: 7
-      Data: 2|LocalizeTitleInfoData, Assembly-CSharp
-    - Name: Title
-      Entry: 1
-      Data: "\u6027\u60C5\uFF1A\u61E6\u592B"
-    - Name: Info
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Cautious
-    - Name: $v
-      Entry: 7
-      Data: 3|LocalizeTitleInfoData, Assembly-CSharp
-    - Name: Title
-      Entry: 1
-      Data: "\u6027\u60C5\uFF1A\u8C28\u614E"
-    - Name: Info
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Moderate
-    - Name: $v
-      Entry: 7
-      Data: 4|LocalizeTitleInfoData, Assembly-CSharp
-    - Name: Title
-      Entry: 1
-      Data: "\u6027\u60C5\uFF1A\u4E2D\u5EB8"
-    - Name: Info
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Brave
-    - Name: $v
-      Entry: 7
-      Data: 5|LocalizeTitleInfoData, Assembly-CSharp
-    - Name: Title
-      Entry: 1
-      Data: "\u6027\u60C5\uFF1A\u52C7\u6562"
-    - Name: Info
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Reckless
-    - Name: $v
-      Entry: 7
-      Data: 6|LocalizeTitleInfoData, Assembly-CSharp
-    - Name: Title
-      Entry: 1
-      Data: "\u6027\u60C5\uFF1A\u9B6F\u83BD"
-    - Name: Info
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+    SerializationNodes: []
+  DataList:
+  - Key: Brave
+    Title: "\u6027\u60C5\uFF1A\u52C7\u6562"
+    Info: 
+  - Key: Cautious
+    Title: "\u6027\u60C5\uFF1A\u8C28\u614E"
+    Info: 
+  - Key: Coward
+    Title: "\u6027\u60C5\uFF1A\u61E6\u592B"
+    Info: 
+  - Key: Moderate
+    Title: "\u6027\u60C5\uFF1A\u4E2D\u5EB8"
+    Info: 
+  - Key: Reckless
+    Title: "\u6027\u60C5\uFF1A\u9B6F\u83BD"
+    Info: 
