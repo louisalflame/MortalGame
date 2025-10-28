@@ -24,16 +24,16 @@ MonoBehaviour:
   DataList:
   - Key: Brave
     Title: "\u6027\u60C5\uFF1A\u52C7\u6562"
-    Info: 
+    Info: "\u6BCF\u56DE\u6062\u5FA93\n\u6BCF\u56DE\u62BD6\u5F35\u724C"
   - Key: Cautious
     Title: "\u6027\u60C5\uFF1A\u8C28\u614E"
-    Info: 
+    Info: "\u6BCF\u56DE\u6062\u5FA93\n\u6BCF\u56DE\u62BD5\u5F35\u724C"
   - Key: Coward
     Title: "\u6027\u60C5\uFF1A\u61E6\u592B"
-    Info: 
+    Info: "\u6BCF\u56DE\u6062\u5FA94\n\u6BCF\u56DE\u62BD5\u5F35\u724C"
   - Key: Moderate
     Title: "\u6027\u60C5\uFF1A\u4E2D\u5EB8"
-    Info: 
+    Info: "\u6BCF\u56DE\u6062\u5FA94\n\u6BCF\u56DE\u62BD4\u5F35\u724C"
   - Key: Reckless
     Title: "\u6027\u60C5\uFF1A\u9B6F\u83BD"
-    Info: 
+    Info: "\u6BCF\u56DE\u6062\u5FA95\n\u6BCF\u56DE\u62BD4\u5F35\u724C"

@@ -46,7 +46,7 @@ public class PlayerBuffView : MonoBehaviour, IRecyclable
 
                 _buffIcon.OnPointerEnterAsObservable()
                     .WithLatestFrom(reactiveProp, (_, info) => info)
-                    .Subscribe(info => simpleHintView.ShowBuffInfo(info, _rectTransform))
+                    .Subscribe(info => _ShowBuffInfo(simpleHintView, info))
                     .AddTo(_disposables);
             });        
         
@@ -56,8 +56,18 @@ public class PlayerBuffView : MonoBehaviour, IRecyclable
     }
 
     private void _Render(PlayerBuffInfo buffInfo)
-    { 
+    {
         _levelText.text = buffInfo.Level.ToString();
+    }
+    
+    private void _ShowBuffInfo(SimpleTitleInfoHintView simpleHintView, PlayerBuffInfo buffInfo)
+    { 
+        var localizeData = _localizeLibrary.Get(LocalizeTitleInfoType.Buff, buffInfo.Id);
+        var templateValue = buffInfo.GetTemplateValues();
+        var title = localizeData.Title;
+        var info = localizeData.Info.ReplaceTemplateKeys(templateValue);
+
+        simpleHintView.ShowTitleInfo(title, info, _rectTransform);
     }
 
     public void Reset()

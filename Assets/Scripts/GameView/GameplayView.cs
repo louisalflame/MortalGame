@@ -250,6 +250,9 @@ public class GameplayView : MonoBehaviour, IGameplayView
     }
     private void _UpdateRoundAndPlayer(RoundStartEvent roundStartEvent)
     {
+        _gameViewModel.UpdateDispositionInfo(
+            new(roundStartEvent.Player.DispositionManager.CurrentDisposition,
+                roundStartEvent.Player.DispositionManager.MaxDisposition));
         _allyInfoView.SetPlayerInfo(roundStartEvent.Round, roundStartEvent.Player);
         _enemyInfoView.SetPlayerInfo(roundStartEvent.Enemy);
     }

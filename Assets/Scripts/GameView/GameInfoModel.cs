@@ -22,6 +22,9 @@ public interface IGameViewModel
     Option<IReadOnlyReactiveProperty<CardInfo>> ObservableCardInfo(Guid identity);
     Option<IReadOnlyReactiveProperty<PlayerBuffInfo>> ObservablePlayerBuffInfo(Guid identity);
     Option<IReadOnlyReactiveProperty<CharacterBuffInfo>> ObservableCharacterBuffInfo(Guid identity);
+
+    void UpdateDispositionInfo(DispositionInfo dispositionInfo);
+    IReadOnlyReactiveProperty<DispositionInfo> ObservableDispositionInfo { get; }
 }
 
 public class GameViewModel : IGameViewModel
@@ -30,6 +33,7 @@ public class GameViewModel : IGameViewModel
     private Dictionary<Guid, ReactiveProperty<PlayerBuffInfo>> _playerBuffInfos;
     private Dictionary<Guid, ReactiveProperty<CharacterBuffInfo>> _characterBuffInfos;
     private Dictionary<Faction, Dictionary<CardCollectionType, ReactiveProperty<CardCollectionInfo>>> _cardCollectionInfos;
+    private ReactiveProperty<DispositionInfo> _dispositionInfo;
 
     private readonly ReactiveProperty<bool> _isHandCardsEnabled;
     public IReadOnlyReactiveProperty<bool> IsHandCardsEnabled => _isHandCardsEnabled;
@@ -60,6 +64,7 @@ public class GameViewModel : IGameViewModel
                 }
             }
         };
+        _dispositionInfo = new ReactiveProperty<DispositionInfo>(new DispositionInfo(0, 0));
         _isHandCardsEnabled = new ReactiveProperty<bool>(false);
     }
 
@@ -124,6 +129,10 @@ public class GameViewModel : IGameViewModel
             _characterBuffInfos[characterBuffInfo.Identity].Value = characterBuffInfo;
         }
     }
+    public void UpdateDispositionInfo(DispositionInfo dispositionInfo)
+    {
+        _dispositionInfo.Value = dispositionInfo;
+    }
 
     public IReadOnlyReactiveProperty<CardCollectionInfo> ObservableCardCollectionInfo(Faction faction, CardCollectionType type)
     {
@@ -148,4 +157,6 @@ public class GameViewModel : IGameViewModel
         return OptionCollectionExtensions.GetValueOrNone(_characterBuffInfos, identity)
             .Map(prop => (IReadOnlyReactiveProperty<CharacterBuffInfo>)prop);
     }
+
+    public IReadOnlyReactiveProperty<DispositionInfo> ObservableDispositionInfo { get { return _dispositionInfo; } }
 }

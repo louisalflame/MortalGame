@@ -25,6 +25,7 @@ public class RoundStartEvent : IGameEvent
     public int Round;
     public AllyEntity Player;
     public EnemyEntity Enemy;
+    //TODO  use allyInfo and enemyInfo
 }
 public class RecycleGraveyardEvent : IGameEvent
 {

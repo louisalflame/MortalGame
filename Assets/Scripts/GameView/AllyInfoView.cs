@@ -24,17 +24,17 @@ public class AllyInfoView : MonoBehaviour
     private LocalizeLibrary _localizeLibrary;
 
     public void Init(
-        IGameViewModel gameInfoModel,
+        IGameViewModel gameViewModel,
         TopBarInfoView topBarInfoView, 
         SimpleTitleInfoHintView simpleHintView,
         LocalizeLibrary localizeLibrary, 
         DispositionLibrary dispositionLibrary)
     {
-        _gameViewModel = gameInfoModel;
+        _gameViewModel = gameViewModel;
         _topBarInfoView = topBarInfoView;
         _localizeLibrary = localizeLibrary;
-        _dispositionView.Init(localizeLibrary, dispositionLibrary);
-        _buffCollectionView.Init(_gameViewModel, _localizeLibrary, simpleHintView);
+        _dispositionView.Init(localizeLibrary, dispositionLibrary, gameViewModel, simpleHintView);
+        _buffCollectionView.Init(gameViewModel, localizeLibrary, simpleHintView);
     }
 
     public void SetPlayerInfo(int round, AllyEntity ally)
@@ -44,7 +44,6 @@ public class AllyInfoView : MonoBehaviour
         _healthBarView.SetHealth(ally.MainCharacter.CurrentHealth, ally.MainCharacter.MaxHealth);
         _healthBarView.SetShield(ally.MainCharacter.CurrentArmor);    
         _energyBarView.SetEnergy(ally.CurrentEnergy, ally.MaxEnergy);
-        _dispositionView.SetDisposition(ally.DispositionManager.CurrentDisposition, ally.DispositionManager.MaxDisposition);
     }
     
     public void UpdateEnergy(LoseEnergyEvent loseEnergyEvent)

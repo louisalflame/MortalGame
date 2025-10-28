@@ -20,15 +20,12 @@ public class SimpleTitleInfoHintView : MonoBehaviour
         _localizeLibrary = localizeLibrary;
     }
 
-    public void ShowBuffInfo(PlayerBuffInfo buffInfo, RectTransform targetRect)
+    public void ShowTitleInfo(string title, string info, RectTransform targetRect)
     {
         gameObject.SetActive(true);
 
-        var localizeData = _localizeLibrary.Get(LocalizeTitleInfoType.Buff, buffInfo.Id);
-        var templateValue = buffInfo.GetTemplateValues();
-        
-        _titleText.text = localizeData.Title;
-        _infoText.text = localizeData.Info.ReplaceTemplateKeys(templateValue);
+        _titleText.text = title;
+        _infoText.text = info;
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(_hintRectTransform);
 

@@ -6,6 +6,8 @@ public interface IDispositionManager
     int MaxDisposition { get; }
 }
 
+public record DispositionInfo(int CurrentDisposition, int MaxDisposition);
+
 public class DispositionManager : IDispositionManager
 {
     public int CurrentDisposition => _disposition;
@@ -16,7 +18,7 @@ public class DispositionManager : IDispositionManager
 
     public DispositionManager(int initialDisposition, int maxDisposition)
     {
-        _disposition = initialDisposition; 
+        _disposition = initialDisposition;
         _maxDisposition = maxDisposition;
     }
 }
