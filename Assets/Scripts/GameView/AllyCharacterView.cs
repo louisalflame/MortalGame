@@ -21,7 +21,6 @@ public class AllyCharacterView : BaseCharacterView, ISelectableView
     {
         _statusWatcher = statusWatcher;
         _timmer = 0;
-        _healthEventBuffer = new Queue<HealthEvent>();
     }
 
     public void SummonAlly(AllySummonEvent allySummonEvent)

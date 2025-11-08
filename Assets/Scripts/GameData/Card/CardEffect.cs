@@ -79,6 +79,20 @@ public class RemovePlayerBuffEffect : ICardEffect
     [ValueDropdown("@DropdownHelper.PlayerBuffNames")]
     public string BuffId;
 }
+[Serializable]
+public class IncreaseDispositionEffect : ICardEffect
+{
+    // Only Ally Has Disposition
+    public ITargetPlayerCollectionValue Targets;
+    public IIntegerValue Value;
+}
+[Serializable]
+public class DecreaseDispositionEffect : ICardEffect
+{
+    // Only Ally Has Disposition
+    public ITargetPlayerCollectionValue Targets;
+    public IIntegerValue Value;
+}
 
 // ==============================
 // Target-Card Effect

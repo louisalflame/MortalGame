@@ -4,7 +4,10 @@ using UnityEngine;
 
 public interface IGameEvent
 {
+}
 
+public interface IAnimationNumberEvent : IGameEvent
+{
 }
 
 public class NoneEvent : IGameEvent
@@ -169,7 +172,7 @@ public class UsedCardEvent : IGameEvent
     public CardCollectionInfo DisposeZoneInfo;
 }
 
-public abstract class EnergyEvent : IGameEvent
+public abstract class EnergyEvent : IGameEvent, IAnimationNumberEvent
 {
     public Faction Faction;
     public int Energy;
@@ -195,11 +198,36 @@ public class LoseEnergyEvent : EnergyEvent
 {
     public EnergyLoseType LoseType;
 
-    public LoseEnergyEvent(IPlayerEntity player, LoseEnergyResult result) : 
-        base(player, result.DeltaEp) { }
+    public LoseEnergyEvent(IPlayerEntity player, LoseEnergyResult result) :
+        base(player, result.DeltaEp)
+    { }
 }
 
-public abstract class HealthEvent : IGameEvent
+public abstract class DispositionEvent : IGameEvent, IAnimationNumberEvent
+{
+    public DispositionInfo Info;
+    public int DeltaDisposition;
+
+    public DispositionEvent(AllyEntity ally, int deltaDisposition)
+    {
+        Info = ally.DispositionManager.ToInfo();
+        DeltaDisposition = deltaDisposition;
+    }
+}
+public class IncreaseDispositionEvent : DispositionEvent
+{
+    public IncreaseDispositionEvent(AllyEntity ally, IncreaseDispositionResult result) :
+        base(ally, result.DeltaDisposition)
+    { }
+}
+public class DecreaseDispositionEvent : DispositionEvent
+{
+    public DecreaseDispositionEvent(AllyEntity ally, DecreaseDispositionResult result) :
+        base(ally, result.DeltaDisposition)
+    { }
+}
+
+public abstract class HealthEvent : IGameEvent, IAnimationNumberEvent
 {
     public Faction Faction;
     public Guid CharacterIdentity;

@@ -1,4 +1,5 @@
 using TMPro;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -59,10 +60,6 @@ public class AllyInfoView : MonoBehaviour
     {
         _healthBarView.SetHealth(healthEvent.Hp, healthEvent.MaxHp);
         _healthBarView.SetShield(healthEvent.Dp);    
-    }
-
-    public void UpdateDisposition()
-    { 
     }
 
     public void AddBuff(AddPlayerBuffEvent addBuffEvent)

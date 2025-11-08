@@ -54,6 +54,21 @@ public class LoseEnergyIntentAction : BaseEffectIntentAction
     { }
 }
 
+public class IncreaseDispositionIntentAction : BaseEffectIntentAction
+{
+    public override EffectType EffectType => EffectType.AdjustDisposition;
+
+    public IncreaseDispositionIntentAction(IActionSource source) : base(source)
+    { }
+}
+public class DecreaseDispositionIntentAction : BaseEffectIntentAction
+{
+    public override EffectType EffectType => EffectType.AdjustDisposition;
+
+    public DecreaseDispositionIntentAction(IActionSource source) : base(source)
+    { }
+}
+
 public class RecycleDeckIntentAction : BaseEffectIntentAction
 {
     public override EffectType EffectType => EffectType.RecycleDeck;

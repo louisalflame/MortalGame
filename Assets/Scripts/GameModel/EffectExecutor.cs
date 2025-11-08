@@ -30,63 +30,70 @@ public static class EffectExecutor
         return cardEffect switch
         {
             // Damage Effects
-            DamageEffect damageEffect => 
-                ApplyDamageEffect(context, damageEffect.Targets, damageEffect.Value, DamageType.Normal, 
+            DamageEffect damageEffect =>
+                ApplyDamageEffect(context, damageEffect.Targets, damageEffect.Value, DamageType.Normal,
                     GameFormula.NormalDamagePoint),
-            
-            PenetrateDamageEffect penetrateDamageEffect => 
-                ApplyDamageEffect(context, penetrateDamageEffect.Targets, penetrateDamageEffect.Value, DamageType.Penetrate, 
+
+            PenetrateDamageEffect penetrateDamageEffect =>
+                ApplyDamageEffect(context, penetrateDamageEffect.Targets, penetrateDamageEffect.Value, DamageType.Penetrate,
                     GameFormula.PenetrateDamagePoint),
-            
-            AdditionalAttackEffect additionalAttackEffect => 
-                ApplyDamageEffect(context, additionalAttackEffect.Targets, additionalAttackEffect.Value, DamageType.Additional, 
+
+            AdditionalAttackEffect additionalAttackEffect =>
+                ApplyDamageEffect(context, additionalAttackEffect.Targets, additionalAttackEffect.Value, DamageType.Additional,
                     GameFormula.AdditionalDamagePoint),
-            
-            EffectiveAttackEffect effectiveAttackEffect => 
-                ApplyDamageEffect(context, effectiveAttackEffect.Targets, effectiveAttackEffect.Value, DamageType.Effective, 
+
+            EffectiveAttackEffect effectiveAttackEffect =>
+                ApplyDamageEffect(context, effectiveAttackEffect.Targets, effectiveAttackEffect.Value, DamageType.Effective,
                     GameFormula.EffectiveDamagePoint),
 
             // Character Health Effects
-            HealEffect healEffect => 
+            HealEffect healEffect =>
                 ApplyHealEffect(context, healEffect),
-            
-            ShieldEffect shieldEffect => 
+
+            ShieldEffect shieldEffect =>
                 ApplyShieldEffect(context, shieldEffect),
 
             // Energy Effects
-            GainEnergyEffect gainEnergyEffect => 
+            GainEnergyEffect gainEnergyEffect =>
                 ApplyGainEnergyEffect(context, gainEnergyEffect),
-            
-            LoseEnegyEffect loseEnergyEffect => 
+
+            LoseEnegyEffect loseEnergyEffect =>
                 ApplyLoseEnergyEffect(context, loseEnergyEffect),
 
+            // Disposition Effects
+            IncreaseDispositionEffect increaseDispositionEffect =>
+                ApplyIncreaseDispositionEffect(context, increaseDispositionEffect),
+
+            DecreaseDispositionEffect decreaseDispositionEffect =>
+                ApplyDecreaseDispositionEffect(context, decreaseDispositionEffect),
+
             // Player Buff Effects
-            AddPlayerBuffEffect addBuffEffect => 
+            AddPlayerBuffEffect addBuffEffect =>
                 ApplyAddPlayerBuffEffect(context, addBuffEffect),
-            
-            RemovePlayerBuffEffect removeBuffEffect => 
+
+            RemovePlayerBuffEffect removeBuffEffect =>
                 ApplyRemovePlayerBuffEffect(context, removeBuffEffect),
 
             // Card Effects
-            DrawCardEffect drawCardEffect => 
+            DrawCardEffect drawCardEffect =>
                 ApplyDrawCardEffect(context, drawCardEffect),
-            
-            DiscardCardEffect discardCardEffect => 
+
+            DiscardCardEffect discardCardEffect =>
                 ApplyDiscardCardEffect(context, discardCardEffect),
-            
-            ConsumeCardEffect consumeCardEffect => 
+
+            ConsumeCardEffect consumeCardEffect =>
                 ApplyConsumeCardEffect(context, consumeCardEffect),
-            
-            DisposeCardEffect disposeCardEffect => 
+
+            DisposeCardEffect disposeCardEffect =>
                 ApplyDisposeCardEffect(context, disposeCardEffect),
-            
-            CreateCardEffect createCardEffect => 
+
+            CreateCardEffect createCardEffect =>
                 ApplyCreateCardEffect(context, createCardEffect),
-            
-            CloneCardEffect cloneCardEffect => 
+
+            CloneCardEffect cloneCardEffect =>
                 ApplyCloneCardEffect(context, cloneCardEffect),
-            
-            AddCardBuffEffect addCardBuffEffect => 
+
+            AddCardBuffEffect addCardBuffEffect =>
                 ApplyAddCardBuffEffect(context, addCardBuffEffect),
 
             _ => new EffectResult(new List<IGameEvent>(), new List<BaseResultAction>())
@@ -226,6 +233,63 @@ public static class EffectExecutor
             resultActions.Add(loseEnergyResultAction);
             cardEffectEvents.AddRange(reactorEvents);
             cardEffectEvents.Add(new LoseEnergyEvent(target, loseEnergyResult));
+        }
+
+        return new EffectResult(cardEffectEvents, resultActions);
+    }
+    #endregion
+
+    #region Disposition Effect Handlers
+    private static EffectResult ApplyIncreaseDispositionEffect(EffectContext context, IncreaseDispositionEffect increaseDispositionEffect)
+    {
+        var cardEffectEvents = new List<IGameEvent>();
+        var resultActions = new List<BaseResultAction>();
+        var intent = new IncreaseDispositionIntentAction(context.ActionSource);
+        var targets = increaseDispositionEffect.Targets.Eval(context.GameplayWatcher, context.Trigger, intent);
+
+        foreach (var target in targets)
+        {
+            if (target is AllyEntity ally)
+            {
+                var playerTarget = new PlayerTarget(ally);
+                var targetIntent = new IncreaseDispositionIntentTargetAction(context.ActionSource, playerTarget);
+                var increaseValue = increaseDispositionEffect.Value.Eval(context.GameplayWatcher, context.Trigger, targetIntent);
+                var increaseResult = ally.DispositionManager.IncreaseDisposition(increaseValue);
+
+                var increaseDispositionResultAction = new IncreaseDispositionResultAction(context.ActionSource, playerTarget, increaseResult);
+                var reactorEvents = context.GameplayReactor.UpdateReactorSessionAction(increaseDispositionResultAction);
+
+                resultActions.Add(increaseDispositionResultAction);
+                cardEffectEvents.AddRange(reactorEvents);
+                cardEffectEvents.Add(new IncreaseDispositionEvent(ally, increaseResult));
+            }
+        }
+
+        return new EffectResult(cardEffectEvents, resultActions);
+    }
+    private static EffectResult ApplyDecreaseDispositionEffect(EffectContext context, DecreaseDispositionEffect decreaseDispositionEffect)
+    {
+        var cardEffectEvents = new List<IGameEvent>();
+        var resultActions = new List<BaseResultAction>();
+        var intent = new DecreaseDispositionIntentAction(context.ActionSource);
+        var targets = decreaseDispositionEffect.Targets.Eval(context.GameplayWatcher, context.Trigger, intent);
+
+        foreach (var target in targets)
+        {
+            if (target is AllyEntity ally)
+            {
+                var playerTarget = new PlayerTarget(ally);
+                var targetIntent = new DecreaseDispositionIntentTargetAction(context.ActionSource, playerTarget);
+                var decreaseValue = decreaseDispositionEffect.Value.Eval(context.GameplayWatcher, context.Trigger, targetIntent);
+                var decreaseResult = ally.DispositionManager.DecreaseDisposition(decreaseValue);
+
+                var decreaseDispositionResultAction = new DecreaseDispositionResultAction(context.ActionSource, playerTarget, decreaseResult);
+                var reactorEvents = context.GameplayReactor.UpdateReactorSessionAction(decreaseDispositionResultAction);
+
+                resultActions.Add(decreaseDispositionResultAction);
+                cardEffectEvents.AddRange(reactorEvents);
+                cardEffectEvents.Add(new DecreaseDispositionEvent(ally, decreaseResult));
+            }
         }
 
         return new EffectResult(cardEffectEvents, resultActions);

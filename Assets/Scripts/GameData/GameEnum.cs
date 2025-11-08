@@ -133,6 +133,7 @@ public enum EffectType
     Shield,
     GainEnergy,
     LoseEnergy,
+    AdjustDisposition,
     RecycleDeck,
     DrawCard,
     DiscardCard,

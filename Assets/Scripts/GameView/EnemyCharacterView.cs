@@ -17,7 +17,6 @@ public class EnemyCharacterView : BaseCharacterView, ISelectableView
     {
         _statusWatcher = statusWatcher;
         _timmer = 0;
-        _healthEventBuffer = new Queue<HealthEvent>();
     }
 
     public void SummonEnemy(EnemySummonEvent enemySummonEvent)

@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Playables;
 
-public class ShieldEventView: MonoBehaviour, IRecyclable, IHealthEventView
+public class ShieldEventView: MonoBehaviour, IRecyclable, IAnimationNumberEventView
 {
     [SerializeField]
     private TextMeshProUGUI _text;

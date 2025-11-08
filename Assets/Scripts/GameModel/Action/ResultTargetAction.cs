@@ -84,6 +84,33 @@ public class LoseEnergyResultAction : BaseResultAction
     }
 }
 
+public class IncreaseDispositionResultAction : BaseResultAction
+{
+    public override EffectType EffectType => EffectType.AdjustDisposition;
+    public IncreaseDispositionResult DispositionResult { get; private set; }
+
+    public IncreaseDispositionResultAction(
+        IActionSource source,
+        IActionTarget target,
+        IncreaseDispositionResult dispositionResult) : base(source, target)
+    {
+        DispositionResult = dispositionResult;
+    }
+}
+public class DecreaseDispositionResultAction : BaseResultAction
+{
+    public override EffectType EffectType => EffectType.AdjustDisposition;
+    public DecreaseDispositionResult DispositionResult { get; private set; }
+
+    public DecreaseDispositionResultAction(
+        IActionSource source,
+        IActionTarget target,
+        DecreaseDispositionResult dispositionResult) : base(source, target)
+    {
+        DispositionResult = dispositionResult;
+    }
+}
+
 public class RecycleDeckResultAction : BaseResultAction
 {
     public override EffectType EffectType => EffectType.RecycleDeck;

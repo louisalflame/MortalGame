@@ -42,6 +42,19 @@ public class LoseEnergyResult : IEffectResult
     public int OverEp;
 }
 
+public class IncreaseDispositionResult : IEffectResult
+{
+    public int DispositionPoint;
+    public int DeltaDisposition;
+    public int OverDisposition;
+}
+public class DecreaseDispositionResult : IEffectResult
+{
+    public int DispositionPoint;
+    public int DeltaDisposition;
+    public int OverDisposition;
+}
+
 public class AddPlayerBuffResult : IEffectResult
 {
     public bool IsNewBuff;

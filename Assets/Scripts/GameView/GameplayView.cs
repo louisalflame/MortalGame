@@ -200,6 +200,9 @@ public class GameplayView : MonoBehaviour, IGameplayView
                 case GainEnergyEvent gainEnergyEvent:
                     _gainEnergyView(gainEnergyEvent);
                     break;
+                case IncreaseDispositionEvent increaseDispositionEvent:
+                    _IncreaseDispositionView(increaseDispositionEvent);
+                    break;
                 case HealthEvent healthEvent:
                     _updateHealthView(healthEvent);
                     break;
@@ -463,6 +466,16 @@ public class GameplayView : MonoBehaviour, IGameplayView
                 _enemyInfoView.UpdateEnergy(gainEnergyEvent);
                 break;
         }
+    }
+    private void _IncreaseDispositionView(IncreaseDispositionEvent increaseDispositionEvent)
+    {
+        _gameViewModel.UpdateDispositionInfo(increaseDispositionEvent.Info);
+        _allyCharacterView.UpdateDisposition(increaseDispositionEvent);
+    }
+    private void _DecreaseDispositionView(DecreaseDispositionEvent decreaseDispositionEvent)
+    {
+        _gameViewModel.UpdateDispositionInfo(decreaseDispositionEvent.Info);
+        _allyCharacterView.UpdateDisposition(decreaseDispositionEvent);
     }
 
     private void _updateHealthView(HealthEvent healthEvent)
