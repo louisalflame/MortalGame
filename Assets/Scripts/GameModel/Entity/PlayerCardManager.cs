@@ -15,7 +15,7 @@ public interface IPlayerCardManager
     Option<ICardEntity> PlayingCard { get; }
     ICardColletionZone GetCardCollectionZone(CardCollectionType type);
 
-    (bool Success, PlayerCardManager This) TryPlayCard(ICardEntity card, out int handCardIndex, out int handCardsCount);
+    (bool Success, IDisposable PlayCardDisposable) TryPlayCard(ICardEntity card, out int handCardIndex, out int handCardsCount);
     IEnumerable<IGameEvent> ClearHandOnTurnEnd(IGameplayStatusWatcher gameWatcher);
 
     Option<ICardEntity> GetCard(Guid cardIdentity);
@@ -86,7 +86,7 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
         }
     }
 
-    public (bool Success, PlayerCardManager This) TryPlayCard(ICardEntity card, out int index, out int cardsCount)
+    public (bool Success, IDisposable PlayCardDisposable) TryPlayCard(ICardEntity card, out int index, out int cardsCount)
     {
         cardsCount = HandCard.Cards.Count;
         index = HandCard.Cards.ToList().IndexOf(card);

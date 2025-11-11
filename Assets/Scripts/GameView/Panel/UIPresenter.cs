@@ -15,7 +15,7 @@ public class UIPresenter : IUIPresenter
 {
     private readonly DeckCardView _deckCardView;
     private readonly GraveyardCardView _graveyardCardView;
-    private readonly IGameViewModel _gameViewModel;
+    private readonly EnemySelectedCardView _enemySelectedCardView;
 
     private IAllCardDetailPresenter _allCardDetailPresenter;
 
@@ -29,7 +29,7 @@ public class UIPresenter : IUIPresenter
     {
         _deckCardView = buttonView.DeckCardView;
         _graveyardCardView = buttonView.GraveyardCardView;
-        _gameViewModel = gameViewModel;
+        _enemySelectedCardView = buttonView.EnemySelectedCardView;
 
         _allCardDetailPresenter = new AllCardDetailPresenter(panelView, gameViewModel, localizeLibrary);
     }
@@ -44,6 +44,10 @@ public class UIPresenter : IUIPresenter
         _graveyardCardView.GraveyardButton.OnClickAsObservable()
             .Subscribe(_ => _TryEnqueueTask(
                 _allCardDetailPresenter.Run(Faction.Ally, CardCollectionType.Graveyard, CancellationToken.None)))
+            .AddTo(disposables);
+        _enemySelectedCardView.DeckButton.OnClickAsObservable()
+            .Subscribe(_ => _TryEnqueueTask(
+                _allCardDetailPresenter.Run(Faction.Enemy, CardCollectionType.Deck, CancellationToken.None)))
             .AddTo(disposables);
 
         while (!cancellationToken.IsCancellationRequested)

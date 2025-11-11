@@ -212,8 +212,7 @@ MonoBehaviour:
   _allCardBuffScriptable: {fileID: 11400000, guid: 7bae4afbef92de04188088ebbfa11d96, type: 2}
   _allBuffScriptable: {fileID: 11400000, guid: 27e3498cc03f5f9469b5e8623b121076, type: 2}
   _allPlayerScriptable: {fileID: 11400000, guid: 19bc02b7a7132174891674a2395803e1, type: 2}
-  _dispositionScriptable: {fileID: 11400000, guid: 4e23cd5ebc9eef049be6883b9135656d, type: 2}
-  _localizeSettingScriptable: {fileID: 11400000, guid: cf009038e447b6b488021875ef2cdfc7, type: 2}
+  _excelDatasScriptable: {fileID: 11400000, guid: 6cfaf229c8576d047b73984f4849082f, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
