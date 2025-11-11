@@ -711,8 +711,7 @@ public static class EffectExecutor
                 drawCardEvents.AddRange(recycleEvents);
                 drawCardEvents.Add(new RecycleGraveyardEvent(
                     Faction: player.Faction,
-                    DeckInfo: player.CardManager.Deck.ToCardCollectionInfo(gameplayWatcher),
-                    GraveyardInfo: player.CardManager.Graveyard.ToCardCollectionInfo(gameplayWatcher)
+                    CardManagerInfo: player.CardManager.ToInfo(gameplayWatcher)
                 ));
             }
 
@@ -749,8 +748,7 @@ public static class EffectExecutor
             drawCardEvents.Add(new DrawCardEvent(
                 Faction: player.Faction,
                 NewCardInfo: newCard.ToInfo(gameplayWatcher),
-                DeckInfo: player.CardManager.Deck.ToCardCollectionInfo(gameplayWatcher),
-                HandCardInfo: player.CardManager.HandCard.ToCardCollectionInfo(gameplayWatcher)
+                CardManagerInfo: player.CardManager.ToInfo(gameplayWatcher)
             ));
         }
         

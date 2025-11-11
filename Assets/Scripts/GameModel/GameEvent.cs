@@ -22,7 +22,7 @@ public record NoneEvent : IGameEvent
 public record AllySummonEvent(AllyEntity Player) : IGameEvent;
 public record EnemySummonEvent(EnemyEntity Enemy) : IGameEvent;
 public record RoundStartEvent(int Round, AllyEntity Player, EnemyEntity Enemy) : IGameEvent;
-public record RecycleGraveyardEvent(Faction Faction, CardCollectionInfo DeckInfo, CardCollectionInfo GraveyardInfo) : IGameEvent;
+public record RecycleGraveyardEvent(Faction Faction, CardManagerInfo CardManagerInfo) : IGameEvent;
 public record RecycleHandCardEvent(
     Faction Faction,
     IReadOnlyCollection<CardInfo> RecycledCardInfos,
@@ -72,20 +72,9 @@ public record RemoveCardBuffEvent(Faction Faction, CardInfo CardInfo) : IGameEve
 
 public record EnemySelectCardEvent(CardInfo SelectedCardInfo, IReadOnlyCollection<CardInfo> SelectedCardInfos) : IGameEvent;
 public record EnemyUnselectedCardEvent(IReadOnlyCollection<CardInfo> UnselectedCardInfos) : IGameEvent;
-public record PlayerExecuteStartEvent(
-    Faction Faction,
-    CardCollectionInfo HandCardInfo,
-    CardCollectionInfo GraveyardInfo,
-    CardCollectionInfo ExclusionZoneInfo,
-    CardCollectionInfo DisposeZoneInfo) : IGameEvent;
-public record PlayerExecuteEndEvent(Faction Faction, CardCollectionInfo HandCardInfo) : IGameEvent;
-public record UsedCardEvent(
-    Faction Faction,
-    CardInfo UsedCardInfo,
-    CardCollectionInfo HandCardInfo,
-    CardCollectionInfo GraveyardInfo,
-    CardCollectionInfo ExclusionZoneInfo,
-    CardCollectionInfo DisposeZoneInfo) : IGameEvent;
+public record PlayerExecuteStartEvent(Faction Faction, CardManagerInfo CardManagerInfo) : IGameEvent;
+public record PlayerExecuteEndEvent(Faction Faction, CardManagerInfo CardManagerInfo) : IGameEvent;
+public record UsedCardEvent(Faction Faction, CardInfo UsedCardInfo, CardManagerInfo CardManagerInfo) : IGameEvent;
 
 public record GainEnergyEvent(Faction Faction, EnergyInfo Info, GainEnergyResult GainEnergyResult) : IGameEvent, IAnimationNumberEvent;
 public record LoseEnergyEvent(Faction Faction, EnergyInfo Info, LoseEnergyResult LoseEnergyResult) : IGameEvent, IAnimationNumberEvent;

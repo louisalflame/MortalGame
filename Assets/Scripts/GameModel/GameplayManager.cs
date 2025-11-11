@@ -180,10 +180,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
     {
         _gameEvents.Add(new PlayerExecuteStartEvent(
             Faction: _gameStatus.Ally.Faction,
-            HandCardInfo: _gameStatus.Ally.CardManager.HandCard.ToCardCollectionInfo(this),
-            GraveyardInfo: _gameStatus.Ally.CardManager.Graveyard.ToCardCollectionInfo(this),
-            ExclusionZoneInfo: _gameStatus.Ally.CardManager.ExclusionZone.ToCardCollectionInfo(this),
-            DisposeZoneInfo: _gameStatus.Ally.CardManager.DisposeZone.ToCardCollectionInfo(this)
+            CardManagerInfo: _gameStatus.Ally.CardManager.ToInfo(this)
         ));
     }
     public void _PlayerExecute()
@@ -219,10 +216,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                         _UseCard(player, useCardAction.CardIndentity);
                         _gameEvents.Add(new PlayerExecuteStartEvent(
                             Faction: player.Faction,
-                            HandCardInfo: player.CardManager.HandCard.ToCardCollectionInfo(this),
-                            GraveyardInfo: player.CardManager.Graveyard.ToCardCollectionInfo(this),
-                            ExclusionZoneInfo: player.CardManager.ExclusionZone.ToCardCollectionInfo(this),
-                            DisposeZoneInfo: player.CardManager.DisposeZone.ToCardCollectionInfo(this)
+                            CardManagerInfo: player.CardManager.ToInfo(this)
                         ));
                     }
                     break;
@@ -241,7 +235,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
     {
         _gameEvents.Add(new PlayerExecuteEndEvent(
             Faction: _gameStatus.Ally.Faction,
-            HandCardInfo: _gameStatus.Ally.CardManager.HandCard.ToCardCollectionInfo(this)
+            CardManagerInfo: _gameStatus.Ally.CardManager.ToInfo(this)
         ));
 
         var endTurnSource = new SystemExectueEndSource(_gameStatus.Ally);
@@ -314,49 +308,48 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                 var loseEnergyResult = player.EnergyManager.ConsumeEnergy(cardRuntimCost);
                 useCardEvents.Add(new LoseEnergyEvent(player.Faction, player.EnergyManager.ToInfo(), loseEnergyResult));
 
-                if (player.CardManager.TryPlayCard(usedCard, out int handCardIndex, out int handCardsCount))
+                var (isSuccess, playCardDisposable) = player.CardManager.TryPlayCard(usedCard, out int handCardIndex, out int handCardsCount);
+                if (isSuccess)
                 {
                     var cardPlaySource = new CardPlaySource(usedCard, handCardIndex, handCardsCount, loseEnergyResult, new CardPlayAttributeEntity());
                     var cardPlayTrigger = new CardPlayTrigger(cardPlaySource);
+                    var cardPlayResultSource = null as CardPlayResultSource;
 
-                    // Create PlayCardSession
-                    useCardEvents.AddRange(
-                        UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.PlayCardStart, new SystemSource())));
-
-                    useCardEvents.AddRange(
-                        UpdateReactorSessionAction(new CardPlayIntentAction(cardPlaySource)));
-
-                    //TODO: check and remove expired buffs
-                    //      trigger events while remove buffs
-
-                    useCardEvents.AddRange(_TriggerTiming(GameTiming.PlayCardStart, cardPlaySource));
-
-                    var effectActionResults = new List<BaseResultAction>();
-                    foreach (var effect in usedCard.Effects)
+                    using (playCardDisposable)
                     {
-                        var effectResult = EffectExecutor.ApplyCardEffect(
-                            this,
-                            this,
-                            cardPlaySource,
-                            cardPlayTrigger,
-                            effect);
-                        useCardEvents.AddRange(effectResult.Events);
-                        effectActionResults.AddRange(effectResult.ResultActions);
+                        // Create PlayCardSession
+                        useCardEvents.AddRange(
+                            UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.PlayCardStart, new SystemSource())));
+
+                        useCardEvents.AddRange(
+                            UpdateReactorSessionAction(new CardPlayIntentAction(cardPlaySource)));
+
+                        //TODO: check and remove expired buffs
+                        //      trigger events while remove buffs
+
+                        useCardEvents.AddRange(_TriggerTiming(GameTiming.PlayCardStart, cardPlaySource));
+
+                        var effectActionResults = new List<BaseResultAction>();
+                        foreach (var effect in usedCard.Effects)
+                        {
+                            var effectResult = EffectExecutor.ApplyCardEffect(
+                                this,
+                                this,
+                                cardPlaySource,
+                                cardPlayTrigger,
+                                effect);
+                            useCardEvents.AddRange(effectResult.Events);
+                            effectActionResults.AddRange(effectResult.ResultActions);
+                        }
+                        cardPlayResultSource = cardPlaySource.CreateResultSource(effectActionResults);
+
+                        var usedCardInfo = usedCard.ToInfo(this);
+                        var usedCardEvent = new UsedCardEvent(
+                            Faction: player.Faction,
+                            UsedCardInfo: usedCardInfo,
+                            CardManagerInfo: player.CardManager.ToInfo(this));
+                        useCardEvents.Add(usedCardEvent);                        
                     }
-                    var cardPlayResultSource = cardPlaySource.CreateResultSource(effectActionResults);                   
-
-                    player.CardManager.EndPlayCard();
-
-                    var usedCardInfo = usedCard.ToInfo(this);
-                    var usedCardEvent = new UsedCardEvent(
-                        Faction: player.Faction,
-                        UsedCardInfo: usedCardInfo,
-                        HandCardInfo: player.CardManager.HandCard.ToCardCollectionInfo(this),
-                        GraveyardInfo: player.CardManager.Graveyard.ToCardCollectionInfo(this),
-                        ExclusionZoneInfo: player.CardManager.ExclusionZone.ToCardCollectionInfo(this),
-                        DisposeZoneInfo: player.CardManager.DisposeZone.ToCardCollectionInfo(this)
-                    );
-                    useCardEvents.Add(usedCardEvent);
 
                     useCardEvents.AddRange(_TriggerTiming(GameTiming.PlayCardEnd, cardPlayResultSource));
 

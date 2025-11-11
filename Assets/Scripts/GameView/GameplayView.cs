@@ -257,12 +257,13 @@ public class GameplayView : MonoBehaviour, IGameplayView
     private void _DrawCardView(DrawCardEvent drawCardEvent, IGameplayActionReciever reciever)
     {
         _gameViewModel.UpdateCardInfo(drawCardEvent.NewCardInfo);
-        _gameViewModel.UpdateCardCollectionInfo(drawCardEvent.Faction, drawCardEvent.HandCardInfo);
-        _gameViewModel.UpdateCardCollectionInfo(drawCardEvent.Faction, drawCardEvent.DeckInfo);
+        _gameViewModel.UpdateCardCollectionInfo(drawCardEvent.Faction, drawCardEvent.CardManagerInfo);
         switch (drawCardEvent.Faction)
         {
             case Faction.Ally:
-                _allyHandCardView.CreateCardView(drawCardEvent.NewCardInfo, drawCardEvent.HandCardInfo);
+                _allyHandCardView.CreateCardView(
+                    drawCardEvent.NewCardInfo,
+                    drawCardEvent.CardManagerInfo.CardZoneInfos[CardCollectionType.HandCard]);
                 break;
             case Faction.Enemy:
                 _gameViewModel.UpdateCardInfo(drawCardEvent.NewCardInfo);
@@ -322,8 +323,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
 
     private void _RecycleGraveyardEvent(RecycleGraveyardEvent recycleGraveyardEvent)
     {
-        _gameViewModel.UpdateCardCollectionInfo(recycleGraveyardEvent.Faction, recycleGraveyardEvent.DeckInfo);
-        _gameViewModel.UpdateCardCollectionInfo(recycleGraveyardEvent.Faction, recycleGraveyardEvent.GraveyardInfo);
+        _gameViewModel.UpdateCardCollectionInfo(recycleGraveyardEvent.Faction, recycleGraveyardEvent.CardManagerInfo);
         switch (recycleGraveyardEvent.Faction)
         {
             case Faction.Ally:
@@ -335,10 +335,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
     }
     private void _RecycleHandCardEvent(RecycleHandCardEvent recycleHandCardEvent)
     {
-        _gameViewModel.UpdateCardCollectionInfo(recycleHandCardEvent.Faction, recycleHandCardEvent.HandCardInfo);
-        _gameViewModel.UpdateCardCollectionInfo(recycleHandCardEvent.Faction, recycleHandCardEvent.GraveyardInfo);
-        _gameViewModel.UpdateCardCollectionInfo(recycleHandCardEvent.Faction, recycleHandCardEvent.ExclusionZoneInfo);
-        _gameViewModel.UpdateCardCollectionInfo(recycleHandCardEvent.Faction, recycleHandCardEvent.DisposeZoneInfo);
+        _gameViewModel.UpdateCardCollectionInfo(recycleHandCardEvent.Faction, recycleHandCardEvent.CardManagerInfo);
         switch (recycleHandCardEvent.Faction)
         {
             case Faction.Ally:
@@ -361,23 +358,18 @@ public class GameplayView : MonoBehaviour, IGameplayView
 
     private void _PlayerExecuteStart(PlayerExecuteStartEvent playerExecuteStartEvent)
     {
-        _gameViewModel.EnableHandCardsAction(playerExecuteStartEvent.HandCardInfo);
-        _gameViewModel.UpdateCardCollectionInfo(playerExecuteStartEvent.Faction, playerExecuteStartEvent.GraveyardInfo);
-        _gameViewModel.UpdateCardCollectionInfo(playerExecuteStartEvent.Faction, playerExecuteStartEvent.ExclusionZoneInfo);
-        _gameViewModel.UpdateCardCollectionInfo(playerExecuteStartEvent.Faction, playerExecuteStartEvent.DisposeZoneInfo);
+        _gameViewModel.EnableHandCardsAction();
+        _gameViewModel.UpdateCardCollectionInfo(playerExecuteStartEvent.Faction, playerExecuteStartEvent.CardManagerInfo);
         _allyHandCardView.EnableHandCardsUseCardAction(playerExecuteStartEvent);
     }
     private void _PlayerExecuteEnd(PlayerExecuteEndEvent playerExecuteEndEvent)
     {
         _gameViewModel.DisableHandCardsAction();
-        _gameViewModel.UpdateCardCollectionInfo(playerExecuteEndEvent.Faction, playerExecuteEndEvent.HandCardInfo);
+        _gameViewModel.UpdateCardCollectionInfo(playerExecuteEndEvent.Faction, playerExecuteEndEvent.CardManagerInfo);
     }
     private void _UsedCardView(UsedCardEvent usedCardEvent)
     {
-        _gameViewModel.UpdateCardCollectionInfo(usedCardEvent.Faction, usedCardEvent.HandCardInfo);
-        _gameViewModel.UpdateCardCollectionInfo(usedCardEvent.Faction, usedCardEvent.GraveyardInfo);
-        _gameViewModel.UpdateCardCollectionInfo(usedCardEvent.Faction, usedCardEvent.ExclusionZoneInfo);
-        _gameViewModel.UpdateCardCollectionInfo(usedCardEvent.Faction, usedCardEvent.DisposeZoneInfo);
+        _gameViewModel.UpdateCardCollectionInfo(usedCardEvent.Faction, usedCardEvent.CardManagerInfo);
         switch (usedCardEvent.Faction)
         {
             case Faction.Ally:

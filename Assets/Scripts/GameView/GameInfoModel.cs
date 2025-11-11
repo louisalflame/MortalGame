@@ -8,7 +8,8 @@ using UnityEngine;
 public interface IGameViewModel
 {
     void UpdateCardCollectionInfo(Faction faction, CardCollectionInfo cardCollectionInfo);
-    void EnableHandCardsAction(CardCollectionInfo handCardsInfod);
+    void UpdateCardCollectionInfo(Faction faction, CardManagerInfo cardManagerInfo);
+    void EnableHandCardsAction();
     void DisableHandCardsAction();
 
     IReadOnlyReactiveProperty<bool> IsHandCardsEnabled { get; }
@@ -68,14 +69,20 @@ public class GameViewModel : IGameViewModel
         _isHandCardsEnabled = new ReactiveProperty<bool>(false);
     }
 
-    public void EnableHandCardsAction(CardCollectionInfo handCardsInfo)
+    public void EnableHandCardsAction()
     {
-        UpdateCardCollectionInfo(Faction.Ally, handCardsInfo);
         _isHandCardsEnabled.Value = true;
     }
     public void DisableHandCardsAction()
     {
         _isHandCardsEnabled.Value = false;
+    }
+    public void UpdateCardCollectionInfo(Faction faction, CardManagerInfo cardManagerInfo)
+    {
+        foreach (var cardCollectionInfo in cardManagerInfo.CardZoneInfos.Values)
+        {
+            UpdateCardCollectionInfo(faction, cardCollectionInfo);
+        }
     }
     public void UpdateCardCollectionInfo(Faction faction, CardCollectionInfo cardCollectionInfo)
     {

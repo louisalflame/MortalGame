@@ -151,7 +151,7 @@ public class AllyHandCardView : MonoBehaviour
         _handleDisposables.Dispose();
         _handleDisposables = new CompositeDisposable();
 
-        var handCardInfos = playerExecuteStartEvent.HandCardInfo.CardInfos;
+        var handCardInfos = playerExecuteStartEvent.CardManagerInfo.CardZoneInfos[CardCollectionType.HandCard].CardInfos;
         foreach (var cardInfo in handCardInfos.Keys)
         {
             if (_cardViewDict.TryGetValue(cardInfo.Identity, out var cardView))

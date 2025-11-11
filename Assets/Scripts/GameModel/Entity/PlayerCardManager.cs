@@ -12,10 +12,10 @@ public interface IPlayerCardManager
     IGraveyardEntity Graveyard { get; }
     IExclusionZoneEntity ExclusionZone { get; }
     IDisposeZoneEntity DisposeZone { get; }
+    Option<ICardEntity> PlayingCard { get; }
     ICardColletionZone GetCardCollectionZone(CardCollectionType type);
 
-    bool TryPlayCard(ICardEntity card, out int handCardIndex, out int handCardsCount);
-    void EndPlayCard();
+    (bool Success, PlayerCardManager This) TryPlayCard(ICardEntity card, out int handCardIndex, out int handCardsCount);
     IEnumerable<IGameEvent> ClearHandOnTurnEnd(IGameplayStatusWatcher gameWatcher);
 
     Option<ICardEntity> GetCard(Guid cardIdentity);
@@ -46,7 +46,7 @@ public record CardManagerInfo(
     IReadOnlyDictionary<CardCollectionType, CardCollectionInfo> CardZoneInfos,
     Option<CardInfo> PlayingCard);
 
-public class PlayerCardManager : IPlayerCardManager
+public class PlayerCardManager : IPlayerCardManager, IDisposable
 {
     public IHandCardEntity HandCard { get; }
     public IDeckEntity Deck { get; }
@@ -86,22 +86,22 @@ public class PlayerCardManager : IPlayerCardManager
         }
     }
 
-    public bool TryPlayCard(ICardEntity card, out int index, out int cardsCount)
+    public (bool Success, PlayerCardManager This) TryPlayCard(ICardEntity card, out int index, out int cardsCount)
     {
         cardsCount = HandCard.Cards.Count;
         index = HandCard.Cards.ToList().IndexOf(card);
         if (index < 0)
         {
-            return false;
+            return (false, this);
         }
         else
         {
             HandCard.RemoveCard(card);
             PlayingCard = Option.Some(card);
-            return true;
+            return (true, this);
         }
     }
-    public void EndPlayCard()
+    public void Dispose()
     {
         PlayingCard.MatchSome(
             card =>
@@ -129,11 +129,7 @@ public class PlayerCardManager : IPlayerCardManager
             Faction: this.Owner(gameWatcher).ValueOr(PlayerEntity.DummyPlayer).Faction,
             RecycledCardInfos: recycleCards.Select(c => c.ToInfo(gameWatcher)).ToArray(),
             ExcludedCardInfos: excludeCards.Select(c => c.ToInfo(gameWatcher)).ToArray(),
-            HandCardInfo: HandCard.ToCardCollectionInfo(gameWatcher),
-            GraveyardInfo: Graveyard.ToCardCollectionInfo(gameWatcher),
-            ExclusionZoneInfo: ExclusionZone.ToCardCollectionInfo(gameWatcher),
-            DisposeZoneInfo: DisposeZone.ToCardCollectionInfo(gameWatcher)
-        ));
+            CardManagerInfo: this.ToInfo(gameWatcher)));
 
         return events;
     }
@@ -398,7 +394,6 @@ public class PlayerCardManager : IPlayerCardManager
             }
         }
     }
-
 }
 
 public static class PlayerCardManagerExtensions
@@ -411,4 +406,16 @@ public static class PlayerCardManagerExtensions
             return (watcher.GameStatus.Enemy as IPlayerEntity).Some();
         return Option.None<IPlayerEntity>();
     }
+
+    public static CardManagerInfo ToInfo(this IPlayerCardManager cardManager, IGameplayStatusWatcher gameWatcher)
+        => new(
+            new Dictionary<CardCollectionType, CardCollectionInfo>
+            {
+                { CardCollectionType.Deck, cardManager.Deck.ToCardCollectionInfo(gameWatcher) },
+                { CardCollectionType.HandCard, cardManager.HandCard.ToCardCollectionInfo(gameWatcher) },
+                { CardCollectionType.Graveyard, cardManager.Graveyard.ToCardCollectionInfo(gameWatcher) },
+                { CardCollectionType.ExclusionZone, cardManager.ExclusionZone.ToCardCollectionInfo(gameWatcher) },
+                { CardCollectionType.DisposeZone, cardManager.DisposeZone.ToCardCollectionInfo(gameWatcher) }
+            },
+            cardManager.PlayingCard.Map(c => c.ToInfo(gameWatcher)));
 }
