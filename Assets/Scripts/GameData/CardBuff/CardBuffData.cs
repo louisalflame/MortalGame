@@ -15,7 +15,7 @@ public class CardBuffData
     [Space(20)]
     [ShowInInspector]
     [BoxGroup("Effects")]
-    public Dictionary<GameTiming, ConditionalCardBuffEffect[]> Effects = new ();
+    public Dictionary<CardTriggeredTiming, ConditionalCardBuffEffect[]> Effects = new ();
 
     [ShowInInspector]
     [TitleGroup("Properties")]

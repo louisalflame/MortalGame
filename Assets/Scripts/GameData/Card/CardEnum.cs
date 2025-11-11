@@ -49,6 +49,16 @@ public enum CardProperty : int
     AutoDispose         = 1 << 9,
     AppendEffect        = 1 << 10,
 }
+public enum CardTriggeredTiming
+// TODO: 卡片關鍵字效果 
+// ex:  保留/靈光/餘波
+{
+    None = 0,
+    Drawed,
+    Preserved,
+    Discarded,
+    Initialize,
+}
 
 public enum CardCollectionType
 {
@@ -66,36 +76,4 @@ public enum TargetLogicTag
     ToEnemy,
     ToAlly,
     ToRandom,
-}
-
-public enum GameKeyWord
-{
-    None = 0,
-    Attack,
-    Defense,
-    Speech,
-    Sneak,
-    Special,
-    Item,
-    TangSect,
-    Emei,
-    Songshan,
-    BeggarClan,
-    DianCang,
-    BattleBegin,
-    TurnStart,
-    OnDrawCard,
-    OnPlayCard,
-    TurnEnd,
-    EffectTimes,
-    RecycleTimes,
-    PowerAdjust,
-    CostAdjust,
-    InitialPriority,
-    Preserved,
-    Sealed,
-    Consumable,
-    Dispose,
-    AutoDispose,
-    AppendEffect,
 }

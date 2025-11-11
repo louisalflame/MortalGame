@@ -10,21 +10,11 @@ public class CardData
     public class TriggeredCardEffect
     {
         [TableColumnWidth(150, false)]
-        [ValueDropdown("_GetAllowedValues")]
-        public GameTiming Timing;
+        public CardTriggeredTiming Timing;
 
         [ShowInInspector]
         // TODO: conditional cardeffect
         public ICardEffect[] Effects = new ICardEffect[0];
-
-        private static IEnumerable _GetAllowedValues()
-        {
-            return new[] {
-                GameTiming.TurnStart,
-                GameTiming.TurnEnd,
-                GameTiming.DrawCard,
-            };
-        }
     }
 
     [BoxGroup("Identification")]
@@ -63,23 +53,6 @@ public class CardData
     [ShowInInspector]
     [BoxGroup("Properties")]
     public List<ICardPropertyData> PropertyDatas = new();
-
-    public void OnValidate()
-    {
-        if (TriggeredEffects == null) return;
-
-        var keys = new HashSet<GameTiming>();
-        TriggeredEffects.RemoveAll(pair =>
-        {
-            if (keys.Contains(pair.Timing))
-            {
-                return true;
-            }
-
-            keys.Add(pair.Timing);
-            return false;
-        });
-    }
 }
 
 [Serializable]

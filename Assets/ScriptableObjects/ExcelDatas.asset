@@ -21,7 +21,7 @@ MonoBehaviour:
     RecoverEnergyPoint: 4
     DrawCardCount: 7
   - Id: Cautious
-    Range: 99
+    Range: 2
     RecoverEnergyPoint: 4
     DrawCardCount: 6
   - Id: Moderate

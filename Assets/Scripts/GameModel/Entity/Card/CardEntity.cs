@@ -19,7 +19,7 @@ public interface ICardEntity
     IEnumerable<SubTargetSelectLogic> SubSelects { get; }
 
     IEnumerable<ICardEffect> Effects { get; }
-    IReadOnlyDictionary<GameTiming, List<ICardEffect>> TriggeredEffects { get; }
+    IReadOnlyDictionary<CardTriggeredTiming, List<ICardEffect>> TriggeredEffects { get; }
     IEnumerable<ICardPropertyEntity> Properties { get; }
     ICardBuffManager BuffManager { get; }
 
@@ -42,7 +42,7 @@ public class CardEntity : ICardEntity
     private readonly MainTargetSelectLogic _mainSelect;
     private readonly IReadOnlyList<SubTargetSelectLogic> _subSelects;
     private readonly IReadOnlyList<ICardEffect> _effects;
-    private readonly IReadOnlyDictionary<GameTiming, List<ICardEffect>> _triggeredEffects;
+    private readonly IReadOnlyDictionary<CardTriggeredTiming, List<ICardEffect>> _triggeredEffects;
     private readonly IReadOnlyList<ICardPropertyEntity> _properties;
     private readonly ICardBuffManager _buffManager;
 
@@ -57,7 +57,7 @@ public class CardEntity : ICardEntity
     public MainTargetSelectLogic MainSelect => _mainSelect;
     public IEnumerable<SubTargetSelectLogic> SubSelects => _subSelects;
     public IEnumerable<ICardEffect> Effects => _effects;
-    public IReadOnlyDictionary<GameTiming, List<ICardEffect>> TriggeredEffects => _triggeredEffects;
+    public IReadOnlyDictionary<CardTriggeredTiming, List<ICardEffect>> TriggeredEffects => _triggeredEffects;
     public IEnumerable<ICardPropertyEntity> Properties => _properties;
     public ICardBuffManager BuffManager => _buffManager;
     public bool IsDummy => this == DummyCard;
@@ -74,7 +74,7 @@ public class CardEntity : ICardEntity
         mainSelect: new (),
         subSelects: new List<SubTargetSelectLogic>(),
         effects: new List<ICardEffect>(),
-        triggeredEffects: new Dictionary<GameTiming, List<ICardEffect>>(),
+        triggeredEffects: new Dictionary<CardTriggeredTiming, List<ICardEffect>>(),
         properties: new List<ICardPropertyEntity>()
     );
     
@@ -90,7 +90,7 @@ public class CardEntity : ICardEntity
         MainTargetSelectLogic mainSelect,
         IEnumerable<SubTargetSelectLogic> subSelects,
         List<ICardEffect> effects,
-        Dictionary<GameTiming, List<ICardEffect>> triggeredEffects,
+        Dictionary<CardTriggeredTiming, List<ICardEffect>> triggeredEffects,
         IEnumerable<ICardPropertyEntity> properties
     )
     {

@@ -10,6 +10,48 @@ public enum LocalizeType
     KeyWord,
 }
 
+public enum GameKeyWord
+{
+    None = 0,
+    // CardType
+    Attack,
+    Defense,
+    Speech,
+    Sneak,
+    Special,
+    Item,
+    // CardTheme
+    TangSect,
+    Emei,
+    Songshan,
+    BeggarClan,
+    DianCang,
+    BattleBegin,
+    // GameTiming
+    TurnStart,
+    OnDrawCard,
+    OnPlayCard,
+    TurnEnd,
+    // CardProperty
+    EffectTimes,
+    RecycleTimes,
+    PowerAdjust,
+    CostAdjust,
+    InitialPriority,
+    Preserved,
+    Sealed,
+    Consumable,
+    Dispose,
+    AutoDispose,
+    AppendEffect,
+    // Disposition
+    Coward,
+    Cautious,
+    Moderate,
+    Brave,
+    Reckless,
+}
+
 public record LocalizeTitleInfoData(string Title, string Info);
 
 public class LocalizeLibrary

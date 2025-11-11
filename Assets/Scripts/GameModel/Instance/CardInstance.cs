@@ -13,7 +13,7 @@ public record CardInstance(
     MainTargetSelectLogic MainSelect,
     IReadOnlyList<SubTargetSelectLogic> SubSelects,
     IReadOnlyList<ICardEffect> Effects,
-    IReadOnlyDictionary<GameTiming, ICardEffect[]> TriggeredEffects,
+    IReadOnlyDictionary<CardTriggeredTiming, ICardEffect[]> TriggeredEffects,
     IReadOnlyList<ICardPropertyData> PropertyDatas)
 {
     public static CardInstance Create(CardData cardData)
