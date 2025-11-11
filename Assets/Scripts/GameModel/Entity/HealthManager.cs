@@ -56,37 +56,34 @@ public class HealthManager : IHealthManager
                 break;
         }
 
-        return new TakeDamageResult()
-        {
-            Type = damageType,
-            DamagePoint = amount,
-            DeltaHp = deltaHp,
-            DeltaDp = deltaDp,
-            OverHp = damageOver
-        };
+        return new TakeDamageResult(
+            Type: damageType,
+            DamagePoint: amount,
+            DeltaHp: deltaHp,
+            DeltaDp: deltaDp,
+            OverHp: damageOver
+        );
     }
 
     public GetHealResult GetHeal(int amount, GameContext context)
     {
         var deltaHp = _AcceptHealthHeal(amount, out var hpOver);
 
-        return new GetHealResult()
-        {
-            HealPoint = amount,
-            DeltaHp = deltaHp,
-            OverHp = hpOver
-        };
+        return new GetHealResult(
+            HealPoint: amount,
+            DeltaHp: deltaHp,
+            OverHp: hpOver
+        );
     }
     public GetShieldResult GetShield(int amount, GameContext context)
     {
         var deltaDp = _AcceptArmorGain(amount, out var dpOver);
 
-        return new GetShieldResult()
-        {
-            ShieldPoint = amount,
-            DeltaDp = deltaDp,
-            OverDp = dpOver
-        };
+        return new GetShieldResult(
+            ShieldPoint: amount,
+            DeltaDp: deltaDp,
+            OverDp: dpOver
+        );
     }
 
     private int _AcceptArmorDamage(int amount, out int damageRemain)

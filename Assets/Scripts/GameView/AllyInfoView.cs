@@ -49,11 +49,11 @@ public class AllyInfoView : MonoBehaviour
     
     public void UpdateEnergy(LoseEnergyEvent loseEnergyEvent)
     {
-        _energyBarView.SetEnergy(loseEnergyEvent.Energy, loseEnergyEvent.MaxEnergy);
+        _energyBarView.SetEnergy(loseEnergyEvent.Info.CurrentEnergy, loseEnergyEvent.Info.MaxEnergy);
     }
     public void UpdateEnergy(GainEnergyEvent gainEnergyEvent)
     {
-        _energyBarView.SetEnergy(gainEnergyEvent.Energy, gainEnergyEvent.MaxEnergy);
+        _energyBarView.SetEnergy(gainEnergyEvent.Info.CurrentEnergy, gainEnergyEvent.Info.MaxEnergy);
     }
 
     public void UpdateHealth(HealthEvent healthEvent)

@@ -60,14 +60,14 @@ public enum DamageStyle
 public enum EnergyGainType
 {
     None = 0,
+    RoundStartRecover,
     GainEffect,
-    Recover,
 }
 public enum EnergyLoseType
 {
     None = 0,
+    PlayCardConsume,
     LoseEffect,
-    Consume,
 }
 
 public enum PlayerBuffPropertyDuration

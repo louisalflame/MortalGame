@@ -127,29 +127,25 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
     private void _GameStart()
     {
         // TODO: summon characters 
-        _gameEvents.Add(new AllySummonEvent() {
-            Player = _gameStatus.Ally 
-        });
-        _gameEvents.Add(new EnemySummonEvent() {
-            Enemy = _gameStatus.Enemy 
-        });
+        _gameEvents.Add(new AllySummonEvent(Player: _gameStatus.Ally));
+        _gameEvents.Add(new EnemySummonEvent(Enemy: _gameStatus.Enemy));
     }
 
     private void _TurnStart()
     {
         _gameStatus.SetNewTurn();
-        _gameEvents.Add(new RoundStartEvent(){
-            Round = _gameStatus.TurnCount,
-            Player = _gameStatus.Ally,
-            Enemy = _gameStatus.Enemy
-        });
+        _gameEvents.Add(new RoundStartEvent(
+            Round: _gameStatus.TurnCount,
+            Player: _gameStatus.Ally,
+            Enemy: _gameStatus.Enemy
+        ));
         
         var recoverEnergyPoint = _contextMgr.DispositionLibrary.GetRecoverEnergyPoint(_gameStatus.Ally.DispositionManager.CurrentDisposition);
         var allyGainEnergyResult = _gameStatus.Ally.EnergyManager.RecoverEnergy(recoverEnergyPoint);
-        _gameEvents.Add(new GainEnergyEvent(_gameStatus.Ally, allyGainEnergyResult));
+        _gameEvents.Add(new GainEnergyEvent(_gameStatus.Ally.Faction, _gameStatus.Ally.EnergyManager.ToInfo(), allyGainEnergyResult));
 
         var enemyGainEnergyResult = _gameStatus.Enemy.EnergyManager.RecoverEnergy(_gameStatus.Enemy.EnergyRecoverPoint);
-        _gameEvents.Add(new GainEnergyEvent(_gameStatus.Enemy, enemyGainEnergyResult));
+        _gameEvents.Add(new GainEnergyEvent(_gameStatus.Enemy.Faction, _gameStatus.Enemy.EnergyManager.ToInfo(), enemyGainEnergyResult));
     }
 
     private void _TurnDrawCard()
@@ -173,24 +169,22 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
     {
         while (_gameStatus.Enemy.TryGetRecommandSelectCard(this, out var recommendCard))
         {
-            _gameEvents.Add(new EnemySelectCardEvent()
-            {
-                SelectedCardInfo = recommendCard.ToInfo(this),
-                SelectedCardInfos = _gameStatus.Enemy.SelectedCards.Cards.ToCardInfos(this)
-            });
+            _gameEvents.Add(new EnemySelectCardEvent(
+                SelectedCardInfo: recommendCard.ToInfo(this),
+                SelectedCardInfos: _gameStatus.Enemy.SelectedCards.Cards.ToCardInfos(this)
+            ));
         }
     }
 
     private void _PlayerPrepare()
     {
-        _gameEvents.Add(new PlayerExecuteStartEvent()
-        {
-            Faction = _gameStatus.Ally.Faction,
-            HandCardInfo = _gameStatus.Ally.CardManager.HandCard.ToCardCollectionInfo(this),
-            GraveyardInfo = _gameStatus.Ally.CardManager.Graveyard.ToCardCollectionInfo(this),
-            ExclusionZoneInfo = _gameStatus.Ally.CardManager.ExclusionZone.ToCardCollectionInfo(this),
-            DisposeZoneInfo = _gameStatus.Ally.CardManager.DisposeZone.ToCardCollectionInfo(this)
-        });
+        _gameEvents.Add(new PlayerExecuteStartEvent(
+            Faction: _gameStatus.Ally.Faction,
+            HandCardInfo: _gameStatus.Ally.CardManager.HandCard.ToCardCollectionInfo(this),
+            GraveyardInfo: _gameStatus.Ally.CardManager.Graveyard.ToCardCollectionInfo(this),
+            ExclusionZoneInfo: _gameStatus.Ally.CardManager.ExclusionZone.ToCardCollectionInfo(this),
+            DisposeZoneInfo: _gameStatus.Ally.CardManager.DisposeZone.ToCardCollectionInfo(this)
+        ));
     }
     public void _PlayerExecute()
     {
@@ -208,7 +202,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
         }
 
         var unselectedCards = _gameStatus.Enemy.SelectedCards.UnSelectAllCards();
-        _gameEvents.Add(new EnemyUnselectedCardEvent() { UnselectedCardInfos = unselectedCards.ToCardInfos(this) });
+        _gameEvents.Add(new EnemyUnselectedCardEvent(UnselectedCardInfos: unselectedCards.ToCardInfos(this)));
         
         _FinishEnemyExecuteTurn();
     }
@@ -223,13 +217,13 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                     using(_SetUseCardSelectTarget(useCardAction))
                     {
                         _UseCard(player, useCardAction.CardIndentity);
-                        _gameEvents.Add(new PlayerExecuteStartEvent(){
-                            Faction = player.Faction,
-                            HandCardInfo = player.CardManager.HandCard.ToCardCollectionInfo(this),
-                            GraveyardInfo = player.CardManager.Graveyard.ToCardCollectionInfo(this),
-                            ExclusionZoneInfo = player.CardManager.ExclusionZone.ToCardCollectionInfo(this),
-                            DisposeZoneInfo = player.CardManager.DisposeZone.ToCardCollectionInfo(this)
-                        });
+                        _gameEvents.Add(new PlayerExecuteStartEvent(
+                            Faction: player.Faction,
+                            HandCardInfo: player.CardManager.HandCard.ToCardCollectionInfo(this),
+                            GraveyardInfo: player.CardManager.Graveyard.ToCardCollectionInfo(this),
+                            ExclusionZoneInfo: player.CardManager.ExclusionZone.ToCardCollectionInfo(this),
+                            DisposeZoneInfo: player.CardManager.DisposeZone.ToCardCollectionInfo(this)
+                        ));
                     }
                     break;
                 case TurnSubmitAction turnSubmitAction:
@@ -245,10 +239,10 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
 
     private void _FinishPlayerExecuteTurn()
     {
-        _gameEvents.Add(new PlayerExecuteEndEvent(){
-            Faction = _gameStatus.Ally.Faction,
-            HandCardInfo = _gameStatus.Ally.CardManager.HandCard.ToCardCollectionInfo(this)
-        });
+        _gameEvents.Add(new PlayerExecuteEndEvent(
+            Faction: _gameStatus.Ally.Faction,
+            HandCardInfo: _gameStatus.Ally.CardManager.HandCard.ToCardCollectionInfo(this)
+        ));
 
         var endTurnSource = new SystemExectueEndSource(_gameStatus.Ally);
         var triggerEvts = _TriggerTiming(GameTiming.ExecuteEnd, endTurnSource);
@@ -318,7 +312,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
             if (cardRuntimCost <= player.CurrentEnergy) 
             {
                 var loseEnergyResult = player.EnergyManager.ConsumeEnergy(cardRuntimCost);
-                useCardEvents.Add(new LoseEnergyEvent(player, loseEnergyResult));
+                useCardEvents.Add(new LoseEnergyEvent(player.Faction, player.EnergyManager.ToInfo(), loseEnergyResult));
 
                 if (player.CardManager.TryPlayCard(usedCard, out int handCardIndex, out int handCardsCount))
                 {
@@ -354,15 +348,14 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                     player.CardManager.EndPlayCard();
 
                     var usedCardInfo = usedCard.ToInfo(this);
-                    var usedCardEvent = new UsedCardEvent()
-                    {
-                        Faction = player.Faction,
-                        UsedCardInfo = usedCardInfo,
-                        HandCardInfo = player.CardManager.HandCard.ToCardCollectionInfo(this),
-                        GraveyardInfo = player.CardManager.Graveyard.ToCardCollectionInfo(this),
-                        ExclusionZoneInfo = player.CardManager.ExclusionZone.ToCardCollectionInfo(this),
-                        DisposeZoneInfo = player.CardManager.DisposeZone.ToCardCollectionInfo(this)
-                    };
+                    var usedCardEvent = new UsedCardEvent(
+                        Faction: player.Faction,
+                        UsedCardInfo: usedCardInfo,
+                        HandCardInfo: player.CardManager.HandCard.ToCardCollectionInfo(this),
+                        GraveyardInfo: player.CardManager.Graveyard.ToCardCollectionInfo(this),
+                        ExclusionZoneInfo: player.CardManager.ExclusionZone.ToCardCollectionInfo(this),
+                        DisposeZoneInfo: player.CardManager.DisposeZone.ToCardCollectionInfo(this)
+                    );
                     useCardEvents.Add(usedCardEvent);
 
                     useCardEvents.AddRange(_TriggerTiming(GameTiming.PlayCardEnd, cardPlayResultSource));

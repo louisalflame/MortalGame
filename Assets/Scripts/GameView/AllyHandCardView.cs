@@ -114,42 +114,16 @@ public class AllyHandCardView : MonoBehaviour
         }
     }
 
-    public void RemoveCardView(DiscardCardEvent discardCardEvent)
+    public void RemoveCardView(MoveCardEvent moveCardEvent)
     {
-        if(_cardViewDict.TryGetValue(discardCardEvent.CardInfo.Identity, out var cardView))
+        if(_cardViewDict.TryGetValue(moveCardEvent.CardInfo.Identity, out var cardView))
         {
             _cardViews.Remove(cardView);
-            _cardViewDict.Remove(discardCardEvent.CardInfo.Identity);
+            _cardViewDict.Remove(moveCardEvent.CardInfo.Identity);
             _cardViewFactory.RecyclePrefab(cardView as CardView);
 
             foreach(var view in _cardViews)
-                view.RemoveLocationOffset(discardCardEvent.CardInfo.Identity, _focusDuration);
-            _RearrangeCardViews();
-        }
-    }
-    public void RemoveCardView(ConsumeCardEvent consumeCardEvent)
-    {
-        if(_cardViewDict.TryGetValue(consumeCardEvent.CardInfo.Identity, out var cardView))
-        {
-            _cardViews.Remove(cardView);
-            _cardViewDict.Remove(consumeCardEvent.CardInfo.Identity);
-            _cardViewFactory.RecyclePrefab(cardView as CardView);
-
-            foreach(var view in _cardViews)
-                view.RemoveLocationOffset(consumeCardEvent.CardInfo.Identity, _focusDuration);
-            _RearrangeCardViews();
-        }
-    }
-    public void RemoveCardView(DisposeCardEvent disposeCardEvent)
-    {
-        if(_cardViewDict.TryGetValue(disposeCardEvent.CardInfo.Identity, out var cardView))
-        {
-            _cardViews.Remove(cardView);
-            _cardViewDict.Remove(disposeCardEvent.CardInfo.Identity);
-            _cardViewFactory.RecyclePrefab(cardView as CardView);
-
-            foreach(var view in _cardViews)
-                view.RemoveLocationOffset(disposeCardEvent.CardInfo.Identity, _focusDuration);
+                view.RemoveLocationOffset(moveCardEvent.CardInfo.Identity, _focusDuration);
             _RearrangeCardViews();
         }
     }

@@ -60,12 +60,12 @@ public class ShieldResultAction : BaseResultAction
 public class GainEnergyResultAction : BaseResultAction
 {    
     public override EffectType EffectType => EffectType.GainEnergy;
-    public GetEnergyResult EnergyResult { get; private set; }
+    public GainEnergyResult EnergyResult { get; private set; }
 
     public GainEnergyResultAction(
         IActionSource source, 
         IActionTarget target,
-        GetEnergyResult energyResult) : base(source, target)
+        GainEnergyResult energyResult) : base(source, target)
     {
         EnergyResult = energyResult;
     }

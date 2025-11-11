@@ -6,98 +6,67 @@ public interface IEffectResult
 {
 }
 
-public class TakeDamageResult : IEffectResult
-{
-    public DamageType Type;
-    public int DamagePoint;
-    public int DeltaHp;
-    public int DeltaDp;
-    public int OverHp;
-}
-public class GetHealResult : IEffectResult
-{
-    public int HealPoint;
-    public int DeltaHp;
-    public int OverHp;
-}
-public class GetShieldResult : IEffectResult
-{
-    public int ShieldPoint;
-    public int DeltaDp;
-    public int OverDp;
-}
+public record TakeDamageResult(
+    DamageType Type,
+    int DamagePoint,
+    int DeltaHp,
+    int DeltaDp,
+    int OverHp) : IEffectResult;
+public record GetHealResult(
+    int HealPoint,
+    int DeltaHp,
+    int OverHp) : IEffectResult;
+public record GetShieldResult(
+    int ShieldPoint,
+    int DeltaDp,
+    int OverDp) : IEffectResult;
 
-public class GetEnergyResult : IEffectResult
-{
-    public EnergyGainType Type;
-    public int EnergyPoint;
-    public int DeltaEp;
-    public int OverEp;
-}
-public class LoseEnergyResult : IEffectResult
-{
-    public EnergyLoseType Type;
-    public int EnergyPoint;
-    public int DeltaEp;
-    public int OverEp;
-}
+public record GainEnergyResult(
+    EnergyGainType Type,
+    int EnergyPoint,
+    int DeltaEp,
+    int OverEp) : IEffectResult;
+public record LoseEnergyResult(
+    EnergyLoseType Type,
+    int EnergyPoint,
+    int DeltaEp,
+    int OverEp) : IEffectResult;
 
-public class IncreaseDispositionResult : IEffectResult
-{
-    public int DispositionPoint;
-    public int DeltaDisposition;
-    public int OverDisposition;
-}
-public class DecreaseDispositionResult : IEffectResult
-{
-    public int DispositionPoint;
-    public int DeltaDisposition;
-    public int OverDisposition;
-}
+public record IncreaseDispositionResult(
+    int DispositionPoint,
+    int DeltaDisposition,
+    int OverDisposition) : IEffectResult;
+public record DecreaseDispositionResult(
+    int DispositionPoint,
+    int DeltaDisposition,
+    int OverDisposition) : IEffectResult;
 
-public class AddPlayerBuffResult : IEffectResult
-{
-    public bool IsNewBuff;
-    public IPlayerBuffEntity Buff;
-    public int DeltaLevel;
-}
-public class AddCharacterBuffResult : IEffectResult
-{
-    public bool IsNewBuff;
-    public ICharacterBuffEntity Buff;
-    public int DeltaLevel;
-}
-public class AddCardBuffResult : IEffectResult
-{
-    public bool IsNewBuff;
-    public ICardBuffEntity Buff;
-    public int DeltaLevel;
-}
+public record AddPlayerBuffResult(
+    bool IsNewBuff,
+    IPlayerBuffEntity Buff,
+    int DeltaLevel) : IEffectResult;
+public record AddCharacterBuffResult(
+    bool IsNewBuff,
+    ICharacterBuffEntity Buff,
+    int DeltaLevel) : IEffectResult;
+public record AddCardBuffResult(
+    bool IsNewBuff,
+    ICardBuffEntity Buff,
+    int DeltaLevel) : IEffectResult;
 
-public class RemovePlayerBuffResult : IEffectResult
-{
-    public IReadOnlyCollection<IPlayerBuffEntity> Buffs;
-}
-public class RemoveCharacterBuffResult : IEffectResult
-{
-    public IReadOnlyCollection<ICharacterBuffEntity> Buff;
-}
-public class RemoveCardBuffResult : IEffectResult
-{
-    public IReadOnlyCollection<ICardBuffEntity> Buff;
-}
+public record RemovePlayerBuffResult(
+    IReadOnlyCollection<IPlayerBuffEntity> Buffs) : IEffectResult;
+public record RemoveCharacterBuffResult(
+    IReadOnlyCollection<ICharacterBuffEntity> Buff) : IEffectResult;
+public record RemoveCardBuffResult(
+    IReadOnlyCollection<ICardBuffEntity> Buff) : IEffectResult;
 
-
-public class CreateCardResult : IEffectResult
-{
-    public ICardEntity Card;
-    public ICardColletionZone Zone;
-    public AddCardBuffResult[] AddBuffs;
-}
-public class CloneCardResult : IEffectResult
-{
-    public ICardEntity OriginCard;
-    public ICardEntity Card;
-    public ICardColletionZone Zone;
-    public AddCardBuffResult[] AddBuffs;
-}
+public record CreateCardResult(
+    ICardEntity Card,
+    ICardColletionZone Zone,
+    AddCardBuffResult[] AddBuffs) : IEffectResult;
+public record CloneCardResult(
+    ICardEntity OriginCard,
+    ICardEntity Card,
+    ICardColletionZone Zone,
+    AddCardBuffResult[] AddBuffs) : IEffectResult;

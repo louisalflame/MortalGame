@@ -207,7 +207,7 @@ public static class EffectExecutor
 
             resultActions.Add(gainEnergyResultAction);
             cardEffectEvents.AddRange(reactorEvents);
-            cardEffectEvents.Add(new GainEnergyEvent(target, gainEnergyResult));
+            cardEffectEvents.Add(new GainEnergyEvent(target.Faction, target.EnergyManager.ToInfo(), gainEnergyResult));
         }
 
         return new EffectResult(cardEffectEvents, resultActions);
@@ -232,7 +232,7 @@ public static class EffectExecutor
 
             resultActions.Add(loseEnergyResultAction);
             cardEffectEvents.AddRange(reactorEvents);
-            cardEffectEvents.Add(new LoseEnergyEvent(target, loseEnergyResult));
+            cardEffectEvents.Add(new LoseEnergyEvent(target.Faction, target.EnergyManager.ToInfo(), loseEnergyResult));
         }
 
         return new EffectResult(cardEffectEvents, resultActions);
@@ -261,7 +261,7 @@ public static class EffectExecutor
 
                 resultActions.Add(increaseDispositionResultAction);
                 cardEffectEvents.AddRange(reactorEvents);
-                cardEffectEvents.Add(new IncreaseDispositionEvent(ally, increaseResult));
+                cardEffectEvents.Add(new IncreaseDispositionEvent(ally.DispositionManager.ToInfo(), increaseResult.DeltaDisposition));
             }
         }
 
@@ -288,7 +288,7 @@ public static class EffectExecutor
 
                 resultActions.Add(decreaseDispositionResultAction);
                 cardEffectEvents.AddRange(reactorEvents);
-                cardEffectEvents.Add(new DecreaseDispositionEvent(ally, decreaseResult));
+                cardEffectEvents.Add(new DecreaseDispositionEvent(ally.DispositionManager.ToInfo(), decreaseResult.DeltaDisposition));
             }
         }
 
@@ -407,7 +407,7 @@ public static class EffectExecutor
 
                     resultActions.Add(discardCardResultAction);
                     cardEffectEvents.AddRange(reactorEvents);
-                    cardEffectEvents.Add(new DiscardCardEvent(discardedCard, context.GameplayWatcher, start, destination));
+                    cardEffectEvents.Add(new MoveCardEvent(discardedCard, context.GameplayWatcher, start, destination));
                 }
             });
         }
@@ -435,7 +435,7 @@ public static class EffectExecutor
 
                     resultActions.Add(consumeCardResultAction);
                     cardEffectEvents.AddRange(reactorEvents);
-                    cardEffectEvents.Add(new ConsumeCardEvent(consumedCard, context.GameplayWatcher, start, destination));
+                    cardEffectEvents.Add(new MoveCardEvent(consumedCard, context.GameplayWatcher, start, destination));
                 }
             });
         }
@@ -463,7 +463,7 @@ public static class EffectExecutor
 
                     resultActions.Add(disposeCardResultAction);
                     cardEffectEvents.AddRange(reactorEvents);
-                    cardEffectEvents.Add(new DisposeCardEvent(disposedCard, context.GameplayWatcher, start, destination));
+                    cardEffectEvents.Add(new MoveCardEvent(disposedCard, context.GameplayWatcher, start, destination));
                 }
             });
         }
@@ -500,7 +500,7 @@ public static class EffectExecutor
 
                 resultActions.Add(createCardResultAction);
                 cardEffectEvents.AddRange(reactorEvents);
-                cardEffectEvents.Add(new CreateCardEvent(createResult.Card, context.GameplayWatcher, createResult.Zone));
+                cardEffectEvents.Add(new AddCardEvent(Option.None<ICardEntity>(), createResult.Card, context.GameplayWatcher, createResult.Zone));
             }
         });
 
@@ -539,7 +539,7 @@ public static class EffectExecutor
 
                 resultActions.Add(cloneCardResultAction);
                 cardEffectEvents.AddRange(reactorEvents);
-                cardEffectEvents.Add(new CloneCardEvent(cloneResult.Card, context.GameplayWatcher, cloneResult.Zone));
+                cardEffectEvents.Add(new AddCardEvent(Option.Some(cloneResult.OriginCard), cloneResult.Card, context.GameplayWatcher, cloneResult.Zone));
             }
         });
 
@@ -709,12 +709,11 @@ public static class EffectExecutor
 
                 resultActions.Add(recycleDeckResultAction);
                 drawCardEvents.AddRange(recycleEvents);
-                drawCardEvents.Add(new RecycleGraveyardEvent()
-                {
-                    Faction = player.Faction,
-                    DeckInfo = player.CardManager.Deck.ToCardCollectionInfo(gameplayWatcher),
-                    GraveyardInfo = player.CardManager.Graveyard.ToCardCollectionInfo(gameplayWatcher)
-                });
+                drawCardEvents.Add(new RecycleGraveyardEvent(
+                    Faction: player.Faction,
+                    DeckInfo: player.CardManager.Deck.ToCardCollectionInfo(gameplayWatcher),
+                    GraveyardInfo: player.CardManager.Graveyard.ToCardCollectionInfo(gameplayWatcher)
+                ));
             }
 
             if (player.CardManager.Deck.Cards.Count > 0)
@@ -747,12 +746,12 @@ public static class EffectExecutor
             resultActions.Add(drawCardResultAction);
             drawCardEvents.AddRange(reactorEvents);
 
-            drawCardEvents.Add(new DrawCardEvent() {
-                Faction = player.Faction,
-                NewCardInfo = newCard.ToInfo(gameplayWatcher),
-                HandCardInfo = player.CardManager.HandCard.ToCardCollectionInfo(gameplayWatcher),
-                DeckInfo = player.CardManager.Deck.ToCardCollectionInfo(gameplayWatcher)
-            });
+            drawCardEvents.Add(new DrawCardEvent(
+                Faction: player.Faction,
+                NewCardInfo: newCard.ToInfo(gameplayWatcher),
+                DeckInfo: player.CardManager.Deck.ToCardCollectionInfo(gameplayWatcher),
+                HandCardInfo: player.CardManager.HandCard.ToCardCollectionInfo(gameplayWatcher)
+            ));
         }
         
         return new EffectResult(drawCardEvents, resultActions);

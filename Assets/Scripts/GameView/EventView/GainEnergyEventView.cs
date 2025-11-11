@@ -13,7 +13,7 @@ public class GainEnergyEventView: MonoBehaviour, IRecyclable, IAnimationNumberEv
     public void SetEventInfo(GainEnergyEvent gainEnergyEvent, Transform parent)
     {
         transform.SetParent(parent, false);
-        _text.text = gainEnergyEvent.DeltaEnergy.ToString();
+        _text.text = gainEnergyEvent.GainEnergyResult.DeltaEp.ToString();
     }
 
     public void Reset()

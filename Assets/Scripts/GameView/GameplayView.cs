@@ -167,17 +167,11 @@ public class GameplayView : MonoBehaviour, IGameplayView
                 case DrawCardEvent drawCardEvent:
                     _DrawCardView(drawCardEvent, reciever);
                     break;
-                case DiscardCardEvent discardCardEvent:
-                    _DiscardCardView(discardCardEvent);
+                case MoveCardEvent moveCardEvent:
+                    _MoveCardView(moveCardEvent);
                     break;
-                case ConsumeCardEvent consumeCardEvent:
-                    _ConsumeCardView(consumeCardEvent);
-                    break;
-                case DisposeCardEvent disposeCardEvent:
-                    _DisposeCardView(disposeCardEvent);
-                    break;
-                case CloneCardEvent cloneCardEvent:
-                    _CloneCardView(cloneCardEvent);
+                case AddCardEvent addCardEvent:
+                    _AddCardView(addCardEvent);
                     break;
                 case EnemySelectCardEvent enemySelectCardEvent:
                     _SelectCardView(enemySelectCardEvent);
@@ -229,17 +223,17 @@ public class GameplayView : MonoBehaviour, IGameplayView
 
     private void _UpdateGeneralInfo(GeneralUpdateEvent updateEvent)
     {
-        foreach (var kvp in updateEvent.PlayerBuffInfos)
+        foreach (var playerBuffInfo in updateEvent.PlayerBuffInfos)
         {
-            _gameViewModel.UpdatePlayerBuffInfo(kvp.Value);
+            _gameViewModel.UpdatePlayerBuffInfo(playerBuffInfo);
         }
-        foreach (var kvp in updateEvent.CharacterBuffInfos)
+        foreach (var characterBuffInfo in updateEvent.CharacterBuffInfos)
         {
-            _gameViewModel.UpdateCharacterBuffInfo(kvp.Value);
+            _gameViewModel.UpdateCharacterBuffInfo(characterBuffInfo);
         }
-        foreach (var kvp in updateEvent.CardInfos)
+        foreach (var cardInfo in updateEvent.CardInfos)
         {
-            _gameViewModel.UpdateCardInfo(kvp.Value);
+            _gameViewModel.UpdateCardInfo(cardInfo);
         }
     }
 
@@ -277,97 +271,49 @@ public class GameplayView : MonoBehaviour, IGameplayView
         }
     }
 
-    private void _DiscardCardView(DiscardCardEvent discardCardEvent)
+    private void _MoveCardView(MoveCardEvent moveCardEvent)
     {
-        _gameViewModel.UpdateCardCollectionInfo(discardCardEvent.Faction, discardCardEvent.StartZoneInfo);
-        _gameViewModel.UpdateCardCollectionInfo(discardCardEvent.Faction, discardCardEvent.DestinationZoneInfo);
-        switch (discardCardEvent.Faction)
+        _gameViewModel.UpdateCardCollectionInfo(moveCardEvent.Faction, moveCardEvent.StartZoneInfo);
+        _gameViewModel.UpdateCardCollectionInfo(moveCardEvent.Faction, moveCardEvent.DestinationZoneInfo);
+        switch (moveCardEvent.Faction)
         {
             case Faction.Ally:
-                switch (discardCardEvent.StartZoneInfo.Type)
+                switch (moveCardEvent.StartZoneInfo.Type)
                 {
                     case CardCollectionType.HandCard:
-                        _allyHandCardView.RemoveCardView(discardCardEvent);
+                        _allyHandCardView.RemoveCardView(moveCardEvent);
                         break;
                 }
                 break;
             case Faction.Enemy:
-                switch (discardCardEvent.StartZoneInfo.Type)
+                switch (moveCardEvent.StartZoneInfo.Type)
                 {
                     case CardCollectionType.HandCard:
-                        _enemySelectedCardView.RemoveCardView(discardCardEvent);
-                        break;
-                }
-                break;
-        }
-    }
-    private void _ConsumeCardView(ConsumeCardEvent consumeCardEvent)
-    {
-        _gameViewModel.UpdateCardCollectionInfo(consumeCardEvent.Faction, consumeCardEvent.StartZoneInfo);
-        _gameViewModel.UpdateCardCollectionInfo(consumeCardEvent.Faction, consumeCardEvent.DestinationZoneInfo);
-        switch (consumeCardEvent.Faction)
-        {
-            case Faction.Ally:
-                switch (consumeCardEvent.StartZoneInfo.Type)
-                {
-                    case CardCollectionType.HandCard:
-                        _allyHandCardView.RemoveCardView(consumeCardEvent);
-                        break;
-                }
-                break;
-            case Faction.Enemy:
-                switch (consumeCardEvent.StartZoneInfo.Type)
-                {
-                    case CardCollectionType.HandCard:
-                        _enemySelectedCardView.RemoveCardView(consumeCardEvent);
-                        break;
-                }
-                break;
-        }
-    }
-    private void _DisposeCardView(DisposeCardEvent disposeCardEvent)
-    {
-        _gameViewModel.UpdateCardCollectionInfo(disposeCardEvent.Faction, disposeCardEvent.StartZoneInfo);
-        _gameViewModel.UpdateCardCollectionInfo(disposeCardEvent.Faction, disposeCardEvent.DestinationZoneInfo);
-        switch (disposeCardEvent.Faction)
-        {
-            case Faction.Ally:
-                switch (disposeCardEvent.StartZoneInfo.Type)
-                {
-                    case CardCollectionType.HandCard:
-                        _allyHandCardView.RemoveCardView(disposeCardEvent);
-                        break;
-                }
-                break;
-            case Faction.Enemy:
-                switch (disposeCardEvent.StartZoneInfo.Type)
-                {
-                    case CardCollectionType.HandCard:
-                        _enemySelectedCardView.RemoveCardView(disposeCardEvent);
+                        _enemySelectedCardView.RemoveCardView(moveCardEvent);
                         break;
                 }
                 break;
         }
     }
 
-    private void _CloneCardView(CloneCardEvent cloneCardEvent)
+    private void _AddCardView(AddCardEvent addCardEvent)
     {
-        _gameViewModel.UpdateCardCollectionInfo(cloneCardEvent.Faction, cloneCardEvent.DestinationZoneInfo);
-        switch (cloneCardEvent.Faction)
+        _gameViewModel.UpdateCardCollectionInfo(addCardEvent.Faction, addCardEvent.DestinationZoneInfo);
+        switch (addCardEvent.Faction)
         {
             case Faction.Ally:
-                switch (cloneCardEvent.DestinationZoneInfo.Type)
+                switch (addCardEvent.DestinationZoneInfo.Type)
                 {
                     case CardCollectionType.HandCard:
-                        _allyHandCardView.CreateCardView(cloneCardEvent.CardInfo, cloneCardEvent.DestinationZoneInfo);
+                        _allyHandCardView.CreateCardView(addCardEvent.CardInfo, addCardEvent.DestinationZoneInfo);
                         break;
                 }
                 break;
             case Faction.Enemy:
-                switch(cloneCardEvent.DestinationZoneInfo.Type)
+                switch(addCardEvent.DestinationZoneInfo.Type)
                 {
                     case CardCollectionType.HandCard:
-                        _enemySelectedCardView.CreateCardView(cloneCardEvent);
+                        _enemySelectedCardView.CreateCardView(addCardEvent);
                         break;
                 }
                 break;

@@ -37,12 +37,11 @@ public class DispositionManager : IDispositionManager
             _disposition = _maxDisposition;
         }
 
-        return new IncreaseDispositionResult()
-        {
-            DispositionPoint = deltaValue,
-            DeltaDisposition = _disposition - previousDisposition,
-            OverDisposition = overDisposition,
-        };
+        return new IncreaseDispositionResult(
+            DispositionPoint: deltaValue,
+            DeltaDisposition: _disposition - previousDisposition,
+            OverDisposition: overDisposition
+        );
     }
 
     public DecreaseDispositionResult DecreaseDisposition(int deltaValue)
@@ -57,12 +56,11 @@ public class DispositionManager : IDispositionManager
             _disposition = 0;
         }
 
-        return new DecreaseDispositionResult()
-        {
-            DispositionPoint = deltaValue,
-            DeltaDisposition = previousDisposition - _disposition,
-            OverDisposition = overDisposition,
-        };
+        return new DecreaseDispositionResult(
+            DispositionPoint: deltaValue,
+            DeltaDisposition: previousDisposition - _disposition,
+            OverDisposition: overDisposition
+        );
     }
 }
 

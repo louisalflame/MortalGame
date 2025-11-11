@@ -1,5 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Optional;
+using Sirenix.Serialization.Utilities;
+using Sirenix.Utilities;
 using UnityEngine;
 
 public interface IGameEvent
@@ -10,346 +14,198 @@ public interface IAnimationNumberEvent : IGameEvent
 {
 }
 
-public class NoneEvent : IGameEvent
+public record NoneEvent : IGameEvent
 {
     public static readonly NoneEvent Instance = new NoneEvent();
 }
 
-public class AllySummonEvent : IGameEvent
-{
-    public AllyEntity Player;
-}
-public class EnemySummonEvent : IGameEvent
-{
-    public EnemyEntity Enemy;
-}
-public class RoundStartEvent : IGameEvent
-{
-    public int Round;
-    public AllyEntity Player;
-    public EnemyEntity Enemy;
-    //TODO  use allyInfo and enemyInfo
-}
-public class RecycleGraveyardEvent : IGameEvent
-{
-    public Faction Faction;
-    public CardCollectionInfo DeckInfo;
-    public CardCollectionInfo GraveyardInfo;
-}
-public class RecycleHandCardEvent : IGameEvent
-{
-    public Faction Faction;    
-    public IReadOnlyCollection<CardInfo> RecycledCardInfos;
-    public IReadOnlyCollection<CardInfo> ExcludedCardInfos;
-    public CardCollectionInfo HandCardInfo;
-    public CardCollectionInfo GraveyardInfo;
-    public CardCollectionInfo ExclusionZoneInfo;
-    public CardCollectionInfo DisposeZoneInfo;
-}
-public class DrawCardEvent : IGameEvent
-{
-    public Faction Faction;
-    public CardInfo NewCardInfo;
-    public CardCollectionInfo DeckInfo;
-    public CardCollectionInfo HandCardInfo;
-}
+public record AllySummonEvent(AllyEntity Player) : IGameEvent;
+public record EnemySummonEvent(EnemyEntity Enemy) : IGameEvent;
+public record RoundStartEvent(int Round, AllyEntity Player, EnemyEntity Enemy) : IGameEvent;
+public record RecycleGraveyardEvent(Faction Faction, CardCollectionInfo DeckInfo, CardCollectionInfo GraveyardInfo) : IGameEvent;
+public record RecycleHandCardEvent(
+    Faction Faction,
+    IReadOnlyCollection<CardInfo> RecycledCardInfos,
+    IReadOnlyCollection<CardInfo> ExcludedCardInfos,
+    CardManagerInfo CardManagerInfo) : IGameEvent;
+public record DrawCardEvent(Faction Faction, CardInfo NewCardInfo, CardManagerInfo CardManagerInfo) : IGameEvent;
 
-public abstract class MoveCardEvent : IGameEvent
+public record MoveCardEvent(
+    Faction Faction,
+    CardInfo CardInfo,
+    CardCollectionInfo StartZoneInfo,
+    CardCollectionInfo DestinationZoneInfo) : IGameEvent
 {
-    public Faction Faction;
-    public CardInfo CardInfo;
-    public CardCollectionInfo StartZoneInfo;
-    public CardCollectionInfo DestinationZoneInfo;
-
     public MoveCardEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher, ICardColletionZone start, ICardColletionZone destination)
-    {
-        Faction = card.Faction(gameWatcher);
-        CardInfo = card.ToInfo(gameWatcher);
-        StartZoneInfo = start.ToCardCollectionInfo(gameWatcher);
-        DestinationZoneInfo = destination.ToCardCollectionInfo(gameWatcher);
-    }
+        : this(card.Faction(gameWatcher),
+            card.ToInfo(gameWatcher),
+            start.ToCardCollectionInfo(gameWatcher),
+            destination.ToCardCollectionInfo(gameWatcher)) { }
 }
-public abstract class AddCardEvent : IGameEvent
+public record AddCardEvent(
+    Faction Faction,
+    Option<CardInfo> OriginCardInfo,
+    CardInfo CardInfo,
+    CardCollectionInfo DestinationZoneInfo) : IGameEvent
 {
-    public Faction Faction;
-    public CardInfo CardInfo;
-    public CardCollectionInfo DestinationZoneInfo;
-
-    public AddCardEvent(ICardEntity card,IGameplayStatusWatcher gameWatcher, ICardColletionZone destination)
-    {
-        Faction = card.Faction(gameWatcher);
-        CardInfo = card.ToInfo(gameWatcher);
-        DestinationZoneInfo = destination.ToCardCollectionInfo(gameWatcher);
-    }
+    public AddCardEvent(Option<ICardEntity> originCard, ICardEntity card, IGameplayStatusWatcher gameWatcher, ICardColletionZone destination)
+        : this(card.Faction(gameWatcher),
+            originCard.Map(c => c.ToInfo(gameWatcher)),
+            card.ToInfo(gameWatcher),
+            destination.ToCardCollectionInfo(gameWatcher)) { }
 }
-public class DiscardCardEvent : MoveCardEvent
+public record UpdateHandCardsEvent(Faction Faction, CardInfo CardInfo) : IGameEvent
 {
-    public DiscardCardEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher, ICardColletionZone start, ICardColletionZone destination) :
-        base(card, gameWatcher, start, destination) { }
+    public UpdateHandCardsEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher) 
+        : this(card.Faction(gameWatcher), card.ToInfo(gameWatcher)) { }
 }
-public class ConsumeCardEvent : MoveCardEvent
+public record AddCardBuffEvent(Faction Faction, CardInfo CardInfo) : IGameEvent
 {
-    public ConsumeCardEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher, ICardColletionZone start, ICardColletionZone destination) :
-        base(card, gameWatcher, start, destination) { }
-}
-public class DisposeCardEvent : MoveCardEvent
-{
-    public DisposeCardEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher, ICardColletionZone start, ICardColletionZone destination) :
-        base(card, gameWatcher, start, destination) { }
-}
-public class CreateCardEvent : AddCardEvent
-{
-    public CreateCardEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher, ICardColletionZone destination) :
-        base(card, gameWatcher, destination) { }
-}
-public class CloneCardEvent : AddCardEvent
-{    
-    public CloneCardEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher, ICardColletionZone destination) :
-        base(card, gameWatcher, destination) { }
-}
-public class UpdateHandCardsEvent : IGameEvent
-{
-    public Faction Faction;
-    public CardInfo CardInfo;
-    public UpdateHandCardsEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher)
-    {
-        Faction = card.Faction(gameWatcher);
-        CardInfo = card.ToInfo(gameWatcher);
-    }
-}
-public class AddCardBuffEvent : IGameEvent
-{
-    public Faction Faction;
-    public CardInfo CardInfo;
-
     public AddCardBuffEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher)
-    {
-        Faction = card.Faction(gameWatcher);
-        CardInfo = card.ToInfo(gameWatcher);
-    }
+        : this(card.Faction(gameWatcher), card.ToInfo(gameWatcher)) { }
 }
-public class RemoveCardBuffEvent : IGameEvent
+public record RemoveCardBuffEvent(Faction Faction, CardInfo CardInfo) : IGameEvent
 {
-    public Faction Faction;
-    public CardInfo CardInfo;
-
     public RemoveCardBuffEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher)
-    {
-        Faction = card.Faction(gameWatcher);
-        CardInfo = card.ToInfo(gameWatcher);
-    }
+        : this(card.Faction(gameWatcher), card.ToInfo(gameWatcher)) { }
 }
 
-public class EnemySelectCardEvent : IGameEvent
-{
-    public CardInfo SelectedCardInfo;
-    public IReadOnlyCollection<CardInfo> SelectedCardInfos;
-}
-public class EnemyUnselectedCardEvent : IGameEvent
-{
-    public IReadOnlyCollection<CardInfo> UnselectedCardInfos;
-}
-public class PlayerExecuteStartEvent : IGameEvent
-{
-    public Faction Faction;
-    public CardCollectionInfo HandCardInfo;
-    public CardCollectionInfo GraveyardInfo;
-    public CardCollectionInfo ExclusionZoneInfo;
-    public CardCollectionInfo DisposeZoneInfo;
-}
-public class PlayerExecuteEndEvent : IGameEvent
-{
-    public Faction Faction;
-    public CardCollectionInfo HandCardInfo;
-}
-public class UsedCardEvent : IGameEvent
-{
-    public Faction Faction;
-    public CardInfo UsedCardInfo;
-    public CardCollectionInfo HandCardInfo;
-    public CardCollectionInfo GraveyardInfo;
-    public CardCollectionInfo ExclusionZoneInfo;
-    public CardCollectionInfo DisposeZoneInfo;
-}
+public record EnemySelectCardEvent(CardInfo SelectedCardInfo, IReadOnlyCollection<CardInfo> SelectedCardInfos) : IGameEvent;
+public record EnemyUnselectedCardEvent(IReadOnlyCollection<CardInfo> UnselectedCardInfos) : IGameEvent;
+public record PlayerExecuteStartEvent(
+    Faction Faction,
+    CardCollectionInfo HandCardInfo,
+    CardCollectionInfo GraveyardInfo,
+    CardCollectionInfo ExclusionZoneInfo,
+    CardCollectionInfo DisposeZoneInfo) : IGameEvent;
+public record PlayerExecuteEndEvent(Faction Faction, CardCollectionInfo HandCardInfo) : IGameEvent;
+public record UsedCardEvent(
+    Faction Faction,
+    CardInfo UsedCardInfo,
+    CardCollectionInfo HandCardInfo,
+    CardCollectionInfo GraveyardInfo,
+    CardCollectionInfo ExclusionZoneInfo,
+    CardCollectionInfo DisposeZoneInfo) : IGameEvent;
 
-public abstract class EnergyEvent : IGameEvent, IAnimationNumberEvent
-{
-    public Faction Faction;
-    public int Energy;
-    public int DeltaEnergy;
-    public int MaxEnergy;
+public record GainEnergyEvent(Faction Faction, EnergyInfo Info, GainEnergyResult GainEnergyResult) : IGameEvent, IAnimationNumberEvent;
+public record LoseEnergyEvent(Faction Faction, EnergyInfo Info, LoseEnergyResult LoseEnergyResult) : IGameEvent, IAnimationNumberEvent;
 
-    public EnergyEvent(IPlayerEntity player, int deltaEnergy)
-    {
-        Faction = player.Faction;
-        Energy = player.CurrentEnergy;
-        DeltaEnergy = deltaEnergy;
-        MaxEnergy = player.MaxEnergy;
-    }
-}
-public class GainEnergyEvent : EnergyEvent
-{
-    public EnergyGainType GainType;
+public record IncreaseDispositionEvent(DispositionInfo Info, int DeltaDisposition) : IGameEvent, IAnimationNumberEvent;
+public record DecreaseDispositionEvent(DispositionInfo Info, int DeltaDisposition) : IGameEvent, IAnimationNumberEvent;
 
-    public GainEnergyEvent(IPlayerEntity player, GetEnergyResult result) : 
-        base(player, result.DeltaEp) { }
-}
-public class LoseEnergyEvent : EnergyEvent
+public abstract record HealthEvent(Faction Faction, Guid CharacterIdentity, int Hp, int Dp, int MaxHp) : IGameEvent, IAnimationNumberEvent;
+public record DamageEvent(
+    DamageType Type,
+    DamageStyle Style,
+    int DeltaHp,
+    int DeltaShield,
+    int DamagePoint,
+    Faction Faction, 
+    Guid CharacterIdentity, 
+    int Hp, 
+    int Dp, 
+    int MaxHp) : HealthEvent(Faction, CharacterIdentity, Hp, Dp, MaxHp)
 {
-    public EnergyLoseType LoseType;
-
-    public LoseEnergyEvent(IPlayerEntity player, LoseEnergyResult result) :
-        base(player, result.DeltaEp)
-    { }
-}
-
-public abstract class DispositionEvent : IGameEvent, IAnimationNumberEvent
-{
-    public DispositionInfo Info;
-    public int DeltaDisposition;
-
-    public DispositionEvent(AllyEntity ally, int deltaDisposition)
-    {
-        Info = ally.DispositionManager.ToInfo();
-        DeltaDisposition = deltaDisposition;
-    }
-}
-public class IncreaseDispositionEvent : DispositionEvent
-{
-    public IncreaseDispositionEvent(AllyEntity ally, IncreaseDispositionResult result) :
-        base(ally, result.DeltaDisposition)
-    { }
-}
-public class DecreaseDispositionEvent : DispositionEvent
-{
-    public DecreaseDispositionEvent(AllyEntity ally, DecreaseDispositionResult result) :
-        base(ally, result.DeltaDisposition)
-    { }
-}
-
-public abstract class HealthEvent : IGameEvent, IAnimationNumberEvent
-{
-    public Faction Faction;
-    public Guid CharacterIdentity;
-    public int Hp;
-    public int Dp;
-    public int MaxHp;
-
-    public HealthEvent(Faction faction, ICharacterEntity character)
-    {
-        Faction = faction;
-        Hp = character.CurrentHealth;
-        Dp = character.CurrentArmor;
-        MaxHp = character.MaxHealth;
-    }
-}
-public class DamageEvent : HealthEvent
-{
-    public DamageType Type;
-    public DamageStyle Style;
-    public int DeltaHp;
-    public int DeltaShield;
-    public int DamagePoint;
-
     public DamageEvent(
-        Faction faction, 
-        ICharacterEntity character, 
-        TakeDamageResult takeDamageResult, 
-        DamageStyle damageStyle) : base(faction, character)
-    {
-        Type = takeDamageResult.Type;
-        Style = damageStyle;
-        DeltaHp = takeDamageResult.DeltaHp;
-        DeltaShield = takeDamageResult.DeltaDp;
-        DamagePoint = takeDamageResult.DamagePoint;
-    }
+        Faction faction,
+        ICharacterEntity character,
+        TakeDamageResult takeDamageResult,
+        DamageStyle damageStyle) : this(
+            takeDamageResult.Type,
+            damageStyle,
+            takeDamageResult.DeltaHp,
+            takeDamageResult.DeltaDp,
+            takeDamageResult.DamagePoint,
+            faction,
+            character.Identity,
+            character.CurrentHealth,
+            character.CurrentArmor,
+            character.MaxHealth) { }
 }
 
-public class GetHealEvent : HealthEvent
+public record GetHealEvent(
+    int DeltaHp,
+    int HealPoint,
+    Faction Faction, 
+    Guid CharacterIdentity, 
+    int Hp, 
+    int Dp, 
+    int MaxHp) : HealthEvent(Faction, CharacterIdentity, Hp, Dp, MaxHp)
 {
-    public int DeltaHp;
-    public int HealPoint;
-
-    public GetHealEvent(Faction faction, ICharacterEntity character, GetHealResult getHealResult) : 
-        base(faction, character)
-    {
-        DeltaHp = getHealResult.DeltaHp;
-        HealPoint = getHealResult.HealPoint;
-    }
+    public GetHealEvent(Faction faction, ICharacterEntity character, GetHealResult getHealResult) 
+        : this(getHealResult.DeltaHp,
+            getHealResult.HealPoint,
+            faction,
+            character.Identity,
+            character.CurrentHealth,
+            character.CurrentArmor,
+            character.MaxHealth) { }
 }
-public class GetShieldEvent : HealthEvent
+public record GetShieldEvent(
+    int DeltaShield,
+    int ShieldPoint,
+    Faction Faction, 
+    Guid CharacterIdentity, 
+    int Hp, 
+    int Dp, 
+    int MaxHp) : HealthEvent(Faction, CharacterIdentity, Hp, Dp, MaxHp)
 {
-    public int DeltaShield;
-    public int ShieldPoint;
-
-    public GetShieldEvent(Faction faction, ICharacterEntity character, GetShieldResult getShieldResult) : 
-        base(faction, character)
-    {
-        DeltaShield = getShieldResult.DeltaDp;
-        ShieldPoint = getShieldResult.ShieldPoint;
-    }
+    public GetShieldEvent(Faction faction, ICharacterEntity character, GetShieldResult getShieldResult) 
+        : this(getShieldResult.DeltaDp,
+            getShieldResult.ShieldPoint,
+            faction,
+            character.Identity,
+            character.CurrentHealth,
+            character.CurrentArmor,
+            character.MaxHealth) { }
 }
 
-public class AddPlayerBuffEvent : IGameEvent
+public record AddPlayerBuffEvent(Faction Faction, PlayerBuffInfo Buff) : IGameEvent
 {
-    public Faction Faction;
-    public PlayerBuffInfo Buff;
-
     public AddPlayerBuffEvent(IPlayerEntity player, PlayerBuffInfo buff)
-    {
-        Faction = player.Faction;
-        Buff = buff;
-    }
+        : this(player.Faction, buff) { }
 }
-public class RemovePlayerBuffEvent : IGameEvent
+public record RemovePlayerBuffEvent(Faction Faction, PlayerBuffInfo Buff) : IGameEvent
 {
-    public Faction Faction;
-    public PlayerBuffInfo Buff;
-
     public RemovePlayerBuffEvent(IPlayerEntity player, PlayerBuffInfo buff)
-    {
-        Faction = player.Faction;
-        Buff = buff;
-    }
+        : this(player.Faction, buff) { }
 }
 
-public class GeneralUpdateEvent : IGameEvent
+public record GeneralUpdateEvent(
+    IReadOnlyList<PlayerBuffInfo> PlayerBuffInfos,
+    IReadOnlyList<CharacterBuffInfo> CharacterBuffInfos,
+    IReadOnlyList<CardInfo> CardInfos) : IGameEvent
 {
-    public Dictionary<Guid, PlayerBuffInfo> PlayerBuffInfos = new();
-    public Dictionary<Guid, CharacterBuffInfo> CharacterBuffInfos = new();
-    public Dictionary<Guid, CardInfo> CardInfos = new();
-
     public GeneralUpdateEvent(
-        IReadOnlyCollection<PlayerBuffInfo> playerBuffInfos,
-        IReadOnlyCollection<CharacterBuffInfo> characterBuffInfos,
-        IReadOnlyCollection<CardInfo> cardInfos)
-    {
-        foreach (var buff in playerBuffInfos) PlayerBuffInfos[buff.Identity] = buff;
-        foreach (var buff in characterBuffInfos) CharacterBuffInfos[buff.Identity] = buff;
-        foreach (var card in cardInfos) CardInfos[card.Identity] = card;
-    }
+        IEnumerable<PlayerBuffInfo> playerBuffInfos,
+        IEnumerable<CharacterBuffInfo> characterBuffInfos,
+        IEnumerable<CardInfo> cardInfos)
+        : this(playerBuffInfos.ToList(),
+            characterBuffInfos.ToList(),
+            cardInfos.ToList()) {}
+               
     public GeneralUpdateEvent(IReadOnlyCollection<PlayerBuffInfo> playerBuffInfos)
-    {
-        foreach (var buff in playerBuffInfos) PlayerBuffInfos[buff.Identity] = buff;
-    }
+        : this(playerBuffInfos.ToList(),
+            Array.Empty<CharacterBuffInfo>(),
+            Array.Empty<CardInfo>()) {}
     public GeneralUpdateEvent(IReadOnlyCollection<CharacterBuffInfo> characterBuffInfos)
-    {
-        foreach (var buff in characterBuffInfos) CharacterBuffInfos[buff.Identity] = buff;
-    }
+        : this(Array.Empty<PlayerBuffInfo>(),
+            characterBuffInfos.ToList(),
+            Array.Empty<CardInfo>()) {}
     public GeneralUpdateEvent(IReadOnlyCollection<CardInfo> cardInfos)
-    {
-        foreach (var buff in cardInfos) CardInfos[buff.Identity] = buff;
-    }
+        : this(Array.Empty<PlayerBuffInfo>(),
+            Array.Empty<CharacterBuffInfo>(),
+            cardInfos.ToList()) {}
     public GeneralUpdateEvent(PlayerBuffInfo playerBuffInfo)
-    {
-        PlayerBuffInfos[playerBuffInfo.Identity] = playerBuffInfo;
-    }
+        : this(new List<PlayerBuffInfo> { playerBuffInfo },
+              Array.Empty<CharacterBuffInfo>(),
+              Array.Empty<CardInfo>()) {}
     public GeneralUpdateEvent(CharacterBuffInfo characterBuffInfo)
-    {
-        CharacterBuffInfos[characterBuffInfo.Identity] = characterBuffInfo;
-    }
+        : this(Array.Empty<PlayerBuffInfo>(),
+            new List<CharacterBuffInfo> { characterBuffInfo },
+            Array.Empty<CardInfo>()) {}
     public GeneralUpdateEvent(CardInfo cardInfo)
-    {
-        CardInfos[cardInfo.Identity] = cardInfo;
-    }
+        : this(Array.Empty<PlayerBuffInfo>(),
+            Array.Empty<CharacterBuffInfo>(),
+            new List<CardInfo> { cardInfo }) {}
 }

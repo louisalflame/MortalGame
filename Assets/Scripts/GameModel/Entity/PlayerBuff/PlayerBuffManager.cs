@@ -47,12 +47,11 @@ public class PlayerBuffManager : IPlayerBuffManager
             if (existBuff.PlayerBuffDataId == buffId)
             {
                 existBuff.AddLevel(level);
-                return new AddPlayerBuffResult
-                {
-                    IsNewBuff = false,
-                    Buff = existBuff,
-                    DeltaLevel = level
-                };
+                return new AddPlayerBuffResult(
+                    IsNewBuff: false,
+                    Buff: existBuff,
+                    DeltaLevel: level
+                );
             }
         }
 
@@ -77,12 +76,11 @@ public class PlayerBuffManager : IPlayerBuffManager
                     kvp => kvp.Key, 
                     kvp => kvp.Value.CreateEntity(gameWatcher, triggerSource, actionUnit)));
         _buffs.Add(resultBuff);
-        return new AddPlayerBuffResult
-        {
-            IsNewBuff = true,
-            Buff = resultBuff,
-            DeltaLevel = level
-        };
+        return new AddPlayerBuffResult(
+            IsNewBuff: true,
+            Buff: resultBuff,
+            DeltaLevel: level
+        );
     }
     
     public RemovePlayerBuffResult RemoveBuff(
@@ -96,17 +94,15 @@ public class PlayerBuffManager : IPlayerBuffManager
             if (existBuff.PlayerBuffDataId == buffId)
             {
                 _buffs.Remove(existBuff);
-                return new RemovePlayerBuffResult
-                {
-                    Buffs = new List<IPlayerBuffEntity> { existBuff }
-                };
+                return new RemovePlayerBuffResult(
+                    Buffs: new List<IPlayerBuffEntity> { existBuff }
+                );
             }
         }
 
-        return new RemovePlayerBuffResult
-        {
-            Buffs = Array.Empty<IPlayerBuffEntity>()
-        };   
+        return new RemovePlayerBuffResult(
+            Buffs: Array.Empty<IPlayerBuffEntity>()
+        );   
     }
     // TODO
     public RemovePlayerBuffResult RemoveExpiredBuff(
@@ -122,10 +118,9 @@ public class PlayerBuffManager : IPlayerBuffManager
             }
         }
 
-        return new RemovePlayerBuffResult
-        {
-            Buffs = expiredBuffs
-        };
+        return new RemovePlayerBuffResult(
+            Buffs: expiredBuffs
+        );
     }
 
     public IEnumerable<IPlayerBuffEntity> Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)

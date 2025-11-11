@@ -47,12 +47,10 @@ public class CardBuffManager : ICardBuffManager
             if (existBuff.CardBuffDataID == buffId)
             {
                 existBuff.AddLevel(level);
-                return new AddCardBuffResult
-                {
-                    IsNewBuff = false,
-                    Buff = existBuff,
-                    DeltaLevel = level
-                };
+                return new AddCardBuffResult(
+                    IsNewBuff: false,
+                    Buff: existBuff,
+                    DeltaLevel: level);
             }
         }
 
@@ -78,12 +76,10 @@ public class CardBuffManager : ICardBuffManager
                     session => session.Value.CreateEntity(gameWatcher, triggerSource, actionUnit)));
 
         _buffs.Add(resultBuff);
-        return new AddCardBuffResult
-        {
-            IsNewBuff = true,
-            Buff = resultBuff,
-            DeltaLevel = level
-        };
+        return new AddCardBuffResult(
+            IsNewBuff: true,
+            Buff: resultBuff,
+            DeltaLevel: level);
     }
 
     public RemoveCardBuffResult RemoveBuff(
@@ -97,17 +93,13 @@ public class CardBuffManager : ICardBuffManager
             if (existBuff.CardBuffDataID == buffId)
             {
                 _buffs.Remove(existBuff);
-                return new RemoveCardBuffResult
-                {
-                    Buff = new List<ICardBuffEntity>() { existBuff }
-                };
+                return new RemoveCardBuffResult(
+                    Buff: new List<ICardBuffEntity>() { existBuff });
             }
         }
 
-        return new RemoveCardBuffResult
-        {
-            Buff = Array.Empty<ICardBuffEntity>()
-        };
+        return new RemoveCardBuffResult(
+            Buff: Array.Empty<ICardBuffEntity>());
     }
 
     public bool Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)

@@ -38,9 +38,13 @@ public interface IPlayerCardManager
         CardCollectionType cloneDestination,
         CardBuffLibrary cardBuffLibrary,
         IEnumerable<AddCardBuffData> addCardBuffDatas);
-    
+
     IEnumerable<ICardEntity> Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit);
 }
+
+public record CardManagerInfo(
+    IReadOnlyDictionary<CardCollectionType, CardCollectionInfo> CardZoneInfos,
+    Option<CardInfo> PlayingCard);
 
 public class PlayerCardManager : IPlayerCardManager
 {
@@ -101,14 +105,14 @@ public class PlayerCardManager : IPlayerCardManager
     {
         PlayingCard.MatchSome(
             card =>
-            { 
+            {
                 ICardColletionZone destination =
                     (card.HasProperty(CardProperty.Dispose) || card.HasProperty(CardProperty.AutoDispose)) ?
                     ExclusionZone : Graveyard;
                 destination.AddCard(card);
             }
         );
-        PlayingCard = Option.None<ICardEntity>();                    
+        PlayingCard = Option.None<ICardEntity>();
     }
 
     public IEnumerable<IGameEvent> ClearHandOnTurnEnd(IGameplayStatusWatcher gameWatcher)
@@ -121,16 +125,15 @@ public class PlayerCardManager : IPlayerCardManager
 
         var recycleCards = nonePreservedCards.Except(excludeCards).ToArray();
         Graveyard.AddCards(recycleCards);
-        events.Add(new RecycleHandCardEvent()
-        {
-            Faction = this.Owner(gameWatcher).ValueOr(PlayerEntity.DummyPlayer).Faction,
-            RecycledCardInfos = recycleCards.Select(c => c.ToInfo(gameWatcher)).ToArray(),
-            ExcludedCardInfos = excludeCards.Select(c => c.ToInfo(gameWatcher)).ToArray(),
-            HandCardInfo = HandCard.ToCardCollectionInfo(gameWatcher),
-            GraveyardInfo = Graveyard.ToCardCollectionInfo(gameWatcher),
-            ExclusionZoneInfo = ExclusionZone.ToCardCollectionInfo(gameWatcher),
-            DisposeZoneInfo = DisposeZone.ToCardCollectionInfo(gameWatcher),
-        });
+        events.Add(new RecycleHandCardEvent(
+            Faction: this.Owner(gameWatcher).ValueOr(PlayerEntity.DummyPlayer).Faction,
+            RecycledCardInfos: recycleCards.Select(c => c.ToInfo(gameWatcher)).ToArray(),
+            ExcludedCardInfos: excludeCards.Select(c => c.ToInfo(gameWatcher)).ToArray(),
+            HandCardInfo: HandCard.ToCardCollectionInfo(gameWatcher),
+            GraveyardInfo: Graveyard.ToCardCollectionInfo(gameWatcher),
+            ExclusionZoneInfo: ExclusionZone.ToCardCollectionInfo(gameWatcher),
+            DisposeZoneInfo: DisposeZone.ToCardCollectionInfo(gameWatcher)
+        ));
 
         return events;
     }
@@ -158,9 +161,9 @@ public class PlayerCardManager : IPlayerCardManager
             return Option.Some(card);
         }
         else if (PlayingCard.Match(
-            card => card.Identity == cardIdentity, 
+            card => card.Identity == cardIdentity,
             () => false))
-        { 
+        {
             return PlayingCard;
         }
         else
@@ -319,15 +322,14 @@ public class PlayerCardManager : IPlayerCardManager
                     addCardBuffData.CardBuffId,
                     addCardBuffData.Level.Eval(gameWatcher, trigger, actionUnit)))
             .ToArray();
-        
+
         _AddCard(newCard, cloneDestination);
 
-        return new CreateCardResult
-        {
-            Card = newCard,
-            Zone = GetCardCollectionZone(cloneDestination),
-            AddBuffs = addCardBuffResults
-        };
+        return new CreateCardResult(
+            Card: newCard,
+            Zone: GetCardCollectionZone(cloneDestination),
+            AddBuffs: addCardBuffResults
+        );
     }
     public CloneCardResult CloneNewCard(
         IGameplayStatusWatcher gameWatcher,
@@ -353,12 +355,12 @@ public class PlayerCardManager : IPlayerCardManager
 
         _AddCard(cloneCard, cloneDestination);
 
-        return new CloneCardResult
-        {
-            Card = cloneCard,
-            Zone = GetCardCollectionZone(cloneDestination),
-            AddBuffs = addCardBuffResults
-        };
+        return new CloneCardResult(
+            OriginCard: originCard,
+            Card: cloneCard,
+            Zone: GetCardCollectionZone(cloneDestination),
+            AddBuffs: addCardBuffResults
+        );
     }
     private void _AddCard(ICardEntity card, CardCollectionType type)
     {
@@ -391,7 +393,7 @@ public class PlayerCardManager : IPlayerCardManager
             .Concat(DisposeZone.Cards))
         {
             if (card.BuffManager.Update(gameWatcher, actionUnit))
-            { 
+            {
                 yield return card;
             }
         }
