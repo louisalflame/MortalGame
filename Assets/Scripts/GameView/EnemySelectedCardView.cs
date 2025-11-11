@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UniRx;
+using UnityEngine.UI;
 
 public class EnemySelectedCardView : MonoBehaviour
 {
@@ -13,6 +15,9 @@ public class EnemySelectedCardView : MonoBehaviour
     [SerializeField]
     private RectTransform _handCardArea;
 
+    [Header("Deck")]
+    [SerializeField]
+    private Button _deckButton;
     [SerializeField]
     private TextMeshProUGUI _deckCountText;
     
@@ -20,32 +25,34 @@ public class EnemySelectedCardView : MonoBehaviour
     private float _cardWidth = 100f;
     [SerializeField]
     private float _widthInterval = 20f;
-    
+
     public IEnumerable<ISelectableView> SelectableViews => _cardViews;
+    public Button DeckButton => _deckButton;
 
     private List<IAiCardView> _cardViews = new List<IAiCardView>();
     private Dictionary<Guid, IAiCardView> _cardViewDict = new Dictionary<Guid, IAiCardView>();
 
     private IGameplayStatusWatcher _statusWatcher;
     private IGameplayActionReciever _reciever;
+    private IGameViewModel _gameViewModel;
     private LocalizeLibrary _localizeLibrary;
 
-    public void Init(IGameplayStatusWatcher statusWatcher, IGameplayActionReciever reciever, LocalizeLibrary localizeLibrary)
+    public void Init(
+        IGameplayStatusWatcher statusWatcher,
+        IGameplayActionReciever reciever,
+        IGameViewModel gameViewModel,
+        LocalizeLibrary localizeLibrary)
     {
         _statusWatcher = statusWatcher;
         _reciever = reciever;
         _localizeLibrary = localizeLibrary;
+        _gameViewModel = gameViewModel;
+
+        _gameViewModel.ObservableCardCollectionInfo(Faction.Enemy, CardCollectionType.Deck)
+            .Subscribe(deckInfo => _deckCountText.text = deckInfo.Count.ToString())
+            .AddTo(this);
     }
 
-    public void UpdateDeckView(DrawCardEvent drawCardEvent)
-    {
-        _deckCountText.text = drawCardEvent.CardManagerInfo.CardZoneInfos[CardCollectionType.Deck].Count.ToString();
-    }
-    public void UpdateDeckView(RecycleGraveyardEvent recycleGraveyardEvent)
-    {
-        _deckCountText.text = recycleGraveyardEvent.CardManagerInfo.CardZoneInfos[CardCollectionType.Deck].Count.ToString();
-    }
- 
     public void CreateCardView(EnemySelectCardEvent enemySelectCardEvent)
     {
         var cardView = _cardViewFactory.CreatePrefab();

@@ -2,6 +2,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+public record DispositionData(
+    string ID,
+    int Range,
+    int RecoverEnergyPoint,
+    int DrawCardCount
+);
+
 public class DispositionLibrary
 {
     // key: upper bound 

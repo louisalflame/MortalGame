@@ -14,26 +14,57 @@ public class ScriptableDataLoader : MonoBehaviour
 
     [SerializeField]
     private AllPlayerScriptable _allPlayerScriptable;
-    
-    [SerializeField]
-    private DispositionScriptable _dispositionScriptable;
 
     [SerializeField]
-    private LocalizeSettingScriptable _localizeSettingScriptable;
+    private ExcelDatas _excelDatasScriptable;
 
     public CardData[] AllCards => _allCardScriptable.AllCardData.Select(c => c.Data).ToArray();
     public CardBuffData[] AllCardBuffs => _allCardBuffScriptable.AllCardBuffData.Select(c => c.Data).ToArray();
     public PlayerBuffData[] AllBuffs => _allBuffScriptable.AllBuffData.Select(b => b.Data).ToArray();
-    public DispositionData[] DispositionSettings => _dispositionScriptable.Datas;
-
     public AllyData Ally => _allPlayerScriptable.AllyObject.Ally;
-
     public EnemyData[] AllEnemies => _allPlayerScriptable.EnemyObjects.Select(p => p.Enemy).ToArray();
 
-    public Dictionary<LocalizeSimpleType, Dictionary<string, string>> LocalizeSimpleSetting => _localizeSettingScriptable
-        .AllLocalizeSimpleData
-        .ToDictionary(pair => pair.Key, pair => pair.Value.Data);
-    public Dictionary<LocalizeTitleInfoType, Dictionary<string, LocalizeTitleInfoData>> LocalizeTitleInfoSetting => _localizeSettingScriptable
-        .AllLocalizeTileInfoData
-        .ToDictionary(pair => pair.Key, pair => pair.Value.Data);
+    public DispositionData[] DispositionSettings()
+    {
+        return _excelDatasScriptable.Disposition
+            .Select(row => new DispositionData(
+                row.Id,
+                row.Range,
+                row.RecoverEnergyPoint,
+                row.DrawCardCount
+            ))
+            .ToArray();
+    }
+
+    public IReadOnlyDictionary<LocalizeType, IReadOnlyDictionary<string, LocalizeTitleInfoData>> LocalizeTitleInfoSetting()
+    {
+        return new Dictionary<LocalizeType, IReadOnlyDictionary<string, LocalizeTitleInfoData>>
+        {
+            {
+                LocalizeType.Player,
+                ParseTable(_excelDatasScriptable.LocalizePlayer)
+            },
+            {
+                LocalizeType.Card,
+                ParseTable(_excelDatasScriptable.LocalizeCard)
+            },
+            {
+                LocalizeType.CardBuff,
+                ParseTable(_excelDatasScriptable.LocalizeCardBuff)
+            },
+            {
+                LocalizeType.PlayerBuff,
+                ParseTable(_excelDatasScriptable.LocalizePlayerBuff)
+            },
+            {
+                LocalizeType.KeyWord,
+                ParseTable(_excelDatasScriptable.LocalizeKeyWord)
+            },
+        };
+
+        LocalizeTitleInfoData Parse(LocalizeExcelData data) =>
+            new LocalizeTitleInfoData(data.Title, data.Info);
+        Dictionary<string, LocalizeTitleInfoData> ParseTable(List<LocalizeExcelData> datas)
+            => datas.ToDictionary(d => d.Id, d => Parse(d));
+    }
 }

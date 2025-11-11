@@ -1,49 +1,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum LocalizeSimpleType
+public enum LocalizeType
 {
-    UI,
-    PlayerName, 
-}
-
-public enum LocalizeTitleInfoType
-{
+    Player,
     Card,
     CardBuff,
-    Buff,
-    Disposition,
-    GameKeyWord,
+    PlayerBuff,
+    KeyWord,
 }
 
+public record LocalizeTitleInfoData(string Title, string Info);
 
 public class LocalizeLibrary
 {
-    private Dictionary<LocalizeSimpleType, Dictionary<string, string>> _localizeSimpleDatas;
-    private Dictionary<LocalizeTitleInfoType, Dictionary<string, LocalizeTitleInfoData>> _localizeTitleInfoDatas;
+    private IReadOnlyDictionary<LocalizeType, IReadOnlyDictionary<string, LocalizeTitleInfoData>> _localizeTitleInfoDatas;
 
     public LocalizeLibrary(
-        Dictionary<LocalizeSimpleType, Dictionary<string, string>> localizeDatas, 
-        Dictionary<LocalizeTitleInfoType, Dictionary<string, LocalizeTitleInfoData>> localizeTitleInfoDatas)
+        IReadOnlyDictionary<LocalizeType, IReadOnlyDictionary<string, LocalizeTitleInfoData>> localizeTitleInfoDatas)
     {
-        _localizeSimpleDatas = localizeDatas;
         _localizeTitleInfoDatas = localizeTitleInfoDatas;
     }
 
-    public string Get(LocalizeSimpleType localizeType, string key)
-    {
-        if (_localizeSimpleDatas.TryGetValue(localizeType, out var localizeData))
-        {
-            if (localizeData.TryGetValue(key, out var value))
-            {
-                return value;
-            }
-        }
-
-        return $"{localizeType}|{key}";
-    }
-
-    public LocalizeTitleInfoData Get(LocalizeTitleInfoType localizeType, string key)
+    public LocalizeTitleInfoData Get(LocalizeType localizeType, string key)
     {
         if (_localizeTitleInfoDatas.TryGetValue(localizeType, out var localizeData))
         {

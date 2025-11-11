@@ -62,7 +62,7 @@ public class PlayerBuffView : MonoBehaviour, IRecyclable
     
     private void _ShowBuffInfo(SimpleTitleInfoHintView simpleHintView, PlayerBuffInfo buffInfo)
     { 
-        var localizeData = _localizeLibrary.Get(LocalizeTitleInfoType.Buff, buffInfo.Id);
+        var localizeData = _localizeLibrary.Get(LocalizeType.PlayerBuff, buffInfo.Id);
         var templateValue = buffInfo.GetTemplateValues();
         var title = localizeData.Title;
         var info = localizeData.Info.ReplaceTemplateKeys(templateValue);

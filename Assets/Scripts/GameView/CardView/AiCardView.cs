@@ -35,7 +35,7 @@ public class AiCardView : MonoBehaviour, IAiCardView
 
     public void SetCardInfo(CardInfo cardInfo, LocalizeLibrary localizeLibrary)
     {
-        var cardLocalizeData = localizeLibrary.Get(LocalizeTitleInfoType.Card, cardInfo.CardDataID);
+        var cardLocalizeData = localizeLibrary.Get(LocalizeType.Card, cardInfo.CardDataID);
         var templateValue = cardInfo.GetTemplateValues();
 
         _cardIdentity = cardInfo.Identity;

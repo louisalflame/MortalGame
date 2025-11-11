@@ -99,7 +99,7 @@ public class CardView : MonoBehaviour, ICardView
     }
     private void _Render(CardInfo cardInfo)
     {
-        var cardLocalizeData = _localizeLibrary.Get(LocalizeTitleInfoType.Card, cardInfo.CardDataID);
+        var cardLocalizeData = _localizeLibrary.Get(LocalizeType.Card, cardInfo.CardDataID);
         var templateValue = cardInfo.GetTemplateValues();
 
         _cardIdentity = cardInfo.Identity;
@@ -116,7 +116,7 @@ public class CardView : MonoBehaviour, ICardView
 
         _title.text = cardLocalizeData.Title;
         _info.text = cardLocalizeData.Info.ReplaceTemplateKeys(templateValue);
-        _type.text = _localizeLibrary.Get(LocalizeTitleInfoType.GameKeyWord, cardInfo.Type.ToString()).Title;
+        _type.text = _localizeLibrary.Get(LocalizeType.KeyWord, cardInfo.Type.ToString()).Title;
 
         _sealedEffectObj.SetActive(cardInfo.Properties.Contains(CardProperty.Sealed));
     }

@@ -26,6 +26,7 @@ public interface IInteractionButtonView
 { 
     DeckCardView DeckCardView { get; }
     GraveyardCardView GraveyardCardView { get; }
+    EnemySelectedCardView EnemySelectedCardView { get; }
 }
 public interface IAllCardDetailPanelView
 {
@@ -99,6 +100,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
     public FocusCardDetailView FocusCardDetailView => _focusCardDetailView;
     public DeckCardView DeckCardView => _deckCardView;
     public GraveyardCardView GraveyardCardView => _graveyardCardView;
+    public EnemySelectedCardView EnemySelectedCardView => _enemySelectedCardView;
 
     private IGameViewModel _gameViewModel;
 
@@ -128,7 +130,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
         _allyCharacterView.Init(statusWatcher);
 
         _enemyInfoView.Init(statusWatcher, _gameViewModel, _simpleHintView, localizeLibrary);
-        _enemySelectedCardView.Init(statusWatcher, reciever, localizeLibrary);
+        _enemySelectedCardView.Init(statusWatcher, reciever, _gameViewModel, localizeLibrary);
         _enemyCharacterView.Init(statusWatcher);
 
         _deckCardView.Init(_gameViewModel);
@@ -258,16 +260,13 @@ public class GameplayView : MonoBehaviour, IGameplayView
     {
         _gameViewModel.UpdateCardInfo(drawCardEvent.NewCardInfo);
         _gameViewModel.UpdateCardCollectionInfo(drawCardEvent.Faction, drawCardEvent.CardManagerInfo);
+
         switch (drawCardEvent.Faction)
         {
             case Faction.Ally:
                 _allyHandCardView.CreateCardView(
                     drawCardEvent.NewCardInfo,
                     drawCardEvent.CardManagerInfo.CardZoneInfos[CardCollectionType.HandCard]);
-                break;
-            case Faction.Enemy:
-                _gameViewModel.UpdateCardInfo(drawCardEvent.NewCardInfo);
-                _enemySelectedCardView.UpdateDeckView(drawCardEvent);
                 break;
         }
     }
@@ -324,14 +323,6 @@ public class GameplayView : MonoBehaviour, IGameplayView
     private void _RecycleGraveyardEvent(RecycleGraveyardEvent recycleGraveyardEvent)
     {
         _gameViewModel.UpdateCardCollectionInfo(recycleGraveyardEvent.Faction, recycleGraveyardEvent.CardManagerInfo);
-        switch (recycleGraveyardEvent.Faction)
-        {
-            case Faction.Ally:
-                break;
-            case Faction.Enemy:
-                _enemySelectedCardView.UpdateDeckView(recycleGraveyardEvent);
-                break;
-        }
     }
     private void _RecycleHandCardEvent(RecycleHandCardEvent recycleHandCardEvent)
     {

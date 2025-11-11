@@ -18,7 +18,7 @@ public class BattleBuidler
         var CardBuffLibrary = new CardBuffLibrary(_context.CardBuffTable);
         var buffLibrary = new PlayerBuffLibrary(_context.BuffTable);
         var dispositionLibrary = new DispositionLibrary(_context.DispositionSettings);
-        var localizeLibrary = new LocalizeLibrary(_context.LocalizeSimpleSetting, _context.LocalizeTitleInfoSetting);
+        var localizeLibrary = new LocalizeLibrary(_context.LocalizeTitleInfoSetting);
 
         return new GameContextManager(
             cardLibrary, 
