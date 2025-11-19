@@ -15,7 +15,8 @@ public static class UseCardLogic
             .Sum(card => GameFormula.CardCost(
                 gameplayWatcher,
                 card,
-                new CardLookIntentAction(card)
+                new CardLookIntentAction(card),
+                new CardTrigger(card)
             ));
         var remainCost = enemy.CurrentEnergy - totalSelectedCost;
 
@@ -23,7 +24,7 @@ public static class UseCardLogic
             .Where(c => !enemy.SelectedCards.Cards.Contains(c))
             .Select(c => (
                 Card: c,
-                Cost: GameFormula.CardCost(gameplayWatcher, c, new CardLookIntentAction(c))
+                Cost: GameFormula.CardCost(gameplayWatcher, c, new CardLookIntentAction(c), new CardTrigger(c))
             ))
             .Where(c => c.Cost <= remainCost);
 
@@ -48,7 +49,7 @@ public static class UseCardLogic
             var selectResult = SelectTargetLogic.SelectTarget(gameplayWatcher, selectedCard);
             if (!selectResult.IsValid) continue;
 
-            var cardRuntimeCost = GameFormula.CardCost(gameplayWatcher, selectedCard, new CardLookIntentAction(selectedCard));
+            var cardRuntimeCost = GameFormula.CardCost(gameplayWatcher, selectedCard, new CardLookIntentAction(selectedCard), new CardTrigger(selectedCard));
             if (cardRuntimeCost <= enemy.CurrentEnergy)
             {
                 useCardAction = new UseCardAction(selectedCard.Identity, selectResult.TargetType, selectResult.TargetId);

@@ -11,12 +11,24 @@ using UnityEngine.UI;
 
 public interface ICardView : IRecyclable, ISelectableView
 {
+    public record RuntimeHandCardProperty(
+        CardInfo CardInfo);
+    public record CardClickableProperty(
+        CardInfo CardInfo,
+        bool IsClickable,
+        Action<CardInfo> OnClickCard = null,
+        Action<CardInfo> OnLongPressCard = null);
+    public record CardDetailProperty(
+        CardInfo CardInfo);
+
     Canvas Canvas { get; }
     RectTransform ParentRectTransform { get; }
     Button Button { get; }
 
     void Initialize(IGameViewModel gameInfoModel, LocalizeLibrary localizeLibrary);
     void SetCardInfo(CardInfo cardInfo);
+    void Render(CardClickableProperty property);
+    void Render(CardDetailProperty property);
 
     void SetPositionAndRotation(Vector3 position, Quaternion rotation);
     void AddLocationOffset(Guid guid, Vector3 offset, float duration);
@@ -67,7 +79,7 @@ public class CardView : MonoBehaviour, ICardView
     public RectTransform ParentRectTransform => transform.parent.GetComponent<RectTransform>();
     public Canvas Canvas => transform.GetComponentInParent<Canvas>();
 
-    private CompositeDisposable _disposables = new CompositeDisposable();
+    private CompositeDisposable _disposables = new();
     private IDisposable _cardInfoSubscription;
     private Vector3 _localPosition;
     private Quaternion _localRotation; 
@@ -95,8 +107,37 @@ public class CardView : MonoBehaviour, ICardView
                 _cardInfoSubscription = reactiveProp
                     .Subscribe(info => _Render(info));
             });
+
         _Render(cardInfo);
     }
+    public void Render(ICardView.CardClickableProperty property)
+    {
+        _button.interactable = property.IsClickable;
+        if (property.IsClickable)
+        {
+            _button.OnClickOrLongPressAsObservable()
+                .Subscribe(pressType =>
+                {
+                    switch (pressType)
+                    {
+                        case ObservableButtonExtensions.PressType.Click:
+                            property.OnClickCard?.Invoke(property.CardInfo);
+                            break;
+                        case ObservableButtonExtensions.PressType.LongPress:
+                            property.OnLongPressCard?.Invoke(property.CardInfo);
+                            break;
+                    }
+                })
+                .AddTo(_disposables);
+        }
+        
+        _Render(property.CardInfo);
+    }
+    public void Render(ICardView.CardDetailProperty property)
+    {
+        _Render(property.CardInfo);
+    }
+
     private void _Render(CardInfo cardInfo)
     {
         var cardLocalizeData = _localizeLibrary.Get(LocalizeType.Card, cardInfo.CardDataID);
@@ -168,6 +209,7 @@ public class CardView : MonoBehaviour, ICardView
         _UpdateLocalPosition();
         _cardInfoSubscription?.Dispose();
         _button.interactable = false;
+        _disposables.Clear();
     } 
 
     public void SetPositionAndRotation(Vector3 position, Quaternion rotation)

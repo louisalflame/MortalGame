@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-
 public record CardInfo(
     Guid Identity,
     string CardDataID,
@@ -17,7 +16,8 @@ public record CardInfo(
     MainSelectableInfo MainSelectable,
     IReadOnlyList<SubSelectableInfo> SubSelectables,
     IReadOnlyList<CardBuffInfo> BuffInfos,
-    IReadOnlyList<CardProperty> Properties)
+    IReadOnlyList<CardProperty> Properties,
+    IReadOnlyList<string> Keywords)
 {
     public static CardInfo Create(ICardEntity card, IGameplayStatusWatcher gameWatcher)
     {
@@ -28,15 +28,19 @@ public record CardInfo(
             Rarity: card.Rarity,
             Themes: card.Themes,
             OriginCost: card.OriginCost,
-            Cost: GameFormula.CardCost(gameWatcher, card, new CardLookIntentAction(card)),
+            Cost: GameFormula.CardCost(gameWatcher, card, new CardLookIntentAction(card), new CardTrigger(card)),
             OriginPower: card.OriginPower,
-            Power: GameFormula.CardPower(gameWatcher, card, new CardLookIntentAction(card)),
+            Power: GameFormula.CardPower(gameWatcher, card, new CardLookIntentAction(card), new CardTrigger(card)),
             MainSelectable: card.MainSelect.ToInfo(),
             SubSelectables: card.SubSelects.Select(s => s.ToInfo()).ToList(),
             BuffInfos: card.BuffManager.Buffs.Select(s => new CardBuffInfo(s)).ToList(),
             Properties: card.Properties.Select(p => p.Property)
                 .Concat(card.BuffManager.Buffs
                     .SelectMany(b => b.Properties.Select(p => p.Property)))
+                .Distinct()
+                .ToList(),
+            Keywords: card.Properties.SelectMany(p => p.Keywords)
+                .Concat(card.BuffManager.Buffs.SelectMany(b => b.Keywords))
                 .Distinct()
                 .ToList()
         );
@@ -87,7 +91,7 @@ public static class CardCollectionInfoUtility
 
     public static CardCollectionInfo ToCardCollectionInfo(
         this ICardColletionZone cardCollectionZone, IGameplayStatusWatcher gameWatcher)
-    { 
+    {
         return cardCollectionZone.Cards
             .Select(c => c.ToInfo(gameWatcher))
             .ToArray()

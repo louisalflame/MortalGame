@@ -106,7 +106,7 @@ public static class EffectExecutor
         ITargetCharacterCollectionValue targets,
         IIntegerValue value,
         DamageType damageType,
-        System.Func<IGameplayStatusWatcher, int, DamageIntentTargetAction, int> formulaFunc)
+        System.Func<IGameplayStatusWatcher, int, DamageIntentTargetAction, ITriggerSource, int> formulaFunc)
     {
         var cardEffectEvents = new List<IGameEvent>();
         var resultActions = new List<BaseResultAction>();
@@ -118,7 +118,7 @@ public static class EffectExecutor
             var characterTarget = new CharacterTarget(target);
             var targetIntent = new DamageIntentTargetAction(context.ActionSource, characterTarget, damageType);
             var damagePoint = value.Eval(context.GameplayWatcher, context.Trigger, targetIntent);
-            var damageFormulaPoint = formulaFunc(context.GameplayWatcher, damagePoint, targetIntent);
+            var damageFormulaPoint = formulaFunc(context.GameplayWatcher, damagePoint, targetIntent, context.Trigger);
 
             var damageResult = target.HealthManager.TakeDamage(damageFormulaPoint, context.GameplayWatcher.ContextManager.Context, damageType);
             var damageStyle = DamageStyle.None; // TODO: pass style from action source
@@ -480,7 +480,7 @@ public static class EffectExecutor
         
         target.MatchSome(targetPlayer =>
         {
-            foreach (var cardData in createCardEffect.CardDatas)
+            foreach (var cardDataId in createCardEffect.CardDataIds)
             {
                 var playerTarget = new PlayerTarget(targetPlayer);
                 var targetIntent = new CreateCardIntentTargetAction(context.ActionSource, playerTarget);
@@ -490,8 +490,9 @@ public static class EffectExecutor
                         context.GameplayWatcher,
                         context.Trigger,
                         targetIntent,
-                        cardData.Data,
+                        cardDataId,
                         createCardEffect.CreateDestination,
+                        context.GameplayWatcher.ContextManager.CardLibrary,
                         context.GameplayWatcher.ContextManager.CardBuffLibrary,
                         createCardEffect.AddCardBuffDatas);
 
@@ -608,7 +609,7 @@ public static class EffectExecutor
                     var characterTarget = new CharacterTarget(target);
                     var targetIntent = new DamageIntentTargetAction(actionSource, characterTarget, DamageType.Additional);
                     var damagePoint = additionalDamageBuffEffect.Value.Eval(gameplayWatcher, triggerSource, targetIntent);
-                    var damageFormulaPoint = GameFormula.AdditionalDamagePoint(gameplayWatcher, damagePoint, targetIntent);
+                    var damageFormulaPoint = GameFormula.AdditionalDamagePoint(gameplayWatcher, damagePoint, targetIntent, triggerSource);
 
                     var damageResult = target.HealthManager.TakeDamage(damageFormulaPoint, gameplayWatcher.ContextManager.Context, DamageType.Additional);
                     var damageStyle = DamageStyle.None;
@@ -629,7 +630,7 @@ public static class EffectExecutor
                     var characterTarget = new CharacterTarget(target);
                     var targetIntent = new DamageIntentTargetAction(actionSource, characterTarget, DamageType.Effective);
                     var damagePoint = effectiveDamageBuffEffect.Value.Eval(gameplayWatcher, triggerSource, targetIntent);
-                    var damageFormulaPoint = GameFormula.EffectiveDamagePoint(gameplayWatcher, damagePoint, targetIntent);
+                    var damageFormulaPoint = GameFormula.EffectiveDamagePoint(gameplayWatcher, damagePoint, targetIntent, triggerSource);
 
                     var damageResult = target.HealthManager.TakeDamage(damageFormulaPoint, gameplayWatcher.ContextManager.Context, DamageType.Effective);
                     var damageStyle = DamageStyle.None;

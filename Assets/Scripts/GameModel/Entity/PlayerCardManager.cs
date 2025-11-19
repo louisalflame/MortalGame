@@ -26,8 +26,9 @@ public interface IPlayerCardManager
         IGameplayStatusWatcher gameWatcher,
         ITriggerSource trigger,
         IActionUnit actionUnit,
-        CardData cardData,
+        string cardDataId,
         CardCollectionType cloneDestination,
+        CardLibrary cardLibrary,
         CardBuffLibrary cardBuffLibrary,
         IEnumerable<AddCardBuffData> addCardBuffDatas);
     CloneCardResult CloneNewCard(
@@ -57,9 +58,10 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
 
     public PlayerCardManager(
         int handCardMaxCount,
-        IEnumerable<CardInstance> cardInstances)
+        IEnumerable<CardInstance> cardInstances,
+        CardLibrary cardLibrary)
     {
-        Deck = new DeckEntity(cardInstances);
+        Deck = new DeckEntity(cardInstances, cardLibrary);
         HandCard = new HandCardEntity(handCardMaxCount);
         Graveyard = new GraveyardEntity();
         ExclusionZone = new ExclusionZoneEntity();
@@ -301,12 +303,13 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
         IGameplayStatusWatcher gameWatcher,
         ITriggerSource trigger,
         IActionUnit actionUnit,
-        CardData cardData,
+        string cardDataId,
         CardCollectionType cloneDestination,
+        CardLibrary cardLibrary,
         CardBuffLibrary cardBuffLibrary,
         IEnumerable<AddCardBuffData> addCardBuffDatas)
     {
-        var newCard = CardEntity.RuntimeCreateFromData(cardData);
+        var newCard = CardEntity.RuntimeCreateFromId(cardDataId, cardLibrary);
 
         var addCardBuffResults = addCardBuffDatas
             .Select(addCardBuffData => newCard.BuffManager
@@ -336,7 +339,7 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
         CardBuffLibrary cardBuffLibrary,
         IEnumerable<AddCardBuffData> addCardBuffDatas)
     {
-        var cloneCard = originCard.Clone();
+        var cloneCard = originCard.Clone(includeCardBuffs: false, includeCardProperties: false);
 
         var addCardBuffResults = addCardBuffDatas
             .Select(addCardBuffData => cloneCard.BuffManager

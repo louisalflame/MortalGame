@@ -123,7 +123,7 @@ public class CreateCardEffect : ICardEffect
 {
     public ITargetPlayerValue Target;
     [ShowInInspector]
-    public List<CardDataScriptable> CardDatas = new ();    
+    public List<string> CardDataIds = new ();    
     [ShowInInspector]
     public List<AddCardBuffData> AddCardBuffDatas = new ();
     public CardCollectionType CreateDestination;

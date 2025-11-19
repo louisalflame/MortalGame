@@ -12,7 +12,9 @@ public class SingleCardDetailPopupPanel : MonoBehaviour
     [SerializeField]
     private CardView _cardView;
     [SerializeField]
-    private CardPropertyHint _cardPropertyHint;
+    private CardPropertyHint _cardBuffHint;
+    [SerializeField]
+    private CardPropertyHint _cardKeywordHint;
 
     private IGameViewModel _gameViewModel;
     private LocalizeLibrary _localizeLibrary;
@@ -21,13 +23,14 @@ public class SingleCardDetailPopupPanel : MonoBehaviour
     {
         _gameViewModel = gameInfoModel;
         _localizeLibrary = localizeLibrary;
-        _cardPropertyHint.Init(_localizeLibrary);
+        _cardBuffHint.Init(_localizeLibrary);
+        _cardKeywordHint.Init(_localizeLibrary);
         _cardView.Initialize(_gameViewModel, _localizeLibrary);
     }
 
-    public async UniTask Run(CardInfo cardInfo)
+    public async UniTask Run(CardDetailProperty property)
     {
-        _cardView.SetCardInfo(cardInfo);
+        _cardView.Render(property.CardProperty);
 
         var disposables = new CompositeDisposable();
         var isClose = false;
@@ -42,7 +45,8 @@ public class SingleCardDetailPopupPanel : MonoBehaviour
         {
             _panel.SetActive(true);
 
-            _cardPropertyHint.ShowHint(cardInfo, false, _cardView.RectTransform);
+            _cardBuffHint.ShowHint(property.CardBuffHint, _cardView.RectTransform);
+            _cardKeywordHint.ShowHint(property.CardKeywordHint, _cardView.RectTransform);
 
             while (!isClose)
             {
@@ -51,7 +55,8 @@ public class SingleCardDetailPopupPanel : MonoBehaviour
 
             _panel.SetActive(false);
 
-            _cardPropertyHint.HideHint();
+            _cardBuffHint.HideHint();
+            _cardKeywordHint.HideHint();
         }
     }
 }

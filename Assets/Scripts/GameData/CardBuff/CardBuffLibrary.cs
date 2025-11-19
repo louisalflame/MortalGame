@@ -11,7 +11,7 @@ public class CardBuffLibrary
         _buffs = new Dictionary<string, CardBuffData>(cardBuffs);
     }
 
-    public ICardBuffLifeTimeData GetCardBuffLifeTime(string buffId)
+    public CardBuffData GetCardBuffData(string buffId)
     {
         if (!_buffs.ContainsKey(buffId))
         {
@@ -19,28 +19,6 @@ public class CardBuffLibrary
             return null;
         }
 
-        return _buffs[buffId].LifeTimeData;
-    }
-
-    public IReadOnlyDictionary<string, IReactionSessionData> GetCardBuffSessions(string buffId)
-    {
-        if (!_buffs.ContainsKey(buffId))
-        {
-            Debug.LogError($"CardBuff ID[{buffId}] not found in library.");
-            return null;
-        }
-
-        return _buffs[buffId].Sessions;
-    }
-
-    public ICardBuffPropertyData[] GetCardBuffProperties(string buffId)
-    {
-        if (!_buffs.ContainsKey(buffId))
-        {
-            Debug.LogError($"CardBuff ID[{buffId}] not found in library.");
-            return Array.Empty<ICardBuffPropertyData>();
-        }
-
-        return _buffs[buffId].PropertyDatas.ToArray();
+        return _buffs[buffId];
     }
 }

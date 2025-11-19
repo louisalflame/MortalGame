@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Optional;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public interface ICardBuffEntity
@@ -13,9 +14,12 @@ public interface ICardBuffEntity
     IReadOnlyCollection<ICardBuffPropertyEntity> Properties { get; }
     ICardBuffLifeTimeEntity LifeTime { get; }
     IReadOnlyDictionary<string, IReactionSessionEntity> ReactionSessions { get; }
+    IReadOnlyDictionary<CardTriggeredTiming, IEnumerable<ConditionalCardBuffEffect>> Effects { get; }
+    IEnumerable<string> Keywords { get; }
 
     bool IsExpired();
     void AddLevel(int level);
+    ICardBuffEntity Clone();
 }
 
 public class CardBuffEntity : ICardBuffEntity
@@ -27,6 +31,7 @@ public class CardBuffEntity : ICardBuffEntity
     private readonly IReadOnlyList<ICardBuffPropertyEntity> _properties;
     private readonly ICardBuffLifeTimeEntity _lifeTime;
     private readonly IReadOnlyDictionary<string, IReactionSessionEntity> _reactionSessions;
+    private readonly CardBuffLibrary _cardBuffLibrary;
 
     public string CardBuffDataID => _cardBuffDataId;
     public Guid Identity => _identity;
@@ -35,15 +40,26 @@ public class CardBuffEntity : ICardBuffEntity
     public IReadOnlyCollection<ICardBuffPropertyEntity> Properties => _properties;
     public ICardBuffLifeTimeEntity LifeTime => _lifeTime;
     public IReadOnlyDictionary<string, IReactionSessionEntity> ReactionSessions => _reactionSessions;
+    public IReadOnlyDictionary<CardTriggeredTiming, IEnumerable<ConditionalCardBuffEffect>> Effects =>
+        _cardBuffLibrary.GetCardBuffData(_cardBuffDataId).Effects.ToDictionary(
+            kvp => kvp.Key,
+            kvp => (IEnumerable<ConditionalCardBuffEffect>)kvp.Value
+        );
+    public IEnumerable<string> Keywords
+        => Effects.Keys.Where(timing => timing != CardTriggeredTiming.None)
+            .Select(t => t.ToString())
+            .Concat(_properties.SelectMany(p => p.Keywords))
+            .Distinct();
 
-    public CardBuffEntity(
+    private CardBuffEntity(
         string cardBuffDataID,
         Guid identity,
         int level,
         Option<IPlayerEntity> caster,
         IEnumerable<ICardBuffPropertyEntity> properties,
         ICardBuffLifeTimeEntity lifeTime,
-        IReadOnlyDictionary<string, IReactionSessionEntity> reactionSessions)
+        IReadOnlyDictionary<string, IReactionSessionEntity> reactionSessions,
+        CardBuffLibrary cardBuffLibrary)
     {
         _cardBuffDataId = cardBuffDataID;
         _identity = identity;
@@ -52,6 +68,37 @@ public class CardBuffEntity : ICardBuffEntity
         _properties = properties.ToList();
         _lifeTime = lifeTime;
         _reactionSessions = reactionSessions;
+        _cardBuffLibrary = cardBuffLibrary;
+    }
+
+    public static CardBuffEntity CreateFromData(
+        string cardBuffDataID,
+        int level,
+        Option<IPlayerEntity> caster,
+        IGameplayStatusWatcher gameWatcher,
+        ITriggerSource triggerSource,
+        IActionUnit actionUnit,
+        CardBuffLibrary cardBuffLibrary)
+    {
+        var buffData = cardBuffLibrary.GetCardBuffData(cardBuffDataID);
+        var properties = buffData.PropertyDatas
+            .Select(p => p.CreateEntity(gameWatcher, triggerSource));
+        var lifeTime = buffData.LifeTimeData.CreateEntity(gameWatcher, triggerSource, actionUnit);
+        var reactionSessions = buffData.Sessions.ToDictionary(
+            kvp => kvp.Key,
+            kvp => kvp.Value.CreateEntity(gameWatcher, triggerSource, actionUnit)
+        );
+
+        return new CardBuffEntity(
+            cardBuffDataID: cardBuffDataID,
+            identity: Guid.NewGuid(),
+            level: level,
+            caster: caster,
+            properties: properties,
+            lifeTime: lifeTime,
+            reactionSessions: reactionSessions,
+            cardBuffLibrary: cardBuffLibrary
+        );
     }
 
     public bool IsExpired()
@@ -62,5 +109,22 @@ public class CardBuffEntity : ICardBuffEntity
     public void AddLevel(int level)
     {
         _level += level;
+    }
+
+    public ICardBuffEntity Clone()
+    {
+        return new CardBuffEntity(
+            cardBuffDataID: _cardBuffDataId,
+            identity: Guid.NewGuid(),
+            level: _level,
+            caster: _caster,
+            properties: _properties.Select(p => p.Clone()),
+            lifeTime: _lifeTime.Clone(),
+            reactionSessions: _reactionSessions.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.Clone()
+            ),
+            cardBuffLibrary: _cardBuffLibrary
+        );
     }
 }

@@ -15,6 +15,34 @@ public interface IAllCardDetailPresenter
         CancellationToken cancellationToken);
 }
 
+public record CardDetailProperty(
+    ICardView.CardDetailProperty CardProperty,
+    CardPropertyHint.ViewData CardBuffHint,
+    CardPropertyHint.ViewData CardKeywordHint)
+{
+    public static CardDetailProperty Create(CardInfo cardInfo)
+    {
+        return new CardDetailProperty(
+            CardProperty: new ICardView.CardDetailProperty(cardInfo),
+            CardBuffHint: new CardPropertyHint.ViewData(
+                cardInfo.BuffInfos
+                    .Select(buffInfo =>
+                        new CardPropertyHint.InfoCellViewData(
+                            LocalizeType.CardBuff,
+                            buffInfo.CardBuffDataId,
+                            buffInfo.GetTemplateValues()))
+                    .ToArray()),
+            CardKeywordHint: new CardPropertyHint.ViewData(
+                cardInfo.Keywords
+                    .Select(keyword =>
+                        new CardPropertyHint.InfoCellViewData(
+                            LocalizeType.KeyWord,
+                            keyword,
+                            Utility.Dictionary<string, string>.EMPTY))
+                    .ToArray()));
+    }
+}
+
 public class AllCardDetailPresenter : IAllCardDetailPresenter
 {
     private readonly IAllCardDetailPanel _detailPanel;
@@ -22,7 +50,6 @@ public class AllCardDetailPresenter : IAllCardDetailPresenter
     private readonly IGameViewModel _gameViewModel;
 
     private CardInfo _selectedCardInfo;
-    private CompositeDisposable _disposables = new CompositeDisposable();
     private Option<UniTask> _currentTask = Option.None<UniTask>();
 
     public AllCardDetailPresenter(
@@ -42,11 +69,10 @@ public class AllCardDetailPresenter : IAllCardDetailPresenter
         CardCollectionType type,
         CancellationToken cancellationToken)
     {
-        _detailPanel.Open();
-
         var disposables = new CompositeDisposable();
         var isClose = false;
 
+        _detailPanel.Open();
         _detailPanel.DeckButton.OnClickAsObservable()
             .WithLatestFrom(
                 _gameViewModel.ObservableCardCollectionInfo(faction, CardCollectionType.Deck),
@@ -87,10 +113,9 @@ public class AllCardDetailPresenter : IAllCardDetailPresenter
         }
 
         disposables.Dispose();
-
         _detailPanel.Close();
     }
-    
+
     private bool _TryPopOutNextTask(out UniTask task)
     {
         if (_currentTask.HasValue)
@@ -113,23 +138,16 @@ public class AllCardDetailPresenter : IAllCardDetailPresenter
 
     private UniTask _ShowCardCollectionInfos(CardCollectionInfo cardCollectionInfo)
     {
-        _disposables?.Dispose();
-        _disposables = new CompositeDisposable();
+        var property = new IAllCardDetailPanel.Property(
+            cardCollectionInfo.CardInfos.Keys.Select(cardInfo =>
+                new ICardView.CardClickableProperty(
+                    CardInfo: cardInfo,
+                    IsClickable: true,
+                    OnClickCard: info => _TryEnqueueTask(
+                        _singlePopupPanel.Run(CardDetailProperty.Create(info)))))
+            );
+        _detailPanel.Render(property);
 
-        foreach (var kvp in _detailPanel.ShowCardInfoCollections(cardCollectionInfo.CardInfos.Keys))
-        {
-            var cardInfo = kvp.Key;
-            var button = kvp.Value;
-            button.interactable = true;
-            button.OnClickAsObservable()
-                .Subscribe(_ =>
-                {
-                    _selectedCardInfo = cardInfo;
-                    _TryEnqueueTask(_singlePopupPanel.Run(cardInfo));
-                })
-                .AddTo(_disposables);
-        }
-        
         return UniTask.CompletedTask;
     }
 }

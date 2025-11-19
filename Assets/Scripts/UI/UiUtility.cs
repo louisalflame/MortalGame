@@ -1,6 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using UniRx;
+using UnityEngine.EventSystems;
+using UniRx.Triggers;
 
 public static class CanvasRectUtility
 {
@@ -46,7 +50,7 @@ public static class CanvasRectUtility
 
 public static class StringHelper
 {
-    public static string ReplaceTemplateKeys(this string template, IDictionary<string, string> kvp)
+    public static string ReplaceTemplateKeys(this string template, IReadOnlyDictionary<string, string> kvp)
     {
         return Regex.Replace(template, @"\{:(\w+)\}", match =>
         {
@@ -56,5 +60,37 @@ public static class StringHelper
             else
                 return match.Value;
         });
+    }
+}
+
+public static class ObservableButtonExtensions
+{
+    public enum PressType
+    {
+        Click,
+        LongPress
+    }
+    
+    public static IObservable<PressType> OnClickOrLongPressAsObservable(
+        this UIBehaviour component, 
+        float longPressDuration = 1f)
+    {
+        return component.OnPointerDownAsObservable()
+            .SelectMany(_ => {
+                
+                var longPressTimer = Observable
+                    .Timer(TimeSpan.FromSeconds(longPressDuration))
+                    .TakeUntil(Observable.Merge(
+                        component.OnPointerUpAsObservable(),
+                        component.OnPointerExitAsObservable()))
+                    .Select(_ => PressType.LongPress)
+                    .CatchIgnore();
+
+                var shortPress = component.OnPointerUpAsObservable()
+                    .Select(_ => PressType.Click)
+                    .Take(1);
+
+                return Observable.Merge(longPressTimer, shortPress).First();
+            });
     }
 }

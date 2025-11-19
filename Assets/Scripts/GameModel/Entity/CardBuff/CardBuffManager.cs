@@ -29,9 +29,9 @@ public class CardBuffManager : ICardBuffManager
 
     public IReadOnlyCollection<ICardBuffEntity> Buffs => _buffs;
 
-    public CardBuffManager()
+    public CardBuffManager(IEnumerable<ICardBuffEntity> buffs)
     {
-        _buffs = new List<ICardBuffEntity>();
+        _buffs = new List<ICardBuffEntity>(buffs);
     }
 
     public AddCardBuffResult AddBuff(
@@ -61,19 +61,14 @@ public class CardBuffManager : ICardBuffManager
             _ => Option.None<IPlayerEntity>()
         };
 
-        var resultBuff = new CardBuffEntity(
+        var resultBuff = CardBuffEntity.CreateFromData(
             buffId,
-            new Guid(),
             level,
             caster,
-            cardBuffLibrary.GetCardBuffProperties(buffId)
-                .Select(p => p.CreateEntity(gameWatcher, triggerSource)),
-            cardBuffLibrary.GetCardBuffLifeTime(buffId)
-                .CreateEntity(gameWatcher, triggerSource, actionUnit),
-            cardBuffLibrary.GetCardBuffSessions(buffId)
-                .ToDictionary(
-                    session => session.Key,
-                    session => session.Value.CreateEntity(gameWatcher, triggerSource, actionUnit)));
+            gameWatcher,
+            triggerSource,
+            actionUnit,
+            cardBuffLibrary);
 
         _buffs.Add(resultBuff);
         return new AddCardBuffResult(

@@ -39,7 +39,7 @@ public enum CardProperty : int
     RecycleTimes        = 1 << 1,
     PowerAddition       = 1 << 2, 
     CostAddition        = 1 << 3,
-    InitialPriority     = 1 << 4,
+    Initialize          = 1 << 4,
     Preserved           = 1 << 5,
     Sealed              = 1 << 6,
     // Consumable means the card will be removed from the battle but added again next battle.
@@ -55,8 +55,12 @@ public enum CardTriggeredTiming
 {
     None = 0,
     Drawed,
+    EffectDrawed,
+    Played,
+    EffectPlayed,
     Preserved,
     Discarded,
+    EffectDiscarded,
     Initialize,
 }
 

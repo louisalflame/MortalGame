@@ -11,6 +11,7 @@ public interface IReactionSessionEntity
     Option<int> IntegerValue { get; }
 
     bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit);
+    IReactionSessionEntity Clone();
 }
 
 public class ReactionSessionEntity : IReactionSessionEntity
@@ -92,5 +93,13 @@ public class ReactionSessionEntity : IReactionSessionEntity
     private void _Clear()
     {
         _currentValue = Option.None<ISessionValueEntity>();
+    }
+
+    public IReactionSessionEntity Clone()
+    {
+        return new ReactionSessionEntity(
+            entity: _baseEntity.Clone(),
+            lifeTime: _lifeTime
+        );
     }
 }

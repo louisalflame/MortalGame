@@ -62,9 +62,9 @@ public class CardIntegerProperty : IIntegerValue
                 card => Property switch
                 {
                     // TODO: Apply EffectAttribute.Power adjust
-                    CardIntegerValueType.Power => GameFormula.CardPower(gameWatcher, card, actionUnit),
+                    CardIntegerValueType.Power => GameFormula.CardPower(gameWatcher, card, actionUnit, triggerSource),
                     // TODO: Apply EffectAttribute.Cost adjust
-                    CardIntegerValueType.Cost => GameFormula.CardCost(gameWatcher, card, actionUnit),
+                    CardIntegerValueType.Cost => GameFormula.CardCost(gameWatcher, card, actionUnit, triggerSource),
                     _ => 0
                 })
             .ValueOr(0);

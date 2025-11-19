@@ -1,154 +1,98 @@
 using Optional;
 using UnityEngine;
 
-public abstract class BaseIntentTargetAction : IEffectTargetAction
-{
-    public GameTiming Timing => GameTiming.EffectTargetIntent;
-    public abstract EffectType EffectType { get; }
-    public IActionSource Source { get; private set; }
-    public IActionTarget Target { get; private set; }
+public abstract record BaseIntentTargetAction(
+    IActionSource Source,
+    IActionTarget Target,
+    EffectType EffectType,
+    GameTiming Timing = GameTiming.EffectTargetIntent) : IEffectTargetAction;
 
-    protected BaseIntentTargetAction(IActionSource source, IActionTarget target)
-    {
-        Source = source;
-        Target = target;
-    }
-}
+public record DamageIntentTargetAction(
+    IActionSource Source,
+    IActionTarget Target,
+    DamageType Type,
+    EffectType EffectType = EffectType.Damage) : BaseIntentTargetAction(Source, Target, EffectType);
 
-public class DamageIntentTargetAction : BaseIntentTargetAction
-{
-    public override EffectType EffectType => EffectType.Damage;
-    public DamageType Type { get; private set; }
+public record HealIntentTargetAction(
+    IActionSource Source,
+    IActionTarget Target,
+    EffectType EffectType = EffectType.Heal) : BaseIntentTargetAction(Source, Target, EffectType);
 
-    public DamageIntentTargetAction(IActionSource source, IActionTarget target, DamageType type) : base(source, target)
-    {
-        Type = type;
-    }
-}
+public record ShieldIntentTargetAction(
+    IActionSource Source,
+    IActionTarget Target,
+    EffectType EffectType = EffectType.Shield) : BaseIntentTargetAction(Source, Target, EffectType);
 
-public class HealIntentTargetAction : BaseIntentTargetAction
-{
-    public override EffectType EffectType => EffectType.Heal;
+public record GainEnergyIntentTargetAction(
+    IActionSource Source,
+    IActionTarget Target,
+    EffectType EffectType = EffectType.GainEnergy) : BaseIntentTargetAction(Source, Target, EffectType);
 
-    public HealIntentTargetAction(IActionSource source, IActionTarget target) : base(source, target)
-    { }
-}
+public record LoseEnergyIntentTargetAction(
+    IActionSource Source,
+    IActionTarget Target,
+    EffectType EffectType = EffectType.LoseEnergy) : BaseIntentTargetAction(Source, Target, EffectType);
 
-public class ShieldIntentTargetAction : BaseIntentTargetAction
-{
-    public override EffectType EffectType => EffectType.Shield;
+public record IncreaseDispositionIntentTargetAction(
+    IActionSource Source,
+    IActionTarget Target,
+    EffectType EffectType = EffectType.AdjustDisposition) : BaseIntentTargetAction(Source, Target, EffectType);
 
-    public ShieldIntentTargetAction(IActionSource source, IActionTarget target) : base(source, target)
-    { }
-}
+public record DecreaseDispositionIntentTargetAction(
+    IActionSource Source,
+    IActionTarget Target,
+    EffectType EffectType = EffectType.AdjustDisposition) : BaseIntentTargetAction(Source, Target, EffectType);
 
-public class GainEnergyIntentTargetAction : BaseIntentTargetAction
-{
-    public override EffectType EffectType => EffectType.GainEnergy;
+public record RecycleDeckIntentTargetAction(
+    IActionTarget Target,
+    EffectType EffectType = EffectType.RecycleDeck) : BaseIntentTargetAction(SystemSource.Instance, Target, EffectType);
 
-    public GainEnergyIntentTargetAction(IActionSource source, IActionTarget target) : base(source, target)
-    { }
-}
-public class LoseEnergyIntentTargetAction : BaseIntentTargetAction
-{
-    public override EffectType EffectType => EffectType.LoseEnergy;
+public record DrawCardIntentTargetAction(
+    IActionSource Source,
+    IActionTarget Target,
+    EffectType EffectType = EffectType.DrawCard) : BaseIntentTargetAction(Source, Target, EffectType);
 
-    public LoseEnergyIntentTargetAction(IActionSource source, IActionTarget target) : base(source, target)
-    { }
-}
+public record DiscardCardIntentTargetAction(
+    IActionSource Source,
+    IActionTarget Target,
+    EffectType EffectType = EffectType.DiscardCard) : BaseIntentTargetAction(Source, Target, EffectType);
 
-public class IncreaseDispositionIntentTargetAction : BaseIntentTargetAction
-{
-    public override EffectType EffectType => EffectType.AdjustDisposition;
+public record ConsumeCardIntentTargetAction(
+    IActionSource Source,
+    IActionTarget Target,
+    EffectType EffectType = EffectType.ConsumeCard) : BaseIntentTargetAction(Source, Target, EffectType);
 
-    public IncreaseDispositionIntentTargetAction(IActionSource source, IActionTarget target) : base(source, target)
-    { }
-}
-public class DecreaseDispositionIntentTargetAction : BaseIntentTargetAction
-{
-    public override EffectType EffectType => EffectType.AdjustDisposition;
+public record DisposeCardIntentTargetAction(
+    IActionSource Source,
+    IActionTarget Target,
+    EffectType EffectType = EffectType.DisposeCard) : BaseIntentTargetAction(Source, Target, EffectType);
 
-    public DecreaseDispositionIntentTargetAction(IActionSource source, IActionTarget target) : base(source, target)
-    { }
-}
+public record CreateCardIntentTargetAction(
+    IActionSource Source,
+    IActionTarget Target,
+    EffectType EffectType = EffectType.CreateCard) : BaseIntentTargetAction(Source, Target, EffectType);
 
-public class RecycleDeckIntentTargetAction : BaseIntentTargetAction
-{
-    public override EffectType EffectType => EffectType.RecycleDeck;
-    public RecycleDeckIntentTargetAction(IActionTarget target) : base(SystemSource.Instance, target)
-    { }
-}
+public record CloneCardIntentTargetAction(
+    IActionSource Source,
+    IActionTarget Target,
+    EffectType EffectType = EffectType.CloneCard) : BaseIntentTargetAction(Source, Target, EffectType);
 
-public class DrawCardIntentTargetAction : BaseIntentTargetAction
-{
-    public override EffectType EffectType => EffectType.DrawCard;
+public record AddPlayerBuffIntentTargetAction(
+    IActionSource Source,
+    IActionTarget Target,
+    EffectType EffectType = EffectType.AddPlayerBuff) : BaseIntentTargetAction(Source, Target, EffectType);
 
-    public DrawCardIntentTargetAction(IActionSource source, IActionTarget target) : base(source, target)
-    { }
-}
+public record RemovePlayerBuffIntentTargetAction(
+    IActionSource Source,
+    IActionTarget Target,
+    EffectType EffectType = EffectType.RemovePlayerBuff) : BaseIntentTargetAction(Source, Target, EffectType);
 
-public class DiscardCardIntentTargetAction : BaseIntentTargetAction
-{
-    public override EffectType EffectType => EffectType.DiscardCard;
+public record AddCardBuffIntentTargetAction(
+    IActionSource Source,
+    IActionTarget Target,
+    EffectType EffectType = EffectType.AddCardBuff) : BaseIntentTargetAction(Source, Target, EffectType);
 
-    public DiscardCardIntentTargetAction(IActionSource source, IActionTarget target) : base(source, target)
-    { }
-}
-public class ConsumeCardIntentTargetAction : BaseIntentTargetAction
-{
-    public override EffectType EffectType => EffectType.ConsumeCard;
-
-    public ConsumeCardIntentTargetAction(IActionSource source, IActionTarget target) : base(source, target)
-    { }
-}
-public class DisposeCardIntentTargetAction : BaseIntentTargetAction
-{
-    public override EffectType EffectType => EffectType.DisposeCard;
-
-    public DisposeCardIntentTargetAction(IActionSource source, IActionTarget target) : base(source, target)
-    { }
-}
-public class CreateCardIntentTargetAction : BaseIntentTargetAction
-{
-    public override EffectType EffectType => EffectType.CreateCard;
-
-    public CreateCardIntentTargetAction(IActionSource source, IActionTarget target) : base(source, target)
-    { }
-}
-public class CloneCardIntentTargetAction : BaseIntentTargetAction
-{
-    public override EffectType EffectType => EffectType.CloneCard;
-
-    public CloneCardIntentTargetAction(IActionSource source, IActionTarget target) : base(source, target)
-    { }
-}
-
-public class AddPlayerBuffIntentTargetAction : BaseIntentTargetAction
-{
-    public override EffectType EffectType => EffectType.AddPlayerBuff;
-
-    public AddPlayerBuffIntentTargetAction(IActionSource source, IActionTarget target) : base(source, target)
-    { }
-}
-public class RemovePlayerBuffIntentTargetAction : BaseIntentTargetAction
-{
-    public override EffectType EffectType => EffectType.RemovePlayerBuff;
-
-    public RemovePlayerBuffIntentTargetAction(IActionSource source, IActionTarget target) : base(source, target)
-    { }
-}
-
-public class AddCardBuffIntentTargetAction : BaseIntentTargetAction
-{
-    public override EffectType EffectType => EffectType.AddCardBuff;
-
-    public AddCardBuffIntentTargetAction(IActionSource source, IActionTarget target) : base(source, target)
-    { }
-}
-public class RemoveCardBuffIntentTargetAction : BaseIntentTargetAction
-{
-    public override EffectType EffectType => EffectType.RemoveCardBuff;
-
-    public RemoveCardBuffIntentTargetAction(IActionSource source, IActionTarget target) : base(source, target)
-    { }
-}
+public record RemoveCardBuffIntentTargetAction(
+    IActionSource Source,
+    IActionTarget Target,
+    EffectType EffectType = EffectType.RemoveCardBuff) : BaseIntentTargetAction(Source, Target, EffectType);

@@ -302,7 +302,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
         {
             var useCardEvents = new List<IGameEvent>();
             
-            var cardRuntimCost = GameFormula.CardCost(this, usedCard, new CardLookIntentAction(usedCard));
+            var cardRuntimCost = GameFormula.CardCost(this, usedCard, new CardLookIntentAction(usedCard), new CardTrigger(usedCard));
             if (cardRuntimCost <= player.CurrentEnergy) 
             {
                 var loseEnergyResult = player.EnergyManager.ConsumeEnergy(cardRuntimCost);

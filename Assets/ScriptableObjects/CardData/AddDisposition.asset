@@ -25,8 +25,8 @@ MonoBehaviour:
       Entry: 7
       Data: 0|CardData, Assembly-CSharp
     - Name: ID
-      Entry: 6
-      Data: 
+      Entry: 1
+      Data: AddDisposition
     - Name: Rarity
       Entry: 3
       Data: 1

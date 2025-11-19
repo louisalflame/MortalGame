@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Sirenix.Serialization.Utilities;
 using UnityEngine;
 
 public class CardBuffInfo
@@ -16,7 +17,7 @@ public class CardBuffInfo
         Level = statusEntity.Level;
     }
 
-    public Dictionary<string, string> GetTemplateValues()
+    public IReadOnlyDictionary<string, string> GetTemplateValues()
     {
         return new Dictionary<string, string>()
         {

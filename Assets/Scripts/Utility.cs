@@ -6,6 +6,11 @@ using UnityEngine;
 
 public static class Utility
 {
+    public class Dictionary<T, V> : System.Collections.Generic.Dictionary<T, V>
+    {
+        public static readonly Dictionary<T, V> EMPTY = new ();
+    }
+
     public static bool TryGetValue<T>(this Option<T> opt, out T value)
     {
         value = opt.Match(
@@ -23,7 +28,7 @@ public static class Utility
                 () => Option.None<(T1, T2)>()),
             () => Option.None<(T1, T2)>());
     }
-    
+
 
     public static bool Eval<T>(this SetConditionType conditionType, IEnumerable<T> items, System.Func<T, bool> predicate)
     {
@@ -35,6 +40,11 @@ public static class Utility
             SetConditionType.AllOutside => items.All(item => !predicate(item)),
             _ => false
         };
+    }
+    
+    public static IEnumerable<T> WrapAsEnumerable<T>(this T item)
+    {
+        yield return item;
     }
 }
 

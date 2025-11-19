@@ -92,7 +92,8 @@ public class AllyEntity : PlayerEntity
         int handCardMaxCount,
         int currentDisposition,
         int maxDisposition,
-        IEnumerable<CardInstance> deckInstance) : 
+        IEnumerable<CardInstance> deckInstance,
+        IGameContextManager gameContext) : 
         base(
             Faction.Ally, 
             currentEnergy,
@@ -103,7 +104,7 @@ public class AllyEntity : PlayerEntity
         _characters = characterParams
             .Select(param => CharacterEntity.Create(param))
             .ToList();
-        _cardManager = new PlayerCardManager(handCardMaxCount, deckInstance);
+        _cardManager = new PlayerCardManager(handCardMaxCount, deckInstance, gameContext.CardLibrary);
         DispositionManager = new DispositionManager(currentDisposition, maxDisposition);
     }
 }
@@ -122,7 +123,8 @@ public class EnemyEntity : PlayerEntity
         IEnumerable<CardInstance> enemyCardInstances,
         int selectedCardMaxCount,
         int turnStartDrawCardCount,
-        int energyRecoverPoint) : 
+        int energyRecoverPoint,
+        IGameContextManager gameContext) : 
         base(
             Faction.Enemy,
             currentEnergy, 
@@ -133,7 +135,7 @@ public class EnemyEntity : PlayerEntity
         _characters = characterParams
             .Select(param => CharacterEntity.Create(param))
             .ToList();
-        _cardManager = new PlayerCardManager(handCardMaxCount, enemyCardInstances);
+        _cardManager = new PlayerCardManager(handCardMaxCount, enemyCardInstances, gameContext.CardLibrary);
         SelectedCards = new SelectedCardEntity(selectedCardMaxCount, new List<ICardEntity>());
         TurnStartDrawCardCount = turnStartDrawCardCount;
         EnergyRecoverPoint = energyRecoverPoint;

@@ -49,12 +49,12 @@ MonoBehaviour:
       Data: 
     - Name: Effects
       Entry: 7
-      Data: 3|System.Collections.Generic.Dictionary`2[[TriggerTiming, Assembly-CSharp],[ConditionalCardBuffEffect[],
+      Data: 3|System.Collections.Generic.Dictionary`2[[CardTriggeredTiming, Assembly-CSharp],[ConditionalCardBuffEffect[],
         Assembly-CSharp]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 4|System.Collections.Generic.EnumEqualityComparer`1[[TriggerTiming, Assembly-CSharp]],
-        mscorlib
+      Data: 4|System.Collections.Generic.EnumEqualityComparer`1[[CardTriggeredTiming,
+        Assembly-CSharp]], mscorlib
     - Name: 
       Entry: 12
       Data: 0

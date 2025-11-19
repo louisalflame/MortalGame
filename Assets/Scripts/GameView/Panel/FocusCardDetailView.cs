@@ -10,7 +10,9 @@ public class FocusCardDetailView : MonoBehaviour
     [SerializeField]
     private CardView _cardView;
     [SerializeField]
-    private CardPropertyHint _cardPropertyHint;
+    private CardPropertyHint _cardBuffHint;
+    [SerializeField]
+    private CardPropertyHint _cardKeywordHint;
 
     private IGameViewModel _gameViewModel;
     private LocalizeLibrary _localizeLibrary;
@@ -19,11 +21,12 @@ public class FocusCardDetailView : MonoBehaviour
     {
         _gameViewModel = gameInfoModel;
         _localizeLibrary = localizeLibrary;
-        _cardPropertyHint.Init(localizeLibrary);
+        _cardBuffHint.Init(localizeLibrary);
+        _cardKeywordHint.Init(localizeLibrary);
         _cardView.Initialize(gameInfoModel, localizeLibrary);
     }
 
-    public void ShowFocus(CardInfo cardInfo, RectTransform targetRect)
+    public void ShowFocus(CardDetailProperty property, RectTransform targetRect)
     {
         _panel.SetActive(true);
 
@@ -31,15 +34,16 @@ public class FocusCardDetailView : MonoBehaviour
         var rectOnCanvas = canvas.GetRectOnCanvas(targetRect, _content.parent as RectTransform);
 
         _content.anchoredPosition = new Vector2(rectOnCanvas.center.x, _content.anchoredPosition.y);
-        var hintDirection = rectOnCanvas.center.x > 0;
 
-        _cardView.SetCardInfo(cardInfo);
-        _cardPropertyHint.ShowHint(cardInfo, hintDirection, _cardView.RectTransform);
+        _cardView.Render(property.CardProperty);
+        _cardBuffHint.ShowHint(property.CardBuffHint, _cardView.RectTransform);
+        _cardKeywordHint.ShowHint(property.CardKeywordHint, _cardView.RectTransform);
     }
 
     public void HideFocus()
     {
-        _cardPropertyHint.HideHint();
+        _cardBuffHint.HideHint();
+        _cardKeywordHint.HideHint();
 
         _panel.SetActive(false);
     }

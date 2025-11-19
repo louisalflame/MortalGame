@@ -238,7 +238,7 @@ public class AllyHandCardView : MonoBehaviour
                 }
 
                 focusCardView.ShowHandCardFocusContent();
-                _focusCardDetailView.ShowFocus(focusCardInfo, focusCardView.RectTransform);
+                _focusCardDetailView.ShowFocus(CardDetailProperty.Create(focusCardInfo), focusCardView.RectTransform);
             }
         }
         else if (previousFocusInfoOpt.TryGetValue(out var previousFocusCardInfo))

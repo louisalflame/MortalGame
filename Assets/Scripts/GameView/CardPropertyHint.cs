@@ -3,8 +3,16 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public class CardPropertyHint : MonoBehaviour
 {
+    public record ViewData(
+        IReadOnlyCollection<InfoCellViewData> InfoDatas);
+    public record InfoCellViewData(
+        LocalizeType Type,
+        string LocalizeId,
+        IReadOnlyDictionary<string, string> TemplateValues);
+
     [SerializeField]
     private CardBuffInfoViewFactory _cardBuffInfoViewFactory;
     [SerializeField]
@@ -13,8 +21,6 @@ public class CardPropertyHint : MonoBehaviour
     private RectTransform _layoutParent;
     [SerializeField]
     private RectTransform _content;
-    [SerializeField]
-    private float _offsetX;
 
     private LocalizeLibrary _localizeLibrary;
     private List<CardBuffInfoView> _propertyViews = new List<CardBuffInfoView>();
@@ -24,22 +30,22 @@ public class CardPropertyHint : MonoBehaviour
         _localizeLibrary = localizeLibrary;
     }
 
-    public void ShowHint(CardInfo cardInfo, bool smallDirection, RectTransform referenceRect)
+    public void ShowHint(ViewData viewData, RectTransform referenceRect)
     {
-        if(cardInfo.BuffInfos.Count == 0)
+        if(viewData.InfoDatas.Count == 0)
         {
             HideHint();
             return;
         }
 
         _content.gameObject.SetActive(true);
-        foreach(var statusInfo in cardInfo.BuffInfos)
+        foreach(var infoData in viewData.InfoDatas)
         {
             var cardBuffInfoView = _cardBuffInfoViewFactory.CreatePrefab();
             cardBuffInfoView.transform.SetParent(_layoutParent, false);
             _propertyViews.Add(cardBuffInfoView);
 
-            cardBuffInfoView.SetInfo(statusInfo, _localizeLibrary);
+            cardBuffInfoView.SetInfo(infoData, _localizeLibrary);
         }
         
         LayoutRebuilder.ForceRebuildLayoutImmediate(_layoutParent);
@@ -51,11 +57,7 @@ public class CardPropertyHint : MonoBehaviour
         var anchorY = _content.rect.height > rectOnCanvas.height ?
             rectOnCanvas.min.y + _content.rect.height / 2 : 
             rectOnCanvas.max.y - _content.rect.height / 2;
-
-        _content.pivot = new Vector2(smallDirection ? 0 : 1, _content.pivot.y);
-        _content.anchoredPosition = new Vector2(
-            smallDirection ? _offsetX : -_offsetX, 
-            anchorY);
+        _content.anchoredPosition = new Vector2(_content.anchoredPosition.x, anchorY);
     }
 
     public void HideHint()

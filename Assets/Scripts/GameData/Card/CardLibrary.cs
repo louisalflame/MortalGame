@@ -12,6 +12,12 @@ public class CardLibrary
     
     public CardData GetCardData(string cardId)
     {
+        if (!_cards.ContainsKey(cardId))
+        {
+            Debug.LogError($"Card ID[{cardId}] not found in library.");
+            return null;
+        }
+
         return _cards[cardId];
     }
 }

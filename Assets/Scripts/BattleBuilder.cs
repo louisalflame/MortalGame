@@ -34,7 +34,7 @@ public class BattleBuidler
             turnCount: 0,
             state: GameState.GameStart,
             player: _ParseAlly(_context.Ally, gameContextManager),
-            enemy: _ParseEnemy(_context.AllEnemies[0])
+            enemy: _ParseEnemy(_context.AllEnemies[0], gameContextManager)
         ); 
         return initialState;
     }
@@ -49,18 +49,19 @@ public class BattleBuidler
         };
 
         return new AllyEntity(
-            originPlayerInstanceGuid    : allyInstance.Identity,
-            characterParams             : new [] { characterRecord },
-            currentEnergy               : allyInstance.CurrentEnergy,
-            maxEnergy                   : allyInstance.MaxEnergy,
-            handCardMaxCount            : allyInstance.HandCardMaxCount,
-            currentDisposition          : allyInstance.CurrentDisposition,
-            maxDisposition              : gameContextManager.DispositionLibrary.MaxDisposition,
-            deckInstance                : allyInstance.Deck
+            originPlayerInstanceGuid: allyInstance.Identity,
+            characterParams: new[] { characterRecord },
+            currentEnergy: allyInstance.CurrentEnergy,
+            maxEnergy: allyInstance.MaxEnergy,
+            handCardMaxCount: allyInstance.HandCardMaxCount,
+            currentDisposition: allyInstance.CurrentDisposition,
+            maxDisposition: gameContextManager.DispositionLibrary.MaxDisposition,
+            deckInstance: allyInstance.Deck,
+            gameContext: gameContextManager
         );
     }
 
-    private EnemyEntity _ParseEnemy(EnemyData enemyData)
+    private EnemyEntity _ParseEnemy(EnemyData enemyData, GameContextManager gameContextManager)
     {
         var enemyCardInstances = enemyData.PlayerData.Deck.Cards.Select(c => CardInstance.Create(c.Data)).ToList(); 
         var characterRecord = new CharacterParameter
@@ -71,14 +72,15 @@ public class BattleBuidler
         };
 
         return new EnemyEntity(
-            characterParams         : new [] { characterRecord },
-            currentEnergy           : enemyData.PlayerData.InitialEnergy,
-            maxEnergy               : enemyData.PlayerData.MaxEnergy,
-            handCardMaxCount        : enemyData.PlayerData.HandCardMaxCount,
-            enemyCardInstances      : enemyCardInstances,
-            selectedCardMaxCount    : enemyData.SelectedCardMaxCount,
-            turnStartDrawCardCount  : enemyData.TurnStartDrawCardCount,
-            energyRecoverPoint      : enemyData.EnergyRecoverPoint
+            characterParams: new[] { characterRecord },
+            currentEnergy: enemyData.PlayerData.InitialEnergy,
+            maxEnergy: enemyData.PlayerData.MaxEnergy,
+            handCardMaxCount: enemyData.PlayerData.HandCardMaxCount,
+            enemyCardInstances: enemyCardInstances,
+            selectedCardMaxCount: enemyData.SelectedCardMaxCount,
+            turnStartDrawCardCount: enemyData.TurnStartDrawCardCount,
+            energyRecoverPoint: enemyData.EnergyRecoverPoint,
+            gameContext: gameContextManager
         );
     }
 }

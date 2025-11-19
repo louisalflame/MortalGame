@@ -5,6 +5,7 @@ public interface ICardBuffLifeTimeEntity
 {
     bool IsExpired();
     bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit);
+    ICardBuffLifeTimeEntity Clone();
 }
 
 public class AlwaysLifeTimeCardBuffEntity : ICardBuffLifeTimeEntity
@@ -16,6 +17,8 @@ public class AlwaysLifeTimeCardBuffEntity : ICardBuffLifeTimeEntity
 
     public bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
         => false;
+    
+    public ICardBuffLifeTimeEntity Clone() => new AlwaysLifeTimeCardBuffEntity();
 }
 
 public class TurnLifeTimeCardBuffEntity : ICardBuffLifeTimeEntity
@@ -42,6 +45,8 @@ public class TurnLifeTimeCardBuffEntity : ICardBuffLifeTimeEntity
         }
         return false;
     }
+
+    public ICardBuffLifeTimeEntity Clone() => new TurnLifeTimeCardBuffEntity(_turn);
 }
 
 public class HandCardLifeTimeCardBuffEntity : ICardBuffLifeTimeEntity
@@ -80,4 +85,6 @@ public class HandCardLifeTimeCardBuffEntity : ICardBuffLifeTimeEntity
         }
         return false;
     }
+
+    public ICardBuffLifeTimeEntity Clone() => new HandCardLifeTimeCardBuffEntity();
 }

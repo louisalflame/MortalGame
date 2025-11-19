@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -19,45 +20,50 @@ public interface ICardEntity
     IEnumerable<SubTargetSelectLogic> SubSelects { get; }
 
     IEnumerable<ICardEffect> Effects { get; }
-    IReadOnlyDictionary<CardTriggeredTiming, List<ICardEffect>> TriggeredEffects { get; }
+    IReadOnlyDictionary<CardTriggeredTiming, IEnumerable<ICardEffect>> TriggeredEffects { get; }
     IEnumerable<ICardPropertyEntity> Properties { get; }
     ICardBuffManager BuffManager { get; }
 
     int OriginCost { get; }
     int OriginPower { get; }
 
-    ICardEntity Clone();
+    ICardEntity Clone(bool includeCardProperties, bool includeCardBuffs);
 }
 
 public class CardEntity : ICardEntity
 {
+    // Card static data
     private readonly Guid _indentity;
     private readonly Option<Guid> _originCardInstanceGuid;
-    private readonly string _cardDataId;
-    private readonly CardType _type;
-    private readonly CardRarity _rarity;
-    private readonly CardTheme[] _themes;
-    private readonly int _cost;
-    private readonly int _power;
-    private readonly MainTargetSelectLogic _mainSelect;
-    private readonly IReadOnlyList<SubTargetSelectLogic> _subSelects;
-    private readonly IReadOnlyList<ICardEffect> _effects;
-    private readonly IReadOnlyDictionary<CardTriggeredTiming, List<ICardEffect>> _triggeredEffects;
-    private readonly IReadOnlyList<ICardPropertyEntity> _properties;
-    private readonly ICardBuffManager _buffManager;
+    private readonly string _mainCardDataId;
 
+    // Card runtime data
+    private readonly List<string> _mutationCardDataIds = new();
+    private readonly IReadOnlyList<ICardPropertyEntity> _properties;
+
+    // Card components
+    private readonly ICardBuffManager _buffManager;
+    private readonly CardLibrary _cardLibrary;
+
+    // from ActingCardData
+    private string _actingCardDataId => _mutationCardDataIds.FirstOrDefault() ?? _mainCardDataId;
+    private CardData _actingCardData => _cardLibrary.GetCardData(_actingCardDataId);
+    public string CardDataId => _actingCardDataId;
+    public CardType Type => _actingCardData.Type;
+    public CardRarity Rarity => _actingCardData.Rarity;
+    public int OriginCost => _actingCardData.Cost;
+    public int OriginPower => _actingCardData.Power;
+    public IEnumerable<CardTheme> Themes => _actingCardData.Themes;
+    public MainTargetSelectLogic MainSelect => _actingCardData.MainSelect;
+    public IEnumerable<SubTargetSelectLogic> SubSelects => _actingCardData.SubSelects;
+    public IEnumerable<ICardEffect> Effects => _actingCardData.Effects;
+    public IReadOnlyDictionary<CardTriggeredTiming, IEnumerable<ICardEffect>> TriggeredEffects
+        => _actingCardData.TriggeredEffects.ToDictionary(
+            pair => pair.Timing,
+            pair => (IEnumerable<ICardEffect>)pair.Effects);
+    
     public Guid Identity => _indentity;
     public Option<Guid> OriginCardInstanceGuid => _originCardInstanceGuid;
-    public string CardDataId => _cardDataId;
-    public CardType Type => _type;
-    public CardRarity Rarity => _rarity;
-    public int OriginCost => _cost;
-    public int OriginPower => _power;
-    public IEnumerable<CardTheme> Themes => _themes;
-    public MainTargetSelectLogic MainSelect => _mainSelect;
-    public IEnumerable<SubTargetSelectLogic> SubSelects => _subSelects;
-    public IEnumerable<ICardEffect> Effects => _effects;
-    public IReadOnlyDictionary<CardTriggeredTiming, List<ICardEffect>> TriggeredEffects => _triggeredEffects;
     public IEnumerable<ICardPropertyEntity> Properties => _properties;
     public ICardBuffManager BuffManager => _buffManager;
     public bool IsDummy => this == DummyCard;
@@ -66,116 +72,71 @@ public class CardEntity : ICardEntity
         indentity: Guid.Empty,
         originCardInstanceGuid: Option.None<Guid>(),
         cardDataId: string.Empty,
-        type: CardType.None,
-        rarity: CardRarity.None,
-        themes: new CardTheme[0],
-        cost: 0,
-        power: 0,
-        mainSelect: new (),
-        subSelects: new List<SubTargetSelectLogic>(),
-        effects: new List<ICardEffect>(),
-        triggeredEffects: new Dictionary<CardTriggeredTiming, List<ICardEffect>>(),
-        properties: new List<ICardPropertyEntity>()
+        properties: new List<ICardPropertyEntity>(),
+        buffs: new List<ICardBuffEntity>(),
+        cardLibrary: null
     );
     
     private CardEntity(
         Guid indentity,
         Option<Guid> originCardInstanceGuid,
         string cardDataId,
-        CardType type,
-        CardRarity rarity,
-        IEnumerable<CardTheme> themes,
-        int cost,
-        int power,
-        MainTargetSelectLogic mainSelect,
-        IEnumerable<SubTargetSelectLogic> subSelects,
-        List<ICardEffect> effects,
-        Dictionary<CardTriggeredTiming, List<ICardEffect>> triggeredEffects,
-        IEnumerable<ICardPropertyEntity> properties
+        IEnumerable<ICardPropertyEntity> properties,
+        IEnumerable<ICardBuffEntity> buffs,
+        CardLibrary cardLibrary
     )
     {
         _indentity = indentity;
         _originCardInstanceGuid = originCardInstanceGuid;
-        _cardDataId = cardDataId;
-        _type = type;
-        _rarity = rarity;
-        _themes = themes.ToArray();
-        _cost = cost;
-        _power = power;
-        _mainSelect = mainSelect;
-        _subSelects = subSelects.ToList();
-        _effects = effects.ToList();
-        _triggeredEffects = triggeredEffects.ToDictionary(
-            pair => pair.Key,
-            pair => pair.Value.ToList()
-        );
+        _mainCardDataId = cardDataId;
+        _mutationCardDataIds = new List<string>();
         _properties = properties.ToList();
-        _buffManager = new CardBuffManager();
+        _buffManager = new CardBuffManager(buffs);
+        _cardLibrary = cardLibrary;
     }
 
-    public static ICardEntity CreateFromInstance(CardInstance cardInstance)
+    public static ICardEntity CreateFromInstance(CardInstance cardInstance, CardLibrary cardLibrary)
     {
         return new CardEntity(
             indentity: Guid.NewGuid(),
             originCardInstanceGuid: cardInstance.InstanceGuid.Some(),
             cardDataId: cardInstance.CardDataId,
-            type: cardInstance.Type,
-            rarity: cardInstance.Rarity,
-            themes: cardInstance.Themes,
-            cost: cardInstance.Cost,
-            power: cardInstance.Power,
-            mainSelect: cardInstance.MainSelect,
-            subSelects: cardInstance.SubSelects,
-            effects: cardInstance.Effects.ToList(),
-            triggeredEffects: cardInstance.TriggeredEffects.ToDictionary(
-                    pair => pair.Key,
-                    pair => pair.Value.ToList()
-                ),
-            properties: cardInstance.PropertyDatas.Select(p => p.CreateEntity())
+            properties: cardLibrary.GetCardData(cardInstance.CardDataId).PropertyDatas
+                .Select(p => p.CreateEntity())
+                .Concat(cardInstance.AdditionPropertyDatas.Select(p => p.CreateEntity())),
+            buffs: Array.Empty<ICardBuffEntity>(),
+            cardLibrary: cardLibrary
         );
     }
 
-    public static ICardEntity RuntimeCreateFromData(CardData cardData)
+    public static ICardEntity RuntimeCreateFromId(string cardDataId, CardLibrary cardLibrary)
     {
         return new CardEntity(
             indentity: Guid.NewGuid(),
             originCardInstanceGuid: Option.None<Guid>(),
-            cardDataId: cardData.ID,
-            type: cardData.Type,
-            rarity: cardData.Rarity,
-            themes: cardData.Themes,
-            cost: cardData.Cost,
-            power: cardData.Power,
-            mainSelect: cardData.MainSelect,
-            subSelects: cardData.SubSelects,
-            effects: cardData.Effects.ToList(),
-            triggeredEffects: cardData.TriggeredEffects.ToDictionary(
-                    pair => pair.Timing,
-                    pair => pair.Effects.ToList()
-                ),
-            properties: cardData.PropertyDatas.Select(p => p.CreateEntity())
+            cardDataId: cardDataId,
+            properties: cardLibrary.GetCardData(cardDataId).PropertyDatas.Select(p => p.CreateEntity()),
+            buffs: Array.Empty<ICardBuffEntity>(),
+            cardLibrary: cardLibrary
         );
     }
 
-    public ICardEntity Clone()
+    public ICardEntity Clone(bool includeCardProperties, bool includeCardBuffs)
     {
-        return new CardEntity(
+        var cloneCard = new CardEntity(
             indentity: Guid.NewGuid(),
             originCardInstanceGuid: Option.None<Guid>(),
-            cardDataId: _cardDataId,
-            type: _type,
-            rarity: _rarity,
-            themes: _themes,
-            cost: _cost,
-            power: _power,
-            mainSelect: _mainSelect,
-            subSelects: _subSelects,
-            effects: _effects.ToList(),
-            triggeredEffects: _triggeredEffects.ToDictionary(
-                pair => pair.Key,
-                pair => pair.Value.ToList()),
-            properties: _properties.ToList()
+            cardDataId: _mainCardDataId,
+            properties: includeCardProperties
+                ? _properties.Select(p => p.Clone())
+                : Array.Empty<ICardPropertyEntity>(),
+            buffs: includeCardBuffs
+                ? _buffManager.Buffs.Select(b => b.Clone())
+                : Array.Empty<ICardBuffEntity>(),
+            cardLibrary: _cardLibrary
         );
+
+        return cloneCard;
     }
 }
 
@@ -225,14 +186,14 @@ public static class CardEntityExtensions
     }
     
     public static int GetCardProperty(
-        this ICardEntity card, IGameplayStatusWatcher watcher, CardProperty targetProperty)
+        this ICardEntity card, IGameplayStatusWatcher watcher, IActionUnit actionUnit, ITriggerSource trigger, CardProperty targetProperty)
     {
         var value = 0;
 
         var cardTrigger = new CardTrigger(card);
         foreach (var property in card.Properties.Where(p => p.Property == targetProperty))
         {
-            value += property.Eval(watcher, cardTrigger);
+            value += property.Eval(watcher, actionUnit, cardTrigger);
         }
 
         foreach (var buff in card.BuffManager.Buffs)
@@ -240,7 +201,7 @@ public static class CardEntityExtensions
             var cardBuffTrigger = new CardBuffTrigger(buff);
             foreach (var property in buff.Properties.Where(p => p.Property == targetProperty))
             {
-                value += property.Eval(watcher, cardBuffTrigger);
+                value += property.Eval(watcher, actionUnit, cardBuffTrigger);
             }
         }
 
