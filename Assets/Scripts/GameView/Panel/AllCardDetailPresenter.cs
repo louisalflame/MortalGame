@@ -16,14 +16,14 @@ public interface IAllCardDetailPresenter
 }
 
 public record CardDetailProperty(
-    ICardView.CardDetailProperty CardProperty,
+    ICardView.CardSimpleProperty CardProperty,
     CardPropertyHint.ViewData CardBuffHint,
     CardPropertyHint.ViewData CardKeywordHint)
 {
     public static CardDetailProperty Create(CardInfo cardInfo)
     {
         return new CardDetailProperty(
-            CardProperty: new ICardView.CardDetailProperty(cardInfo),
+            CardProperty: new ICardView.CardSimpleProperty(cardInfo),
             CardBuffHint: new CardPropertyHint.ViewData(
                 cardInfo.BuffInfos
                     .Select(buffInfo =>

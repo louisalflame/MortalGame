@@ -67,7 +67,7 @@ public class CardSelectionPanel : MonoBehaviour, ICardSelectionPanel
             var cardView = _cardViewFactory.CreatePrefab();
             cardView.transform.SetParent(_cardViewParent, false);
             cardView.Initialize(_gameViewModel, _localizeLibrary);
-            cardView.SetCardInfo(selection.CardInfo);
+            cardView.Render(new ICardView.CardSimpleProperty(selection.CardInfo));
             _cardViews.Add(cardView);
         }
     }

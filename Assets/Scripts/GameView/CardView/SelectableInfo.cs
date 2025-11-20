@@ -3,10 +3,7 @@ using UnityEngine;
 public record MainSelectableInfo(
     SelectType SelectType,
     TargetLogicTag LogicTag);
-public record SubSelectableInfo(
-    SelectType SelectType,
-    int SelectCount,
-    TargetLogicTag LogicTag);
+public record SubSelectableInfo();
 
 public static class SelectableInfoUtility
 {
@@ -14,35 +11,34 @@ public static class SelectableInfoUtility
     {
         return new MainSelectableInfo(
             mainTargetLogic.MainSelectable.SelectType, mainTargetLogic.LogicTag);
-    } 
+    }
 
     public static SubSelectableInfo ToInfo(this SubTargetSelectLogic subTargetLogic)
     {
-        return new SubSelectableInfo(
-            subTargetLogic.SubSelectable.SelectType, subTargetLogic.SubSelectable.TargetCount, subTargetLogic.LogicTag);
+        return new SubSelectableInfo();
     }
 
     public static bool IsSelectable(this SelectType selectType, TargetType targetType)
     {
-        switch(selectType)
+        switch (selectType)
         {
             case SelectType.Character:
-                return targetType == TargetType.AllyCharacter || 
+                return targetType == TargetType.AllyCharacter ||
                        targetType == TargetType.EnemyCharacter;
             case SelectType.AllyCharacter:
                 return targetType == TargetType.AllyCharacter;
-            case SelectType.EnemyCharacter:  
+            case SelectType.EnemyCharacter:
                 return targetType == TargetType.EnemyCharacter;
             case SelectType.Card:
-                return targetType == TargetType.AllyCard || 
+                return targetType == TargetType.AllyCard ||
                        targetType == TargetType.EnemyCard;
-            case SelectType.AllyCard:   
+            case SelectType.AllyCard:
                 return targetType == TargetType.AllyCard;
-            case SelectType.EnemyCard:  
+            case SelectType.EnemyCard:
                 return targetType == TargetType.EnemyCard;
             case SelectType.None:
-            default:    
-                return false;        
+            default:
+                return false;
         }
     }
 }

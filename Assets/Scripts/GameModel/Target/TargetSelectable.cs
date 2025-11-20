@@ -1,18 +1,10 @@
-using UnityEngine;
  
-public interface ITargetSelectable
-{
+public interface IMainTargetSelectable
+{ 
     SelectType SelectType { get; }
 }
-public interface IMainTargetSelectable : ITargetSelectable
-{ 
-}
-public interface ISubTargetSelectable : ITargetSelectable
-{
-    int TargetCount { get; }
-}
 
-public class NoneSelectable : IMainTargetSelectable, ISubTargetSelectable
+public class NoneSelectable : IMainTargetSelectable
 {
     public SelectType SelectType => SelectType.None;
     public int TargetCount => 0;
@@ -47,3 +39,27 @@ public class CardEnemySelectable : IMainTargetSelectable
 {
     public SelectType SelectType => SelectType.EnemyCard;
 }
+
+
+
+
+public interface ISubSelectionGroup
+{
+}
+
+public class ExistCardSelectionGroup : ISubSelectionGroup
+{
+}
+
+public record NewCardSelectionGroup() : ISubSelectionGroup
+{
+}
+
+public record NewPartialCardSelectionGroup() : ISubSelectionGroup
+{
+}
+
+public record NewEffectSelectionGroup() : ISubSelectionGroup
+{
+}
+

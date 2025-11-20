@@ -63,7 +63,7 @@ public class MainTargetSelectLogic
 }
 [Serializable]
 public class SubTargetSelectLogic
-{ 
-    public ISubTargetSelectable SubSelectable = new NoneSelectable();
-    public TargetLogicTag LogicTag = TargetLogicTag.None;
+{
+    [ShowInInspector]
+    public List<ISubSelectionGroup> SubSelectables = new ();
 }

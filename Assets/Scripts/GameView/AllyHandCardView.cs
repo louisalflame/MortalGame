@@ -2,16 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Optional;
-using Optional.Unsafe;
-using Optional.Linq;
-using Optional.Utilities;
-using Optional.Collections;
 using Sirenix.OdinInspector;
-using Unity.Burst.Intrinsics;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UniRx;
-using UniRx.Triggers;
+using Sirenix.Utilities;
+using Optional.Collections;
 
 
 public class AllyHandCardView : MonoBehaviour
@@ -42,16 +37,10 @@ public class AllyHandCardView : MonoBehaviour
     [BoxGroup("Focus")]
     [SerializeField]
     private float _focusDuration = 0.5f;
-    
+
     [BoxGroup("Arrow Setting")]
     [SerializeField]
-    private LineRenderer _lineRenderer;
-    [BoxGroup("Arrow Setting")]
-    [SerializeField]
-    private float _curveHeight;
-    [BoxGroup("Arrow Setting")]
-    [SerializeField]
-    private int _curveResolution;    
+    private CustomLineRenderer _customLineRenderer;
 
     private List<ICardView> _cardViews = new List<ICardView>();
     private Dictionary<Guid, ICardView> _cardViewDict = new Dictionary<Guid, ICardView>();
@@ -64,12 +53,14 @@ public class AllyHandCardView : MonoBehaviour
     private FocusCardDetailView _focusCardDetailView;
     // Dragging
     private Vector2 _beginDragPosition;
+    private Vector2 _beginDragWorldPosition;
     private Vector2 _dragOffset;
     private ISelectableView _currentSelectedView;
 
     public IEnumerable<ISelectableView> SelectableViews => _cardViews;
     
-    private CompositeDisposable _handleDisposables = new CompositeDisposable();
+    private CompositeDisposable _handleDisposables = new ();
+    private CompositeDisposable _dragDisposables = new ();
     private readonly ReactiveProperty<Option<CardInfo>> _currentFocusInfo = new(Option.None<CardInfo>());
     private readonly ReactiveProperty<Option<(CardInfo, Vector2)>> _currentDragInfo = new(Option.None<(CardInfo, Vector2)>());
     private IReadOnlyReactiveProperty<bool> IsDragging => _currentDragInfo.Select(info => info.HasValue).ToReactiveProperty();
@@ -93,7 +84,7 @@ public class AllyHandCardView : MonoBehaviour
         var cardView = _cardViewFactory.CreatePrefab();
         cardView.Initialize(_gameViewModel, _localizeLibrary);
         cardView.transform.SetParent(_cardViewParent, false);
-        cardView.SetCardInfo(newCardInfo);
+        cardView.Render(new ICardView.CardSimpleProperty(newCardInfo));
         _cardViews.Add(cardView);
         _cardViewDict.Add(newCardInfo.Identity, cardView);
 
@@ -148,6 +139,22 @@ public class AllyHandCardView : MonoBehaviour
     
     public void EnableHandCardsUseCardAction(PlayerExecuteStartEvent playerExecuteStartEvent)
     {
+        void OnPointerEnter(CardInfo info)
+        {
+            if (IsDragging.Value) return;
+            _currentFocusInfo.Value = info.Some();
+        }
+        void OnDragging(CardInfo info, Vector2 position)
+        {
+            if (_currentDragInfo.Value.Map(d => d.Item1.Identity == info.Identity).ValueOr(false))
+                _currentDragInfo.Value = (info, position).Some();
+        }
+        void OnEndDrag(CardInfo info, Vector2 position)
+        {
+            if (_currentDragInfo.Value.Map(d => d.Item1.Identity == info.Identity).ValueOr(false))
+                _currentDragInfo.Value = Option.None<(CardInfo, Vector2)>();
+        }
+
         _handleDisposables.Dispose();
         _handleDisposables = new CompositeDisposable();
 
@@ -156,30 +163,14 @@ public class AllyHandCardView : MonoBehaviour
         {
             if (_cardViewDict.TryGetValue(cardInfo.Identity, out var cardView))
             {
-                cardView.SetCardInfo(cardInfo);
-                cardView.Button.OnPointerEnterAsObservable()
-                    .Where(_ => IsDragging.Value == false)
-                    .Subscribe(_ => _currentFocusInfo.Value = cardInfo.Some())
-                    .AddTo(_handleDisposables);
-                cardView.Button.OnPointerExitAsObservable()
-                    .Subscribe(_ => _currentFocusInfo.Value = Option.None<CardInfo>())
-                    .AddTo(_handleDisposables);
-
-                cardView.Button.OnBeginDragAsObservable()
-                    .Subscribe(data => _currentDragInfo.Value = (cardInfo, data.position).Some())
-                    .AddTo(_handleDisposables);
-                cardView.Button.OnDragAsObservable()
-                    .Where(_ => _currentDragInfo.Value.Match(
-                        info => info.Item1.Identity == cardInfo.Identity,
-                        () => false))
-                    .Subscribe(data => _currentDragInfo.Value = (cardInfo, data.position).Some())
-                    .AddTo(_handleDisposables);
-                cardView.Button.OnEndDragAsObservable()
-                    .Where(_ => _currentDragInfo.Value.Match(
-                        info => info.Item1.Identity == cardInfo.Identity,
-                        () => false))
-                    .Subscribe(data => _currentDragInfo.Value = Option.None<(CardInfo, Vector2)>())
-                    .AddTo(_handleDisposables);
+                cardView.Render(
+                    new ICardView.RuntimeHandCardProperty(
+                        CardInfo: cardInfo,
+                        OnPointerEnter: info => OnPointerEnter(info),
+                        OnPointerExit: info => _currentFocusInfo.Value = Option.None<CardInfo>(),
+                        OnBeginDrag: (info, position) => _currentDragInfo.Value = (info, position).Some(),
+                        OnDrag: (info, position) => OnDragging(info, position),
+                        OnEndDrag: (info, position) => OnEndDrag(info, position)));
             }
         }
 
@@ -197,181 +188,113 @@ public class AllyHandCardView : MonoBehaviour
                 seed: (Previous: Option.None<(CardInfo, Vector2)>(), Current: Option.None<(CardInfo, Vector2)>()),
                 accumulator: (acc, current) => (Previous: acc.Current, Current: current)
             )
-            .WithLatestFrom(
-                _currentFocusInfo,
-                (dragInfoPair, focusInfo) => (dragInfoPair.Previous, dragInfoPair.Current, focusInfo))
-            .Subscribe(pair => _HandleDragInfoChange(pair.Previous, pair.Current, pair.focusInfo, handCardInfos))
+            .Subscribe(pair => _HandleDragInfoChange(pair.Previous, pair.Current, handCardInfos))
             .AddTo(_handleDisposables);
     }
     private void _HandleFocusInfoChange(
         Option<CardInfo> previousFocusInfoOpt,
         Option<CardInfo> currentFocusInfoOpt,
-        IReadOnlyDictionary<CardInfo, int> handCardInfos)
+        IReadOnlyDictionary<CardInfo, int> handCardInfoIndexes)
     {
-        if (currentFocusInfoOpt.TryGetValue(out var focusCardInfo))
+        void ApplyLocationOffset(
+            Guid focusIdentity,
+            Func<int, bool> condition,
+            Vector3 offset)
+            => handCardInfoIndexes
+                .Where(kvp => condition(kvp.Value))
+                .SelectValue(kvp => _cardViewDict.TryGetValue(kvp.Key.Identity, out var cardView) ? cardView : null)
+                .ForEach(cardView => cardView.AddLocationOffset(focusIdentity, offset, _focusDuration));
+
+        if (currentFocusInfoOpt.TryGetValue(out var focusCardInfo) &&
+            _cardViewDict.TryGetValue(focusCardInfo.Identity, out var focusCardView) &&
+            handCardInfoIndexes.TryGetValue(focusCardInfo, out var focusCardIndex))
         {
-            if (_cardViewDict.TryGetValue(focusCardInfo.Identity, out var focusCardView) &&
-                handCardInfos.TryGetValue(focusCardInfo, out var focusCardIndex))
-            {
-                var smaller = handCardInfos
-                    .Where(kvp => kvp.Value < focusCardIndex)
-                    .Select(kvp => kvp.Key.Identity);
-                var larger = handCardInfos
-                    .Where(kvp => kvp.Value > focusCardIndex)
-                    .Select(kvp => kvp.Key.Identity);
+            ApplyLocationOffset(
+                focusIdentity: focusCardInfo.Identity,
+                condition: index => index < focusCardIndex,
+                offset: new Vector3(-_focusOtherOffsetX, 0, 0));
+            ApplyLocationOffset(
+                focusIdentity: focusCardInfo.Identity,
+                condition: index => index > focusCardIndex,
+                offset: new Vector3(_focusOtherOffsetX, 0, 0));
 
-                foreach (var identity in smaller)
-                {
-                    if (_cardViewDict.TryGetValue(identity, out var cardView))
-                    {
-                        var offset = new Vector3(-_focusOtherOffsetX, 0, 0);
-                        cardView.AddLocationOffset(focusCardInfo.Identity, offset, _focusDuration);
-                    }
-                }
-                foreach (var identity in larger)
-                {
-                    if (_cardViewDict.TryGetValue(identity, out var cardView))
-                    {
-                        var offset = new Vector3(_focusOtherOffsetX, 0, 0);
-                        cardView.AddLocationOffset(focusCardInfo.Identity, offset, _focusDuration);
-                    }
-                }
-
-                focusCardView.ShowHandCardFocusContent();
-                _focusCardDetailView.ShowFocus(CardDetailProperty.Create(focusCardInfo), focusCardView.RectTransform);
-            }
+            focusCardView.ShowHandCardFocusContent();
+            _focusCardDetailView.ShowFocus(CardDetailProperty.Create(focusCardInfo), focusCardView.RectTransform);
         }
-        else if (previousFocusInfoOpt.TryGetValue(out var previousFocusCardInfo))
+        else
         {
-            if (_cardViewDict.TryGetValue(previousFocusCardInfo.Identity, out var focusView))
-            {
-                _FocusStop(focusView, previousFocusCardInfo.Identity);
-            }
+            _TryStopFocus(previousFocusInfoOpt);
         }
     }
     private void _HandleDragInfoChange(
-        Option<(CardInfo Info, Vector2 Position)> PreviousDragInfoOpt,
-        Option<(CardInfo Info, Vector2 Position)> CurrentDragInfoOpt,
-        Option<CardInfo> FocusInfoOpt,
+        Option<(CardInfo Info, Vector2 Position)> previousDragInfoOpt,
+        Option<(CardInfo Info, Vector2 Position)> currentDragInfoOpt,
         IReadOnlyDictionary<CardInfo, int> handCardInfos)
     {
-        if (!PreviousDragInfoOpt.HasValue && CurrentDragInfoOpt.TryGetValue(out var newDragInfo))
+        if (!previousDragInfoOpt.HasValue &&
+            currentDragInfoOpt.TryGetValue(out var newDragInfo) &&
+            _cardViewDict.TryGetValue(newDragInfo.Info.Identity, out var beginDradView) &&
+            handCardInfos.TryGetValue(newDragInfo.Info, out var sibilingIndex))
         {
-            if (_cardViewDict.TryGetValue(newDragInfo.Info.Identity, out var dragView))
-            {
-                // Clear focus content
-                if (FocusInfoOpt.TryGetValue(out var focusInfo) &&
-                    _cardViewDict.TryGetValue(focusInfo.Identity, out var focusView))
-                {
-                    _FocusStop(focusView, focusInfo.Identity);
-                }
+            _TryStopFocus(_currentFocusInfo.Value);
 
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                    dragView.ParentRectTransform, newDragInfo.Position, dragView.Canvas.worldCamera, out Vector2 localPoint);
-                _beginDragPosition = dragView.RectTransform.anchoredPosition;
-                _dragOffset = _beginDragPosition - localPoint;
-                dragView.BeginDrag(_beginDragPosition);
-            }
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                beginDradView.ParentRectTransform, newDragInfo.Position, beginDradView.Canvas.worldCamera, out Vector2 localPoint);
+            _beginDragPosition = beginDradView.RectTransform.anchoredPosition;
+            _beginDragWorldPosition = beginDradView.RectTransform.position;
+            _dragOffset = _beginDragPosition - localPoint;
+
+            _dragDisposables.Clear();
+            _dragDisposables.Add(beginDradView.BeginDrag(sibilingIndex));
+            _dragDisposables.Add(Disposable.Create(() =>
+            {
+                _beginDragPosition = Vector2.zero;
+                _beginDragWorldPosition = Vector3.zero;
+                _dragOffset = Vector2.zero;
+                _currentSelectedView?.OnDeselect();
+                _currentSelectedView = null;
+                _customLineRenderer.gameObject.SetActive(false);
+            }));
         }
-        else if (PreviousDragInfoOpt.TryGetValue(out var latestDragInfo) && !CurrentDragInfoOpt.HasValue)
-        {
-            if (_cardViewDict.TryGetValue(latestDragInfo.Info.Identity, out var dragView) &&
+        else if (previousDragInfoOpt.TryGetValue(out var latestDragInfo) &&
+                !currentDragInfoOpt.HasValue &&
+                _cardViewDict.TryGetValue(latestDragInfo.Info.Identity, out var endDragView) &&
                 handCardInfos.TryGetValue(latestDragInfo.Info, out var originIndex))
-            {
-                _lineRenderer.gameObject.SetActive(false);
-                dragView.EndDrag(_beginDragPosition, originIndex);
-
-                if (latestDragInfo.Info.MainSelectable.SelectType != SelectType.None)
-                {
-                    var selectView = _reciever.SelectableViews
-                        .Where(view => view != dragView as ISelectableView)
-                        .Where(view => latestDragInfo.Info.MainSelectable.SelectType.IsSelectable(view.TargetType))
-                        .Where(view => RectTransformUtility.RectangleContainsScreenPoint(
-                            view.RectTransform, latestDragInfo.Position, dragView.Canvas.worldCamera))
-                        .FirstOrDefault();
-                    if (selectView != null)
-                    {
-                        _reciever.RecieveEvent(new UseCardAction(
-                            latestDragInfo.Info.Identity, selectView.TargetType, selectView.TargetIdentity));
-                    }
-                }
-                else
-                {
-                    if (RectTransformUtility.RectangleContainsScreenPoint(
-                        _reciever.BasicSelectableView.RectTransform, latestDragInfo.Position, dragView.Canvas.worldCamera))
-                    {
-                        _reciever.RecieveEvent(new UseCardAction(latestDragInfo.Info.Identity));
-                    }
-                }
-            }
-        }
-        else if (CurrentDragInfoOpt.TryGetValue(out var currentDragInfo) &&
-                 PreviousDragInfoOpt.HasValue)
         {
-            if (_cardViewDict.TryGetValue(currentDragInfo.Info.Identity, out var dragView))
-            {
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                    dragView.ParentRectTransform, currentDragInfo.Position, dragView.Canvas.worldCamera, out Vector2 localPoint);
-                var localDragPoint = localPoint + _dragOffset;
+            _dragDisposables.Clear();
 
-                if (currentDragInfo.Info.MainSelectable.SelectType != SelectType.None)
-                {
-                    var selectView = _reciever.SelectableViews
-                        .Where(view => view != dragView as ISelectableView)
-                        .Where(view => currentDragInfo.Info.MainSelectable.SelectType.IsSelectable(view.TargetType))
-                        .Where(view => RectTransformUtility.RectangleContainsScreenPoint(
-                            view.RectTransform, currentDragInfo.Position, dragView.Canvas.worldCamera))
-                        .FirstOrDefault();
-                    if (_currentSelectedView != selectView)
-                    {
-                        _currentSelectedView?.OnDeselect();
-                        selectView?.OnSelect();
-                        _currentSelectedView = selectView;
-                    }
+            _TryUseCardOnEndDrag(latestDragInfo.Info, latestDragInfo.Position, endDragView);
+        }
+        else if (currentDragInfoOpt.TryGetValue(out var currentDragInfo) &&
+                previousDragInfoOpt.HasValue &&
+                _cardViewDict.TryGetValue(currentDragInfo.Info.Identity, out var dragView))
+        {
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                dragView.ParentRectTransform, currentDragInfo.Position, dragView.Canvas.worldCamera, out Vector2 localPoint);
+            var localDragPoint = localPoint + _dragOffset;
 
-                    if (selectView != null)
-                    {
-                        var beginDragWorldPos = dragView.ParentRectTransform.TransformPoint(_beginDragPosition);
-                        var beginDragLinePos = _lineRenderer.transform.parent.InverseTransformPoint(beginDragWorldPos);
-                        var selectViewLinePos = _lineRenderer.transform.parent.InverseTransformPoint(selectView.RectTransform.position);
-                        _lineRenderer.gameObject.SetActive(true);
-                        var points = _GenerateCurvePoints(beginDragLinePos, selectViewLinePos);
-                        _lineRenderer.positionCount = points.Length;
-                        _lineRenderer.SetPositions(points);
-                        dragView.Drag(localDragPoint, currentDragInfo.Info.MainSelectable.SelectType, true);
-                    }
-                    else
-                    {
-                        _lineRenderer.gameObject.SetActive(false);
-                        dragView.Drag(localDragPoint, currentDragInfo.Info.MainSelectable.SelectType, false);
-                    }
-                }
-                else
-                {
-                    if (RectTransformUtility.RectangleContainsScreenPoint(
-                        _reciever.BasicSelectableView.RectTransform, currentDragInfo.Position, dragView.Canvas.worldCamera))
-                    {
-                        dragView.Drag(localDragPoint, currentDragInfo.Info.MainSelectable.SelectType, true);
-                    }
-                    else
-                    {
-                        dragView.Drag(localDragPoint, currentDragInfo.Info.MainSelectable.SelectType, false);
-                    }
-                }
-            }        
+            var (dragTargetStatus, selectViewOpt) = _GetDragCardStatusAndTargetView(
+                currentDragInfo.Info, currentDragInfo.Position, dragView);
+            dragView.Drag(localDragPoint, dragTargetStatus);
+
+            _UpdateSelectedViewAndLine(currentDragInfo.Info, dragView, selectViewOpt);
         }
     }
-    private void _FocusStop(ICardView focusView, Guid focusIdentity)
-    {    
-        focusView.HideHandCardFocusContent();
-        _focusCardDetailView.HideFocus();
-        
-        foreach(var cardView in _cardViews)
+    private void _TryStopFocus(Option<CardInfo> focusInfoOpt)
+    { 
+        if (focusInfoOpt.TryGetValue(out var focusInfo) &&
+            _cardViewDict.TryGetValue(focusInfo.Identity, out var focusView))
         {
-            cardView.RemoveLocationOffset(
-                focusIdentity,
-                // focusing view dont need to play animation of return location
-                cardView == focusView ? 0f : _focusDuration);
+            focusView.HideHandCardFocusContent();
+            _focusCardDetailView.HideFocus();
+
+            foreach (var cardView in _cardViews)
+            {
+                cardView.RemoveLocationOffset(
+                    focusInfo.Identity,
+                    // focusing view dont need to play animation of return location
+                    cardView == focusView ? 0f : _focusDuration);
+            }
         }
     }
 
@@ -383,17 +306,17 @@ public class AllyHandCardView : MonoBehaviour
 
     private void _RearrangeCardViews()
     {
-        var cardCount = _cardViews.Count; 
-        if(cardCount <= 0 ) return;
-        
+        var cardCount = _cardViews.Count;
+        if (cardCount <= 0) return;
+
         float centerIndex = (cardCount - 1) / 2f;
-        var angleStep = _arcAngle / (cardCount-1);
+        var angleStep = _arcAngle / (cardCount - 1);
         angleStep = Mathf.Min(angleStep, _arcStepMinAngle);
 
-        for(var i = 0; i < cardCount; i++)
+        for (var i = 0; i < cardCount; i++)
         {
             var cardView = _cardViews[i];
-            float angle = 90 + (centerIndex - i) * angleStep; 
+            float angle = 90 + (centerIndex - i) * angleStep;
 
             var x = _arcRadiusX * Mathf.Cos(angle * Mathf.Deg2Rad);
             var y = _arcRadiusY * Mathf.Sin(angle * Mathf.Deg2Rad);
@@ -402,35 +325,91 @@ public class AllyHandCardView : MonoBehaviour
             cardView.SetPositionAndRotation(localPosition, localRotation);
         }
     }
-     
-    private Vector3[] _GenerateCurvePoints(Vector3 startPoint, Vector3 endPoint)
+
+    #region TargetEventLogic
+    private bool _TryUseCardOnEndDrag(CardInfo dragCardInfo, Vector2 dragCardPosition, ICardView dragCardView)
     {
-        var points = new Vector3[_curveResolution];
-        Vector3 midPoint = (startPoint + endPoint) / 2;
-        midPoint += Vector3.up * _curveHeight;
-
-        Vector3 controlPoint0 = startPoint + (startPoint - midPoint);
-        Vector3 controlPoint1 = startPoint;
-        Vector3 controlPoint2 = endPoint;
-        Vector3 controlPoint3 = endPoint + (endPoint - midPoint);
-
-        for (int i = 0; i < _curveResolution; i++)
+        if (dragCardInfo.MainSelectable.SelectType != SelectType.None)
         {
-            float t = (float)i / (_curveResolution - 1);
-            Vector3 point = _CatmullRom(controlPoint0, controlPoint1, controlPoint2, controlPoint3, t);
-            points[i] = point;
+            return OptionCollectionExtensions.FirstOrNone(_reciever.SelectableViews
+                .Where(view => view != dragCardView &&
+                    dragCardInfo.MainSelectable.SelectType.IsSelectable(view.TargetType) &&
+                    RectTransformUtility.RectangleContainsScreenPoint(
+                        view.RectTransform, dragCardPosition, dragCardView.Canvas.worldCamera)))
+                .Match(
+                    selectView =>
+                    {
+                        _reciever.RecieveEvent(new UseCardAction(
+                            dragCardInfo.Identity, selectView.TargetType, selectView.TargetIdentity));
+                        return true;
+                    },
+                    () => false);
         }
-
-        return points;
+        else if (RectTransformUtility.RectangleContainsScreenPoint(
+                _reciever.BasicSelectableView.RectTransform, dragCardPosition, dragCardView.Canvas.worldCamera))
+        {
+            _reciever.RecieveEvent(new UseCardAction(dragCardInfo.Identity));
+            return true;
+        }
+        return false;
     }
-    private Vector3 _CatmullRom(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float t)
+
+    private (IDragableCardView.DradTargetStatus Status, Option<ISelectableView> SelectView) _GetDragCardStatusAndTargetView(
+        CardInfo dragCardInfo,
+        Vector2 dragCardPosition,
+        ICardView dragCardView)
     {
-        float t2 = t * t;
-        float t3 = t2 * t;
-
-        return 0.5f * ((2.0f * p1) +
-                       (-p0 + p2) * t +
-                       (2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3) * t2 +
-                       (-p0 + 3.0f * p1 - 3.0f * p2 + p3) * t3);
+        if (dragCardInfo.MainSelectable.SelectType != SelectType.None)
+        {
+            var selectView = OptionCollectionExtensions
+                .FirstOrNone(_reciever.SelectableViews
+                    .Where(view => view != dragCardView &&
+                        dragCardInfo.MainSelectable.SelectType.IsSelectable(view.TargetType) &&
+                        RectTransformUtility.RectangleContainsScreenPoint(
+                            view.RectTransform, dragCardPosition, dragCardView.Canvas.worldCamera)));
+            if (selectView.HasValue)
+            {
+                return (IDragableCardView.DradTargetStatus.ValidTarget, selectView);
+            }
+            else
+            {
+                return (IDragableCardView.DradTargetStatus.None, Option.None<ISelectableView>());
+            }
+        }
+        else if (RectTransformUtility.RectangleContainsScreenPoint(
+                _reciever.BasicSelectableView.RectTransform, dragCardPosition, dragCardView.Canvas.worldCamera))
+        {
+            return (IDragableCardView.DradTargetStatus.WithoutTarget, _reciever.BasicSelectableView.Some());
+        }
+        else
+        {
+            return (IDragableCardView.DradTargetStatus.None, Option.None<ISelectableView>());
+        }
     }
+    
+    private void _UpdateSelectedViewAndLine(
+        CardInfo dragCardInfo,
+        ICardView dragCardView,
+        Option<ISelectableView> selectViewOpt)
+    {
+        if (dragCardInfo.MainSelectable.SelectType == SelectType.None)
+            return;
+            
+        selectViewOpt.Match(
+            selectView =>
+            {
+                if (_currentSelectedView != selectView)
+                {
+                    selectView?.OnSelect();
+                    _currentSelectedView?.OnDeselect();
+                    _currentSelectedView = selectView;
+                }
+                
+                _customLineRenderer.gameObject.SetActive(true);
+                _customLineRenderer.SetLineProperty(_beginDragWorldPosition, selectView.RectTransform);
+            },
+            () => _customLineRenderer.gameObject.SetActive(false)
+        );
+    }
+    #endregion
 }

@@ -6,7 +6,7 @@ using UniRx;
 using UnityEngine.EventSystems;
 using UniRx.Triggers;
 
-public static class CanvasRectUtility
+public static class CanvasUtility
 {
     public static Rect GetRectOnCanvas(this Canvas canvas, RectTransform targetRect, RectTransform parentRect)
     {
@@ -21,12 +21,12 @@ public static class CanvasRectUtility
         for (int i = 0; i < 4; i++)
         {
             Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(
-                targetCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera, 
+                targetCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera,
                 rectWorldCorners[i]);
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                parentRect, 
-                screenPos, 
-                canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera, 
+                parentRect,
+                screenPos,
+                canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera,
                 out canvasLocalCorners[i]);
         }
 

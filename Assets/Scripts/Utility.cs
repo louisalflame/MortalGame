@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Optional;
@@ -41,10 +42,33 @@ public static class Utility
             _ => false
         };
     }
-    
+
     public static IEnumerable<T> WrapAsEnumerable<T>(this T item)
     {
         yield return item;
+    }
+
+    public static IEnumerable<T> Values<T>(this IEnumerable<Option<T>> source)
+    {
+        foreach (var option in source)
+        {
+            if (option.TryGetValue(out var value))
+            {
+                yield return value;
+            }
+        }
+    }
+    
+    public static IEnumerable<U> SelectValue<T, U>(this IEnumerable<T> source, Func<T, U> selector)
+    {
+        foreach (var item in source)
+        {
+            var value = selector(item);
+            if (value != null)
+            {
+                yield return value;
+            }
+        }
     }
 }
 

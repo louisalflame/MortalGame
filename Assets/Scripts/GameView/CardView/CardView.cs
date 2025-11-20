@@ -9,26 +9,43 @@ using UniRx.Triggers;
 using UnityEngine;
 using UnityEngine.UI;
 
-public interface ICardView : IRecyclable, ISelectableView
+public interface IDragableCardView
+{
+    public enum DradTargetStatus
+    {
+        None,
+        ValidTarget,
+        WithoutTarget,
+    }
+
+    IDisposable BeginDrag(int originSiblingIndex);
+    void Drag(Vector2 dragPosition, DradTargetStatus dradTargetStatus);
+}
+    
+public interface ICardView : IRecyclable, ISelectableView, IDragableCardView
 {
     public record RuntimeHandCardProperty(
-        CardInfo CardInfo);
+        CardInfo CardInfo,
+        Action<CardInfo> OnPointerEnter = null,
+        Action<CardInfo> OnPointerExit = null,
+        Action<CardInfo, Vector2> OnBeginDrag = null,
+        Action<CardInfo, Vector2> OnDrag = null,
+        Action<CardInfo, Vector2> OnEndDrag = null);
     public record CardClickableProperty(
         CardInfo CardInfo,
         bool IsClickable,
         Action<CardInfo> OnClickCard = null,
         Action<CardInfo> OnLongPressCard = null);
-    public record CardDetailProperty(
+    public record CardSimpleProperty(
         CardInfo CardInfo);
 
     Canvas Canvas { get; }
     RectTransform ParentRectTransform { get; }
-    Button Button { get; }
 
     void Initialize(IGameViewModel gameInfoModel, LocalizeLibrary localizeLibrary);
-    void SetCardInfo(CardInfo cardInfo);
+    void Render(RuntimeHandCardProperty property);
     void Render(CardClickableProperty property);
-    void Render(CardDetailProperty property);
+    void Render(CardSimpleProperty property);
 
     void SetPositionAndRotation(Vector3 position, Quaternion rotation);
     void AddLocationOffset(Guid guid, Vector3 offset, float duration);
@@ -36,10 +53,6 @@ public interface ICardView : IRecyclable, ISelectableView
 
     void ShowHandCardFocusContent();
     void HideHandCardFocusContent();
-
-    void BeginDrag(Vector2 dragPosition);
-    void Drag(Vector2 dragPosition, SelectType selectType, bool isSelecting);
-    void EndDrag(Vector2 beginDragPosition, int originSiblingIndex);
 }
 
 public class CardView : MonoBehaviour, ICardView
@@ -74,7 +87,6 @@ public class CardView : MonoBehaviour, ICardView
     public RectTransform RectTransform => _rectTransform;
     public TargetType TargetType => TargetType.AllyCard;
     public Guid TargetIdentity => _cardIdentity;
-    public Button Button => _button;
 
     public RectTransform ParentRectTransform => transform.parent.GetComponent<RectTransform>();
     public Canvas Canvas => transform.GetComponentInParent<Canvas>();
@@ -98,9 +110,10 @@ public class CardView : MonoBehaviour, ICardView
         _localizeLibrary = localizeLibrary;
     }
 
-    public void SetCardInfo(CardInfo cardInfo)
+    public void Render(ICardView.RuntimeHandCardProperty property)
     {
-        _gameViewModel.ObservableCardInfo(cardInfo.Identity)
+        _disposables.Clear();
+        _gameViewModel.ObservableCardInfo(property.CardInfo.Identity)
             .MatchSome(reactiveProp =>
             {
                 _cardInfoSubscription?.Dispose();
@@ -108,10 +121,27 @@ public class CardView : MonoBehaviour, ICardView
                     .Subscribe(info => _Render(info));
             });
 
-        _Render(cardInfo);
+        _button.OnPointerEnterAsObservable()
+            .Subscribe(_ => property.OnPointerEnter?.Invoke(property.CardInfo))
+            .AddTo(_disposables);
+        _button.OnPointerExitAsObservable()
+            .Subscribe(_ => property.OnPointerExit?.Invoke(property.CardInfo))
+            .AddTo(_disposables);
+        _button.OnBeginDragAsObservable()
+            .Subscribe(eventData => property.OnBeginDrag?.Invoke(property.CardInfo, eventData.position))
+            .AddTo(_disposables);
+        _button.OnDragAsObservable()
+            .Subscribe(eventData => property.OnDrag?.Invoke(property.CardInfo, eventData.position))
+            .AddTo(_disposables);
+        _button.OnEndDragAsObservable()
+            .Subscribe(eventData => property.OnEndDrag?.Invoke(property.CardInfo, eventData.position))
+            .AddTo(_disposables);
+
+        _Render(property.CardInfo);
     }
     public void Render(ICardView.CardClickableProperty property)
     {
+        _disposables.Clear();
         _button.interactable = property.IsClickable;
         if (property.IsClickable)
         {
@@ -133,8 +163,9 @@ public class CardView : MonoBehaviour, ICardView
         
         _Render(property.CardInfo);
     }
-    public void Render(ICardView.CardDetailProperty property)
+    public void Render(ICardView.CardSimpleProperty property)
     {
+        _disposables.Clear();
         _Render(property.CardInfo);
     }
 
@@ -178,24 +209,31 @@ public class CardView : MonoBehaviour, ICardView
         _canvasGroup.alpha = 1f;
     }
 
-    public void BeginDrag(Vector2 dragPosition)
+    public IDisposable BeginDrag(int originSiblingIndex)
     {
         RectTransform.rotation = Quaternion.identity;
+        var originAnchoredPosition = RectTransform.anchoredPosition;
         _canvasGroup.alpha = 1f;
         transform.SetAsLastSibling();
+
+        return Disposable.Create(() =>
+        {
+            RectTransform.rotation = _localRotation;
+            RectTransform.anchoredPosition = originAnchoredPosition;
+            _canvasGroup.alpha = 1f;
+            transform.SetSiblingIndex(originSiblingIndex);
+        });
     }
-    public void Drag(Vector2 dragPosition, SelectType selectType, bool isSelecting)
+    public void Drag(Vector2 dragPosition, IDragableCardView.DradTargetStatus dradTargetStatus)
     {
         RectTransform.anchoredPosition = dragPosition;
-        _canvasGroup.alpha = 
-            isSelecting ? (selectType == SelectType.None ? 1f: 0f) : 0.5f;
-    }
-    public void EndDrag(Vector2 beginDragPosition, int originSiblingIndex)
-    {
-        RectTransform.rotation = _localRotation;
-        RectTransform.anchoredPosition = beginDragPosition;
-        _canvasGroup.alpha = 1f;
-        transform.SetSiblingIndex(originSiblingIndex);
+        _canvasGroup.alpha = dradTargetStatus switch
+        {
+            IDragableCardView.DradTargetStatus.None => 0.5f,
+            IDragableCardView.DradTargetStatus.ValidTarget => 0f,
+            IDragableCardView.DradTargetStatus.WithoutTarget => 1f,
+            _ => 1f,
+        };
     }
 
     public void Reset()
