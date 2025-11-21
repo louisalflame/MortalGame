@@ -339,8 +339,7 @@ public class AllyHandCardView : MonoBehaviour
                 .Match(
                     selectView =>
                     {
-                        _reciever.RecieveEvent(new UseCardAction(
-                            dragCardInfo.Identity, selectView.TargetType, selectView.TargetIdentity));
+                        _reciever.RecieveEvent(UseCardAction.Create(dragCardInfo, selectView));
                         return true;
                     },
                     () => false);
@@ -348,7 +347,7 @@ public class AllyHandCardView : MonoBehaviour
         else if (RectTransformUtility.RectangleContainsScreenPoint(
                 _reciever.BasicSelectableView.RectTransform, dragCardPosition, dragCardView.Canvas.worldCamera))
         {
-            _reciever.RecieveEvent(new UseCardAction(dragCardInfo.Identity));
+            _reciever.RecieveEvent(UseCardAction.Create(dragCardInfo));
             return true;
         }
         return false;

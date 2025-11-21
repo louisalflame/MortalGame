@@ -6,8 +6,8 @@ using UnityEngine;
 public record SelectTargetResult(
     bool IsValid,
     TargetType TargetType,
-    Guid TargetId
-);
+    Guid TargetIdentity
+) : ISelectionTarget;
 
 public static class SelectTargetLogic
 {

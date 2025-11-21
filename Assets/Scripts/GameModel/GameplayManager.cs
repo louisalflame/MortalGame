@@ -1,11 +1,8 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using Cysharp.Threading.Tasks;
 using Optional;
-using Optional.Unsafe;
-using Unity.VisualScripting;
-using UnityEngine;
 
 public interface IGameplayStatusWatcher
 {
@@ -35,6 +32,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
     private Option<BattleResult> _battleResult;
     private List<IGameEvent> _gameEvents;
     private Queue<IGameAction> _gameActions;
+    private BlockingCollection<IGameAction> _actionQueue = new BlockingCollection<IGameAction>();
     private IGameContextManager _contextMgr;
     private GameHistory _gameHistory;
 
@@ -205,6 +203,8 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
     }
     private void _TurnExecute(IPlayerEntity player)
     {
+        var x = _actionQueue.Take();
+
         while(_gameActions.Count > 0)
         {
             var action = _gameActions.Dequeue();
@@ -277,16 +277,16 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
 
     private GameContextManager _SetUseCardSelectTarget(UseCardAction useCardAction)
     {
-        switch(useCardAction.TargetType)
+        switch(useCardAction.MainSelectionAction.TargetType)
         {
             case TargetType.AllyCharacter:
             case TargetType.EnemyCharacter:
-                var enemyCharacterOpt = useCardAction.SelectedTarget
+                var enemyCharacterOpt = useCardAction.MainSelectionAction.SelectedTarget
                     .FlatMap(enemyCharacterIdentity => this.GetCharacter(enemyCharacterIdentity));
                 return _contextMgr.SetSelectedCharacter(enemyCharacterOpt);
             case TargetType.AllyCard:
             case TargetType.EnemyCard:
-                var enemyCardOpt = useCardAction.SelectedTarget
+                var enemyCardOpt = useCardAction.MainSelectionAction.SelectedTarget
                     .FlatMap(enemyCardIndentity => this.GetCard(enemyCardIndentity));
                 return _contextMgr.SetSelectedCard(enemyCardOpt);
             default:

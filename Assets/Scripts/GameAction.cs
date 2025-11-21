@@ -8,27 +8,47 @@ public interface IGameAction
 
 }
 
-public class UseCardAction : IGameAction
+public record UseCardAction(
+    Guid CardIndentity,
+    MainSelectableInfo MainSelectableInfo,
+    MainSelectionAction MainSelectionAction) : IGameAction
 {
-    public Guid CardIndentity;
-
-    public Option<Guid> SelectedTarget;
-    public TargetType TargetType;
-
-    public UseCardAction(Guid cardIndentity)
+    public static UseCardAction Create(CardInfo cardInfo)
     {
-        CardIndentity = cardIndentity;
-        SelectedTarget = Option.None<Guid>();
-        TargetType = TargetType.None;
+        return new UseCardAction(
+            cardInfo.Identity,
+            cardInfo.MainSelectable,
+            MainSelectionAction.Empty);
     }
 
-    public UseCardAction(Guid cardIndentity, TargetType targetType, Guid selectedTarget)
+    public static UseCardAction Create(CardInfo cardInfo, ISelectionTarget selectionTarget)
     {
-        CardIndentity = cardIndentity;
-        TargetType = targetType;
-        SelectedTarget = selectedTarget.Some();
+        return new UseCardAction(
+            cardInfo.Identity,
+            cardInfo.MainSelectable,
+            MainSelectionAction.Create(selectionTarget));
     }
 }
+
+public record MainSelectionAction(
+    TargetType TargetType,
+    Option<Guid> SelectedTarget)
+{
+    public static MainSelectionAction Empty = new MainSelectionAction(TargetType.None, Option.None<Guid>());
+    public static MainSelectionAction Create(ISelectionTarget selectionTarget)
+    {
+        return new MainSelectionAction(selectionTarget.TargetType, selectionTarget.TargetIdentity.Some());
+    }
+}
+
+public interface ISubSelectionAction
+{
+}
+public record ExistCardSubSelectionAction(
+    IReadOnlyList<Guid> CardIdentity) : ISubSelectionAction;
+public record NewCardSubSelectionAction() : ISubSelectionAction;
+public record NewPartialCardSubSelectionAction() : ISubSelectionAction;
+public record NewEffecrtSubSelectionAction() : ISubSelectionAction;
 
 public class TurnSubmitAction : IGameAction
 {
