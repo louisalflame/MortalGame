@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Optional;
 using Rayark.Mast;
 using UnityEngine;
 
@@ -21,6 +22,9 @@ public class GameplayPresenter : IGameplayActionReciever
     private IUIPresenter _uiPresenter;
     private IGameResultLosePresenter _gameResultLosePresenter;
     private IGameResultWinPresenter _gameResultWinPresenter;
+
+    private readonly Queue<UniTask> _pendingActionTasks = new Queue<UniTask>();
+    private bool _isProcessingAction = false;
 
     public IEnumerable<ISelectableView> SelectableViews => _gameplayView.SelectableViews;
     public ISelectableView BasicSelectableView => _gameplayView.BasicSelectableView;
@@ -48,9 +52,9 @@ public class GameplayPresenter : IGameplayActionReciever
         var cts = new CancellationTokenSource();
         
         var gameplayLoopTask = _RunGameplayLoop(cts);
-        var cardPresenterTask = _uiPresenter.Run(cts.Token);
+        var uiPresenterTask = _uiPresenter.Run(cts.Token);
 
-        var (battleResult, _) = await UniTask.WhenAll(gameplayLoopTask, cardPresenterTask);
+        var (battleResult, _) = await UniTask.WhenAll(gameplayLoopTask, uiPresenterTask);
 
         if (battleResult.IsAllyWin)
         {
@@ -71,6 +75,9 @@ public class GameplayPresenter : IGameplayActionReciever
         BattleResult result;
         while (!_gameplayManager.BattleResult.TryGetValue(out result))
         {
+            // Process any pending action tasks first
+            await _ProcessPendingActionTasks();
+
             await UniTask.NextFrame();
 
             var events = _gameplayManager.PopAllEvents();
@@ -84,10 +91,34 @@ public class GameplayPresenter : IGameplayActionReciever
         return result;
     }
 
+    private async UniTask _ProcessPendingActionTasks()
+    {
+        while (_pendingActionTasks.Count > 0)
+        {
+            var actionTask = _pendingActionTasks.Dequeue();
+            await actionTask;
+        }
+    }
+
     public void RecieveEvent(IGameAction gameAction)
     {
         Debug.Log($"-- GameplayPresenter.RecieveEvent:[{gameAction}] --");
-        _gameplayManager.EnqueueAction(gameAction);
+        
         _gameplayView.DisableAllHandCards();
+        _pendingActionTasks.Enqueue(_ProcessGameAction(gameAction));
+    }
+
+    private async UniTask _ProcessGameAction(IGameAction gameAction)
+    {
+        var postProcessAction = await _PostProcessAction(gameAction);
+
+        _gameplayManager.EnqueueAction(postProcessAction);
+    }
+
+    private UniTask<IGameAction> _PostProcessAction(IGameAction gameAction)
+    {
+
+
+        return UniTask.FromResult(gameAction);
     }
 }

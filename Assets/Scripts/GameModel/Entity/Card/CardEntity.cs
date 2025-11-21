@@ -17,7 +17,7 @@ public interface ICardEntity
     IEnumerable<CardTheme> Themes { get; }
 
     MainTargetSelectLogic MainSelect { get; }
-    IEnumerable<SubTargetSelectLogic> SubSelects { get; }
+    IEnumerable<ISubSelectionGroup> SubSelects { get; }
 
     IEnumerable<ICardEffect> Effects { get; }
     IReadOnlyDictionary<CardTriggeredTiming, IEnumerable<ICardEffect>> TriggeredEffects { get; }
@@ -55,7 +55,7 @@ public class CardEntity : ICardEntity
     public int OriginPower => _actingCardData.Power;
     public IEnumerable<CardTheme> Themes => _actingCardData.Themes;
     public MainTargetSelectLogic MainSelect => _actingCardData.MainSelect;
-    public IEnumerable<SubTargetSelectLogic> SubSelects => _actingCardData.SubSelects;
+    public IEnumerable<ISubSelectionGroup> SubSelects => _actingCardData.SubSelects;
     public IEnumerable<ICardEffect> Effects => _actingCardData.Effects;
     public IReadOnlyDictionary<CardTriggeredTiming, IEnumerable<ICardEffect>> TriggeredEffects
         => _actingCardData.TriggeredEffects.ToDictionary(

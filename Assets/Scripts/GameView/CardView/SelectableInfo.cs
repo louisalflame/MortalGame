@@ -1,9 +1,9 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public record MainSelectableInfo(
     SelectType SelectType,
     TargetLogicTag LogicTag);
-public record SubSelectableInfo();
 
 public static class SelectableInfoUtility
 {
@@ -11,11 +11,6 @@ public static class SelectableInfoUtility
     {
         return new MainSelectableInfo(
             mainTargetLogic.MainSelectable.SelectType, mainTargetLogic.LogicTag);
-    }
-
-    public static SubSelectableInfo ToInfo(this SubTargetSelectLogic subTargetLogic)
-    {
-        return new SubSelectableInfo();
     }
 
     public static bool IsSelectable(this SelectType selectType, TargetType targetType)

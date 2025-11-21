@@ -52,7 +52,7 @@ public static class UseCardLogic
             var cardRuntimeCost = GameFormula.CardCost(gameplayWatcher, selectedCard, new CardLookIntentAction(selectedCard), new CardTrigger(selectedCard));
             if (cardRuntimeCost <= enemy.CurrentEnergy)
             {
-                useCardAction = new UseCardAction(selectedCard.Identity, selectResult.TargetType, selectResult.TargetId);
+                useCardAction = UseCardAction.Create(selectedCard.ToInfo(gameplayWatcher), selectResult);
                 return true;
             }
         }

@@ -14,7 +14,6 @@ public record CardInfo(
     int OriginPower,
     int Power,
     MainSelectableInfo MainSelectable,
-    IReadOnlyList<SubSelectableInfo> SubSelectables,
     IReadOnlyList<CardBuffInfo> BuffInfos,
     IReadOnlyList<CardProperty> Properties,
     IReadOnlyList<string> Keywords)
@@ -32,7 +31,6 @@ public record CardInfo(
             OriginPower: card.OriginPower,
             Power: GameFormula.CardPower(gameWatcher, card, new CardLookIntentAction(card), new CardTrigger(card)),
             MainSelectable: card.MainSelect.ToInfo(),
-            SubSelectables: card.SubSelects.Select(s => s.ToInfo()).ToList(),
             BuffInfos: card.BuffManager.Buffs.Select(s => new CardBuffInfo(s)).ToList(),
             Properties: card.Properties.Select(p => p.Property)
                 .Concat(card.BuffManager.Buffs
@@ -104,3 +102,4 @@ public static class CardCollectionInfoUtility
         return cards.Select(c => c.ToInfo(gameWatcher)).ToArray();
     }
 }
+

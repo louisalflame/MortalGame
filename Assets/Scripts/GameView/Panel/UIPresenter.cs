@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using Optional;
 using UniRx;
 using UnityEngine;
+
 public interface IUIPresenter
 {
     UniTask<bool> Run(CancellationToken cancellationToken);
@@ -19,7 +20,7 @@ public class UIPresenter : IUIPresenter
 
     private IAllCardDetailPresenter _allCardDetailPresenter;
 
-    private Option<UniTask> _currentTask = Option.None<UniTask>();
+    private UniTaskPresenter<bool> _uniTaskPresenter;
 
     public UIPresenter(
         IInteractionButtonView buttonView,
@@ -31,59 +32,34 @@ public class UIPresenter : IUIPresenter
         _graveyardCardView = buttonView.GraveyardCardView;
         _enemySelectedCardView = buttonView.EnemySelectedCardView;
 
-        _allCardDetailPresenter = new AllCardDetailPresenter(panelView, gameViewModel, localizeLibrary);
+        _allCardDetailPresenter = new AllCardDetailPresenter(panelView, gameViewModel, localizeLibrary);        
+        _uniTaskPresenter = new UniTaskPresenter<bool>();
     }
 
     public async UniTask<bool> Run(CancellationToken cancellationToken)
     {
+        var result = await _uniTaskPresenter.Run(
+            _SetupSubscriptions(),
+            () => true,
+            cancellationToken);
+        return result.ValueOr(true);
+    }
+
+    private IDisposable _SetupSubscriptions()
+    {
         var disposables = new CompositeDisposable();
         _deckCardView.DeckButton.OnClickAsObservable()
-            .Subscribe(_ => _TryEnqueueTask(
+            .Subscribe(_ => _uniTaskPresenter.TryEnqueueTask(
                 _allCardDetailPresenter.Run(Faction.Ally, CardCollectionType.Deck, CancellationToken.None)))
-            .AddTo(disposables);
+            .AddTo(disposables);                
         _graveyardCardView.GraveyardButton.OnClickAsObservable()
-            .Subscribe(_ => _TryEnqueueTask(
+            .Subscribe(_ => _uniTaskPresenter.TryEnqueueTask(
                 _allCardDetailPresenter.Run(Faction.Ally, CardCollectionType.Graveyard, CancellationToken.None)))
             .AddTo(disposables);
         _enemySelectedCardView.DeckButton.OnClickAsObservable()
-            .Subscribe(_ => _TryEnqueueTask(
+            .Subscribe(_ => _uniTaskPresenter.TryEnqueueTask(
                 _allCardDetailPresenter.Run(Faction.Enemy, CardCollectionType.Deck, CancellationToken.None)))
             .AddTo(disposables);
-
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            if (_TryPopOutNextTask(out var task))
-            {
-                await task;
-            }
-            else
-            {
-                await UniTask.NextFrame();
-            }
-        }
-
-        disposables.Dispose();
-
-        return true;
-    }
-    
-    private bool _TryPopOutNextTask(out UniTask task)
-    {
-        if (_currentTask.HasValue)
-        {
-            task = _currentTask.ValueOr(UniTask.CompletedTask);
-            _currentTask = Option.None<UniTask>();
-            return true;
-        }
-
-        task = UniTask.CompletedTask;
-        return false;
-    }
-    private void _TryEnqueueTask(UniTask task)
-    {
-        if (!_currentTask.HasValue)
-        {
-            _currentTask = Option.Some(task);
-        }
+        return disposables;
     }
 }
