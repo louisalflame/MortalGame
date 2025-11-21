@@ -53,30 +53,40 @@ public class CardEnemySelectable : IMainTargetSelectable
 
 public interface ISubSelectionGroup
 {
+    string Id { get; }
 }
 
 [Serializable]
 public class ExistCardSelectionGroup : ISubSelectionGroup
 {
+    public string Id;
+    string ISubSelectionGroup.Id => Id;
+
     public ITargetCardCollectionValue CardCandidates;
 
     public IIntegerValue SelectCount;
 
-    public IBooleanValue AllowLowerSelection;
+    public IBooleanValue IsMustSelect;
 }
 
 [Serializable]
 public record NewCardSelectionGroup() : ISubSelectionGroup
 {
+    public string Id;
+    string ISubSelectionGroup.Id => Id;
 }
 
 [Serializable]
 public record NewPartialCardSelectionGroup() : ISubSelectionGroup
 {
+    public string Id;
+    string ISubSelectionGroup.Id => Id;
 }
 
 [Serializable]
 public record NewEffectSelectionGroup() : ISubSelectionGroup
 {
+    public string Id;
+    string ISubSelectionGroup.Id => Id;
 }
 

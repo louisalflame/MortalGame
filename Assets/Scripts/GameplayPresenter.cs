@@ -8,7 +8,7 @@ using UnityEngine;
 
 public interface IGameplayActionReciever
 {
-    void RecieveEvent(IGameAction gameplayAction);
+    void RecieveEvent(IGameCommand gameCommand);
 
     IEnumerable<ISelectableView> SelectableViews { get; }
     ISelectableView BasicSelectableView { get; }
@@ -20,11 +20,11 @@ public class GameplayPresenter : IGameplayActionReciever
     private GameViewModel _gameInfoModel;
     private GameplayManager _gameplayManager;
     private IUIPresenter _uiPresenter;
+    private ISubSelectionPresenter _subSelectionPresenter;
     private IGameResultLosePresenter _gameResultLosePresenter;
     private IGameResultWinPresenter _gameResultWinPresenter;
 
     private readonly Queue<UniTask> _pendingActionTasks = new Queue<UniTask>();
-    private bool _isProcessingAction = false;
 
     public IEnumerable<ISelectableView> SelectableViews => _gameplayView.SelectableViews;
     public ISelectableView BasicSelectableView => _gameplayView.BasicSelectableView;
@@ -45,18 +45,22 @@ public class GameplayPresenter : IGameplayActionReciever
         _uiPresenter = new UIPresenter(_gameplayView, _gameplayView, _gameInfoModel, gameContextManager.LocalizeLibrary);
         _gameResultWinPresenter = new GameResultWinPresenter(gameResultWinPanel);
         _gameResultLosePresenter = new GameResultLosePresenter(gameResultLosePanel);
+        _subSelectionPresenter = new SubSelectionPresenter(_gameInfoModel, gameContextManager.LocalizeLibrary, _gameplayView.SinglePopupPanel, _gameplayView.CardSelectionPanel);
     }
 
     public async UniTask<GameplayResultCommand> Run()
     {
         var cts = new CancellationTokenSource();
         
-        var gameplayLoopTask = _RunGameplayLoop(cts);
-        var uiPresenterTask = _uiPresenter.Run(cts.Token);
+        _GameplayBattleActions(cts).Forget();
+        _uiPresenter.Run(cts.Token).Forget();
 
-        var (battleResult, _) = await UniTask.WhenAll(gameplayLoopTask, uiPresenterTask);
+        var battleResult = await _gameplayManager.StartBattle();
 
-        if (battleResult.IsAllyWin)
+        cts.Cancel();
+        _gameplayView.DisableAllInteraction();
+
+        if (battleResult.Map(result => result.IsAllyWin).ValueOr(false))
         {
             var winResult = await _gameResultWinPresenter.Run();
             return new GameplayResultCommand(winResult);
@@ -68,57 +72,65 @@ public class GameplayPresenter : IGameplayActionReciever
         }
     }
 
-    private async UniTask<BattleResult> _RunGameplayLoop(CancellationTokenSource cts)
+    public void RecieveEvent(IGameCommand gameCommand)
     {
-        _gameplayManager.Start();
+        Debug.Log($"-- GameplayPresenter.RecieveEvent:[{gameCommand}] --");
+        _pendingActionTasks.Enqueue(_ProcessGameAction(gameCommand));
+    }
 
-        BattleResult result;
-        while (!_gameplayManager.BattleResult.TryGetValue(out result))
+    private async UniTask<BattleResult> _GameplayBattleActions(CancellationTokenSource cts)
+    {
+        while (true)
         {
-            // Process any pending action tasks first
-            await _ProcessPendingActionTasks();
-
-            await UniTask.NextFrame();
+            while (_pendingActionTasks.Count > 0)
+            {
+                var actionTask = _pendingActionTasks.Dequeue();
+                await actionTask;
+            }
+            
+            await UniTask.Yield();
 
             var events = _gameplayManager.PopAllEvents();
             _gameplayView.Render(events, this);
         }
-
-        cts.Cancel();
-        _gameplayView.DisableAllInteraction();
-
-        Debug.Log($"-- GameplayPresenter.Run: GameResult[{result}] --");
-        return result;
     }
 
-    private async UniTask _ProcessPendingActionTasks()
-    {
-        while (_pendingActionTasks.Count > 0)
-        {
-            var actionTask = _pendingActionTasks.Dequeue();
-            await actionTask;
-        }
-    }
-
-    public void RecieveEvent(IGameAction gameAction)
-    {
-        Debug.Log($"-- GameplayPresenter.RecieveEvent:[{gameAction}] --");
-        
+    private async UniTask _ProcessGameAction(IGameCommand gameCommand)
+    {        
         _gameplayView.DisableAllHandCards();
-        _pendingActionTasks.Enqueue(_ProcessGameAction(gameAction));
+        var postProcessAction = await _PostProcessAction(gameCommand);
+
+        postProcessAction.MatchSome(action => _gameplayManager.EnqueueAction(action));
     }
 
-    private async UniTask _ProcessGameAction(IGameAction gameAction)
+    private async UniTask<Option<IGameAction>> _PostProcessAction(IGameCommand gameCommand)
     {
-        var postProcessAction = await _PostProcessAction(gameAction);
+        switch (gameCommand)
+        {
+            case TurnSubmitCommand turnSubmitCommand:
+                return Option.Some<IGameAction>(new TurnSubmitAction(turnSubmitCommand.Faction));
 
-        _gameplayManager.EnqueueAction(postProcessAction);
-    }
+            case UseCardCommand useCardCommand:
+                var subSelectionOpt = _gameplayManager.QueryCardSubSelectionInfos(useCardCommand.CardIndentity);
+                if (subSelectionOpt.TryGetValue(out var subSelectionInfo))
+                {
+                    var subSelectionActions = await _subSelectionPresenter.RunSubSelection(subSelectionInfo);
 
-    private UniTask<IGameAction> _PostProcessAction(IGameAction gameAction)
-    {
+                    var action = new UseCardAction(
+                        useCardCommand.CardIndentity,
+                        useCardCommand.SelectionTarget.Match(
+                            some: target => MainSelectionAction.Create(target),
+                            none: () => MainSelectionAction.Empty),
+                        subSelectionActions);
+                    return Option.Some<IGameAction>(action);
+                }
+                else
+                { 
+                    return Option.None<IGameAction>();
+                }
 
-
-        return UniTask.FromResult(gameAction);
+            default:
+                throw new System.NotImplementedException($"Unhandled game command type: {gameCommand.GetType()}");
+        }
     }
 }

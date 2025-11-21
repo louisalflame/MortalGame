@@ -1,17 +1,21 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Optional.Collections;
+using UniRx;
 using UnityEngine;
 
-public record SelectTargetResult(
+public record SelectMainTargetResult(
     bool IsValid,
     TargetType TargetType,
-    Guid TargetIdentity
-) : ISelectionTarget;
+    Guid TargetIdentity) : ISelectionTarget;
+
+public record SelectSubTargetsResult(
+    IReadOnlyDictionary<string, ISubSelectionAction> SubSelectionActions);
 
 public static class SelectTargetLogic
 {
-    public static SelectTargetResult SelectTarget(
+    public static SelectMainTargetResult SelectMainTarget(
         IGameplayStatusWatcher gameplayWatcher,
         ICardEntity cardEntity)
     {
@@ -19,106 +23,154 @@ public static class SelectTargetLogic
         if (mainSelect == null)
         {
             Debug.LogError($"MainSelect is null. cardId={cardEntity.CardDataId}");
-            return new SelectTargetResult(false, TargetType.None, Guid.Empty);
+            return new SelectMainTargetResult(false, TargetType.None, Guid.Empty);
         }
 
         var selectable = mainSelect.MainSelectable;
         if (selectable == null)
         {
             Debug.LogError($"MainSelectable is null. cardId={cardEntity.CardDataId}");
-            return new SelectTargetResult(false, TargetType.None, Guid.Empty);
+            return new SelectMainTargetResult(false, TargetType.None, Guid.Empty);
         }
 
         return selectable switch
         {
-            NoneSelectable => new SelectTargetResult(true, TargetType.None, Guid.Empty),            
+            NoneSelectable => new SelectMainTargetResult(true, TargetType.None, Guid.Empty),
             CharacterSelectable => SelectCharacterWithLogic(gameplayWatcher, mainSelect.LogicTag),
             CharacterAllySelectable => SelectAllyCharacter(gameplayWatcher),
             CharacterEnemySelectable => SelectEnemyCharacter(gameplayWatcher),
             CardSelectable => SelectCardWithLogic(gameplayWatcher, mainSelect.LogicTag),
             CardAllySelectable => SelectAllyCard(gameplayWatcher),
             CardEnemySelectable => SelectEnemyCard(gameplayWatcher),
-            _ => new SelectTargetResult(false, TargetType.None, Guid.Empty)
+            _ => new SelectMainTargetResult(false, TargetType.None, Guid.Empty)
         };
     }
 
-    private static SelectTargetResult SelectCharacterWithLogic(IGameplayStatusWatcher gameplayWatcher, TargetLogicTag logicTag)
+    public static SelectSubTargetsResult SelectSubTargets(
+        IGameplayStatusWatcher gameplayWatcher,
+        ICardEntity cardEntity)
+    {
+        var subSelectionActions = new Dictionary<string, ISubSelectionAction>();
+
+        var subSelectionInfoOpt = gameplayWatcher.QueryCardSubSelectionInfos(cardEntity.Identity);
+        if (subSelectionInfoOpt.TryGetValue(out var subSelectionInfo))
+        {
+            foreach (var kvp in subSelectionInfo.SelectionInfos)
+            {
+                switch (kvp.Value)
+                {
+                    case ExistCardSelectionInfo existCardGroup:
+                        subSelectionActions[kvp.Key] =
+                            RandomSelectExistCardSubSelection(existCardGroup);
+                        break;
+                    case NewCardSelectionInfo:
+                        subSelectionActions[kvp.Key] = new NewCardSubSelectionAction();
+                        break;
+                    case NewPartialCardSelectionInfo:
+                        subSelectionActions[kvp.Key] = new NewPartialCardSubSelectionAction();
+                        break;
+                    case NewEffectSelectionInfo:
+                        subSelectionActions[kvp.Key] = new NewEffectSubSelectionAction();
+                        break;
+                }
+            }
+        }
+
+        return new SelectSubTargetsResult(subSelectionActions);
+    }
+
+    private static SelectMainTargetResult SelectCharacterWithLogic(IGameplayStatusWatcher gameplayWatcher, TargetLogicTag logicTag)
     {
         return logicTag switch
         {
             TargetLogicTag.ToEnemy => SelectEnemyCharacter(gameplayWatcher),
             TargetLogicTag.ToAlly => SelectAllyCharacter(gameplayWatcher),
             TargetLogicTag.ToRandom => SelectRandomCharacter(gameplayWatcher),
-            _ => new SelectTargetResult(false, TargetType.None, Guid.Empty)
+            _ => new SelectMainTargetResult(false, TargetType.None, Guid.Empty)
         };
     }
 
-    private static SelectTargetResult SelectCardWithLogic(IGameplayStatusWatcher gameplayWatcher, TargetLogicTag logicTag)
+    private static SelectMainTargetResult SelectCardWithLogic(IGameplayStatusWatcher gameplayWatcher, TargetLogicTag logicTag)
     {
         return logicTag switch
         {
             TargetLogicTag.ToEnemy => SelectEnemyCard(gameplayWatcher),
             TargetLogicTag.ToAlly => SelectAllyCard(gameplayWatcher),
             TargetLogicTag.ToRandom => SelectRandomCard(gameplayWatcher),
-            _ => new SelectTargetResult(false, TargetType.None, Guid.Empty)
+            _ => new SelectMainTargetResult(false, TargetType.None, Guid.Empty)
         };
     }
 
-    private static SelectTargetResult SelectEnemyCharacter(IGameplayStatusWatcher gameplayWatcher)
+    private static SelectMainTargetResult SelectEnemyCharacter(IGameplayStatusWatcher gameplayWatcher)
     {
         return gameplayWatcher.GameStatus.OppositePlayer
             .FlatMap(oppositePlayer => LinqEnumerableExtensions.FirstOrNone(oppositePlayer.Characters))
-            .Map(oppositeCharacter => new SelectTargetResult(true, TargetType.EnemyCharacter, oppositeCharacter.Identity))
-            .ValueOr(new SelectTargetResult(false, TargetType.None, Guid.Empty));
+            .Map(oppositeCharacter => new SelectMainTargetResult(true, TargetType.EnemyCharacter, oppositeCharacter.Identity))
+            .ValueOr(new SelectMainTargetResult(false, TargetType.None, Guid.Empty));
     }
 
-    private static SelectTargetResult SelectAllyCharacter(IGameplayStatusWatcher gameplayWatcher)
+    private static SelectMainTargetResult SelectAllyCharacter(IGameplayStatusWatcher gameplayWatcher)
     {
         return gameplayWatcher.GameStatus.CurrentPlayer
             .FlatMap(currentPlayer => LinqEnumerableExtensions.FirstOrNone(currentPlayer.Characters))
-            .Map(currentCharacter => new SelectTargetResult(true, TargetType.AllyCharacter, currentCharacter.Identity))
-            .ValueOr(new SelectTargetResult(false, TargetType.None, Guid.Empty));
+            .Map(currentCharacter => new SelectMainTargetResult(true, TargetType.AllyCharacter, currentCharacter.Identity))
+            .ValueOr(new SelectMainTargetResult(false, TargetType.None, Guid.Empty));
     }
 
-    private static SelectTargetResult SelectRandomCharacter(IGameplayStatusWatcher gameplayWatcher)
+    private static SelectMainTargetResult SelectRandomCharacter(IGameplayStatusWatcher gameplayWatcher)
     {
         return LinqEnumerableExtensions.FirstOrNone(
             gameplayWatcher.GameStatus.Ally.Characters
                 .Concat(gameplayWatcher.GameStatus.Enemy.Characters))
             .FlatMap(randomCharacter => randomCharacter.Owner(gameplayWatcher)
                 .Map(randomPlayer => (randomPlayer, randomCharacter)))
-            .Map(tuple => new SelectTargetResult(true,
+            .Map(tuple => new SelectMainTargetResult(true,
                 tuple.randomPlayer.Faction == Faction.Ally ? TargetType.AllyCharacter : TargetType.EnemyCharacter,
                 tuple.randomCharacter.Identity))
-            .ValueOr(new SelectTargetResult(false, TargetType.None, Guid.Empty));
+            .ValueOr(new SelectMainTargetResult(false, TargetType.None, Guid.Empty));
     }
 
-    private static SelectTargetResult SelectEnemyCard(IGameplayStatusWatcher gameplayWatcher)
+    private static SelectMainTargetResult SelectEnemyCard(IGameplayStatusWatcher gameplayWatcher)
     {
         return gameplayWatcher.GameStatus.OppositePlayer
             .FlatMap(oppositePlayer => LinqEnumerableExtensions.FirstOrNone(oppositePlayer.CardManager.HandCard.Cards))
-            .Map(oppositeCard => new SelectTargetResult(true, TargetType.EnemyCard, oppositeCard.Identity))
-            .ValueOr(new SelectTargetResult(false, TargetType.None, Guid.Empty));
+            .Map(oppositeCard => new SelectMainTargetResult(true, TargetType.EnemyCard, oppositeCard.Identity))
+            .ValueOr(new SelectMainTargetResult(false, TargetType.None, Guid.Empty));
     }
 
-    private static SelectTargetResult SelectAllyCard(IGameplayStatusWatcher gameplayWatcher)
+    private static SelectMainTargetResult SelectAllyCard(IGameplayStatusWatcher gameplayWatcher)
     {
         return gameplayWatcher.GameStatus.CurrentPlayer
             .FlatMap(currentPlayer => LinqEnumerableExtensions.FirstOrNone(currentPlayer.CardManager.HandCard.Cards))
-            .Map(currentCard => new SelectTargetResult(true, TargetType.AllyCard, currentCard.Identity))
-            .ValueOr(new SelectTargetResult(false, TargetType.None, Guid.Empty));
+            .Map(currentCard => new SelectMainTargetResult(true, TargetType.AllyCard, currentCard.Identity))
+            .ValueOr(new SelectMainTargetResult(false, TargetType.None, Guid.Empty));
     }
 
-    private static SelectTargetResult SelectRandomCard(IGameplayStatusWatcher gameplayWatcher)
+    private static SelectMainTargetResult SelectRandomCard(IGameplayStatusWatcher gameplayWatcher)
     {
         return LinqEnumerableExtensions.FirstOrNone(
             gameplayWatcher.GameStatus.Ally.CardManager.HandCard.Cards
                 .Concat(gameplayWatcher.GameStatus.Enemy.CardManager.HandCard.Cards))
             .FlatMap(randomCard => randomCard.Owner(gameplayWatcher)
                 .Map(randomPlayer => (randomPlayer, randomCard)))
-            .Map(tuple => new SelectTargetResult(true,
+            .Map(tuple => new SelectMainTargetResult(true,
                 tuple.randomPlayer.Faction == Faction.Ally ? TargetType.AllyCard : TargetType.EnemyCard,
                 tuple.randomCard.Identity))
-            .ValueOr(new SelectTargetResult(false, TargetType.None, Guid.Empty));
+            .ValueOr(new SelectMainTargetResult(false, TargetType.None, Guid.Empty));
+    }
+
+    private static ExistCardSubSelectionAction RandomSelectExistCardSubSelection(ExistCardSelectionInfo existCardGroup)
+    {
+        var selectCount = Math.Min(
+            existCardGroup.Count,
+            existCardGroup.CardInfos.Count);
+
+        var selectedCards = existCardGroup.CardInfos
+            .Select(cardInfo => cardInfo.Identity)
+            .Shuffle()
+            .Take(selectCount)
+            .ToList();
+
+        return new ExistCardSubSelectionAction(selectedCards);
     }
 }

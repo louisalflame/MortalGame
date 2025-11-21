@@ -68,7 +68,7 @@ MonoBehaviour:
       Data: 
     - Name: SubSelects
       Entry: 7
-      Data: 4|System.Collections.Generic.List`1[[SubTargetSelectLogic, Assembly-CSharp]],
+      Data: 4|System.Collections.Generic.List`1[[ISubSelectionGroup, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12

@@ -68,7 +68,7 @@ MonoBehaviour:
       Data: 
     - Name: SubSelects
       Entry: 7
-      Data: 4|System.Collections.Generic.List`1[[SubTargetSelectLogic, Assembly-CSharp]],
+      Data: 4|System.Collections.Generic.List`1[[ISubSelectionGroup, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -85,7 +85,34 @@ MonoBehaviour:
         mscorlib
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 6|IncreaseDispositionEffect, Assembly-CSharp
+    - Name: Targets
+      Entry: 7
+      Data: 7|SinglePlayerCollection, Assembly-CSharp
+    - Name: Target
+      Entry: 7
+      Data: 8|CurrentPlayer, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Value
+      Entry: 7
+      Data: 9|ConstInteger, Assembly-CSharp
+    - Name: Value
+      Entry: 3
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -94,7 +121,7 @@ MonoBehaviour:
       Data: 
     - Name: TriggeredEffects
       Entry: 7
-      Data: 6|System.Collections.Generic.List`1[[CardData+TriggeredCardEffect, Assembly-CSharp]],
+      Data: 10|System.Collections.Generic.List`1[[CardData+TriggeredCardEffect, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -107,7 +134,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 7|System.Collections.Generic.List`1[[ICardPropertyData, Assembly-CSharp]],
+      Data: 11|System.Collections.Generic.List`1[[ICardPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12

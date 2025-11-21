@@ -1459,6 +1459,7 @@ MonoBehaviour:
   _singleCardDetailPopupPanel: {fileID: 338487541981763455}
   _focusCardDetailView: {fileID: 4396381153802467370}
   _simpleHintView: {fileID: 3072992098113081040}
+  _cardSelectionPanel: {fileID: 3067843708731523119}
 --- !u!1 &1402232043
 GameObject:
   m_ObjectHideFlags: 0
@@ -3531,6 +3532,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6932eb69f2a823a4a80af93bef9c3eed, type: 3}
+--- !u!114 &3067843708731523119 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 757609811710341895, guid: 6932eb69f2a823a4a80af93bef9c3eed, type: 3}
+  m_PrefabInstance: {fileID: 3067843708731523118}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15659c58e685f2b4a887e6f7bae9b720, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &3072992098113081038
 PrefabInstance:
   m_ObjectHideFlags: 0

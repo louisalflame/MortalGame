@@ -12,11 +12,14 @@ public interface ICardSelectionPanel
         IEnumerable<SelectionProperty> Selections);
     public record SelectionProperty(
         string Id,
-        CardInfo CardInfo);
+        CardInfo CardInfo,
+        Action<CardInfo> OnClick,
+        Action<CardInfo> OnLongPress);
 
     void Init(IGameViewModel gameInfoModel, LocalizeLibrary localizeLibrary);
     void Open();
     void Render(Property property);
+    void ToggleVisible();
     void Close();
 
     Button VisibleToggleButton { get; }
@@ -67,7 +70,12 @@ public class CardSelectionPanel : MonoBehaviour, ICardSelectionPanel
             var cardView = _cardViewFactory.CreatePrefab();
             cardView.transform.SetParent(_cardViewParent, false);
             cardView.Initialize(_gameViewModel, _localizeLibrary);
-            cardView.Render(new ICardView.CardSimpleProperty(selection.CardInfo));
+            cardView.Render(
+                new ICardView.CardClickableProperty(
+                    selection.CardInfo,
+                    true,
+                    selection.OnClick,
+                    selection.OnLongPress));
             _cardViews.Add(cardView);
         }
     }
@@ -80,6 +88,11 @@ public class CardSelectionPanel : MonoBehaviour, ICardSelectionPanel
     {
         _Clear();
         _panel.SetActive(false);
+    }
+
+    public void ToggleVisible()
+    {
+        _panel.SetActive(!_panel.activeSelf);
     }
 
     private void _Clear()

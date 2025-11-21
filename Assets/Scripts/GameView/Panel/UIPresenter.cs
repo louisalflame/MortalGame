@@ -9,7 +9,7 @@ using UnityEngine;
 
 public interface IUIPresenter
 {
-    UniTask<bool> Run(CancellationToken cancellationToken);
+    UniTaskVoid Run(CancellationToken cancellationToken);
 }
 
 public class UIPresenter : IUIPresenter
@@ -20,7 +20,7 @@ public class UIPresenter : IUIPresenter
 
     private IAllCardDetailPresenter _allCardDetailPresenter;
 
-    private UniTaskPresenter<bool> _uniTaskPresenter;
+    private IUniTaskPresenter<Unit> _uniTaskPresenter;
 
     public UIPresenter(
         IInteractionButtonView buttonView,
@@ -33,16 +33,15 @@ public class UIPresenter : IUIPresenter
         _enemySelectedCardView = buttonView.EnemySelectedCardView;
 
         _allCardDetailPresenter = new AllCardDetailPresenter(panelView, gameViewModel, localizeLibrary);        
-        _uniTaskPresenter = new UniTaskPresenter<bool>();
+        _uniTaskPresenter = new UniTaskPresenter<Unit>();
     }
 
-    public async UniTask<bool> Run(CancellationToken cancellationToken)
+    public async UniTaskVoid Run(CancellationToken cancellationToken)
     {
-        var result = await _uniTaskPresenter.Run(
+        await _uniTaskPresenter.Run(
             _SetupSubscriptions(),
             () => true,
             cancellationToken);
-        return result.ValueOr(true);
     }
 
     private IDisposable _SetupSubscriptions()

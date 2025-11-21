@@ -40,7 +40,7 @@ public class CardData
     public MainTargetSelectLogic MainSelect = new ();
     [ShowInInspector]
     [BoxGroup("Target")]
-    public List<SubTargetSelectLogic> SubSelects = new();
+    public List<ISubSelectionGroup> SubSelects = new();
 
     [BoxGroup("Effects")]
     [ShowInInspector]
@@ -60,10 +60,4 @@ public class MainTargetSelectLogic
 {
     public IMainTargetSelectable MainSelectable = new NoneSelectable();
     public TargetLogicTag LogicTag = TargetLogicTag.None;
-}
-[Serializable]
-public class SubTargetSelectLogic
-{
-    [ShowInInspector]
-    public List<ISubSelectionGroup> SubSelectables = new ();
 }

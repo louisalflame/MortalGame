@@ -46,13 +46,18 @@ public static class UseCardLogic
     {
         foreach (var selectedCard in enemy.SelectedCards.Cards)
         {
-            var selectResult = SelectTargetLogic.SelectTarget(gameplayWatcher, selectedCard);
+            var selectResult = SelectTargetLogic.SelectMainTarget(gameplayWatcher, selectedCard);
             if (!selectResult.IsValid) continue;
+
+            var subSelectResult = SelectTargetLogic.SelectSubTargets(gameplayWatcher, selectedCard);
 
             var cardRuntimeCost = GameFormula.CardCost(gameplayWatcher, selectedCard, new CardLookIntentAction(selectedCard), new CardTrigger(selectedCard));
             if (cardRuntimeCost <= enemy.CurrentEnergy)
             {
-                useCardAction = UseCardAction.Create(selectedCard.ToInfo(gameplayWatcher), selectResult);
+                useCardAction = new UseCardAction(
+                    selectedCard.Identity,
+                    MainSelectionAction.Create(selectResult),
+                    subSelectResult.SubSelectionActions);
                 return true;
             }
         }

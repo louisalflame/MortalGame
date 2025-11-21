@@ -68,11 +68,47 @@ MonoBehaviour:
       Data: 
     - Name: SubSelects
       Entry: 7
-      Data: 4|System.Collections.Generic.List`1[[SubTargetSelectLogic, Assembly-CSharp]],
-        mscorlib
+      Data: 4|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[ISubSelectionGroup,
+        Assembly-CSharp]], Unity.Plastic.Antlr3.Runtime
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 5|ExistCardSelectionGroup, Assembly-CSharp
+    - Name: Id
+      Entry: 1
+      Data: Ally2
+    - Name: CardCandidates
+      Entry: 7
+      Data: 6|AllyHandCards, Assembly-CSharp
+    - Name: Player
+      Entry: 7
+      Data: 7|CurrentPlayer, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: SelectCount
+      Entry: 7
+      Data: 8|ConstInteger, Assembly-CSharp
+    - Name: Value
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: IsMustSelect
+      Entry: 7
+      Data: 9|TrueValue, Assembly-CSharp
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -81,20 +117,20 @@ MonoBehaviour:
       Data: 
     - Name: Effects
       Entry: 7
-      Data: 5|System.Collections.Generic.List`1[[ICardEffect, Assembly-CSharp]],
+      Data: 10|System.Collections.Generic.List`1[[ICardEffect, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 6|DamageEffect, Assembly-CSharp
+      Data: 11|DamageEffect, Assembly-CSharp
     - Name: Targets
       Entry: 7
-      Data: 7|SingleCharacterCollection, Assembly-CSharp
+      Data: 12|SingleCharacterCollection, Assembly-CSharp
     - Name: Target
       Entry: 7
-      Data: 8|SelectedCharacter, Assembly-CSharp
+      Data: 13|SelectedCharacter, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -103,10 +139,10 @@ MonoBehaviour:
       Data: 
     - Name: Value
       Entry: 7
-      Data: 9|CardIntegerProperty, Assembly-CSharp
+      Data: 14|CardIntegerProperty, Assembly-CSharp
     - Name: Card
       Entry: 7
-      Data: 10|PlayingCard, Assembly-CSharp
+      Data: 15|PlayingCard, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -127,7 +163,7 @@ MonoBehaviour:
       Data: 
     - Name: TriggeredEffects
       Entry: 7
-      Data: 11|System.Collections.Generic.List`1[[CardData+TriggeredCardEffect, Assembly-CSharp]],
+      Data: 16|System.Collections.Generic.List`1[[CardData+TriggeredCardEffect, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -140,7 +176,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 12|System.Collections.Generic.List`1[[ICardPropertyData, Assembly-CSharp]],
+      Data: 17|System.Collections.Generic.List`1[[ICardPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12

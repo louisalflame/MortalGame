@@ -68,7 +68,7 @@ MonoBehaviour:
       Data: 
     - Name: SubSelects
       Entry: 7
-      Data: 4|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[SubTargetSelectLogic,
+      Data: 4|Unity.Plastic.Antlr3.Runtime.Misc.ListStack`1[[ISubSelectionGroup,
         Assembly-CSharp]], Unity.Plastic.Antlr3.Runtime
     - Name: 
       Entry: 12

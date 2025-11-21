@@ -13,7 +13,7 @@ public record CardInfo(
     int Cost,
     int OriginPower,
     int Power,
-    MainSelectableInfo MainSelectable,
+    MainSelectionInfo MainSelectable,
     IReadOnlyList<CardBuffInfo> BuffInfos,
     IReadOnlyList<CardProperty> Properties,
     IReadOnlyList<string> Keywords)

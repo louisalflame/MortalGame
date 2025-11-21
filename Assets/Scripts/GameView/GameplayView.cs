@@ -33,6 +33,7 @@ public interface IAllCardDetailPanelView
     AllCardDetailPanel DetailPanel { get; }
     SingleCardDetailPopupPanel SinglePopupPanel { get; }
     FocusCardDetailView FocusCardDetailView { get; }
+    ICardSelectionPanel CardSelectionPanel { get; }
 }
 
 public class GameplayView : MonoBehaviour, IGameplayView
@@ -94,13 +95,17 @@ public class GameplayView : MonoBehaviour, IGameplayView
     [BoxGroup("Popup")]
     [SerializeField]
     private SimpleTitleInfoHintView _simpleHintView;
+    [BoxGroup("Popup")]
+    [SerializeField]
+    private CardSelectionPanel _cardSelectionPanel;
 
-    public AllCardDetailPanel DetailPanel => _allCardDetailPanel;
-    public SingleCardDetailPopupPanel SinglePopupPanel => _singleCardDetailPopupPanel;
-    public FocusCardDetailView FocusCardDetailView => _focusCardDetailView;
-    public DeckCardView DeckCardView => _deckCardView;
-    public GraveyardCardView GraveyardCardView => _graveyardCardView;
-    public EnemySelectedCardView EnemySelectedCardView => _enemySelectedCardView;
+    AllCardDetailPanel IAllCardDetailPanelView.DetailPanel => _allCardDetailPanel;
+    SingleCardDetailPopupPanel IAllCardDetailPanelView.SinglePopupPanel => _singleCardDetailPopupPanel;
+    ICardSelectionPanel IAllCardDetailPanelView.CardSelectionPanel => _cardSelectionPanel;
+    FocusCardDetailView IAllCardDetailPanelView.FocusCardDetailView => _focusCardDetailView;
+    DeckCardView IInteractionButtonView.DeckCardView => _deckCardView;
+    GraveyardCardView IInteractionButtonView.GraveyardCardView => _graveyardCardView;
+    EnemySelectedCardView IInteractionButtonView.EnemySelectedCardView => _enemySelectedCardView;
 
     private IGameViewModel _gameViewModel;
 
@@ -146,6 +151,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
     {
         foreach (var gameEvent in events)
         {
+            Debug.Log($"Render Event: {gameEvent.GetType().Name}");
             switch (gameEvent)
             {
                 case GeneralUpdateEvent updateEvent:

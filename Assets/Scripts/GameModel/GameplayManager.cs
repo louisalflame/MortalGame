@@ -2,12 +2,14 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Optional;
 
 public interface IGameplayStatusWatcher
 {
     GameStatus GameStatus { get; }
     IGameContextManager ContextManager { get; }
+    Option<SubSelectionInfo> QueryCardSubSelectionInfos(Guid cardIdentity);
 }
 
 public interface IGameplayReactor
@@ -16,11 +18,39 @@ public interface IGameplayReactor
 }
 
 public interface IGameEventWatcher : IGameplayStatusWatcher
+{
+    event Action OnUseCard;
+    event Action OneTurnStart;
+    event Action OnTurnEnd;
+}
+
+public class UniTaskAwaitableQueue<T>
+{ 
+    private readonly ConcurrentQueue<T> _queue = new ConcurrentQueue<T>();
+
+    public void Enqueue(T task)
     {
-        event Action OnUseCard;
-        event Action OneTurnStart;
-        event Action OnTurnEnd;
+        _queue.Enqueue(task);
     }
+
+    public async UniTask<T> Dequeue()
+    {
+        while (true)
+        {
+            if (_queue.TryDequeue(out var result))
+            {
+                return result;
+            }
+            
+            await UniTask.Yield();
+        }
+    }
+    
+    public void Clear()
+    {
+        _queue.Clear();
+    }
+}
 
 public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGameplayReactor
 {
@@ -28,17 +58,25 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
     public event Action OneTurnStart;
     public event Action OnTurnEnd;
 
+    public class GameEndException : Exception
+    {
+        public readonly bool IsAllyWin;
+        public GameEndException(bool isAllyWin) : base() 
+        {
+            IsAllyWin = isAllyWin;
+        }
+    }
+
     private GameStatus _gameStatus;
     private Option<BattleResult> _battleResult;
     private List<IGameEvent> _gameEvents;
-    private Queue<IGameAction> _gameActions;
-    private BlockingCollection<IGameAction> _actionQueue = new BlockingCollection<IGameAction>();
+    private UniTaskAwaitableQueue<IGameAction> _gameActions;
     private IGameContextManager _contextMgr;
     private GameHistory _gameHistory;
 
     public Option<BattleResult> BattleResult { get { return _battleResult; } }
-    GameStatus IGameplayStatusWatcher.GameStatus { get{ return _gameStatus; } }
-    IGameContextManager IGameplayStatusWatcher.ContextManager { get{ return _contextMgr; } }
+    GameStatus IGameplayStatusWatcher.GameStatus { get { return _gameStatus; } }
+    IGameContextManager IGameplayStatusWatcher.ContextManager { get { return _contextMgr; } }
 
     public GameplayManager(GameStatus initialStatus, GameContextManager contextManager)
     {
@@ -48,13 +86,15 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
         _gameHistory = new GameHistory(this);
     }
 
-    public void Start()
+    public async UniTask<Option<BattleResult>> StartBattle()
     {
         _gameEvents = new List<IGameEvent>();
-        _gameActions = new Queue<IGameAction>();
+        _gameActions = new UniTaskAwaitableQueue<IGameAction>();
         _battleResult = Option.None<BattleResult>();
 
-        _NextState(_gameStatus);
+        await _Run();
+
+        return _battleResult;
     }
 
     public void EnqueueAction(IGameAction action)
@@ -64,66 +104,53 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
 
     public IReadOnlyCollection<IGameEvent> PopAllEvents()
     {
-        _NextState(_gameStatus);
         var events = _gameEvents.ToArray();
         _gameEvents.Clear();
         return events;
     }
 
-    private void _NextState(GameStatus gameStatus)
+    public Option<SubSelectionInfo> QueryCardSubSelectionInfos(Guid cardIdentity)
     {
-        switch (gameStatus.State)
-        {
-            case GameState.GameStart:
-                _gameEvents.AddRange(
-                    UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.GameStart, new SystemSource())));
-                _GameStart();
-                _gameStatus.SetState(GameState.TurnStart);
-                break;
-            case GameState.TurnStart:
-                _gameEvents.AddRange(
-                    UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.TurnStart, new SystemSource())));
-                _TurnStart();
-                _gameStatus.SetState(GameState.DrawCard);
-                break;
-            case GameState.DrawCard:
-                _gameEvents.AddRange(
-                    UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.DrawCard, new SystemSource())));
-                _TurnDrawCard();
-                _gameStatus.SetState(GameState.EnemyPrepare);
-                break;
-            case GameState.EnemyPrepare:
-                _EnemyPrepare();
-                _gameStatus.SetState(GameState.PlayerPrepare);
-                break;
-            case GameState.PlayerPrepare:
-                _PlayerPrepare();
-                _gameStatus.SetState(GameState.PlayerExecute);
-                break;
-            case GameState.PlayerExecute:
-                _PlayerExecute();
-                break;
-            case GameState.EnemyExecute:
-                _EnemyExecute();
-                break;
-            case GameState.TurnEnd:
-                _gameEvents.AddRange(
-                    UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.TurnEnd, new SystemSource())));
-                _TurnEnd();
-                _gameStatus.SetState(GameState.TurnStart);
-                break;
-            case GameState.GameEnd:
-                break;
-        }
+        return CardEntityExtensions
+            .GetCard(this, cardIdentity)
+            .Map(cardEntity => { 
+                var cardData = _contextMgr.CardLibrary.GetCardData(cardEntity.CardDataId);
+                return cardData.SubSelects.ToInfo(this, cardEntity);
+            });
+    }
 
-        if (_IsGameEnd())
+    private async UniTask _Run()
+    {
+        _GameStart();
+
+        try
         {
-            _gameStatus.SetState(GameState.GameEnd);
+            while (true)
+            {
+                _TurnStart();
+                
+                _TurnDrawCard();
+                
+                _EnemyPrepare();    
+
+                await _PlayerExecute();
+                
+                _EnemyExecute();
+                
+                _TurnEnd();
+            }
+        }
+        catch (GameEndException gameEndEx)
+        {
+            _battleResult = new BattleResult(gameEndEx.IsAllyWin).Some();
         }
     }
 
     private void _GameStart()
     {
+        _gameEvents.AddRange(
+            UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.GameStart, new SystemSource())));
+        
         // TODO: summon characters 
         _gameEvents.Add(new AllySummonEvent(Player: _gameStatus.Ally));
         _gameEvents.Add(new EnemySummonEvent(Enemy: _gameStatus.Enemy));
@@ -131,23 +158,31 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
 
     private void _TurnStart()
     {
+        _gameEvents.AddRange(
+            UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.TurnStart, new SystemSource())));
+        
         _gameStatus.SetNewTurn();
         _gameEvents.Add(new RoundStartEvent(
             Round: _gameStatus.TurnCount,
             Player: _gameStatus.Ally,
             Enemy: _gameStatus.Enemy
         ));
-        
+
         var recoverEnergyPoint = _contextMgr.DispositionLibrary.GetRecoverEnergyPoint(_gameStatus.Ally.DispositionManager.CurrentDisposition);
         var allyGainEnergyResult = _gameStatus.Ally.EnergyManager.RecoverEnergy(recoverEnergyPoint);
         _gameEvents.Add(new GainEnergyEvent(_gameStatus.Ally.Faction, _gameStatus.Ally.EnergyManager.ToInfo(), allyGainEnergyResult));
 
         var enemyGainEnergyResult = _gameStatus.Enemy.EnergyManager.RecoverEnergy(_gameStatus.Enemy.EnergyRecoverPoint);
         _gameEvents.Add(new GainEnergyEvent(_gameStatus.Enemy.Faction, _gameStatus.Enemy.EnergyManager.ToInfo(), enemyGainEnergyResult));
+
+        _CheckGameEnd();
     }
 
     private void _TurnDrawCard()
     {
+        _gameEvents.AddRange(
+            UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.DrawCard, new SystemSource())));
+        
         var allyDrawCount = _contextMgr.DispositionLibrary.GetDrawCardCount(_gameStatus.Ally.DispositionManager.CurrentDisposition);
         var enemyDrawCount = _gameStatus.Enemy.TurnStartDrawCardCount;
 
@@ -159,8 +194,8 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
 
         var triggerEvts = _TriggerTiming(GameTiming.DrawCard, SystemSource.Instance);
         _gameEvents.AddRange(triggerEvts);
-
-        _gameActions.Clear();
+   
+        _CheckGameEnd();
     }
 
     private void _EnemyPrepare()
@@ -172,63 +207,70 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                 SelectedCardInfos: _gameStatus.Enemy.SelectedCards.Cards.ToCardInfos(this)
             ));
         }
+        
+        _CheckGameEnd();
     }
 
-    private void _PlayerPrepare()
+    public async UniTask _PlayerExecute()
     {
+        using var allyStatus = _gameStatus.SetCurrentPlayer(_gameStatus.Ally);
+
         _gameEvents.Add(new PlayerExecuteStartEvent(
             Faction: _gameStatus.Ally.Faction,
             CardManagerInfo: _gameStatus.Ally.CardManager.ToInfo(this)
         ));
-    }
-    public void _PlayerExecute()
-    {
-        _TurnExecute(_gameStatus.Ally);
+        
+        var isExecuting = true;
+        while (isExecuting)
+        {
+            var action = await _gameActions.Dequeue();
+
+            switch (action)
+            {
+                case UseCardAction useCardAction:
+                    using (_SetUseCardSelectTarget(useCardAction))
+                    {
+                        _UseCard(_gameStatus.Ally, useCardAction.CardIndentity);
+                        _gameEvents.Add(new PlayerExecuteStartEvent(
+                            Faction: _gameStatus.Ally.Faction,
+                            CardManagerInfo: _gameStatus.Ally.CardManager.ToInfo(this)
+                        ));
+                    }
+                    break;
+
+                case TurnSubmitAction turnSubmitAction:
+                    isExecuting = false;
+                    _FinishPlayerExecuteTurn();
+                    break;
+            }
+            
+            _CheckGameEnd();
+        }
     }
     private void _EnemyExecute()
     {
         _gameEvents.AddRange(
             UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.ExecuteStart, new SystemSource())));
 
+        using var enemyStatus = _gameStatus.SetCurrentPlayer(_gameStatus.Enemy);
         while (_gameStatus.Enemy.TryGetNextUseCardAction(this, out var useCardAction))
         {
-            _gameActions.Enqueue(useCardAction);
-            _TurnExecute(_gameStatus.Enemy);
+            using (_SetUseCardSelectTarget(useCardAction))
+            {
+                _UseCard(_gameStatus.Enemy, useCardAction.CardIndentity);
+                _gameEvents.Add(new PlayerExecuteStartEvent(
+                    Faction: _gameStatus.Enemy.Faction,
+                    CardManagerInfo: _gameStatus.Enemy.CardManager.ToInfo(this)
+                ));
+            }
+            
+            _CheckGameEnd();
         }
 
         var unselectedCards = _gameStatus.Enemy.SelectedCards.UnSelectAllCards();
         _gameEvents.Add(new EnemyUnselectedCardEvent(UnselectedCardInfos: unselectedCards.ToCardInfos(this)));
-        
-        _FinishEnemyExecuteTurn();
-    }
-    private void _TurnExecute(IPlayerEntity player)
-    {
-        var x = _actionQueue.Take();
 
-        while(_gameActions.Count > 0)
-        {
-            var action = _gameActions.Dequeue();
-            switch(action)
-            {
-                case UseCardAction useCardAction:
-                    using(_SetUseCardSelectTarget(useCardAction))
-                    {
-                        _UseCard(player, useCardAction.CardIndentity);
-                        _gameEvents.Add(new PlayerExecuteStartEvent(
-                            Faction: player.Faction,
-                            CardManagerInfo: player.CardManager.ToInfo(this)
-                        ));
-                    }
-                    break;
-                case TurnSubmitAction turnSubmitAction:
-                    if (_gameStatus.State == GameState.PlayerExecute &&
-                        turnSubmitAction.Faction == Faction.Ally)
-                    {
-                        _FinishPlayerExecuteTurn();
-                    }
-                    break;
-            }
-        }
+        _FinishEnemyExecuteTurn();
     }
 
     private void _FinishPlayerExecuteTurn()
@@ -241,13 +283,12 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
         var endTurnSource = new SystemExectueEndSource(_gameStatus.Ally);
         var triggerEvts = _TriggerTiming(GameTiming.ExecuteEnd, endTurnSource);
         _gameEvents.AddRange(triggerEvts);
-        
+
         _gameEvents.AddRange(
             UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.ExecuteEnd, new SystemSource())));
 
-        _gameStatus.SetState(GameState.EnemyExecute);
         _gameActions.Clear();
-    }   
+    }
     private void _FinishEnemyExecuteTurn()
     {
         var endTurnSource = new SystemExectueEndSource(_gameStatus.Enemy);
@@ -257,7 +298,6 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
         _gameEvents.AddRange(
             UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.ExecuteEnd, new SystemSource())));
 
-        _gameStatus.SetState(GameState.TurnEnd);
         _gameActions.Clear();
     }
 
@@ -273,11 +313,13 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
 
         var triggerEvts = _TriggerTiming(GameTiming.TurnEnd, SystemSource.Instance);
         _gameEvents.AddRange(triggerEvts);
+        
+        _CheckGameEnd();
     }
 
     private GameContextManager _SetUseCardSelectTarget(UseCardAction useCardAction)
     {
-        switch(useCardAction.MainSelectionAction.TargetType)
+        switch (useCardAction.MainSelectionAction.TargetType)
         {
             case TargetType.AllyCharacter:
             case TargetType.EnemyCharacter:
@@ -291,7 +333,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                 return _contextMgr.SetSelectedCard(enemyCardOpt);
             default:
             case TargetType.None:
-                return _contextMgr.SetClone();      
+                return _contextMgr.SetClone();
         }
     }
     private void _UseCard(IPlayerEntity player, Guid CardIndentity)
@@ -301,9 +343,9 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
             !usedCard.HasProperty(CardProperty.Sealed))
         {
             var useCardEvents = new List<IGameEvent>();
-            
+
             var cardRuntimCost = GameFormula.CardCost(this, usedCard, new CardLookIntentAction(usedCard), new CardTrigger(usedCard));
-            if (cardRuntimCost <= player.CurrentEnergy) 
+            if (cardRuntimCost <= player.CurrentEnergy)
             {
                 var loseEnergyResult = player.EnergyManager.ConsumeEnergy(cardRuntimCost);
                 useCardEvents.Add(new LoseEnergyEvent(player.Faction, player.EnergyManager.ToInfo(), loseEnergyResult));
@@ -348,7 +390,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                             Faction: player.Faction,
                             UsedCardInfo: usedCardInfo,
                             CardManagerInfo: player.CardManager.ToInfo(this));
-                        useCardEvents.Add(usedCardEvent);                        
+                        useCardEvents.Add(usedCardEvent);
                     }
 
                     useCardEvents.AddRange(_TriggerTiming(GameTiming.PlayCardEnd, cardPlayResultSource));
@@ -444,19 +486,16 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
 
         return triggerBuffEvents;
     }
-    
-    private bool _IsGameEnd()
+
+    private void _CheckGameEnd()
     {
         if (_gameStatus.Ally.IsDead)
         {
-            _battleResult = new BattleResult(false).Some();
-            return true;
+            throw new GameEndException(false);
         }
         else if (_gameStatus.Enemy.IsDead)
         {
-            _battleResult = new BattleResult(true).Some();
-            return true;
+            throw new GameEndException(true);
         }
-        return false;
     }
 }

@@ -5,7 +5,6 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Optional;
 using UniRx;
-using UnityEngine;
 
 public interface IAllCardDetailPresenter
 {
@@ -50,7 +49,7 @@ public class AllCardDetailPresenter : IAllCardDetailPresenter
     private readonly IGameViewModel _gameViewModel;
 
     private CardInfo _selectedCardInfo;
-    private UniTaskPresenter<Unit> _uniTaskPresenter;
+    private IUniTaskPresenter<Unit> _uniTaskPresenter;
     private bool _isClose;
 
     public AllCardDetailPresenter(

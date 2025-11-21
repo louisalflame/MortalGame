@@ -8,10 +8,16 @@ using UnityEngine;
 
 public interface IUniTaskPresenter<T>
 {
-    UniTask<Option<T>> Run(CancellationToken cancellationToken);
+    UniTask<Option<T>> Run(
+        IDisposable disposables,
+        Func<bool> conditionFunc,
+        CancellationToken cancellationToken,
+        UniTask firstTask = default);
+    void TryEnqueueTask(UniTask task);
+    void SetResult(T result);
 }
 
-public class UniTaskPresenter<T>
+public class UniTaskPresenter<T> : IUniTaskPresenter<T>
 {
     private Option<UniTask> _currentTask = Option.None<UniTask>();
     private Option<T> _result = Option.None<T>();

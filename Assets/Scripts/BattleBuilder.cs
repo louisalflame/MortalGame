@@ -32,10 +32,9 @@ public class BattleBuidler
     { 
         var initialState = new GameStatus(
             turnCount: 0,
-            state: GameState.GameStart,
             player: _ParseAlly(_context.Ally, gameContextManager),
-            enemy: _ParseEnemy(_context.AllEnemies[0], gameContextManager)
-        ); 
+            enemy: _ParseEnemy(_context.AllEnemies[0], gameContextManager),
+            randomSeed: Environment.TickCount); 
         return initialState;
     }
 
