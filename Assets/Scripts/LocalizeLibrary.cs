@@ -8,6 +8,7 @@ public enum LocalizeType
     CardBuff,
     PlayerBuff,
     KeyWord,
+    UI,
 }
 
 public enum GameKeyWord

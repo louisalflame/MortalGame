@@ -743,7 +743,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 6008013502882035219}
   m_HandleRect: {fileID: 6782961972177492527}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -810,17 +810,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3163604086960013631}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8195751123270194617}
-  m_Father: {fileID: 650929424339176829}
+  m_Father: {fileID: 5562764038042737811}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 410.00003, y: -140}
   m_SizeDelta: {x: 200, y: 100}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &2340147740783330033
@@ -1167,7 +1167,6 @@ RectTransform:
   m_Children:
   - {fileID: 4590869422228434479}
   - {fileID: 3802462712980537956}
-  - {fileID: 40506810192854678}
   - {fileID: 2443036686975881664}
   - {fileID: 1150985333838320571}
   m_Father: {fileID: 5562764038042737811}
@@ -1392,7 +1391,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_DisabledColor: {r: 0.8773585, g: 0.8773585, b: 0.8773585, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -1551,6 +1550,7 @@ RectTransform:
   - {fileID: 4996778410107239681}
   - {fileID: 650929424339176829}
   - {fileID: 7866802546406397379}
+  - {fileID: 40506810192854678}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1570,15 +1570,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15659c58e685f2b4a887e6f7bae9b720, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _panel: {fileID: 309488650692560172}
+  _panel: {fileID: 8130107456170679240}
   _cardViewParent: {fileID: 7700991502773994521}
   _cardViewFactory: {fileID: 6288538647246495656}
   _selectionDescriptionText: {fileID: 3501441517062059606}
+  _visibleToggleObjects:
+  - {fileID: 1723547039707680072}
+  - {fileID: 6164211927272238898}
+  _closeObject: {fileID: 2083958898456825921}
   _closeButtons:
   - {fileID: 919844237176627699}
   - {fileID: 7104936944083287132}
   _visibleToggleButton: {fileID: 7747474354770675169}
   _confirmButton: {fileID: 1041316862350687073}
+  _selectionInfoLocalizeKey: 
 --- !u!1 &8499311787100510646
 GameObject:
   m_ObjectHideFlags: 0
@@ -1734,7 +1739,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u96B1\u85CF"
+  m_text: "\u78BA\u8A8D"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 752995447ffb431458928aaa5566fb8d, type: 2}
   m_sharedMaterial: {fileID: -4165318182404224684, guid: 752995447ffb431458928aaa5566fb8d, type: 2}

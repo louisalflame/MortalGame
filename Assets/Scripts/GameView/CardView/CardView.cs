@@ -34,8 +34,8 @@ public interface ICardView : IRecyclable, ISelectableView, IDragableCardView
     public record CardClickableProperty(
         CardInfo CardInfo,
         bool IsClickable,
-        Action<CardInfo> OnClickCard = null,
-        Action<CardInfo> OnLongPressCard = null);
+        Action<CardInfo, ICardView> OnClickCard = null,
+        Action<CardInfo, ICardView> OnLongPressCard = null);
     public record CardSimpleProperty(
         CardInfo CardInfo);
 
@@ -67,6 +67,7 @@ public class CardView : MonoBehaviour, ICardView
     [SerializeField]
     private CanvasGroup _canvasGroup;
 
+    [BoxGroup("Info")]
     [SerializeField]
     private TextMeshProUGUI _title;
     [SerializeField]
@@ -81,6 +82,8 @@ public class CardView : MonoBehaviour, ICardView
     private IntColorMapping _powerColorMapping;
 
     [TitleGroup("Effect")]
+    [SerializeField]
+    private GameObject _selectedEffectObj;
     [SerializeField]
     private GameObject _sealedEffectObj;
 
@@ -151,10 +154,10 @@ public class CardView : MonoBehaviour, ICardView
                     switch (pressType)
                     {
                         case ObservableButtonExtensions.PressType.Click:
-                            property.OnClickCard?.Invoke(property.CardInfo);
+                            property.OnClickCard?.Invoke(property.CardInfo, this);
                             break;
                         case ObservableButtonExtensions.PressType.LongPress:
-                            property.OnLongPressCard?.Invoke(property.CardInfo);
+                            property.OnLongPressCard?.Invoke(property.CardInfo, this);
                             break;
                     }
                 })
@@ -195,9 +198,11 @@ public class CardView : MonoBehaviour, ICardView
 
     public void OnSelect()
     {
+        _selectedEffectObj.SetActive(true);
     }
     public void OnDeselect()
     {
+        _selectedEffectObj.SetActive(false);
     }
 
     public void ShowHandCardFocusContent()
@@ -248,6 +253,8 @@ public class CardView : MonoBehaviour, ICardView
         _cardInfoSubscription?.Dispose();
         _button.interactable = false;
         _disposables.Clear();
+        OnDeselect();
+        HideHandCardFocusContent();
     } 
 
     public void SetPositionAndRotation(Vector3 position, Quaternion rotation)

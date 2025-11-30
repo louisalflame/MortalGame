@@ -122,7 +122,7 @@ public class AllCardDetailPresenter : IAllCardDetailPresenter
                 new ICardView.CardClickableProperty(
                     CardInfo: cardInfo,
                     IsClickable: true,
-                    OnClickCard: info => _uniTaskPresenter.TryEnqueueTask(
+                    OnClickCard: (info, cardView) => _uniTaskPresenter.TryEnqueueTask(
                         _singlePopupPanel.Run(CardDetailProperty.Create(info)))))
             );
         _detailPanel.Render(property);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -52,6 +53,7 @@ public class SubSelectionPresenter : ISubSelectionPresenter
     private async UniTask<ExistCardSubSelectionAction> _RunExistCardSelection(ExistCardSelectionInfo existCardSelection)
     {
         var isClose = false;
+        var isVisible = true;
         var selectedCardIds = new List<Guid>();
         var disposables = new CompositeDisposable();
 
@@ -65,38 +67,20 @@ public class SubSelectionPresenter : ISubSelectionPresenter
         }
         _cardSelectionPanel.ConfirmButton
             .OnClickAsObservable()
-            .Subscribe(_ => isClose = true)
+            .Subscribe(_ => isClose = existCardSelection.IsMustSelect 
+                ? selectedCardIds.Count >= existCardSelection.Count 
+                : true)
             .AddTo(disposables); 
         _cardSelectionPanel.VisibleToggleButton
             .OnClickAsObservable()
-            .Subscribe(_ => _cardSelectionPanel.ToggleVisible())
+            .Subscribe(_ =>
+            {
+                isVisible = !isVisible;
+                _cardSelectionPanel.RenderUpdate(GetUpdateProperty());
+            })
             .AddTo(disposables);
 
-        _cardSelectionPanel.Open();
-
-        _cardSelectionPanel.Render(new ICardSelectionPanel.Property(
-            existCardSelection.CardInfos
-                .Select(cardInfo => new ICardSelectionPanel.SelectionProperty(
-                    cardInfo.Identity.ToString(),
-                    cardInfo,
-                    (cardInfo) =>
-                    {
-                        if (selectedCardIds.Contains(cardInfo.Identity))
-                        {
-                            selectedCardIds.Remove(cardInfo.Identity);
-                        }
-                        else if (selectedCardIds.Count < existCardSelection.Count)
-                        {
-                            selectedCardIds.Add(cardInfo.Identity);
-                        }
-                    },
-                    (cardInfo) =>
-                    {
-                        _uniTaskPresenter.TryEnqueueTask(
-                            _singleCardDetailPopupPanel.Run(CardDetailProperty.Create(cardInfo)));
-                    }
-                ))
-        ));
+        _cardSelectionPanel.Open(CreateProperty());
 
         var selectionsOpt = await _uniTaskPresenter.Run(
             disposables,
@@ -106,5 +90,53 @@ public class SubSelectionPresenter : ISubSelectionPresenter
         _cardSelectionPanel.Close();
 
         return new ExistCardSubSelectionAction(selectedCardIds);
+
+        ICardSelectionPanel.SelectionProperty CreateSelectionProperty(CardInfo cardInfo)
+        {
+            return new ICardSelectionPanel.SelectionProperty(
+                cardInfo.Identity.ToString(),
+                cardInfo,
+                (info, cardView) =>
+                {
+                    if (selectedCardIds.Contains(info.Identity))
+                    {
+                        selectedCardIds.Remove(info.Identity);
+                    }
+                    else if (selectedCardIds.Count < existCardSelection.Count)
+                    {
+                        selectedCardIds.Add(info.Identity);
+                    }
+
+                    _cardSelectionPanel.RenderUpdate(GetUpdateProperty());
+                },
+                (info, cardView) =>
+                {
+                    _uniTaskPresenter.TryEnqueueTask(
+                        _singleCardDetailPopupPanel.Run(CardDetailProperty.Create(info)));
+                }
+            );
+        }
+        ICardSelectionPanel.Property CreateProperty()
+        {
+            return new ICardSelectionPanel.Property(
+                existCardSelection.IsMustSelect,
+                !existCardSelection.IsMustSelect,
+                existCardSelection.Count,
+                existCardSelection.CardInfos
+                    .Select(cardInfo => CreateSelectionProperty(cardInfo))
+            );
+        }
+        ICardSelectionPanel.UpdateProperty GetUpdateProperty()
+        {
+            return new ICardSelectionPanel.UpdateProperty(
+                isVisible,
+                existCardSelection.IsMustSelect
+                    ? selectedCardIds.Count >= existCardSelection.Count
+                    : true,
+                existCardSelection.Count,
+                existCardSelection.CardInfos
+                    .Where(cardInfo => selectedCardIds.Contains(cardInfo.Identity))
+            );
+        }
     }
 }
