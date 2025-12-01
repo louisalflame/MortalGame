@@ -9,10 +9,9 @@ using UnityEngine;
 
 public interface IUIPresenter
 {
-    public record DeckEvent() : IUniTaskPresenter<Unit>.Event;
-    public record GraveyardEvent() : IUniTaskPresenter<Unit>.Event;
-    public record EnemySelectedEvent() : IUniTaskPresenter<Unit>.Event;
-
+    public record DeckEvent() : IUniTaskPresenter.Event;
+    public record GraveyardEvent() : IUniTaskPresenter.Event;
+    public record EnemySelectedEvent() : IUniTaskPresenter.Event;
     UniTaskVoid Run(CancellationToken cancellationToken);
 }
 
@@ -24,7 +23,7 @@ public class UIPresenter : IUIPresenter
 
     private IAllCardDetailPresenter _allCardDetailPresenter;
 
-    private IUniTaskPresenter<Unit> _uniTaskPresenter;
+    private IUniTaskPresenter _uniTaskPresenter;
 
     public UIPresenter(
         IInteractionButtonView buttonView,
@@ -37,7 +36,7 @@ public class UIPresenter : IUIPresenter
         _enemySelectedCardView = buttonView.EnemySelectedCardView;
 
         _allCardDetailPresenter = new AllCardDetailPresenter(panelView, gameViewModel, localizeLibrary);        
-        _uniTaskPresenter = new UniTaskPresenter<Unit>();
+        _uniTaskPresenter = new UniTaskPresenter();
     }
 
     public async UniTaskVoid Run(CancellationToken cancellationToken)
@@ -48,21 +47,21 @@ public class UIPresenter : IUIPresenter
             cancellationToken,
             EventHandler);
 
-        async UniTask<IUniTaskPresenter<Unit>.Event> EventHandler(IUniTaskPresenter<Unit>.Event evt)
+        async UniTask<IUniTaskPresenter.Event> EventHandler(IUniTaskPresenter.Event evt)
         {
             switch (evt)
             {
                 case IUIPresenter.DeckEvent:
                     await _allCardDetailPresenter.Run(Faction.Ally, CardCollectionType.Deck, CancellationToken.None);
-                    return new IUniTaskPresenter<Unit>.None();
+                    return new IUniTaskPresenter.None();
                 case IUIPresenter.GraveyardEvent:
                     await _allCardDetailPresenter.Run(Faction.Ally, CardCollectionType.Graveyard, CancellationToken.None);
-                    return new IUniTaskPresenter<Unit>.None();
+                    return new IUniTaskPresenter.None();
                 case IUIPresenter.EnemySelectedEvent:
                     await _allCardDetailPresenter.Run(Faction.Enemy, CardCollectionType.Deck, CancellationToken.None);
-                    return new IUniTaskPresenter<Unit>.None();
+                    return new IUniTaskPresenter.None();
             }
-            return new IUniTaskPresenter<Unit>.None();
+            return new IUniTaskPresenter.None();
         }
     }
 

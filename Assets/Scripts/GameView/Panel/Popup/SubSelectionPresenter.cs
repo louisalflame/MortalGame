@@ -9,11 +9,11 @@ using UniRx;
 
 public interface ISubSelectionPresenter
 {
-    public record CloseEvent : IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Event;
-    public record ConfirmEvent : IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Event;
-    public record VisibleToggleEvent : IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Event;
-    public record SelectCardEvent(CardInfo CardInfo, ICardView CardView) : IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Event;
-    public record LongTouchCardEvent(CardInfo CardInfo, ICardView CardView) : IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Event;
+    public record CloseEvent : IUniTaskPresenter.Event;
+    public record ConfirmEvent : IUniTaskPresenter.Event;
+    public record VisibleToggleEvent : IUniTaskPresenter.Event;
+    public record SelectCardEvent(CardInfo CardInfo, ICardView CardView) : IUniTaskPresenter.Event;
+    public record LongTouchCardEvent(CardInfo CardInfo, ICardView CardView) : IUniTaskPresenter.Event;
 
     UniTask<IReadOnlyDictionary<string, ISubSelectionAction>> RunSubSelection(SubSelectionInfo subSelectionInfoOpt);
 }
@@ -22,7 +22,7 @@ public class SubSelectionPresenter : ISubSelectionPresenter
 {
     private readonly ICardSelectionPanel _cardSelectionPanel;
     private readonly SingleCardDetailPopupPanel _singleCardDetailPopupPanel;
-    private readonly IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>> _uniTaskPresenter;
+    private readonly IUniTaskPresenter _uniTaskPresenter;
 
     public SubSelectionPresenter(
         IGameViewModel gameViewModel,
@@ -35,7 +35,7 @@ public class SubSelectionPresenter : ISubSelectionPresenter
         _cardSelectionPanel = cardSelectionPanel;
         _cardSelectionPanel.Init(gameViewModel, localizeLibrary);
 
-        _uniTaskPresenter = new UniTaskPresenter<IReadOnlyList<ISubSelectionAction>>();
+        _uniTaskPresenter = new UniTaskPresenter();
     }
 
     public async UniTask<IReadOnlyDictionary<string, ISubSelectionAction>> RunSubSelection(SubSelectionInfo subSelectionInfo)
@@ -65,7 +65,7 @@ public class SubSelectionPresenter : ISubSelectionPresenter
 
         _cardSelectionPanel.Open(CreateProperty());
 
-        var selectionsOpt = await _uniTaskPresenter.Run(
+        await _uniTaskPresenter.Run(
             disposables,
             () => !isClose,
             CancellationToken.None,
@@ -75,23 +75,23 @@ public class SubSelectionPresenter : ISubSelectionPresenter
 
         return new ExistCardSubSelectionAction(selectedCardIds);
 
-        UniTask<IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Event> EventHandler(IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Event evt)
+        UniTask<IUniTaskPresenter.Event> EventHandler(IUniTaskPresenter.Event evt)
         {
             switch (evt)
             {
                 case ISubSelectionPresenter.CloseEvent:
-                    return UniTask.FromResult<IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Event>(
+                    return UniTask.FromResult<IUniTaskPresenter.Event>(
                         existCardSelection.IsMustSelect
-                        ? new IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.None()
-                        : new IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Halt());
+                        ? new IUniTaskPresenter.None()
+                        : new IUniTaskPresenter.Halt());
 
                 case ISubSelectionPresenter.ConfirmEvent:
                     var canClose = existCardSelection.IsMustSelect
                         ? selectedCardIds.Count >= existCardSelection.Count
                         : true;
-                    return UniTask.FromResult<IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Event>(canClose
-                        ? new IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Halt()
-                        : new IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.None());
+                    return UniTask.FromResult<IUniTaskPresenter.Event>(canClose
+                        ? new IUniTaskPresenter.Halt()
+                        : new IUniTaskPresenter.None());
 
                 case ISubSelectionPresenter.VisibleToggleEvent:
                     isVisible = !isVisible;
@@ -116,12 +116,12 @@ public class SubSelectionPresenter : ISubSelectionPresenter
                 case ISubSelectionPresenter.LongTouchCardEvent longTouchCardEvent:
                     return _singleCardDetailPopupPanel
                         .Run(CardDetailProperty.Create(longTouchCardEvent.CardInfo))
-                        .ContinueWith<IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Event>(
-                            () => new IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.None());
+                        .ContinueWith<IUniTaskPresenter.Event>(
+                            () => new IUniTaskPresenter.None());
             }
 
-            return UniTask.FromResult<IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Event>(
-                new IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.None());
+            return UniTask.FromResult<IUniTaskPresenter.Event>(
+                new IUniTaskPresenter.None());
         }
 
         ICardSelectionPanel.SelectionProperty CreateSelectionProperty(CardInfo cardInfo)

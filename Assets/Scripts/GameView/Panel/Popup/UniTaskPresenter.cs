@@ -6,38 +6,36 @@ using Optional;
 using UniRx;
 using UnityEngine;
 
-public interface IUniTaskPresenter<T>
+public interface IUniTaskPresenter
 {
     public abstract record Event();
     public record None() : Event;
     public record Halt() : Event;
 
-    UniTask<Option<T>> Run(
+    UniTask Run(
         IDisposable disposables,
         Func<bool> conditionFunc,
         CancellationToken cancellationToken,
         Func<Event, UniTask<Event>> eventTaskHandler,
         UniTask<Event> firstTask = default);
     void TryEnqueueNextEvent(Event task);
-    void SetResult(T result);
 }
 
-public class UniTaskPresenter<T> : IUniTaskPresenter<T>
+public class UniTaskPresenter : IUniTaskPresenter
 {
-    private Option<UniTask<IUniTaskPresenter<T>.Event>> _currentTask = Option.None<UniTask<IUniTaskPresenter<T>.Event>>();
-    private Func<IUniTaskPresenter<T>.Event, UniTask<IUniTaskPresenter<T>.Event>> _eventTaskHandler;
-    private Option<T> _result = Option.None<T>();
+    private Option<UniTask<IUniTaskPresenter.Event>> _currentTask = Option.None<UniTask<IUniTaskPresenter.Event>>();
+    private Func<IUniTaskPresenter.Event, UniTask<IUniTaskPresenter.Event>> _eventTaskHandler;
 
     public UniTaskPresenter()
     {
     }
 
-    public async UniTask<Option<T>> Run(
+    public async UniTask Run(
         IDisposable disposables,
         Func<bool> conditionFunc,
         CancellationToken cancellationToken,
-        Func<IUniTaskPresenter<T>.Event, UniTask<IUniTaskPresenter<T>.Event>> eventTaskHandler,
-        UniTask<IUniTaskPresenter<T>.Event> firstTask = default)
+        Func<IUniTaskPresenter.Event, UniTask<IUniTaskPresenter.Event>> eventTaskHandler,
+        UniTask<IUniTaskPresenter.Event> firstTask = default)
     {
         _eventTaskHandler = eventTaskHandler;
 
@@ -50,7 +48,7 @@ public class UniTaskPresenter<T> : IUniTaskPresenter<T>
                 if (_TryPopOutNextTask(out var task))
                 {
                     var evt = await task;
-                    if (evt is IUniTaskPresenter<T>.Halt)
+                    if (evt is IUniTaskPresenter.Halt)
                     {
                         break;
                     }
@@ -61,33 +59,27 @@ public class UniTaskPresenter<T> : IUniTaskPresenter<T>
                 }
             }
         }
-
-        return _result;
     }
 
-    private bool _TryPopOutNextTask(out UniTask<IUniTaskPresenter<T>.Event> task)
+    private bool _TryPopOutNextTask(out UniTask<IUniTaskPresenter.Event> task)
     {
         if (_currentTask.HasValue)
         {
-            task = _currentTask.ValueOr(UniTask.FromResult<IUniTaskPresenter<T>.Event>(new IUniTaskPresenter<T>.None()));
-            _currentTask = Option.None<UniTask<IUniTaskPresenter<T>.Event>>();
+            task = _currentTask.ValueOr(UniTask.FromResult<IUniTaskPresenter.Event>(new IUniTaskPresenter.None()));
+            _currentTask = Option.None<UniTask<IUniTaskPresenter.Event>>();
             return true;
         }
 
-        task = UniTask.FromResult<IUniTaskPresenter<T>.Event>(new IUniTaskPresenter<T>.None());
+        task = UniTask.FromResult<IUniTaskPresenter.Event>(new IUniTaskPresenter.None());
         return false;
     }
 
-    public void TryEnqueueNextEvent(IUniTaskPresenter<T>.Event nextEvent)
+    public void TryEnqueueNextEvent(IUniTaskPresenter.Event nextEvent)
     {
         if (!_currentTask.HasValue)
         {
             var task = _eventTaskHandler(nextEvent);
             _currentTask = Option.Some(task);
         }
-    }
-    public void SetResult(T result)
-    {
-        _result = Option.Some(result);
     }
 }

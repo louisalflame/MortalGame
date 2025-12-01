@@ -8,11 +8,11 @@ using UniRx;
 
 public interface IAllCardDetailPresenter
 {
-    public record CloseEvent() : IUniTaskPresenter<Unit>.Event;
-    public record DeckEvent(CardCollectionInfo DeckInfo) : IUniTaskPresenter<Unit>.Event;
-    public record HandCardEvent(CardCollectionInfo HandCardInfo) : IUniTaskPresenter<Unit>.Event;
-    public record GraveyardEvent(CardCollectionInfo GraveyardInfo) : IUniTaskPresenter<Unit>.Event;
-    public record CardDetailEvent(CardInfo CardInfo, ICardView CardView) : IUniTaskPresenter<Unit>.Event;
+    public record CloseEvent() : IUniTaskPresenter.Event;
+    public record DeckEvent(CardCollectionInfo DeckInfo) : IUniTaskPresenter.Event;
+    public record HandCardEvent(CardCollectionInfo HandCardInfo) : IUniTaskPresenter.Event;
+    public record GraveyardEvent(CardCollectionInfo GraveyardInfo) : IUniTaskPresenter.Event;
+    public record CardDetailEvent(CardInfo CardInfo, ICardView CardView) : IUniTaskPresenter.Event;
 
     UniTask Run(
         Faction faction,
@@ -55,7 +55,7 @@ public class AllCardDetailPresenter : IAllCardDetailPresenter
     private readonly IGameViewModel _gameViewModel;
 
     private CardInfo _selectedCardInfo;
-    private IUniTaskPresenter<Unit> _uniTaskPresenter;
+    private IUniTaskPresenter _uniTaskPresenter;
     private bool _isClose;
 
     public AllCardDetailPresenter(
@@ -68,7 +68,7 @@ public class AllCardDetailPresenter : IAllCardDetailPresenter
         _gameViewModel = gameViewModel;
 
         _detailPanel.Init(_gameViewModel, localizeLibrary);
-        _uniTaskPresenter = new UniTaskPresenter<Unit>();
+        _uniTaskPresenter = new UniTaskPresenter();
     }
 
     public async UniTask Run(
@@ -90,13 +90,13 @@ public class AllCardDetailPresenter : IAllCardDetailPresenter
 
         _detailPanel.Close();
         
-        async UniTask<IUniTaskPresenter<Unit>.Event> EventHandler(IUniTaskPresenter<Unit>.Event evt)
+        async UniTask<IUniTaskPresenter.Event> EventHandler(IUniTaskPresenter.Event evt)
         {
             switch (evt)
             {
                 case IAllCardDetailPresenter.CloseEvent:
                     _isClose = true;
-                    return new IUniTaskPresenter<Unit>.Halt();
+                    return new IUniTaskPresenter.Halt();
                 case IAllCardDetailPresenter.DeckEvent deckEvent:
                     _ShowCardCollectionInfos(deckEvent.DeckInfo);
                     break;
@@ -113,7 +113,7 @@ public class AllCardDetailPresenter : IAllCardDetailPresenter
                     await _singlePopupPanel.Run(CardDetailProperty.Create(cardDetailEvent.CardInfo));
                     break;
             }
-            return new IUniTaskPresenter<Unit>.None();
+            return new IUniTaskPresenter.None();
         }
     }
 
