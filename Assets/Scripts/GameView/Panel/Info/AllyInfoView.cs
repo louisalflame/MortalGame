@@ -41,7 +41,7 @@ public class AllyInfoView : MonoBehaviour
     public void SetPlayerInfo(int round, AllyEntity ally)
     {
         _topBarInfoView.UpdateTurnInfo(round);
-        _nameText.text = _localizeLibrary.Get(LocalizeType.Player, ally.MainCharacter.NameKey).Title;
+        _nameText.text = _localizeLibrary.Get(LocalizeTitleInfoType.Player, ally.MainCharacter.NameKey).Title;
         _healthBarView.SetHealth(ally.MainCharacter.CurrentHealth, ally.MainCharacter.MaxHealth);
         _healthBarView.SetShield(ally.MainCharacter.CurrentArmor);    
         _energyBarView.SetEnergy(ally.CurrentEnergy, ally.MaxEnergy);

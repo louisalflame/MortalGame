@@ -9,7 +9,7 @@ public class CardPropertyHint : MonoBehaviour
     public record ViewData(
         IReadOnlyCollection<InfoCellViewData> InfoDatas);
     public record InfoCellViewData(
-        LocalizeType Type,
+        LocalizeTitleInfoType Type,
         string LocalizeId,
         IReadOnlyDictionary<string, string> TemplateValues);
 

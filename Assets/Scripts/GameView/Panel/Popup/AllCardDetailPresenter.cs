@@ -8,6 +8,12 @@ using UniRx;
 
 public interface IAllCardDetailPresenter
 {
+    public record CloseEvent() : IUniTaskPresenter<Unit>.Event;
+    public record DeckEvent(CardCollectionInfo DeckInfo) : IUniTaskPresenter<Unit>.Event;
+    public record HandCardEvent(CardCollectionInfo HandCardInfo) : IUniTaskPresenter<Unit>.Event;
+    public record GraveyardEvent(CardCollectionInfo GraveyardInfo) : IUniTaskPresenter<Unit>.Event;
+    public record CardDetailEvent(CardInfo CardInfo, ICardView CardView) : IUniTaskPresenter<Unit>.Event;
+
     UniTask Run(
         Faction faction,
         CardCollectionType type,
@@ -27,7 +33,7 @@ public record CardDetailProperty(
                 cardInfo.BuffInfos
                     .Select(buffInfo =>
                         new CardPropertyHint.InfoCellViewData(
-                            LocalizeType.CardBuff,
+                            LocalizeTitleInfoType.CardBuff,
                             buffInfo.CardBuffDataId,
                             buffInfo.GetTemplateValues()))
                     .ToArray()),
@@ -35,7 +41,7 @@ public record CardDetailProperty(
                 cardInfo.Keywords
                     .Select(keyword =>
                         new CardPropertyHint.InfoCellViewData(
-                            LocalizeType.KeyWord,
+                            LocalizeTitleInfoType.KeyWord,
                             keyword,
                             Utility.Dictionary<string, string>.EMPTY))
                     .ToArray()));
@@ -74,14 +80,41 @@ public class AllCardDetailPresenter : IAllCardDetailPresenter
         _detailPanel.Open();
 
         var cardCollectionInfo = _gameViewModel.ObservableCardCollectionInfo(faction, type);
+        _ShowCardCollectionInfos(cardCollectionInfo.Value);
 
         await _uniTaskPresenter.Run(
             _SetupSubscriptions(faction),
             () => !_isClose,
             cancellationToken,
-            _ShowCardCollectionInfos(cardCollectionInfo.Value));
+            EventHandler);
 
         _detailPanel.Close();
+        
+        async UniTask<IUniTaskPresenter<Unit>.Event> EventHandler(IUniTaskPresenter<Unit>.Event evt)
+        {
+            switch (evt)
+            {
+                case IAllCardDetailPresenter.CloseEvent:
+                    _isClose = true;
+                    return new IUniTaskPresenter<Unit>.Halt();
+                case IAllCardDetailPresenter.DeckEvent deckEvent:
+                    _ShowCardCollectionInfos(deckEvent.DeckInfo);
+                    break;
+
+                case IAllCardDetailPresenter.GraveyardEvent graveyardEvent:
+                    _ShowCardCollectionInfos(graveyardEvent.GraveyardInfo);
+                    break;
+
+                case IAllCardDetailPresenter.HandCardEvent handCardEvent:
+                    _ShowCardCollectionInfos(handCardEvent.HandCardInfo);
+                    break;
+
+                case IAllCardDetailPresenter.CardDetailEvent cardDetailEvent:
+                    await _singlePopupPanel.Run(CardDetailProperty.Create(cardDetailEvent.CardInfo));
+                    break;
+            }
+            return new IUniTaskPresenter<Unit>.None();
+        }
     }
 
     private IDisposable _SetupSubscriptions(Faction faction)
@@ -92,41 +125,39 @@ public class AllCardDetailPresenter : IAllCardDetailPresenter
             .WithLatestFrom(
                 _gameViewModel.ObservableCardCollectionInfo(faction, CardCollectionType.Deck),
                 (_, deckInfo) => deckInfo)
-            .Subscribe(deckInfo => _uniTaskPresenter.TryEnqueueTask(_ShowCardCollectionInfos(deckInfo)))
+            .Subscribe(deckInfo => _uniTaskPresenter.TryEnqueueNextEvent(new IAllCardDetailPresenter.DeckEvent(deckInfo)))
             .AddTo(disposables);
         _detailPanel.HandCardButton.OnClickAsObservable()
             .WithLatestFrom(
                 _gameViewModel.ObservableCardCollectionInfo(faction, CardCollectionType.HandCard),
                 (_, handCardsInfo) => handCardsInfo)
-            .Subscribe(handCardsInfo => _uniTaskPresenter.TryEnqueueTask(_ShowCardCollectionInfos(handCardsInfo)))
+            .Subscribe(handCardsInfo => _uniTaskPresenter.TryEnqueueNextEvent(new IAllCardDetailPresenter.HandCardEvent(handCardsInfo)))
             .AddTo(disposables);
         _detailPanel.GraveyardButton.OnClickAsObservable()
             .WithLatestFrom(
                 _gameViewModel.ObservableCardCollectionInfo(faction, CardCollectionType.Graveyard),
                 (_, graveyardInfo) => graveyardInfo)
-            .Subscribe(graveyardInfo => _uniTaskPresenter.TryEnqueueTask(_ShowCardCollectionInfos(graveyardInfo)))
+            .Subscribe(graveyardInfo => _uniTaskPresenter.TryEnqueueNextEvent(new IAllCardDetailPresenter.GraveyardEvent(graveyardInfo)))
             .AddTo(disposables);
         _detailPanel.CloseButtons
             .Select(button => button.OnClickAsObservable())
             .Merge()
-            .Subscribe(_ => _isClose = true)
+            .Subscribe(_ => _uniTaskPresenter.TryEnqueueNextEvent(new IAllCardDetailPresenter.CloseEvent()))
             .AddTo(disposables);
         
         return disposables;
     }
 
-    private UniTask _ShowCardCollectionInfos(CardCollectionInfo cardCollectionInfo)
+    private void _ShowCardCollectionInfos(CardCollectionInfo cardCollectionInfo)
     {
         var property = new IAllCardDetailPanel.Property(
             cardCollectionInfo.CardInfos.Keys.Select(cardInfo =>
                 new ICardView.CardClickableProperty(
                     CardInfo: cardInfo,
                     IsClickable: true,
-                    OnClickCard: (info, cardView) => _uniTaskPresenter.TryEnqueueTask(
-                        _singlePopupPanel.Run(CardDetailProperty.Create(info)))))
+                    OnClickCard: (info, cardView) => 
+                        _uniTaskPresenter.TryEnqueueNextEvent(new IAllCardDetailPresenter.CardDetailEvent(info, cardView))))
             );
         _detailPanel.Render(property);
-
-        return UniTask.CompletedTask;
     }
 }

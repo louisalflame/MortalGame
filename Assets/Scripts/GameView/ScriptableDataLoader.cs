@@ -36,35 +36,47 @@ public class ScriptableDataLoader : MonoBehaviour
             .ToArray();
     }
 
-    public IReadOnlyDictionary<LocalizeType, IReadOnlyDictionary<string, LocalizeTitleInfoData>> LocalizeTitleInfoSetting()
+    public IReadOnlyDictionary<LocalizeTitleInfoType, IReadOnlyDictionary<string, LocalizeTitleInfoData>> LocalizeTitleInfoSetting()
     {
-        return new Dictionary<LocalizeType, IReadOnlyDictionary<string, LocalizeTitleInfoData>>
+        return new Dictionary<LocalizeTitleInfoType, IReadOnlyDictionary<string, LocalizeTitleInfoData>>
         {
             {
-                LocalizeType.Player,
+                LocalizeTitleInfoType.Player,
                 ParseTable(_excelDatasScriptable.LocalizePlayer)
             },
             {
-                LocalizeType.Card,
+                LocalizeTitleInfoType.Card,
                 ParseTable(_excelDatasScriptable.LocalizeCard)
             },
             {
-                LocalizeType.CardBuff,
+                LocalizeTitleInfoType.CardBuff,
                 ParseTable(_excelDatasScriptable.LocalizeCardBuff)
             },
             {
-                LocalizeType.PlayerBuff,
+                LocalizeTitleInfoType.PlayerBuff,
                 ParseTable(_excelDatasScriptable.LocalizePlayerBuff)
             },
             {
-                LocalizeType.KeyWord,
+                LocalizeTitleInfoType.KeyWord,
                 ParseTable(_excelDatasScriptable.LocalizeKeyWord)
             },
         };
 
-        LocalizeTitleInfoData Parse(LocalizeExcelData data) =>
-            new LocalizeTitleInfoData(data.Title, data.Info);
-        Dictionary<string, LocalizeTitleInfoData> ParseTable(List<LocalizeExcelData> datas)
-            => datas.ToDictionary(d => d.Id, d => Parse(d));
+        Dictionary<string, LocalizeTitleInfoData> ParseTable(List<LocalizeExcelTitleData> datas)
+            => datas.ToDictionary(d => d.Id, d => new LocalizeTitleInfoData(d.Title, d.Info));
+    }
+
+    public IReadOnlyDictionary<LocalizeInfoType, IReadOnlyDictionary<string, LocalizeInfoData>> LocalizeInfoSetting()
+    {
+        return new Dictionary<LocalizeInfoType, IReadOnlyDictionary<string, LocalizeInfoData>>
+        {
+            {
+                LocalizeInfoType.UI,
+                ParseTable(_excelDatasScriptable.LocalizeUI)
+            },
+        };
+
+        Dictionary<string, LocalizeInfoData> ParseTable(List<LocalizeExcelData> datas)
+            => datas.ToDictionary(d => d.Id, d => new LocalizeInfoData(d.Info));
     }
 }

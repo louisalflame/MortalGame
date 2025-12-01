@@ -7,11 +7,12 @@ public class ExcelDatas : ScriptableObject
 {
 	public List<ConstExcelData> Constant;
 	public List<DispositionExcelData> Disposition;
-	public List<LocalizeExcelData> LocalizeCard;
-	public List<LocalizeExcelData> LocalizeCardBuff;
-	public List<LocalizeExcelData> LocalizeKeyWord;
-	public List<LocalizeExcelData> LocalizePlayerBuff;
-	public List<LocalizeExcelData> LocalizePlayer;
+	public List<LocalizeExcelTitleData> LocalizeCard;
+	public List<LocalizeExcelTitleData> LocalizeCardBuff;
+	public List<LocalizeExcelTitleData> LocalizeKeyWord;
+	public List<LocalizeExcelTitleData> LocalizePlayerBuff;
+	public List<LocalizeExcelTitleData> LocalizePlayer;
+	public List<LocalizeExcelData> LocalizeUI;
 }
 
 [Serializable]
@@ -32,9 +33,16 @@ public class DispositionExcelData
 }
 
 [Serializable]
-public class LocalizeExcelData
+public class LocalizeExcelTitleData
 {
 	public string Id;
 	public string Title;
+	public string Info;
+}
+
+[Serializable]
+public class LocalizeExcelData
+{
+	public string Id;
 	public string Info;
 }

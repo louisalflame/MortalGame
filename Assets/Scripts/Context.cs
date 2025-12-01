@@ -11,7 +11,8 @@ public class Context
     public DispositionData[] DispositionSettings { get; private set; }
     public EnemyData[] AllEnemies { get; private set; }
     public AllyInstance Ally{ get; private set; }
-    public IReadOnlyDictionary<LocalizeType, IReadOnlyDictionary<string, LocalizeTitleInfoData>> LocalizeTitleInfoSetting { get; private set; }
+    public IReadOnlyDictionary<LocalizeTitleInfoType, IReadOnlyDictionary<string, LocalizeTitleInfoData>> LocalizeTitleInfoSetting { get; private set; }
+    public IReadOnlyDictionary<LocalizeInfoType, IReadOnlyDictionary<string, LocalizeInfoData>> LocalizeInfoSetting { get; private set; }
 
     public Context(
         ScriptableDataLoader scriptableDataLoader)
@@ -36,5 +37,6 @@ public class Context
         };
 
         LocalizeTitleInfoSetting = scriptableDataLoader.LocalizeTitleInfoSetting();
+        LocalizeInfoSetting = scriptableDataLoader.LocalizeInfoSetting();
     }
 }

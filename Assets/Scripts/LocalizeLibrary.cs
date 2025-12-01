@@ -1,14 +1,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum LocalizeType
+public enum LocalizeTitleInfoType
 {
     Player,
     Card,
     CardBuff,
     PlayerBuff,
-    KeyWord,
-    UI,
+    KeyWord
+}
+public enum LocalizeInfoType
+{
+    UI
 }
 
 public enum GameKeyWord
@@ -54,18 +57,22 @@ public enum GameKeyWord
 }
 
 public record LocalizeTitleInfoData(string Title, string Info);
+public record LocalizeInfoData(string Info);
 
 public class LocalizeLibrary
 {
-    private IReadOnlyDictionary<LocalizeType, IReadOnlyDictionary<string, LocalizeTitleInfoData>> _localizeTitleInfoDatas;
+    private IReadOnlyDictionary<LocalizeTitleInfoType, IReadOnlyDictionary<string, LocalizeTitleInfoData>> _localizeTitleInfoDatas;
+    private IReadOnlyDictionary<LocalizeInfoType, IReadOnlyDictionary<string, LocalizeInfoData>> _localizeInfoDatas;
 
     public LocalizeLibrary(
-        IReadOnlyDictionary<LocalizeType, IReadOnlyDictionary<string, LocalizeTitleInfoData>> localizeTitleInfoDatas)
+        IReadOnlyDictionary<LocalizeTitleInfoType, IReadOnlyDictionary<string, LocalizeTitleInfoData>> localizeTitleInfoDatas,
+        IReadOnlyDictionary<LocalizeInfoType, IReadOnlyDictionary<string, LocalizeInfoData>> localizeInfoDatas)
     {
         _localizeTitleInfoDatas = localizeTitleInfoDatas;
+        _localizeInfoDatas = localizeInfoDatas;
     }
 
-    public LocalizeTitleInfoData Get(LocalizeType localizeType, string key)
+    public LocalizeTitleInfoData Get(LocalizeTitleInfoType localizeType, string key)
     {
         if (_localizeTitleInfoDatas.TryGetValue(localizeType, out var localizeData))
         {
@@ -77,6 +84,20 @@ public class LocalizeLibrary
 
         return new LocalizeTitleInfoData(
             $"{localizeType}|{key}_Title",
+            $"{localizeType}|{key}_Info");
+    }
+
+    public LocalizeInfoData Get(LocalizeInfoType localizeType, string key)
+    {
+        if (_localizeInfoDatas.TryGetValue(localizeType, out var localizeData))
+        {
+            if (localizeData.TryGetValue(key, out var value))
+            {
+                return value;
+            }
+        }
+
+        return new LocalizeInfoData(
             $"{localizeType}|{key}_Info");
     }
 }

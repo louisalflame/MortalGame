@@ -1573,7 +1573,6 @@ MonoBehaviour:
   _panel: {fileID: 8130107456170679240}
   _cardViewParent: {fileID: 7700991502773994521}
   _cardViewFactory: {fileID: 6288538647246495656}
-  _selectionDescriptionText: {fileID: 3501441517062059606}
   _visibleToggleObjects:
   - {fileID: 1723547039707680072}
   - {fileID: 6164211927272238898}
@@ -1583,7 +1582,12 @@ MonoBehaviour:
   - {fileID: 7104936944083287132}
   _visibleToggleButton: {fileID: 7747474354770675169}
   _confirmButton: {fileID: 1041316862350687073}
-  _selectionInfoLocalizeKey: 
+  _visibleButtonText: {fileID: 2342143550811405607}
+  _confirmButtonText: {fileID: 5749091073895094858}
+  _selectionDescriptionText: {fileID: 3501441517062059606}
+  _visibleButtonLocalizeKey: Visible
+  _confirmButtonLocalizeKey: Confirm
+  _selectionInfoLocalizeKey: SelectionDescription
 --- !u!1 &8499311787100510646
 GameObject:
   m_ObjectHideFlags: 0

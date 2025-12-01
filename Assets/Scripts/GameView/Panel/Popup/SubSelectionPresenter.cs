@@ -9,6 +9,12 @@ using UniRx;
 
 public interface ISubSelectionPresenter
 {
+    public record CloseEvent : IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Event;
+    public record ConfirmEvent : IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Event;
+    public record VisibleToggleEvent : IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Event;
+    public record SelectCardEvent(CardInfo CardInfo, ICardView CardView) : IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Event;
+    public record LongTouchCardEvent(CardInfo CardInfo, ICardView CardView) : IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Event;
+
     UniTask<IReadOnlyDictionary<string, ISubSelectionAction>> RunSubSelection(SubSelectionInfo subSelectionInfoOpt);
 }
 
@@ -57,39 +63,66 @@ public class SubSelectionPresenter : ISubSelectionPresenter
         var selectedCardIds = new List<Guid>();
         var disposables = new CompositeDisposable();
 
-        if (!existCardSelection.IsMustSelect)
-        {
-            _cardSelectionPanel.CloseButtons
-                .Select(button => button.OnClickAsObservable())
-                .Merge()
-                .Subscribe(_ => isClose = true)
-                .AddTo(disposables);
-        }
-        _cardSelectionPanel.ConfirmButton
-            .OnClickAsObservable()
-            .Subscribe(_ => isClose = existCardSelection.IsMustSelect 
-                ? selectedCardIds.Count >= existCardSelection.Count 
-                : true)
-            .AddTo(disposables); 
-        _cardSelectionPanel.VisibleToggleButton
-            .OnClickAsObservable()
-            .Subscribe(_ =>
-            {
-                isVisible = !isVisible;
-                _cardSelectionPanel.RenderUpdate(GetUpdateProperty());
-            })
-            .AddTo(disposables);
-
         _cardSelectionPanel.Open(CreateProperty());
 
         var selectionsOpt = await _uniTaskPresenter.Run(
             disposables,
             () => !isClose,
-            CancellationToken.None);
+            CancellationToken.None,
+            EventHandler);
 
         _cardSelectionPanel.Close();
 
         return new ExistCardSubSelectionAction(selectedCardIds);
+
+        UniTask<IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Event> EventHandler(IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Event evt)
+        {
+            switch (evt)
+            {
+                case ISubSelectionPresenter.CloseEvent:
+                    return UniTask.FromResult<IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Event>(
+                        existCardSelection.IsMustSelect
+                        ? new IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.None()
+                        : new IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Halt());
+
+                case ISubSelectionPresenter.ConfirmEvent:
+                    var canClose = existCardSelection.IsMustSelect
+                        ? selectedCardIds.Count >= existCardSelection.Count
+                        : true;
+                    return UniTask.FromResult<IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Event>(canClose
+                        ? new IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Halt()
+                        : new IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.None());
+
+                case ISubSelectionPresenter.VisibleToggleEvent:
+                    isVisible = !isVisible;
+                    _cardSelectionPanel.RenderUpdate(GetUpdateProperty());
+                    break;
+                
+                case ISubSelectionPresenter.SelectCardEvent selectCardEvent:
+                    {
+                        if (selectedCardIds.Contains(selectCardEvent.CardInfo.Identity))
+                        {
+                            selectedCardIds.Remove(selectCardEvent.CardInfo.Identity);
+                        }
+                        else if (selectedCardIds.Count < existCardSelection.Count)
+                        {
+                            selectedCardIds.Add(selectCardEvent.CardInfo.Identity);
+                        }
+
+                        _cardSelectionPanel.RenderUpdate(GetUpdateProperty());
+                    }
+                    break;
+
+                case ISubSelectionPresenter.LongTouchCardEvent longTouchCardEvent:
+                    return _singleCardDetailPopupPanel
+                        .Run(CardDetailProperty.Create(longTouchCardEvent.CardInfo))
+                        .ContinueWith<IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Event>(
+                            () => new IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.None());
+            }
+
+            return UniTask.FromResult<IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.Event>(
+                new IUniTaskPresenter<IReadOnlyList<ISubSelectionAction>>.None());
+        }
 
         ICardSelectionPanel.SelectionProperty CreateSelectionProperty(CardInfo cardInfo)
         {
@@ -97,23 +130,9 @@ public class SubSelectionPresenter : ISubSelectionPresenter
                 cardInfo.Identity.ToString(),
                 cardInfo,
                 (info, cardView) =>
-                {
-                    if (selectedCardIds.Contains(info.Identity))
-                    {
-                        selectedCardIds.Remove(info.Identity);
-                    }
-                    else if (selectedCardIds.Count < existCardSelection.Count)
-                    {
-                        selectedCardIds.Add(info.Identity);
-                    }
-
-                    _cardSelectionPanel.RenderUpdate(GetUpdateProperty());
-                },
+                    _uniTaskPresenter.TryEnqueueNextEvent(new ISubSelectionPresenter.SelectCardEvent(info, cardView)),
                 (info, cardView) =>
-                {
-                    _uniTaskPresenter.TryEnqueueTask(
-                        _singleCardDetailPopupPanel.Run(CardDetailProperty.Create(info)));
-                }
+                    _uniTaskPresenter.TryEnqueueNextEvent(new ISubSelectionPresenter.LongTouchCardEvent(info, cardView))
             );
         }
         ICardSelectionPanel.Property CreateProperty()
@@ -123,7 +142,10 @@ public class SubSelectionPresenter : ISubSelectionPresenter
                 !existCardSelection.IsMustSelect,
                 existCardSelection.Count,
                 existCardSelection.CardInfos
-                    .Select(cardInfo => CreateSelectionProperty(cardInfo))
+                    .Select(cardInfo => CreateSelectionProperty(cardInfo)),
+                OnClose: () => _uniTaskPresenter.TryEnqueueNextEvent(new ISubSelectionPresenter.CloseEvent()),
+                OnConfirm: () => _uniTaskPresenter.TryEnqueueNextEvent(new ISubSelectionPresenter.ConfirmEvent()),
+                OnVisibleToggle: () => _uniTaskPresenter.TryEnqueueNextEvent(new ISubSelectionPresenter.VisibleToggleEvent())
             );
         }
         ICardSelectionPanel.UpdateProperty GetUpdateProperty()

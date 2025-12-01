@@ -36,7 +36,7 @@ public class DispositionView : MonoBehaviour
             .Subscribe(info =>
             {
                 var dispositionId = _dispositionLibrary.GetDispositionId(info.CurrentDisposition);
-                var localizeInfo = _localizeLibrary.Get(LocalizeType.KeyWord, dispositionId);
+                var localizeInfo = _localizeLibrary.Get(LocalizeTitleInfoType.KeyWord, dispositionId);
                 _simpleHintView.ShowTitleInfo(localizeInfo.Title, localizeInfo.Info, _image.rectTransform);
             })
             .AddTo(this);
@@ -50,7 +50,7 @@ public class DispositionView : MonoBehaviour
         _image.fillAmount = (float)info.CurrentDisposition / info.MaxDisposition;
 
         var dispositionId = _dispositionLibrary.GetDispositionId(info.CurrentDisposition);
-        var localizeInfo = _localizeLibrary.Get(LocalizeType.KeyWord, dispositionId);
+        var localizeInfo = _localizeLibrary.Get(LocalizeTitleInfoType.KeyWord, dispositionId);
         _dispositionText.text = localizeInfo.Title;
     }
 }

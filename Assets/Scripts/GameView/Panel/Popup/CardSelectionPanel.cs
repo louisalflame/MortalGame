@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sirenix.Utilities;
 using TMPro;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,7 +15,10 @@ public interface ICardSelectionPanel
         bool IsMustSelect,
         bool IsConfirmable,
         int MaxSelectCount,
-        IEnumerable<SelectionProperty> Selections);
+        IEnumerable<SelectionProperty> Selections,
+        Action OnClose,
+        Action OnConfirm,
+        Action OnVisibleToggle);
     public record SelectionProperty(
         string Id,
         CardInfo CardInfo,
@@ -29,10 +34,6 @@ public interface ICardSelectionPanel
     void Open(Property property);
     void RenderUpdate(UpdateProperty property);
     void Close();
-
-    Button VisibleToggleButton { get; }
-    Button ConfirmButton { get; }
-    Button[] CloseButtons { get; }
 }
 
 public class CardSelectionPanel : MonoBehaviour, ICardSelectionPanel
@@ -44,8 +45,6 @@ public class CardSelectionPanel : MonoBehaviour, ICardSelectionPanel
     [SerializeField]
     private CardViewFactory _cardViewFactory;
 
-    [SerializeField]
-    private TextMeshProUGUI _selectionDescriptionText;
 
     [Header("Objects")]
     [SerializeField]
@@ -61,13 +60,25 @@ public class CardSelectionPanel : MonoBehaviour, ICardSelectionPanel
     [SerializeField]
     private Button _confirmButton;
 
+    [Header("Text")]
+    [SerializeField]
+    private TextMeshProUGUI _visibleButtonText;
+    [SerializeField]
+    private TextMeshProUGUI _confirmButtonText;
+    [SerializeField]
+    private TextMeshProUGUI _selectionDescriptionText;
+
     [Header("LocalizeKey")]
+    [SerializeField]
+    private string _visibleButtonLocalizeKey;
+    [SerializeField]
+    private string _confirmButtonLocalizeKey;
     [SerializeField]
     private string _selectionInfoLocalizeKey;
 
-    public Button VisibleToggleButton => _visibleToggleButton;
-    public Button ConfirmButton => _confirmButton;
-    public Button[] CloseButtons => _closeButtons;
+    private Action _OnClose;
+    private Action _OnConfirm;
+    private Action _OnVisibleToggle;
 
     private IGameViewModel _gameViewModel;
     private LocalizeLibrary _localizeLibrary;
@@ -77,11 +88,28 @@ public class CardSelectionPanel : MonoBehaviour, ICardSelectionPanel
     {
         _gameViewModel = gameInfoModel;
         _localizeLibrary = localizeLibrary;
+
+        _visibleButtonText.text = _localizeLibrary.Get(LocalizeInfoType.UI, _visibleButtonLocalizeKey).Info;
+        _confirmButtonText.text = _localizeLibrary.Get(LocalizeInfoType.UI, _confirmButtonLocalizeKey).Info;
+
+        _closeButtons.ForEach(button => button.OnClickAsObservable()
+            .Subscribe(_ => _OnClose?.Invoke())
+            .AddTo(this));
+        _confirmButton.OnClickAsObservable()
+            .Subscribe(_ => _OnConfirm?.Invoke())
+            .AddTo(this);
+        _visibleToggleButton.OnClickAsObservable()
+            .Subscribe(_ => _OnVisibleToggle?.Invoke())
+            .AddTo(this);
     }
 
     public void Open(ICardSelectionPanel.Property property)
     {
         _Clear();
+
+        _OnClose = property.OnClose;
+        _OnConfirm = property.OnConfirm;
+        _OnVisibleToggle = property.OnVisibleToggle;
 
         _panel.SetActive(true);
         foreach (var obj in _visibleToggleObjects)
@@ -93,7 +121,7 @@ public class CardSelectionPanel : MonoBehaviour, ICardSelectionPanel
         _confirmButton.interactable = property.IsConfirmable;
 
         _selectionDescriptionText.text = string.Format(
-            _localizeLibrary.Get(LocalizeType.UI, _selectionInfoLocalizeKey).Title,
+            _localizeLibrary.Get(LocalizeInfoType.UI, _selectionInfoLocalizeKey).Info,
             0,
             property.MaxSelectCount);
 
@@ -121,7 +149,7 @@ public class CardSelectionPanel : MonoBehaviour, ICardSelectionPanel
         _confirmButton.interactable = property.IsConfirmable;
 
         _selectionDescriptionText.text = string.Format(
-            _localizeLibrary.Get(LocalizeType.UI, _selectionInfoLocalizeKey).Title,
+            _localizeLibrary.Get(LocalizeInfoType.UI, _selectionInfoLocalizeKey).Info,
             property.SelectedCards.Count(),
             property.MaxSelectCount);
         
@@ -150,6 +178,11 @@ public class CardSelectionPanel : MonoBehaviour, ICardSelectionPanel
         {
             _cardViewFactory.RecyclePrefab(cardView);
         }
+        
         _cardViewMap.Clear();
+
+        _OnClose = null;
+        _OnConfirm = null;
+        _OnVisibleToggle = null;
     }
 }

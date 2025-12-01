@@ -193,3 +193,18 @@ MonoBehaviour:
   - Id: e01
     Title: "\u8DEF\u4EBA\u4FE0"
     Info: "\u8DEF\u4EBA\u4FE0"
+  LocalizeUI:
+  - Id: Deck
+    Info: '{0}'
+  - Id: Tomb
+    Info: '{0}'
+  - Id: TurnSubmit
+    Info: "\u7D50\u675F"
+  - Id: Turn
+    Info: "\u56DE\u5408"
+  - Id: Confirm
+    Info: "\u78BA\u8A8D"
+  - Id: Visible
+    Info: "\u6AA2\u8996"
+  - Id: SelectionDescription
+    Info: "\u9078\u64C7 {0} / {1}  \u5F35\u5361\u7247"

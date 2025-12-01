@@ -10,7 +10,7 @@ public class GameKeyWordInfoView : MonoBehaviour, IRecyclable
 
     public void SetInfo(GameKeyWord gameKeyWord, LocalizeLibrary localizeLibrary)
     {
-        var localizeData = localizeLibrary.Get(LocalizeType.KeyWord, gameKeyWord.ToString());
+        var localizeData = localizeLibrary.Get(LocalizeTitleInfoType.KeyWord, gameKeyWord.ToString());
         _gameKeyWordTitleText.text = localizeData.Title;
         _gameKeyWordInfoText.text = localizeData.Info;
     }
