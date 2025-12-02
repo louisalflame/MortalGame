@@ -7,7 +7,8 @@ public class Context
 {
     public Dictionary<string, CardData> CardTable { get; private set; }
     public Dictionary<string, CardBuffData> CardBuffTable { get; private set; }
-    public Dictionary<string, PlayerBuffData> BuffTable { get; private set; }
+    public Dictionary<string, PlayerBuffData> PlayerBuffTable { get; private set; }
+    public Dictionary<string, CharacterBuffData> CharacterBuffTable { get; private set; }
     public DispositionData[] DispositionSettings { get; private set; }
     public EnemyData[] AllEnemies { get; private set; }
     public AllyInstance Ally{ get; private set; }
@@ -19,7 +20,7 @@ public class Context
     {
         CardTable = scriptableDataLoader.AllCards.ToDictionary(c => c.ID, c => c);
         CardBuffTable = scriptableDataLoader.AllCardBuffs.ToDictionary(c => c.ID, c => c);
-        BuffTable = scriptableDataLoader.AllBuffs.ToDictionary(b => b.ID, b => b);
+        PlayerBuffTable = scriptableDataLoader.AllBuffs.ToDictionary(b => b.ID, b => b);
         DispositionSettings = scriptableDataLoader.DispositionSettings();
         AllEnemies = scriptableDataLoader.AllEnemies;
 

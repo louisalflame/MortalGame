@@ -6,9 +6,11 @@ public interface IGameContextManager
 {
     CardLibrary CardLibrary { get; }
     CardBuffLibrary CardBuffLibrary { get; }
-    PlayerBuffLibrary BuffLibrary { get; }
+    PlayerBuffLibrary PlayerBuffLibrary { get; }
+    CharacterBuffLibrary CharacterBuffLibrary { get; }
     DispositionLibrary DispositionLibrary { get; }
     LocalizeLibrary LocalizeLibrary { get; }
+
     GameContext Context { get; }
 
     GameContextManager SetClone();
@@ -21,13 +23,15 @@ public class GameContextManager : IDisposable, IGameContextManager
 {
     private readonly CardLibrary _cardLibrary;
     private readonly CardBuffLibrary _cardBuffLibrary;
-    private readonly PlayerBuffLibrary _buffLibrary;
+    private readonly PlayerBuffLibrary _playerBuffLibrary;
+    private readonly CharacterBuffLibrary _characterBuffLibrary;
     private readonly DispositionLibrary _dispositionLibrary;
     private readonly LocalizeLibrary _localizeLibrary;
 
     public CardLibrary CardLibrary => _cardLibrary;
     public CardBuffLibrary CardBuffLibrary => _cardBuffLibrary;
-    public PlayerBuffLibrary BuffLibrary => _buffLibrary;
+    public PlayerBuffLibrary PlayerBuffLibrary => _playerBuffLibrary;
+    public CharacterBuffLibrary CharacterBuffLibrary => _characterBuffLibrary;
     public DispositionLibrary DispositionLibrary => _dispositionLibrary;
     public LocalizeLibrary LocalizeLibrary => _localizeLibrary;
 
@@ -37,13 +41,15 @@ public class GameContextManager : IDisposable, IGameContextManager
     public GameContextManager(
         CardLibrary cardLibrary,
         CardBuffLibrary cardBuffLibrary,
-        PlayerBuffLibrary buffLibrary,
+        PlayerBuffLibrary playerBuffLibrary,
+        CharacterBuffLibrary characterBuffLibrary,
         DispositionLibrary dispositionLibrary,
         LocalizeLibrary localizeLibrary)
     {
         _cardLibrary = cardLibrary;
         _cardBuffLibrary = cardBuffLibrary;
-        _buffLibrary = buffLibrary;
+        _playerBuffLibrary = playerBuffLibrary;
+        _characterBuffLibrary = characterBuffLibrary;
         _dispositionLibrary = dispositionLibrary;
         _localizeLibrary = localizeLibrary;
         _contextStack.Push(GameContext.EMPTY);

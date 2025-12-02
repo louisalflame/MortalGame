@@ -17,7 +17,7 @@ public class AllyCharacterView : BaseCharacterView, ISelectableView
 
     private Guid _playerIdentity;
 
-    public void Init(IGameplayStatusWatcher statusWatcher) 
+    public void Init(IGameplayModel statusWatcher) 
     {
         _statusWatcher = statusWatcher;
         _timmer = 0;

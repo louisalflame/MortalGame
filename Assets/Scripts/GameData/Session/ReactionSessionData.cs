@@ -6,7 +6,7 @@ using UnityEngine;
 
 public interface IReactionSessionData
 {
-    IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit);
+    IReactionSessionEntity CreateEntity(TriggerContext triggerContext);
 }
 
 
@@ -29,7 +29,7 @@ public class SessionBoolean : IReactionSessionData
     [TableList]
     public List<TimingRule> UpdateRules = new ();
     
-    public IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public IReactionSessionEntity CreateEntity(TriggerContext triggerContext)
     {
         return new ReactionSessionEntity(
             new SessionBooleanEntity(InitialValue, UpdateRules),
@@ -56,7 +56,7 @@ public class SessionInteger : IReactionSessionData
     [TableList]
     public List<TimingRule> UpdateRules = new ();
 
-    public IReactionSessionEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public IReactionSessionEntity CreateEntity(TriggerContext triggerContext)
     {
         return new ReactionSessionEntity(
             new SessionIntegerEntity(InitialValue, UpdateRules),

@@ -18,8 +18,12 @@ public record CardInfo(
     IReadOnlyList<CardProperty> Properties,
     IReadOnlyList<string> Keywords)
 {
-    public static CardInfo Create(ICardEntity card, IGameplayStatusWatcher gameWatcher)
+    public static CardInfo Create(ICardEntity card, IGameplayModel gameWatcher)
     {
+        var cardLookTriggerContext = new TriggerContext(
+            gameWatcher,
+            new CardTrigger(card),
+            new CardLookIntentAction(card));
         return new CardInfo(
             Identity: card.Identity,
             CardDataID: card.CardDataId,
@@ -27,9 +31,9 @@ public record CardInfo(
             Rarity: card.Rarity,
             Themes: card.Themes,
             OriginCost: card.OriginCost,
-            Cost: GameFormula.CardCost(gameWatcher, card, new CardLookIntentAction(card), new CardTrigger(card)),
+            Cost: GameFormula.CardCost(cardLookTriggerContext, card),
             OriginPower: card.OriginPower,
-            Power: GameFormula.CardPower(gameWatcher, card, new CardLookIntentAction(card), new CardTrigger(card)),
+            Power: GameFormula.CardPower(cardLookTriggerContext, card),
             MainSelectable: card.MainSelect.ToInfo(),
             BuffInfos: card.BuffManager.Buffs.Select(s => new CardBuffInfo(s)).ToList(),
             Properties: card.Properties.Select(p => p.Property)
@@ -71,7 +75,7 @@ public record CardCollectionInfo(
 public static class CardCollectionInfoUtility
 {
     public static CardInfo ToInfo(
-        this ICardEntity card, IGameplayStatusWatcher gameWatcher)
+        this ICardEntity card, IGameplayModel gameWatcher)
     {
         return CardInfo.Create(card, gameWatcher);
     }
@@ -88,7 +92,7 @@ public static class CardCollectionInfoUtility
     }
 
     public static CardCollectionInfo ToCardCollectionInfo(
-        this ICardColletionZone cardCollectionZone, IGameplayStatusWatcher gameWatcher)
+        this ICardColletionZone cardCollectionZone, IGameplayModel gameWatcher)
     {
         return cardCollectionZone.Cards
             .Select(c => c.ToInfo(gameWatcher))
@@ -97,7 +101,7 @@ public static class CardCollectionInfoUtility
     }
 
     public static IReadOnlyCollection<CardInfo> ToCardInfos(
-        this IReadOnlyCollection<ICardEntity> cards, IGameplayStatusWatcher gameWatcher)
+        this IReadOnlyCollection<ICardEntity> cards, IGameplayModel gameWatcher)
     {
         return cards.Select(c => c.ToInfo(gameWatcher)).ToArray();
     }

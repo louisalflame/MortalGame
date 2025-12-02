@@ -1,11 +1,16 @@
 using Unity.VisualScripting;
 using UnityEngine;
 
-public interface ITriggerSource
+public record TriggerContext(
+    IGameplayModel Model,
+    ITriggeredSource Triggered,
+    IActionUnit Action);
+
+public interface ITriggeredSource
 {
 }
 
-public class CardPlayTrigger : ITriggerSource
+public class CardPlayTrigger : ITriggeredSource
 {
     public CardPlaySource CardPlay { get; private set; }
 
@@ -15,7 +20,7 @@ public class CardPlayTrigger : ITriggerSource
     }
 }
 
-public class CardTrigger : ITriggerSource
+public class CardTrigger : ITriggeredSource
 {
     public ICardEntity Card { get; private set; }
 
@@ -25,7 +30,7 @@ public class CardTrigger : ITriggerSource
     }
 }
 
-public class CardBuffTrigger : ITriggerSource
+public class CardBuffTrigger : ITriggeredSource
 {
     public ICardBuffEntity Buff { get; private set; }
 
@@ -35,7 +40,7 @@ public class CardBuffTrigger : ITriggerSource
     }
 }
 
-public class PlayerBuffTrigger : ITriggerSource
+public class PlayerBuffTrigger : ITriggeredSource
 {
     public IPlayerBuffEntity Buff { get; private set; }
 
@@ -45,12 +50,22 @@ public class PlayerBuffTrigger : ITriggerSource
     }
 }
 
-public class CharacterBuffTrigger : ITriggerSource
+public class CharacterBuffTrigger : ITriggeredSource
 {
     public ICharacterBuffEntity Buff { get; private set; }
 
     public CharacterBuffTrigger(ICharacterBuffEntity buff)
     {
         Buff = buff;
+    }
+}
+
+public class PlayerTrigger : ITriggeredSource
+{
+    public IPlayerEntity Player { get; private set; }
+
+    public PlayerTrigger(IPlayerEntity player)
+    {
+        Player = player;
     }
 }

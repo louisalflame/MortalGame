@@ -7,7 +7,7 @@ using UnityEngine;
 
 public interface ICardValueCondition
 {
-    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, ICardEntity card);
+    bool Eval(TriggerContext triggerContext, ICardEntity card);
 }
 
 [Serializable]
@@ -16,10 +16,10 @@ public class CardEqualCondition : ICardValueCondition
     [HorizontalGroup("1")]
     public ITargetCardValue CompareCard;
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, ICardEntity card)
+    public bool Eval(TriggerContext triggerContext, ICardEntity card)
     {
         return CompareCard
-            .Eval(gameWatcher, source, actionUnit)
+            .Eval(triggerContext)
             .Match(
                 compareCard => card.Identity == compareCard.Identity,
                 () => false);
@@ -34,7 +34,7 @@ public class CardTypesCondition : ICardValueCondition
 
     public SetConditionType Condition;
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, ICardEntity card)
+    public bool Eval(TriggerContext triggerContext, ICardEntity card)
     {
         return Condition.Eval(CardTypes, type => type == card.Type);
     }

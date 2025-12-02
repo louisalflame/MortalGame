@@ -5,7 +5,7 @@ using Sirenix.OdinInspector;
 
 public interface ICardPlayResultValueCondition
 {
-    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, CardPlayResultSource cardPlayResultSource);
+    bool Eval(TriggerContext triggerContext, CardPlayResultSource cardPlayResultSource);
 }
 
 [Serializable]
@@ -15,15 +15,15 @@ public class CardPlayEffectResultCondition : ICardPlayResultValueCondition
     [HorizontalGroup("1")]
     public List<IEffectResultCondition> Conditions = new();
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, CardPlayResultSource cardPlayResultSource)
+    public bool Eval(TriggerContext triggerContext, CardPlayResultSource cardPlayResultSource)
     {
-        return cardPlayResultSource.EffectResults.All(effectResult => Conditions.All(c => c.Eval(gameWatcher, source, actionUnit, effectResult)));
+        return cardPlayResultSource.EffectResults.All(effectResult => Conditions.All(c => c.Eval(triggerContext, effectResult)));
     }
 }
 
 public interface IEffectResultCondition
 {
-    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, IEffectResultAction effectResult);
+    bool Eval(TriggerContext triggerContext, IEffectResultAction effectResult);
 }
 
 [Serializable]
@@ -45,7 +45,7 @@ public class EffectResultTypeCondition : IEffectResultCondition
     public SetConditionType Condition;
 
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, IEffectResultAction effectResult)
+    public bool Eval(TriggerContext triggerContext, IEffectResultAction effectResult)
     {
         return Condition.Eval(EffectTypes, type => _Eval(type, effectResult));
     }
@@ -76,14 +76,14 @@ public class DamageResultCondition : IEffectResultCondition
 
     public SetConditionType SetCondition;
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, IEffectResultAction effectResult)
+    public bool Eval(TriggerContext triggerContext, IEffectResultAction effectResult)
     {
         return effectResult switch
         {
             DamageResultAction damageResult =>
                 SetCondition.Eval(
                     DamageConditions,
-                    damageCondtion => damageCondtion.Eval(gameWatcher, source, actionUnit, damageResult)
+                    damageCondtion => damageCondtion.Eval(triggerContext, damageResult)
                 ),
             _ => false
         };
@@ -92,7 +92,7 @@ public class DamageResultCondition : IEffectResultCondition
 
 public interface IDamageResultCondition
 {
-    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, DamageResultAction damageResult);
+    bool Eval(TriggerContext triggerContext, DamageResultAction damageResult);
 }
 
 [Serializable]
@@ -102,14 +102,14 @@ public class DamageResultPlayerTargetCondition : IDamageResultCondition
     [HorizontalGroup("1")]
     public List<IPlayerValueCondition> TargetPlayerConditions = new ();
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, DamageResultAction damageResult)
+    public bool Eval(TriggerContext triggerContext, DamageResultAction damageResult)
     {
         return damageResult.Target switch
         {
             PlayerTarget playerTarget =>
-                TargetPlayerConditions.All(condition => condition.Eval(gameWatcher, source, actionUnit, playerTarget.Player)),
+                TargetPlayerConditions.All(condition => condition.Eval(triggerContext, playerTarget.Player)),
             PlayerAndCardTarget playerAndCardTarget =>
-                TargetPlayerConditions.All(condition => condition.Eval(gameWatcher, source, actionUnit, playerAndCardTarget.Player)),
+                TargetPlayerConditions.All(condition => condition.Eval(triggerContext, playerAndCardTarget.Player)),
             _ => false
         };
     }
@@ -122,12 +122,12 @@ public class DamageResultCharacterTargetCondition : IDamageResultCondition
     [HorizontalGroup("1")]
     public List<ICharacterValueCondition> TargetCharacterConditions = new ();
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, DamageResultAction damageResult)
+    public bool Eval(TriggerContext triggerContext, DamageResultAction damageResult)
     {
         return damageResult.Target switch
         {
             CharacterTarget characterTarget =>
-                TargetCharacterConditions.All(condition => condition.Eval(gameWatcher, source, actionUnit, characterTarget.Character)),
+                TargetCharacterConditions.All(condition => condition.Eval(triggerContext, characterTarget.Character)),
             _ => false
         };
     }

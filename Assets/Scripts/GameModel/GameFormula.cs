@@ -4,129 +4,94 @@ using UnityEngine;
 
 public static class GameFormula
 {
-    public static int NormalDamagePoint(
-        IGameplayStatusWatcher gameWatcher,
-        int rawDamagePoint,
-        IActionUnit actionUnit,
-        ITriggerSource trigger)
+    public static int NormalDamagePoint(TriggerContext triggerContext, int rawDamagePoint)
     {
-        var actionAddition = GetAttributeAddition(
-            gameWatcher, actionUnit, trigger, EffectAttributeAdditionType.NormalDamageAddition, PlayerBuffProperty.NormalDamageAddition);
+        var actionAddition = GetAttributeAddition(triggerContext, EffectAttributeAdditionType.NormalDamageAddition, PlayerBuffProperty.NormalDamageAddition);
         
-        var actionRatio = GetAttributeRatio(
-            gameWatcher, actionUnit, trigger, EffectAttributeRatioType.NormalDamageRatio, PlayerBuffProperty.NormalDamageRatio);
+        var actionRatio = GetAttributeRatio(triggerContext, EffectAttributeRatioType.NormalDamageRatio, PlayerBuffProperty.NormalDamageRatio);
 
         return rawDamagePoint + actionAddition;
     }
 
-    public static int PenetrateDamagePoint(
-        IGameplayStatusWatcher gameWatcher,
-        int rawDamagePoint,
-        IActionUnit actionUnit,
-        ITriggerSource trigger)
+    public static int PenetrateDamagePoint(TriggerContext triggerContext, int rawDamagePoint)
     {
         var actionAddition = GetAttributeAddition(
-            gameWatcher, actionUnit, trigger, EffectAttributeAdditionType.PenetrateDamageAddition, PlayerBuffProperty.PenetrateDamageAddition);
+            triggerContext, EffectAttributeAdditionType.PenetrateDamageAddition, PlayerBuffProperty.PenetrateDamageAddition);
         
         var actionRatio = GetAttributeRatio(
-            gameWatcher, actionUnit, trigger, EffectAttributeRatioType.PenetrateDamageRatio, PlayerBuffProperty.PenetrateDamageRatio);
+            triggerContext, EffectAttributeRatioType.PenetrateDamageRatio, PlayerBuffProperty.PenetrateDamageRatio);
 
         return rawDamagePoint + actionAddition;
     }
 
-    public static int AdditionalDamagePoint(
-        IGameplayStatusWatcher gameWatcher,
-        int rawDamagePoint,
-        IActionUnit actionUnit,
-        ITriggerSource trigger)
+    public static int AdditionalDamagePoint(TriggerContext triggerContext, int rawDamagePoint)
     {
         var actionAddition = GetAttributeAddition(
-            gameWatcher, actionUnit, trigger, EffectAttributeAdditionType.AdditionalDamageAddition, PlayerBuffProperty.AdditionalDamageAddition);
+            triggerContext, EffectAttributeAdditionType.AdditionalDamageAddition, PlayerBuffProperty.AdditionalDamageAddition);
         
         var actionRatio = GetAttributeRatio(
-            gameWatcher, actionUnit, trigger, EffectAttributeRatioType.AdditionalDamageRatio, PlayerBuffProperty.AdditionalDamageRatio);
+            triggerContext, EffectAttributeRatioType.AdditionalDamageRatio, PlayerBuffProperty.AdditionalDamageRatio);
 
         return rawDamagePoint + actionAddition;
     }
     
-    public static int EffectiveDamagePoint(
-        IGameplayStatusWatcher gameWatcher,
-        int rawDamagePoint,
-        IActionUnit actionUnit,
-        ITriggerSource trigger)
+    public static int EffectiveDamagePoint(TriggerContext triggerContext, int rawDamagePoint)
     {
         var actionAddition = GetAttributeAddition(
-            gameWatcher, actionUnit, trigger, EffectAttributeAdditionType.EffectiveDamageAddition, PlayerBuffProperty.EffectiveDamageAddition);
+            triggerContext, EffectAttributeAdditionType.EffectiveDamageAddition, PlayerBuffProperty.EffectiveDamageAddition);
         
         var actionRatio = GetAttributeRatio(
-            gameWatcher, actionUnit, trigger, EffectAttributeRatioType.EffectiveDamageRatio, PlayerBuffProperty.EffectiveDamageRatio);
+            triggerContext, EffectAttributeRatioType.EffectiveDamageRatio, PlayerBuffProperty.EffectiveDamageRatio);
 
         return rawDamagePoint + actionAddition;
     }
 
-    public static int HealPoint(
-        IGameplayStatusWatcher gameWatcher,
-        int rawHealPoint,
-        IActionUnit actionUnit,
-        ITriggerSource trigger)
+    public static int HealPoint(TriggerContext triggerContext, int rawHealPoint)
     {
         var actionAddition = GetAttributeAddition(
-            gameWatcher, actionUnit, trigger, EffectAttributeAdditionType.HealAddition, PlayerBuffProperty.HealAddition);
+            triggerContext, EffectAttributeAdditionType.HealAddition, PlayerBuffProperty.HealAddition);
 
         var actionRatio = GetAttributeRatio(
-            gameWatcher, actionUnit, trigger, EffectAttributeRatioType.HealRatio, PlayerBuffProperty.HealRatio);
+            triggerContext, EffectAttributeRatioType.HealRatio, PlayerBuffProperty.HealRatio);
 
         return rawHealPoint + actionAddition;
     }
 
-    public static int CardPower(
-        IGameplayStatusWatcher gameWatcher,
-        ICardEntity card,
-        IActionUnit actionUnit,
-        ITriggerSource trigger)
+    public static int CardPower(TriggerContext triggerContext, ICardEntity card)
     {
-        var actionAddition = GetAttributeAddition(
-            gameWatcher, actionUnit, trigger, EffectAttributeAdditionType.PowerAddition, PlayerBuffProperty.AllCardPower);
+        var actionAddition = GetAttributeAddition(triggerContext, EffectAttributeAdditionType.PowerAddition, PlayerBuffProperty.AllCardPower);
 
-        var cardAddition = card.GetCardProperty(gameWatcher, actionUnit, trigger, CardProperty.PowerAddition);
+        var cardAddition = card.GetCardProperty(triggerContext, CardProperty.PowerAddition);
 
         return Math.Max(0, card.OriginPower + actionAddition + cardAddition);
     }
 
-    public static int CardCost(
-        IGameplayStatusWatcher gameWatcher,
-        ICardEntity card,
-        IActionUnit actionUnit,
-        ITriggerSource trigger)
+    public static int CardCost(TriggerContext triggerContext, ICardEntity card)
     {
-        var actionAddition = GetAttributeAddition(
-            gameWatcher, actionUnit, trigger, EffectAttributeAdditionType.CostAddition, PlayerBuffProperty.AllCardCost);
+        var actionAddition = GetAttributeAddition(triggerContext, EffectAttributeAdditionType.CostAddition, PlayerBuffProperty.AllCardCost);
 
-        var cardAddition = card.GetCardProperty(gameWatcher, actionUnit, trigger, CardProperty.CostAddition);
-
+        var cardAddition = card.GetCardProperty(triggerContext, CardProperty.CostAddition);
         return Math.Max(0, card.OriginCost + actionAddition + cardAddition);
     }
 
     private static int GetAttributeAddition(
-        IGameplayStatusWatcher gameWatcher,
-        IActionUnit actionUnit,
-        ITriggerSource trigger,
+        TriggerContext triggerContext,
         EffectAttributeAdditionType attribute,
         PlayerBuffProperty playerBuffProperty)
     {
-        if (actionUnit is CardLookIntentAction cardLookIntent)
+        if (triggerContext.Action is CardLookIntentAction cardLookIntent)
         {
-            var playerAttribute = cardLookIntent.Card.Owner(gameWatcher)
-                .Map(player => player.GetPlayerBuffAdditionProperty(gameWatcher, playerBuffProperty))
+            var playerAttribute = cardLookIntent.Card.Owner(triggerContext.Model)
+                .Map(player => player.GetPlayerBuffAdditionProperty(triggerContext, playerBuffProperty))
                 .ValueOr(0);
             return playerAttribute;
         }
-        if (actionUnit.Source is CardPlaySource cardPlaySource)
+        if (triggerContext.Action.Source is CardPlaySource cardPlaySource)
         {
             var cardPlayAttribute = cardPlaySource.Attribute.IntValues
                 .GetValueOrDefault(attribute, 0);
-            var playerAttribute = gameWatcher.GameStatus.CurrentPlayer
-                .Map(player => player.GetPlayerBuffAdditionProperty(gameWatcher, playerBuffProperty))
+            var playerAttribute = triggerContext.Model.GameStatus.CurrentPlayer
+                .Map(player => player.GetPlayerBuffAdditionProperty(triggerContext, playerBuffProperty))
                 .ValueOr(0);
 
             return cardPlayAttribute + playerAttribute;
@@ -134,18 +99,16 @@ public static class GameFormula
         return 0;
     }
     private static float GetAttributeRatio(
-        IGameplayStatusWatcher gameWatcher,
-        IActionUnit actionUnit,
-        ITriggerSource trigger,
+        TriggerContext triggerContext,
         EffectAttributeRatioType attribute,
         PlayerBuffProperty playerBuffProperty)
     {
-        if (actionUnit.Source is CardPlaySource cardPlaySource)
+        if (triggerContext.Action.Source is CardPlaySource cardPlaySource)
         {
             var cardPlayAttribute = cardPlaySource.Attribute.FloatValues
                 .GetValueOrDefault(attribute, 0);
-            var playerAttribute = gameWatcher.GameStatus.CurrentPlayer
-                .Map(player => player.GetPlayerBuffRatioProperty(gameWatcher, playerBuffProperty))
+            var playerAttribute = triggerContext.Model.GameStatus.CurrentPlayer
+                .Map(player => player.GetPlayerBuffRatioProperty(triggerContext, playerBuffProperty))
                 .ValueOr(0);
 
             return cardPlayAttribute + playerAttribute;

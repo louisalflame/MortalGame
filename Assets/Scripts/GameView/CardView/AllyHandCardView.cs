@@ -44,7 +44,7 @@ public class AllyHandCardView : MonoBehaviour
 
     private List<ICardView> _cardViews = new List<ICardView>();
     private Dictionary<Guid, ICardView> _cardViewDict = new Dictionary<Guid, ICardView>();
-    private IGameplayStatusWatcher _statusWatcher;
+    private IGameplayModel _statusWatcher;
     private IGameViewModel _gameViewModel;
     private IGameplayActionReciever _reciever;
     private LocalizeLibrary _localizeLibrary;
@@ -66,7 +66,7 @@ public class AllyHandCardView : MonoBehaviour
     private IReadOnlyReactiveProperty<bool> IsDragging => _currentDragInfo.Select(info => info.HasValue).ToReactiveProperty();
 
     public void Init(
-        IGameplayStatusWatcher statusWatcher,
+        IGameplayModel statusWatcher,
         IGameplayActionReciever reciever,
         IGameViewModel gameInfoModel,
         IAllCardDetailPanelView allCardDetailPanelView,

@@ -7,7 +7,7 @@ public interface ICardBuffPropertyEntity
     CardProperty Property { get; }
     IEnumerable<string> Keywords { get; }
 
-    int Eval(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit, ITriggerSource triggerSource);
+    int Eval(TriggerContext triggerContext);
 
     ICardBuffPropertyEntity Clone();
 }
@@ -18,7 +18,7 @@ public class SealedCardBuffPropertyEntity : ICardBuffPropertyEntity
     public IEnumerable<string> Keywords => Property.ToString().WrapAsEnumerable();
 
     public SealedCardBuffPropertyEntity() { }
-    public int Eval(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit, ITriggerSource triggerSource) => 0;
+    public int Eval(TriggerContext triggerContext) => 0;
 
     public ICardBuffPropertyEntity Clone() => new SealedCardBuffPropertyEntity();
 }
@@ -34,9 +34,10 @@ public class PowerCardBuffPropertyEntity : ICardBuffPropertyEntity
     {
         _value = value;
     }
-    public int Eval(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit, ITriggerSource triggerSource)
+    public int Eval(TriggerContext triggerContext)
     {
-        return _value.Eval(gameWatcher, triggerSource, new CardBuffPropertyLookAction(this));
+        var cardBuffPropertyContext = triggerContext with { Action = new CardBuffPropertyLookAction(this) };
+        return _value.Eval(cardBuffPropertyContext);
     }
 
     public ICardBuffPropertyEntity Clone() => new PowerCardBuffPropertyEntity(_value);

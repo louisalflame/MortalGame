@@ -32,13 +32,13 @@ public class EnemySelectedCardView : MonoBehaviour
     private List<IAiCardView> _cardViews = new List<IAiCardView>();
     private Dictionary<Guid, IAiCardView> _cardViewDict = new Dictionary<Guid, IAiCardView>();
 
-    private IGameplayStatusWatcher _statusWatcher;
+    private IGameplayModel _statusWatcher;
     private IGameplayActionReciever _reciever;
     private IGameViewModel _gameViewModel;
     private LocalizeLibrary _localizeLibrary;
 
     public void Init(
-        IGameplayStatusWatcher statusWatcher,
+        IGameplayModel statusWatcher,
         IGameplayActionReciever reciever,
         IGameViewModel gameViewModel,
         LocalizeLibrary localizeLibrary)

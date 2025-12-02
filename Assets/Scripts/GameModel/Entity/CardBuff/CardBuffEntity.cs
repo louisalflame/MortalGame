@@ -75,18 +75,16 @@ public class CardBuffEntity : ICardBuffEntity
         string cardBuffDataID,
         int level,
         Option<IPlayerEntity> caster,
-        IGameplayStatusWatcher gameWatcher,
-        ITriggerSource triggerSource,
-        IActionUnit actionUnit,
+        TriggerContext triggerContext,
         CardBuffLibrary cardBuffLibrary)
     {
         var buffData = cardBuffLibrary.GetCardBuffData(cardBuffDataID);
         var properties = buffData.PropertyDatas
-            .Select(p => p.CreateEntity(gameWatcher, triggerSource));
-        var lifeTime = buffData.LifeTimeData.CreateEntity(gameWatcher, triggerSource, actionUnit);
+            .Select(p => p.CreateEntity(triggerContext));
+        var lifeTime = buffData.LifeTimeData.CreateEntity(triggerContext);
         var reactionSessions = buffData.Sessions.ToDictionary(
             kvp => kvp.Key,
-            kvp => kvp.Value.CreateEntity(gameWatcher, triggerSource, actionUnit)
+            kvp => kvp.Value.CreateEntity(triggerContext)
         );
 
         return new CardBuffEntity(

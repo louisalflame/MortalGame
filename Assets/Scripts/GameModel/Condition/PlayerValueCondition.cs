@@ -7,7 +7,7 @@ using UnityEngine;
 
 public interface IPlayerValueCondition
 {
-    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, IPlayerEntity player);
+    bool Eval(TriggerContext triggerContext, IPlayerEntity player);
 }
 
 [Serializable]
@@ -24,10 +24,10 @@ public class PlayerFactionCondition : IPlayerValueCondition
     public ITargetPlayerValue ComparePlayer;
     public FactionCondition Faction;
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, IPlayerEntity player)
+    public bool Eval(TriggerContext triggerContext, IPlayerEntity player)
     {
         return ComparePlayer
-            .Eval(gameWatcher, source, actionUnit)
+            .Eval(triggerContext)
             .Match(
                 comparePlayer => Faction switch
                 {
@@ -46,15 +46,15 @@ public class PlayerEnergyCondition : IPlayerValueCondition
     [HorizontalGroup("1")]
     public List<IPlayerEnergyCondition> Conditions = new ();
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, IPlayerEntity player)
+    public bool Eval(TriggerContext triggerContext, IPlayerEntity player)
     {
-        return Conditions.All(c => c.Eval(gameWatcher, source, actionUnit, player.EnergyManager));
+        return Conditions.All(c => c.Eval(triggerContext, player.EnergyManager));
     }
 }
 
 public interface IPlayerEnergyCondition
 {
-    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, IEnergyManager energyManager);
+    bool Eval(TriggerContext triggerContext, IEnergyManager energyManager);
 }
 
 [Serializable]
@@ -72,12 +72,12 @@ public class EnergyIntegerCondition : IPlayerEnergyCondition
     [HorizontalGroup("1")]
     public List<IIntegerValueCondition> Conditions = new ();
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, IEnergyManager energyManager)
+    public bool Eval(TriggerContext triggerContext, IEnergyManager energyManager)
     {
         return ValueType switch
         {
-            EnergyValueType.Current => Conditions.All(c => c.Eval(gameWatcher, source, actionUnit, energyManager.Energy)),
-            EnergyValueType.Max     => Conditions.All(c => c.Eval(gameWatcher, source, actionUnit, energyManager.MaxEnergy)),
+            EnergyValueType.Current => Conditions.All(c => c.Eval(triggerContext, energyManager.Energy)),
+            EnergyValueType.Max     => Conditions.All(c => c.Eval(triggerContext, energyManager.MaxEnergy)),
             _                       => false
         };
     }

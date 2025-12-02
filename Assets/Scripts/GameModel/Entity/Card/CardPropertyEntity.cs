@@ -8,7 +8,7 @@ public interface ICardPropertyEntity
     CardProperty Property { get; }
     IEnumerable<string> Keywords { get; }
 
-    int Eval(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit, ITriggerSource triggerSource);
+    int Eval(TriggerContext triggerContext);
 
     ICardPropertyEntity Clone();
 }
@@ -19,7 +19,7 @@ public class PreservedPropertyEntity : ICardPropertyEntity
     public IEnumerable<string> Keywords => Property.ToString().WrapAsEnumerable();
 
     public PreservedPropertyEntity() { }
-    public int Eval(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit, ITriggerSource triggerSource) => 0;
+    public int Eval(TriggerContext triggerContext) => 0;
     public ICardPropertyEntity Clone() => new PreservedPropertyEntity();
 }
 
@@ -29,7 +29,7 @@ public class InitialPriorityPropertyEntity : ICardPropertyEntity
     public IEnumerable<string> Keywords => Property.ToString().WrapAsEnumerable();
 
     public InitialPriorityPropertyEntity() { }
-    public int Eval(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit, ITriggerSource triggerSource) => 0;
+    public int Eval(TriggerContext triggerContext) => 0;
     public ICardPropertyEntity Clone() => new InitialPriorityPropertyEntity();
 }   
 
@@ -39,7 +39,7 @@ public class ConsumablePropertyEntity : ICardPropertyEntity
     public IEnumerable<string> Keywords => Property.ToString().WrapAsEnumerable();
 
     public ConsumablePropertyEntity() { }
-    public int Eval(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit, ITriggerSource triggerSource) => 0;
+    public int Eval(TriggerContext triggerContext) => 0;
     public ICardPropertyEntity Clone() => new ConsumablePropertyEntity();
 }
 
@@ -49,7 +49,7 @@ public class DisposePropertyEntity : ICardPropertyEntity
     public IEnumerable<string> Keywords => Property.ToString().WrapAsEnumerable();
 
     public DisposePropertyEntity() { }
-    public int Eval(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit, ITriggerSource triggerSource) => 0;
+    public int Eval(TriggerContext triggerContext) => 0;
     public ICardPropertyEntity Clone() => new DisposePropertyEntity();
 }
 
@@ -59,7 +59,7 @@ public class AutoDisposePropertyEntity : ICardPropertyEntity
     public IEnumerable<string> Keywords => Property.ToString().WrapAsEnumerable();
 
     public AutoDisposePropertyEntity() { }
-    public int Eval(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit, ITriggerSource triggerSource) => 0;
+    public int Eval(TriggerContext triggerContext) => 0;
     public ICardPropertyEntity Clone() => new AutoDisposePropertyEntity();
 }
 
@@ -69,6 +69,6 @@ public class SealedPropertyEntity : ICardPropertyEntity
     public IEnumerable<string> Keywords => Property.ToString().WrapAsEnumerable();
 
     public SealedPropertyEntity() { }
-    public int Eval(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit, ITriggerSource triggerSource) => 0;
+    public int Eval(TriggerContext triggerContext) => 0;
     public ICardPropertyEntity Clone() => new SealedPropertyEntity();
 }

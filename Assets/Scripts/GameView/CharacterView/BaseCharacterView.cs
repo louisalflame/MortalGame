@@ -39,7 +39,7 @@ public abstract class BaseCharacterView : MonoBehaviour
 
     protected float _timmer = 0;
     protected Queue<IAnimationNumberEvent> _animationEventBuffer;
-    protected IGameplayStatusWatcher _statusWatcher;
+    protected IGameplayModel _statusWatcher;
 
     public void UpdateHealth(IAnimationNumberEvent healthEvent)
     {

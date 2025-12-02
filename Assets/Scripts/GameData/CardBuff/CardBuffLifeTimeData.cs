@@ -3,13 +3,13 @@ using UnityEngine;
 
 public interface ICardBuffLifeTimeData
 {
-    ICardBuffLifeTimeEntity CreateEntity(IGameplayStatusWatcher watcher, ITriggerSource trigger, IActionUnit actionUnit);
+    ICardBuffLifeTimeEntity CreateEntity(TriggerContext triggerContext);
 }
 
 [Serializable]
 public class AlwaysLifeTimeCardBuffData : ICardBuffLifeTimeData
 {
-    public ICardBuffLifeTimeEntity CreateEntity(IGameplayStatusWatcher watcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public ICardBuffLifeTimeEntity CreateEntity(TriggerContext triggerContext)
     {
         return new AlwaysLifeTimeCardBuffEntity();
     }
@@ -20,16 +20,16 @@ public class TurnLifeTimeCardBuffData : ICardBuffLifeTimeData
 {
     public IIntegerValue Turn;
 
-    public ICardBuffLifeTimeEntity CreateEntity(IGameplayStatusWatcher watcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public ICardBuffLifeTimeEntity CreateEntity(TriggerContext triggerContext)
     {
-        return new TurnLifeTimeCardBuffEntity(Turn.Eval(watcher, trigger, actionUnit));
+        return new TurnLifeTimeCardBuffEntity(Turn.Eval(triggerContext));
     }
 }
 
 [Serializable]
 public class HandCardLifeTimeCardBuffData : ICardBuffLifeTimeData
 {
-    public ICardBuffLifeTimeEntity CreateEntity(IGameplayStatusWatcher watcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public ICardBuffLifeTimeEntity CreateEntity(TriggerContext triggerContext)
     {
         return new HandCardLifeTimeCardBuffEntity();
     }

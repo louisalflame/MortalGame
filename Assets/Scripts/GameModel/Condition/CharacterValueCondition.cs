@@ -5,7 +5,7 @@ using UnityEngine;
 
 public interface ICharacterValueCondition
 {
-    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, ICharacterEntity character);
+    bool Eval(TriggerContext triggerContext, ICharacterEntity character);
 }
 
 [Serializable]
@@ -22,10 +22,10 @@ public class CharacterFactionCondition : ICharacterValueCondition
 
     public FactionCondition Faction;
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, ICharacterEntity character)
+    public bool Eval(TriggerContext triggerContext, ICharacterEntity character)
     {
-        return ComparePlayer.Eval(gameWatcher, source, actionUnit)
-            .Combine(character.Owner(gameWatcher))
+        return ComparePlayer.Eval(triggerContext)
+            .Combine(character.Owner(triggerContext.Model))
             .Match(
                 tuple => Faction switch
                 {

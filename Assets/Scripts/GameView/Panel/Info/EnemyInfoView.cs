@@ -17,12 +17,12 @@ public class EnemyInfoView : MonoBehaviour
     private PlayerBuffCollectionView _buffCollectionView;
     
     
-    private IGameplayStatusWatcher _statusWatcher;
+    private IGameplayModel _statusWatcher;
     private IGameViewModel _gameViewModel;
     private LocalizeLibrary _localizeLibrary;
 
     public void Init(
-        IGameplayStatusWatcher statusWatcher,
+        IGameplayModel statusWatcher,
         IGameViewModel gameInfoModel,
         SimpleTitleInfoHintView simpleHintView,
         LocalizeLibrary localizeLibrary)

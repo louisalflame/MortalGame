@@ -66,7 +66,7 @@ public class DummyCharacter : CharacterEntity
 
 public static class CharacterEntityExtensions
 {
-    public static Option<IPlayerEntity> Owner(this ICharacterEntity character, IGameplayStatusWatcher gameWatcher)
+    public static Option<IPlayerEntity> Owner(this ICharacterEntity character, IGameplayModel gameWatcher)
     {
         if (gameWatcher.GameStatus.Ally.Characters.Any(c => c.Identity == character.Identity))
             return (gameWatcher.GameStatus.Ally as IPlayerEntity).Some();
@@ -74,7 +74,7 @@ public static class CharacterEntityExtensions
             return (gameWatcher.GameStatus.Enemy as IPlayerEntity).Some();
         return Option.None<IPlayerEntity>();
     }
-    public static Faction Faction(this ICharacterEntity character, IGameplayStatusWatcher watcher)
+    public static Faction Faction(this ICharacterEntity character, IGameplayModel watcher)
     {
         return character.Owner(watcher).ValueOr(PlayerEntity.DummyPlayer).Faction;
     }

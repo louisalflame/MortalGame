@@ -8,18 +8,13 @@ using UnityEngine;
 
 public interface ITargetCharacterValue
 {
-    Option<ICharacterEntity> Eval(
-        IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger,
-        IActionUnit actionUnit);
+    Option<ICharacterEntity> Eval(TriggerContext triggerContext);
 }
 
 [Serializable]
 public class NoneCharacter : ITargetCharacterValue
 {
-    public Option<ICharacterEntity> Eval(IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger,
-        IActionUnit actionUnit)
+    public Option<ICharacterEntity> Eval(TriggerContext triggerContext)
     {
         return Option.None<ICharacterEntity>();
     }
@@ -30,41 +25,29 @@ public class MainCharacterOfPlayer : ITargetCharacterValue
     [HorizontalGroup("1")]
     public ITargetPlayerValue Player;
 
-    public Option<ICharacterEntity> Eval(
-        IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger,
-        IActionUnit actionUnit)
+    public Option<ICharacterEntity> Eval(TriggerContext triggerContext)
     {
-        return Player.Eval(gameWatcher, trigger, actionUnit).Map(player => player.MainCharacter);
+        return Player.Eval(triggerContext).Map(player => player.MainCharacter);
     }
 }
 [Serializable]
 public class SelectedCharacter : ITargetCharacterValue
 {
-    public Option<ICharacterEntity> Eval(
-        IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger,
-        IActionUnit actionUnit)
+    public Option<ICharacterEntity> Eval(TriggerContext triggerContext)
     {
-        return gameWatcher.ContextManager.Context.SelectedCharacter.SomeNotNull();
+        return triggerContext.Model.ContextManager.Context.SelectedCharacter.SomeNotNull();
     }
 }
 
 public interface ITargetCharacterCollectionValue
 {
-    IReadOnlyCollection<ICharacterEntity> Eval(
-        IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger,
-        IActionUnit actionUnit);
+    IReadOnlyCollection<ICharacterEntity> Eval(TriggerContext triggerContext);
 }
 
 [Serializable]
 public class NoneCharacters : ITargetCharacterCollectionValue
 {
-    public IReadOnlyCollection<ICharacterEntity> Eval(
-        IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger,
-        IActionUnit actionUnit)
+    public IReadOnlyCollection<ICharacterEntity> Eval(TriggerContext triggerContext)
     {
         return  Array.Empty<ICharacterEntity>();
     }
@@ -75,13 +58,8 @@ public class SingleCharacterCollection : ITargetCharacterCollectionValue
     [HorizontalGroup("1")]
     public ITargetCharacterValue Target;
 
-    public IReadOnlyCollection<ICharacterEntity> Eval(
-        IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger,
-        IActionUnit actionUnit)
+    public IReadOnlyCollection<ICharacterEntity> Eval(TriggerContext triggerContext)
     {
-        return Target
-            .Eval(gameWatcher, trigger, actionUnit)
-            .ToEnumerable().ToList();
+        return Target.Eval(triggerContext).ToEnumerable().ToList();
     }
 }

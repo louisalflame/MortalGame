@@ -8,7 +8,7 @@ public interface ISessionValueEntity
 {
     ISessionValueEntity Clone();
 
-    bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit);
+    bool Update(TriggerContext triggerContext);
 }
 
 public class SessionBooleanEntity : ISessionValueEntity
@@ -30,16 +30,14 @@ public class SessionBooleanEntity : ISessionValueEntity
     }
 
     private bool _UpdateRules(
-        IReadOnlyCollection<ConditionBooleanUpdateRule> rules,
-        IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger,
-        IActionUnit actionUnit)
+        IReadOnlyCollection<ConditionBooleanUpdateRule> rules, 
+        TriggerContext triggerContext)
     {
         foreach (var rule in rules)
         {
-            if (rule.Conditions.All(condition => condition.Eval(gameWatcher, trigger, actionUnit)))
+            if (rule.Conditions.All(condition => condition.Eval(triggerContext)))
             {
-                var newVal = rule.NewValue.Eval(gameWatcher, trigger, actionUnit);
+                var newVal = rule.NewValue.Eval(triggerContext);
                 Value = rule.Operation switch
                 {
                     ConditionBooleanUpdateRule.UpdateType.AndOrigin => Value && newVal,
@@ -54,12 +52,12 @@ public class SessionBooleanEntity : ISessionValueEntity
         return false;
     }
 
-    public bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public bool Update(TriggerContext triggerContext)
     {
         var isChanged = false;
-        foreach (var rule in _updateRules.Where(r => r.Timing == actionUnit.Timing))
+        foreach (var rule in _updateRules.Where(r => r.Timing == triggerContext.Action.Timing))
         {
-            isChanged |= _UpdateRules(rule.Rules, gameWatcher, trigger, actionUnit);
+            isChanged |= _UpdateRules(rule.Rules, triggerContext);
         }
         return isChanged;
     }
@@ -85,15 +83,13 @@ public class SessionIntegerEntity : ISessionValueEntity
 
     private bool _UpdateRules(
         IReadOnlyCollection<ConditionIntegerUpdateRule> rules,
-        IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger,
-        IActionUnit actionUnit)
+        TriggerContext triggerContext)
     {
         foreach (var rule in rules)
         {
-            if (rule.Conditions.All(condition => condition.Eval(gameWatcher, trigger, actionUnit)))
+            if (rule.Conditions.All(condition => condition.Eval(triggerContext)))
             {
-                var newVal = rule.NewValue.Eval(gameWatcher, trigger, actionUnit);
+                var newVal = rule.NewValue.Eval(triggerContext);
                 Value = rule.Operation switch
                 {
                     ConditionIntegerUpdateRule.UpdateType.AddOrigin => Value + newVal,
@@ -107,13 +103,13 @@ public class SessionIntegerEntity : ISessionValueEntity
         return false;
     }
 
-    public bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public bool Update(TriggerContext triggerContext)
     {
         var isChanged = false;
 
-        foreach (var rule in _updateRules.Where(r => r.Timing == actionUnit.Timing))
+        foreach (var rule in _updateRules.Where(r => r.Timing == triggerContext.Action.Timing))
         {
-            isChanged |= _UpdateRules(rule.Rules, gameWatcher, trigger, actionUnit);
+            isChanged |= _UpdateRules(rule.Rules, triggerContext);
         }
         return isChanged;
     }

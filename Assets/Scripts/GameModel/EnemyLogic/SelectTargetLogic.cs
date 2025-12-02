@@ -16,7 +16,7 @@ public record SelectSubTargetsResult(
 public static class SelectTargetLogic
 {
     public static SelectMainTargetResult SelectMainTarget(
-        IGameplayStatusWatcher gameplayWatcher,
+        IGameplayModel gameplayWatcher,
         ICardEntity cardEntity)
     {
         var mainSelect = cardEntity.MainSelect;
@@ -47,7 +47,7 @@ public static class SelectTargetLogic
     }
 
     public static SelectSubTargetsResult SelectSubTargets(
-        IGameplayStatusWatcher gameplayWatcher,
+        IGameplayModel gameplayWatcher,
         ICardEntity cardEntity)
     {
         var subSelectionActions = new Dictionary<string, ISubSelectionAction>();
@@ -79,7 +79,7 @@ public static class SelectTargetLogic
         return new SelectSubTargetsResult(subSelectionActions);
     }
 
-    private static SelectMainTargetResult SelectCharacterWithLogic(IGameplayStatusWatcher gameplayWatcher, TargetLogicTag logicTag)
+    private static SelectMainTargetResult SelectCharacterWithLogic(IGameplayModel gameplayWatcher, TargetLogicTag logicTag)
     {
         return logicTag switch
         {
@@ -90,7 +90,7 @@ public static class SelectTargetLogic
         };
     }
 
-    private static SelectMainTargetResult SelectCardWithLogic(IGameplayStatusWatcher gameplayWatcher, TargetLogicTag logicTag)
+    private static SelectMainTargetResult SelectCardWithLogic(IGameplayModel gameplayWatcher, TargetLogicTag logicTag)
     {
         return logicTag switch
         {
@@ -101,7 +101,7 @@ public static class SelectTargetLogic
         };
     }
 
-    private static SelectMainTargetResult SelectEnemyCharacter(IGameplayStatusWatcher gameplayWatcher)
+    private static SelectMainTargetResult SelectEnemyCharacter(IGameplayModel gameplayWatcher)
     {
         return gameplayWatcher.GameStatus.OppositePlayer
             .FlatMap(oppositePlayer => LinqEnumerableExtensions.FirstOrNone(oppositePlayer.Characters))
@@ -109,7 +109,7 @@ public static class SelectTargetLogic
             .ValueOr(new SelectMainTargetResult(false, TargetType.None, Guid.Empty));
     }
 
-    private static SelectMainTargetResult SelectAllyCharacter(IGameplayStatusWatcher gameplayWatcher)
+    private static SelectMainTargetResult SelectAllyCharacter(IGameplayModel gameplayWatcher)
     {
         return gameplayWatcher.GameStatus.CurrentPlayer
             .FlatMap(currentPlayer => LinqEnumerableExtensions.FirstOrNone(currentPlayer.Characters))
@@ -117,7 +117,7 @@ public static class SelectTargetLogic
             .ValueOr(new SelectMainTargetResult(false, TargetType.None, Guid.Empty));
     }
 
-    private static SelectMainTargetResult SelectRandomCharacter(IGameplayStatusWatcher gameplayWatcher)
+    private static SelectMainTargetResult SelectRandomCharacter(IGameplayModel gameplayWatcher)
     {
         return LinqEnumerableExtensions.FirstOrNone(
             gameplayWatcher.GameStatus.Ally.Characters
@@ -130,7 +130,7 @@ public static class SelectTargetLogic
             .ValueOr(new SelectMainTargetResult(false, TargetType.None, Guid.Empty));
     }
 
-    private static SelectMainTargetResult SelectEnemyCard(IGameplayStatusWatcher gameplayWatcher)
+    private static SelectMainTargetResult SelectEnemyCard(IGameplayModel gameplayWatcher)
     {
         return gameplayWatcher.GameStatus.OppositePlayer
             .FlatMap(oppositePlayer => LinqEnumerableExtensions.FirstOrNone(oppositePlayer.CardManager.HandCard.Cards))
@@ -138,7 +138,7 @@ public static class SelectTargetLogic
             .ValueOr(new SelectMainTargetResult(false, TargetType.None, Guid.Empty));
     }
 
-    private static SelectMainTargetResult SelectAllyCard(IGameplayStatusWatcher gameplayWatcher)
+    private static SelectMainTargetResult SelectAllyCard(IGameplayModel gameplayWatcher)
     {
         return gameplayWatcher.GameStatus.CurrentPlayer
             .FlatMap(currentPlayer => LinqEnumerableExtensions.FirstOrNone(currentPlayer.CardManager.HandCard.Cards))
@@ -146,7 +146,7 @@ public static class SelectTargetLogic
             .ValueOr(new SelectMainTargetResult(false, TargetType.None, Guid.Empty));
     }
 
-    private static SelectMainTargetResult SelectRandomCard(IGameplayStatusWatcher gameplayWatcher)
+    private static SelectMainTargetResult SelectRandomCard(IGameplayModel gameplayWatcher)
     {
         return LinqEnumerableExtensions.FirstOrNone(
             gameplayWatcher.GameStatus.Ally.CardManager.HandCard.Cards

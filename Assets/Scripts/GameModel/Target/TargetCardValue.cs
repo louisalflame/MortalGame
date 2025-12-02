@@ -7,19 +7,13 @@ using UnityEngine;
 
 public interface ITargetCardValue
 {
-    Option<ICardEntity> Eval(
-        IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger,
-        IActionUnit actionUnit);
+    Option<ICardEntity> Eval(TriggerContext triggerContext);
 }
 
 [Serializable]
 public class NoneCard : ITargetCardValue
 {
-    public Option<ICardEntity> Eval(
-        IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger,
-        IActionUnit actionUnit)
+    public Option<ICardEntity> Eval(TriggerContext triggerContext)
     {
         return Option.None<ICardEntity>();
     }
@@ -27,23 +21,18 @@ public class NoneCard : ITargetCardValue
 [Serializable]
 public class SelectedCard : ITargetCardValue
 {
-    public Option<ICardEntity> Eval(
-        IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger,
-        IActionUnit actionUnit)
+
+    public Option<ICardEntity> Eval(TriggerContext triggerContext)
     {
-        return gameWatcher.ContextManager.Context.SelectedCard.SomeNotNull();
+        return triggerContext.Model.ContextManager.Context.SelectedCard.SomeNotNull();
     }
 }
 [Serializable]
 public class PlayingCard : ITargetCardValue
 {
-    public Option<ICardEntity> Eval(
-        IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger,
-        IActionUnit actionUnit)
+    public Option<ICardEntity> Eval(TriggerContext triggerContext)
     {
-        return actionUnit.Source switch
+        return triggerContext.Triggered switch
         {
             CardPlaySource cardPlaySource =>
                 cardPlaySource.Card.SomeNotNull(),
@@ -66,19 +55,16 @@ public class IndexOfCardCollection : ITargetCardValue
 
     public OrderType Order;
 
-    public Option<ICardEntity> Eval(
-        IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger,
-        IActionUnit actionUnit)
+    public Option<ICardEntity> Eval(TriggerContext triggerContext)
     {
-        var cards = CardCollection.Eval(gameWatcher, trigger, actionUnit);
+        var cards = CardCollection.Eval(triggerContext);
         var orderedCards = Order switch
         {
             OrderType.Ascending => cards.ToList(),
             OrderType.Descending => cards.Reverse().ToList(),
             _ => cards.ToList()
         };
-        var index = Index.Eval(gameWatcher, trigger, actionUnit);
+        var index = Index.Eval(triggerContext);
         return cards.Count > index && index >= 0 ?
             orderedCards.ElementAt(index).SomeNotNull() :
             Option.None<ICardEntity>();
@@ -87,10 +73,7 @@ public class IndexOfCardCollection : ITargetCardValue
 
 public interface ITargetCardCollectionValue
 {
-    IReadOnlyCollection<ICardEntity> Eval(
-        IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger,
-        IActionUnit actionUnit);
+    IReadOnlyCollection<ICardEntity> Eval(TriggerContext triggerContext);
 }
 
 [Serializable]
@@ -99,13 +82,10 @@ public class SingleCardCollection : ITargetCardCollectionValue
     [HorizontalGroup("1")]
     public ITargetCardValue TargetCard;
 
-    public IReadOnlyCollection<ICardEntity> Eval(
-        IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger,
-        IActionUnit actionUnit)
+    public IReadOnlyCollection<ICardEntity> Eval(TriggerContext triggerContext)
     {
         return TargetCard
-            .Eval(gameWatcher, trigger, actionUnit)
+            .Eval(triggerContext)
             .ToEnumerable().ToList();
     }
 }
@@ -115,12 +95,9 @@ public class AllyHandCards : ITargetCardCollectionValue
     [HorizontalGroup("1")]
     public ITargetPlayerValue Player;
 
-    public IReadOnlyCollection<ICardEntity> Eval(
-        IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger,
-        IActionUnit actionUnit)
+    public IReadOnlyCollection<ICardEntity> Eval(TriggerContext triggerContext)
     {
-        var playerOpt = Player.Eval(gameWatcher, trigger, actionUnit);
+        var playerOpt = Player.Eval(triggerContext);
         return playerOpt
             .Map(player => player.CardManager.HandCard.Cards)
             .ValueOr(Array.Empty<ICardEntity>());

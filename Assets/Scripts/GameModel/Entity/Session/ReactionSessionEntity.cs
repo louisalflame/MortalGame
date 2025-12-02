@@ -10,7 +10,7 @@ public interface IReactionSessionEntity
     Option<bool> BooleanValue { get; }
     Option<int> IntegerValue { get; }
 
-    bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit);
+    bool Update(TriggerContext triggerContext);
     IReactionSessionEntity Clone();
 }
 
@@ -46,10 +46,10 @@ public class ReactionSessionEntity : IReactionSessionEntity
         }
     }
 
-    public bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public bool Update(TriggerContext triggerContext)
     {
         bool isUpdated = false;
-        if (actionUnit is UpdateTimingAction timingAction)
+        if (triggerContext.Action is UpdateTimingAction timingAction)
         {
             switch (_lifeTime)
             {
@@ -81,7 +81,7 @@ public class ReactionSessionEntity : IReactionSessionEntity
         }
 
         isUpdated |= _currentValue.Match(
-            value => value.Update(gameWatcher, trigger, actionUnit),
+            value => value.Update(triggerContext),
             () => false);
         return isUpdated;
     }

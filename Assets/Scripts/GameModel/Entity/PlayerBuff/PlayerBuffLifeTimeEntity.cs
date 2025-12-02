@@ -3,7 +3,7 @@ using UnityEngine;
 public interface IPlayerBuffLifeTimeEntity
 {
     bool IsExpired();
-    bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit);
+    bool Update(TriggerContext triggerContext);
 }
 
 public class AlwaysLifeTimePlayerBuffEntity : IPlayerBuffLifeTimeEntity
@@ -13,7 +13,7 @@ public class AlwaysLifeTimePlayerBuffEntity : IPlayerBuffLifeTimeEntity
         return false;
     }
 
-    public bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public bool Update(TriggerContext triggerContext)
     {
         return false;
     }
@@ -33,9 +33,9 @@ public class TurnLifeTimePlayerBuffEntity : IPlayerBuffLifeTimeEntity
         return _turn <= 0;
     }
 
-    public bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public bool Update(TriggerContext triggerContext)
     {
-        if (actionUnit is UpdateTimingAction timingAction &&
+        if (triggerContext.Action is UpdateTimingAction timingAction &&
             timingAction.Timing == GameTiming.TurnEnd)
         {
             _turn--;

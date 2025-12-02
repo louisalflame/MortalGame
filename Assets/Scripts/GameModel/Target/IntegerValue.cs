@@ -6,7 +6,7 @@ using Sirenix.OdinInspector;
 
 public interface IIntegerValue
 {
-    int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource, IActionUnit actionUnit);
+    int Eval(TriggerContext triggerContext);
 }
 
 [Serializable]
@@ -14,7 +14,7 @@ public class ConstInteger : IIntegerValue
 {
     public int Value;
 
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource, IActionUnit actionUnit)
+    public int Eval(TriggerContext triggerContext)
     {
         return Value;
     }
@@ -27,10 +27,10 @@ public class ArithmeticInteger : IIntegerValue
     public IIntegerValue Left;
     public IIntegerValue Right;
 
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource, IActionUnit actionUnit)
+    public int Eval(TriggerContext triggerContext)
     {
-        var leftValue = Left.Eval(gameWatcher, triggerSource, actionUnit);
-        var rightValue = Right.Eval(gameWatcher, triggerSource, actionUnit);
+        var leftValue = Left.Eval(triggerContext);
+        var rightValue = Right.Eval(triggerContext);
 
         return Operation switch
         {
@@ -54,17 +54,17 @@ public class CardIntegerProperty : IIntegerValue
     public ITargetCardValue Card;
     public CardIntegerValueType Property;
 
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource, IActionUnit actionUnit)
+    public int Eval(TriggerContext triggerContext)
     {
         return Card
-            .Eval(gameWatcher, triggerSource, actionUnit)
+            .Eval(triggerContext)
             .Map(
                 card => Property switch
                 {
                     // TODO: Apply EffectAttribute.Power adjust
-                    CardIntegerValueType.Power => GameFormula.CardPower(gameWatcher, card, actionUnit, triggerSource),
+                    CardIntegerValueType.Power => GameFormula.CardPower(triggerContext, card),
                     // TODO: Apply EffectAttribute.Cost adjust
-                    CardIntegerValueType.Cost => GameFormula.CardCost(gameWatcher, card, actionUnit, triggerSource),
+                    CardIntegerValueType.Cost => GameFormula.CardCost(triggerContext, card),
                     _ => 0
                 })
             .ValueOr(0);
@@ -84,13 +84,13 @@ public class PlayerIntegerProperty : IIntegerValue
     public ITargetPlayerValue Player;
     public PlayerIntegerValueType Property;
 
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource, IActionUnit actionUnit)
+    public int Eval(TriggerContext triggerContext)
     {
-        var playerOpt = Player.Eval(gameWatcher, triggerSource, actionUnit);
+        var playerOpt = Player.Eval(triggerContext);
         return Player
-            .Eval(gameWatcher, triggerSource, actionUnit)
-            .Map(
-                player => Property switch
+            .Eval(triggerContext)
+            .Map(player => 
+                Property switch
                 {
                     PlayerIntegerValueType.MaxEnergy => player.MaxEnergy,
                     PlayerIntegerValueType.CurrentEnergy => player.CurrentEnergy,
@@ -112,9 +112,9 @@ public class CardBuffIntegerProperty : IIntegerValue
     public ITargetCardBuffValue CardBuff;
     public CardBuffIntegerValueType Property;
 
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource, IActionUnit actionUnit)
+    public int Eval(TriggerContext triggerContext)
     {
-        var cardBuffOpt = CardBuff.Eval(gameWatcher, triggerSource, actionUnit);
+        var cardBuffOpt = CardBuff.Eval(triggerContext);
         return cardBuffOpt
             .Map(
                 cardBuff => Property switch
@@ -138,10 +138,10 @@ public class PlayerBuffIntegerProperty : IIntegerValue
     public ITargetPlayerBuffValue PlayerBuff;
     public PlayerBuffIntegerValueType Property;
 
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource, IActionUnit actionUnit)
+    public int Eval(TriggerContext triggerContext)
     {
         return PlayerBuff
-            .Eval(gameWatcher, triggerSource, actionUnit)
+            .Eval(triggerContext)
             .Map(
                 playerBuff => Property switch
                 {
@@ -159,10 +159,10 @@ public class PlayerBuffSessionInteger : IIntegerValue
     public ITargetPlayerBuffValue PlayerBuff;
     public string SessionIntegerId;
 
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource, IActionUnit actionUnit)
+    public int Eval(TriggerContext triggerContext)
     {
         return PlayerBuff
-            .Eval(gameWatcher, triggerSource, actionUnit)
+            .Eval(triggerContext)
             .FlatMap(playerBuff => playerBuff.GetSessionInteger(SessionIntegerId))
             .ValueOr(0);
     }
@@ -186,13 +186,13 @@ public class ConditionalValue : IIntegerValue
     [HorizontalGroup("1")]
     public List<ConditionPair> Pairs = new ();
 
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource, IActionUnit actionUnit)
+    public int Eval(TriggerContext triggerContext)
     {
         foreach (var pair in Pairs)
         {
-            if (pair.Conditions.All(condition => condition.Eval(gameWatcher, triggerSource, actionUnit)))
+            if (pair.Conditions.All(condition => condition.Eval(triggerContext)))
             {
-                return pair.Value.Eval(gameWatcher, triggerSource, actionUnit);
+                return pair.Value.Eval(triggerContext);
             }
         }
         return 0;

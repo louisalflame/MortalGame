@@ -5,7 +5,7 @@ using Sirenix.OdinInspector;
 
 public interface ICardPlayValueCondition
 {
-    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, CardPlaySource cardPlay);
+    bool Eval(TriggerContext triggerContext, CardPlaySource cardPlay);
 }
 [Serializable]
 public class CardPlayPositionCondition : ICardPlayValueCondition
@@ -18,7 +18,7 @@ public class CardPlayPositionCondition : ICardPlayValueCondition
 
     public OrderType Order;
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, CardPlaySource cardPlay)
+    public bool Eval(TriggerContext triggerContext, CardPlaySource cardPlay)
     {
         switch (Order)
         { 
@@ -38,8 +38,8 @@ public class CardPlayCardCondition : ICardPlayValueCondition
     [HorizontalGroup("1")]
     public List<ICardValueCondition> Conditions = new();
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, CardPlaySource cardPlay)
+    public bool Eval(TriggerContext triggerContext, CardPlaySource cardPlay)
     {
-        return Conditions.All(c => c.Eval(gameWatcher, source, actionUnit, cardPlay.Card));
+        return Conditions.All(c => c.Eval(triggerContext, cardPlay.Card));
     }
 }

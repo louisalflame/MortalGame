@@ -9,7 +9,7 @@ using UnityEngine;
 
 public interface ICondition
 {
-    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit);
+    bool Eval(TriggerContext triggerContext);
 }
 
 public interface ICardBuffCondition : ICondition { }
@@ -20,7 +20,7 @@ public interface ICharacterBuffCondition : ICondition { }
 public class ConstCondition : ICardBuffCondition, IPlayerBuffCondition, ICharacterBuffCondition
 {
     public bool Value;
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit)
+    public bool Eval(TriggerContext triggerContext)
     {
         return Value;
     }
@@ -33,9 +33,9 @@ public class AllCondition : ICardBuffCondition, IPlayerBuffCondition, ICharacter
     [HorizontalGroup("1")]
     public List<ICondition> Conditions = new();
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit)
+    public bool Eval(TriggerContext triggerContext)
     {
-        return Conditions.All(condition => condition.Eval(gameWatcher, source, actionUnit));
+        return Conditions.All(condition => condition.Eval(triggerContext));
     }
 }
 
@@ -46,9 +46,9 @@ public class AnyCondition : ICardBuffCondition, IPlayerBuffCondition, ICharacter
     [HorizontalGroup("1")]
     public List<ICondition> Conditions = new();
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit)
+    public bool Eval(TriggerContext triggerContext)
     {
-        return Conditions.Any(condition => condition.Eval(gameWatcher, source, actionUnit));
+        return Conditions.Any(condition => condition.Eval(triggerContext));
     }
 }
 
@@ -58,9 +58,9 @@ public class InverseCondition : ICardBuffCondition, IPlayerBuffCondition, IChara
     [HorizontalGroup("1")]
     public ICondition Condition;
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit)
+    public bool Eval(TriggerContext triggerContext)
     {
-        return !Condition.Eval(gameWatcher, source, actionUnit);
+        return !Condition.Eval(triggerContext);
     }
 }
 
@@ -70,10 +70,10 @@ public class IsSelfTurnCondition : IPlayerBuffCondition, ICharacterBuffCondition
     [HorizontalGroup("1")]
     public ITargetPlayerValue TargetPlayer;
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public bool Eval(TriggerContext triggerContext)
     {
-        return gameWatcher.GameStatus.CurrentPlayer.Match(
-            currnentPlayer => TargetPlayer.Eval(gameWatcher, trigger, actionUnit).Match(
+        return triggerContext.Model.GameStatus.CurrentPlayer.Match(
+            currnentPlayer => TargetPlayer.Eval(triggerContext).Match(
                                 targetPlayer => currnentPlayer == targetPlayer,
                                 ()           => false),
             ()             => false
@@ -91,10 +91,10 @@ public class IntegerCondition : ICardBuffCondition, IPlayerBuffCondition, IChara
     [HorizontalGroup("2")]
     public List<IIntegerValueCondition> Conditions = new ();
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public bool Eval(TriggerContext triggerContext)
     {
-        var value = Value.Eval(gameWatcher, trigger, actionUnit);
-        return Conditions.All(c => c.Eval(gameWatcher, trigger, actionUnit, value));
+        var value = Value.Eval(triggerContext);
+        return Conditions.All(c => c.Eval(triggerContext, value));
     }
 }
 
@@ -108,11 +108,11 @@ public class CardCondition : ICardBuffCondition, IPlayerBuffCondition, ICharacte
     [HorizontalGroup("2")]
     public List<ICardValueCondition> Conditions = new ();
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public bool Eval(TriggerContext triggerContext)
     {
-        var cardOpt = Card.Eval(gameWatcher, trigger, actionUnit);
+        var cardOpt = Card.Eval(triggerContext);
         return cardOpt.Match(
-            card => Conditions.All(c => c.Eval(gameWatcher, trigger, actionUnit, card)),
+            card => Conditions.All(c => c.Eval(triggerContext, card)),
             ()   => false
         );
     }
@@ -124,14 +124,14 @@ public class CardPlayCondition : ICardBuffCondition, IPlayerBuffCondition, IChar
     [HorizontalGroup("1")]
     public List<ICardPlayValueCondition> Conditions = new();
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public bool Eval(TriggerContext triggerContext)
     {
-        return actionUnit.Source switch
+        return triggerContext.Action.Source switch
         {
             CardPlaySource cardPlaySource =>
-                Conditions.All(c => c.Eval(gameWatcher, trigger, actionUnit, cardPlaySource)),
+                Conditions.All(c => c.Eval(triggerContext, cardPlaySource)),
             CardPlayResultSource cardPlayResultSource =>
-                Conditions.All(c => c.Eval(gameWatcher, trigger, actionUnit, cardPlayResultSource.CardPlaySource)),
+                Conditions.All(c => c.Eval(triggerContext, cardPlayResultSource.CardPlaySource)),
             _ => false
         };
     }
@@ -144,12 +144,12 @@ public class CardPlayResultCondition : ICardBuffCondition, IPlayerBuffCondition,
     [HorizontalGroup("1")]
     public List<ICardPlayResultValueCondition> Conditions = new();
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public bool Eval(TriggerContext triggerContext)
     {
-        return actionUnit.Source switch
+        return triggerContext.Action.Source switch
         {
             CardPlayResultSource cardPlayResultSource =>
-                Conditions.All(c => c.Eval(gameWatcher, trigger, actionUnit, cardPlayResultSource)),
+                Conditions.All(c => c.Eval(triggerContext, cardPlayResultSource)),
             _ => false
         };
     }
@@ -165,11 +165,11 @@ public class PlayerCondition : ICardBuffCondition, IPlayerBuffCondition, ICharac
     [HorizontalGroup("2")]
     public List<IPlayerValueCondition> Conditions = new ();
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public bool Eval(TriggerContext triggerContext)
     {
-        var playerOpt = Player.Eval(gameWatcher, trigger, actionUnit);
+        var playerOpt = Player.Eval(triggerContext);
         return playerOpt.Match(
-            player => Conditions.All(c => c.Eval(gameWatcher, trigger, actionUnit, player)),
+            player => Conditions.All(c => c.Eval(triggerContext, player)),
             ()     => false
         );
     }
@@ -185,11 +185,11 @@ public class CharacterCondition : ICardBuffCondition, IPlayerBuffCondition, ICha
     [HorizontalGroup("2")]
     public List<ICharacterValueCondition> Conditions = new ();
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public bool Eval(TriggerContext triggerContext)
     {
-        var characterOpt = Character.Eval(gameWatcher, trigger, actionUnit);
+        var characterOpt = Character.Eval(triggerContext);
         return characterOpt.Match(
-            character => Conditions.All(c => c.Eval(gameWatcher, trigger, actionUnit, character)),
+            character => Conditions.All(c => c.Eval(triggerContext, character)),
             ()        => false
         );
     }
@@ -204,11 +204,11 @@ public class PlayerBuffCondition : IPlayerBuffCondition
     [ShowInInspector]
     [HorizontalGroup("2")]
     public List<IPlayerBuffValueCondition> Conditions = new ();
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public bool Eval(TriggerContext triggerContext)
     {
-        var playerBuffOpt = PlayerBuff.Eval(gameWatcher, trigger, actionUnit);
+        var playerBuffOpt = PlayerBuff.Eval(triggerContext);
         return playerBuffOpt.Match(
-            playerBuff => Conditions.All(c => c.Eval(gameWatcher, trigger, actionUnit, playerBuff)),
+            playerBuff => Conditions.All(c => c.Eval(triggerContext, playerBuff)),
             ()         => false
         );
     }

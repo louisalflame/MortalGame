@@ -3,13 +3,13 @@ using Sirenix.OdinInspector;
 
 public interface ICharacterBuffPropertyData
 {
-    ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger);
+    ICharacterBuffPropertyEntity CreateEntity(TriggerContext triggerContext);
 }
 
 [Serializable]
 public class MaxHealthPropertyCharacterBuffData : ICharacterBuffPropertyData
 {
-    public ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
+    public ICharacterBuffPropertyEntity CreateEntity(TriggerContext triggerContext)
     {
         return new MaxHealthPropertyCharacterBuffEntity();
     }
@@ -18,7 +18,7 @@ public class MaxHealthPropertyCharacterBuffData : ICharacterBuffPropertyData
 [Serializable]
 public class MaxEnergyPropertyCharacterBuffData : ICharacterBuffPropertyData
 {
-    public ICharacterBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
+    public ICharacterBuffPropertyEntity CreateEntity(TriggerContext triggerContext)
     {
         return new MaxEnergyPropertyCharacterBuffEntity();
     }

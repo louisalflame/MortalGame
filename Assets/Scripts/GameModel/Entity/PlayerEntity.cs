@@ -18,7 +18,7 @@ public interface IPlayerEntity
     IPlayerBuffManager BuffManager { get; }
     ICharacterEntity MainCharacter { get; }
 
-    IGameEvent Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit);
+    IGameEvent Update(TriggerContext triggerContext);
 }
 
 public abstract class PlayerEntity : IPlayerEntity
@@ -58,21 +58,20 @@ public abstract class PlayerEntity : IPlayerEntity
         _buffManager = new PlayerBuffManager();
     }
 
-    public IGameEvent Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)
+    public IGameEvent Update(TriggerContext triggerContext)
     {
         var updatedPlayerBuffInfos = _buffManager
-            .Update(gameWatcher, actionUnit)
-            .Select(buff => buff.ToInfo(gameWatcher));
+            .Update(triggerContext)
+            .Select(buff => buff.ToInfo(triggerContext.Model));
 
         var updatedCharacterBuffInfos = _characters
             .Select(character => character.BuffManager)
-            .SelectMany(buffManager => buffManager.Update(gameWatcher, actionUnit))
-            .Select(buff => buff.ToInfo(gameWatcher));
+            .SelectMany(buffManager => buffManager.Update(triggerContext))
+            .Select(buff => buff.ToInfo(triggerContext.Model));
 
         var updatedCardInfos = _cardManager
-            .Update(gameWatcher, actionUnit)
-            .Select(card => card.ToInfo(gameWatcher));
-
+            .Update(triggerContext)
+            .Select(card => card.ToInfo(triggerContext.Model));
         return new GeneralUpdateEvent(
             updatedPlayerBuffInfos.ToList(),
             updatedCharacterBuffInfos.ToList(),
@@ -141,7 +140,7 @@ public class EnemyEntity : PlayerEntity
         EnergyRecoverPoint = energyRecoverPoint;
     }
 
-    public bool TryGetRecommandSelectCard(IGameplayStatusWatcher gameplayWatcher, out ICardEntity cardEntity)
+    public bool TryGetRecommandSelectCard(IGameplayModel gameplayWatcher, out ICardEntity cardEntity)
     {
         if (UseCardLogic.TryGetRecommandSelectCard(gameplayWatcher, this, out cardEntity))
         {
@@ -152,7 +151,7 @@ public class EnemyEntity : PlayerEntity
         return false;
     }
 
-    public bool TryGetNextUseCardAction(IGameplayStatusWatcher gameplayWatcher, out UseCardAction useCardAction)
+    public bool TryGetNextUseCardAction(IGameplayModel gameplayWatcher, out UseCardAction useCardAction)
     {
         if (UseCardLogic.TryGetNextUseCardAction(gameplayWatcher, this, out useCardAction))
         {
@@ -175,36 +174,38 @@ public class DummyPlayer : PlayerEntity
 public static class PlayerEntityExtensions
 {
     public static int GetPlayerBuffAdditionProperty(
-        this IPlayerEntity player, IGameplayStatusWatcher watcher, PlayerBuffProperty targetProperty)
+        this IPlayerEntity player, TriggerContext triggerContext, PlayerBuffProperty targetProperty)
     {
         var value = 0;
         foreach (var playerBuff in player.BuffManager.Buffs)
         {
             var triggerBuff = new PlayerBuffTrigger(playerBuff);
+            var playerBuffTriggerContext = triggerContext with { Triggered = triggerBuff };
             foreach (var property in playerBuff.Properties)
             {
                 if (property is IPlayerBuffIntegerPropertyEntity integerEntity &&
                     property.Property == targetProperty)
                 {
-                    value += integerEntity.Eval(watcher, triggerBuff);
+                    value += integerEntity.Eval(playerBuffTriggerContext);
                 }
             }
         }
         return value;
     }
     public static float GetPlayerBuffRatioProperty(
-        this IPlayerEntity player, IGameplayStatusWatcher watcher, PlayerBuffProperty targetProperty)
+        this IPlayerEntity player, TriggerContext triggerContext, PlayerBuffProperty targetProperty)
     {
         float ratio = 0f;
         foreach (var playerBuff in player.BuffManager.Buffs)
         {
             var triggerBuff = new PlayerBuffTrigger(playerBuff);
+            var playerBuffTriggerContext = triggerContext with { Triggered = triggerBuff };
             foreach (var property in playerBuff.Properties)
             {
                 if (property is IPlayerBuffRatioPropertyEntity ratioEntity &&
                     property.Property == targetProperty)
                 {
-                    ratio += ratioEntity.Eval(watcher, triggerBuff);
+                    ratio += ratioEntity.Eval(playerBuffTriggerContext);
                 }
             }
         }

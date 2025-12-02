@@ -16,31 +16,27 @@ public interface IPlayerCardManager
     ICardColletionZone GetCardCollectionZone(CardCollectionType type);
 
     (bool Success, IDisposable PlayCardDisposable) TryPlayCard(ICardEntity card, out int handCardIndex, out int handCardsCount);
-    IEnumerable<IGameEvent> ClearHandOnTurnEnd(IGameplayStatusWatcher gameWatcher);
+    IEnumerable<IGameEvent> ClearHandOnTurnEnd(IGameplayModel gameWatcher);
 
     Option<ICardEntity> GetCard(Guid cardIdentity);
     bool TryDiscardCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
     bool TryConsumeCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
     bool TryDisposeCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
     CreateCardResult CreateNewCard(
-        IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger,
-        IActionUnit actionUnit,
+        TriggerContext triggerContext,
         string cardDataId,
         CardCollectionType cloneDestination,
         CardLibrary cardLibrary,
         CardBuffLibrary cardBuffLibrary,
         IEnumerable<AddCardBuffData> addCardBuffDatas);
     CloneCardResult CloneNewCard(
-        IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger,
-        IActionUnit actionUnit,
+        TriggerContext triggerContext,
         ICardEntity originCard,
         CardCollectionType cloneDestination,
         CardBuffLibrary cardBuffLibrary,
         IEnumerable<AddCardBuffData> addCardBuffDatas);
 
-    IEnumerable<ICardEntity> Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit);
+    IEnumerable<ICardEntity> Update(TriggerContext triggerContext);
 }
 
 public record CardManagerInfo(
@@ -117,7 +113,7 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
         PlayingCard = Option.None<ICardEntity>();
     }
 
-    public IEnumerable<IGameEvent> ClearHandOnTurnEnd(IGameplayStatusWatcher gameWatcher)
+    public IEnumerable<IGameEvent> ClearHandOnTurnEnd(IGameplayModel gameWatcher)
     {
         var events = new List<IGameEvent>();
 
@@ -300,9 +296,7 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
     }
 
     public CreateCardResult CreateNewCard(
-        IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger,
-        IActionUnit actionUnit,
+        TriggerContext triggerContext,
         string cardDataId,
         CardCollectionType cloneDestination,
         CardLibrary cardLibrary,
@@ -315,11 +309,9 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
             .Select(addCardBuffData => newCard.BuffManager
                 .AddBuff(
                     cardBuffLibrary,
-                    gameWatcher,
-                    trigger,
-                    actionUnit,
+                    triggerContext,
                     addCardBuffData.CardBuffId,
-                    addCardBuffData.Level.Eval(gameWatcher, trigger, actionUnit)))
+                    addCardBuffData.Level.Eval(triggerContext)))
             .ToArray();
 
         _AddCard(newCard, cloneDestination);
@@ -331,9 +323,7 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
         );
     }
     public CloneCardResult CloneNewCard(
-        IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger,
-        IActionUnit actionUnit,
+        TriggerContext triggerContext,
         ICardEntity originCard,
         CardCollectionType cloneDestination,
         CardBuffLibrary cardBuffLibrary,
@@ -345,11 +335,9 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
             .Select(addCardBuffData => cloneCard.BuffManager
                 .AddBuff(
                     cardBuffLibrary,
-                    gameWatcher,
-                    trigger,
-                    actionUnit,
+                    triggerContext,
                     addCardBuffData.CardBuffId,
-                    addCardBuffData.Level.Eval(gameWatcher, trigger, actionUnit)))
+                    addCardBuffData.Level.Eval(triggerContext)))
             .ToArray();
 
         _AddCard(cloneCard, cloneDestination);
@@ -383,7 +371,7 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
         }
     }
 
-    public IEnumerable<ICardEntity> Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)
+    public IEnumerable<ICardEntity> Update(TriggerContext triggerContext)
     {
         foreach (var card in HandCard.Cards
             .Concat(Deck.Cards)
@@ -391,7 +379,7 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
             .Concat(ExclusionZone.Cards)
             .Concat(DisposeZone.Cards))
         {
-            if (card.BuffManager.Update(gameWatcher, actionUnit))
+            if (card.BuffManager.Update(triggerContext))
             {
                 yield return card;
             }
@@ -401,7 +389,7 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
 
 public static class PlayerCardManagerExtensions
 {
-    public static Option<IPlayerEntity> Owner(this IPlayerCardManager cardManager, IGameplayStatusWatcher watcher)
+    public static Option<IPlayerEntity> Owner(this IPlayerCardManager cardManager, IGameplayModel watcher)
     {
         if (watcher.GameStatus.Ally.CardManager == cardManager)
             return (watcher.GameStatus.Ally as IPlayerEntity).Some();
@@ -410,7 +398,7 @@ public static class PlayerCardManagerExtensions
         return Option.None<IPlayerEntity>();
     }
 
-    public static CardManagerInfo ToInfo(this IPlayerCardManager cardManager, IGameplayStatusWatcher gameWatcher)
+    public static CardManagerInfo ToInfo(this IPlayerCardManager cardManager, IGameplayModel gameWatcher)
         => new(
             new Dictionary<CardCollectionType, CardCollectionInfo>
             {

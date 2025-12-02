@@ -26,21 +26,24 @@ public static class SelectionInfoUtility
             mainTargetLogic.MainSelectable.SelectType, mainTargetLogic.LogicTag);
     }
 
-    public static SubSelectionInfo ToInfo(this IEnumerable<ISubSelectionGroup> subSelectionGroups, IGameplayStatusWatcher gameplayWatcher, ICardEntity cardEntity)
+    public static SubSelectionInfo ToInfo(this IEnumerable<ISubSelectionGroup> subSelectionGroups, IGameplayModel model, ICardEntity cardEntity)
     {
         var selectionInfos = new Dictionary<string, ISubSelectionGroupInfo>();
         foreach (var group in subSelectionGroups)
         {
             switch (group)
             {
-                case ExistCardSelectionGroup existCardGroup:
+                case ExistCardSelectionGroup existCardGroup:                
+                    var cardLookTriggerContext = new TriggerContext(
+                        model,
+                        new CardTrigger(cardEntity),
+                        new CardLookIntentAction(cardEntity));
+
                     selectionInfos[group.Id] =
                         new ExistCardSelectionInfo(
-                            existCardGroup.CardCandidates.Eval(gameplayWatcher, new CardTrigger(cardEntity), new CardLookIntentAction(cardEntity))
-                                .Select(c => CardInfo.Create(c, gameplayWatcher))
-                                .ToList(),
-                            existCardGroup.SelectCount.Eval(gameplayWatcher, new CardTrigger(cardEntity), new CardLookIntentAction(cardEntity)),
-                            existCardGroup.IsMustSelect.Eval(gameplayWatcher, new CardTrigger(cardEntity), new CardLookIntentAction(cardEntity)));
+                            existCardGroup.CardCandidates.Eval(cardLookTriggerContext).Select(c => c.ToInfo(model)).ToList(),
+                            existCardGroup.SelectCount.Eval(cardLookTriggerContext),
+                            existCardGroup.IsMustSelect.Eval(cardLookTriggerContext));
                     break;
                 case NewCardSelectionGroup:
                     selectionInfos[group.Id] = new NewCardSelectionInfo();

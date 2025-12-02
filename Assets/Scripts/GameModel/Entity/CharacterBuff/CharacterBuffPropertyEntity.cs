@@ -5,7 +5,7 @@ public interface ICharacterBuffPropertyEntity
 {
     CharacterBuffProperty Property { get; }
     
-    int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource);
+    int Eval(IGameplayModel gameWatcher, ITriggeredSource triggerSource);
 }
 
 public class MaxHealthPropertyCharacterBuffEntity : ICharacterBuffPropertyEntity
@@ -13,7 +13,7 @@ public class MaxHealthPropertyCharacterBuffEntity : ICharacterBuffPropertyEntity
     public CharacterBuffProperty Property => CharacterBuffProperty.MaxHealth;
 
     public MaxHealthPropertyCharacterBuffEntity() { }
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource) => 0;
+    public int Eval(IGameplayModel gameWatcher, ITriggeredSource triggerSource) => 0;
 }
 
 public class MaxEnergyPropertyCharacterBuffEntity : ICharacterBuffPropertyEntity
@@ -21,5 +21,5 @@ public class MaxEnergyPropertyCharacterBuffEntity : ICharacterBuffPropertyEntity
     public CharacterBuffProperty Property => CharacterBuffProperty.MaxEnergy;
 
     public MaxEnergyPropertyCharacterBuffEntity() { }
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource) => 0;
+    public int Eval(IGameplayModel gameWatcher, ITriggeredSource triggerSource) => 0;
 }

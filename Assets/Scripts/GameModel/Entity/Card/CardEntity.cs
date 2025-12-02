@@ -142,7 +142,7 @@ public class CardEntity : ICardEntity
 
 public static class CardEntityExtensions
 {
-    public static Option<ICardEntity> GetCard(this IGameplayStatusWatcher gameplayWatcher, Guid identity)
+    public static Option<ICardEntity> GetCard(this IGameplayModel gameplayWatcher, Guid identity)
     {
         var allyCardOpt = gameplayWatcher.GameStatus.Ally.CardManager.GetCard(identity);
         if (allyCardOpt.HasValue)
@@ -153,7 +153,7 @@ public static class CardEntityExtensions
         return Option.None<ICardEntity>();
     }
 
-    public static Option<IPlayerEntity> Owner(this ICardEntity card, IGameplayStatusWatcher gameplayWatcher)
+    public static Option<IPlayerEntity> Owner(this ICardEntity card, IGameplayModel gameplayWatcher)
     {
         var gameStatus = gameplayWatcher.GameStatus;
         var allyCardOpt = gameStatus.Ally.CardManager.GetCard(card.Identity);
@@ -164,7 +164,7 @@ public static class CardEntityExtensions
             return (gameStatus.Enemy as IPlayerEntity).Some();
         return Option.None<IPlayerEntity>();
     }
-    public static Faction Faction(this ICardEntity card, IGameplayStatusWatcher gameplayWatcher)
+    public static Faction Faction(this ICardEntity card, IGameplayModel gameplayWatcher)
     {
         return card.Owner(gameplayWatcher).ValueOr(PlayerEntity.DummyPlayer).Faction;
     }
@@ -186,22 +186,24 @@ public static class CardEntityExtensions
     }
     
     public static int GetCardProperty(
-        this ICardEntity card, IGameplayStatusWatcher watcher, IActionUnit actionUnit, ITriggerSource trigger, CardProperty targetProperty)
+        this ICardEntity card, TriggerContext triggerContext, CardProperty targetProperty)
     {
         var value = 0;
 
         var cardTrigger = new CardTrigger(card);
+        var propertyContext = triggerContext with { Triggered = cardTrigger };
         foreach (var property in card.Properties.Where(p => p.Property == targetProperty))
         {
-            value += property.Eval(watcher, actionUnit, cardTrigger);
+            value += property.Eval(propertyContext);
         }
 
         foreach (var buff in card.BuffManager.Buffs)
         {
             var cardBuffTrigger = new CardBuffTrigger(buff);
+            var cardBuffContext = triggerContext with { Triggered = cardBuffTrigger };
             foreach (var property in buff.Properties.Where(p => p.Property == targetProperty))
             {
-                value += property.Eval(watcher, actionUnit, cardBuffTrigger);
+                value += property.Eval(cardBuffContext);
             }
         }
 

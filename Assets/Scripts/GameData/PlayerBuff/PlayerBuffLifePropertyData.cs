@@ -3,7 +3,7 @@ using Sirenix.OdinInspector;
 
 public interface IPlayerBuffPropertyData
 {
-    IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger);
+    IPlayerBuffPropertyEntity CreateEntity(TriggerContext triggerContext);
 }
 
 [Serializable]
@@ -11,7 +11,7 @@ public class AllCardPowerPlayerBuffPropertyData : IPlayerBuffPropertyData
 {
     public IIntegerValue Value;
 
-    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
+    public IPlayerBuffPropertyEntity CreateEntity(TriggerContext triggerContext)
     {
         return new AllCardPowerPlayerBuffPropertyEntity(Value);
     }
@@ -21,7 +21,7 @@ public class AllCardCostPlayerBuffPropertyData : IPlayerBuffPropertyData
 {
     public IIntegerValue Value;
 
-    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
+    public IPlayerBuffPropertyEntity CreateEntity(TriggerContext triggerContext)
     {
         return new AllCardCostPlayerBuffPropertyEntity(Value);
     }
@@ -32,7 +32,7 @@ public class NormalDamageAdditionPlayerBuffPropertyData : IPlayerBuffPropertyDat
 {
     public IIntegerValue Value;
 
-    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
+    public IPlayerBuffPropertyEntity CreateEntity(TriggerContext triggerContext)
     {
         return new NormalDamageAdditionPlayerBuffPropertyEntity(Value);
     }
@@ -42,7 +42,7 @@ public class NormalDamageRatioPlayerBuffPropertyData : IPlayerBuffPropertyData
 {
     public float Value;
 
-    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
+    public IPlayerBuffPropertyEntity CreateEntity(TriggerContext triggerContext)
     {
         return new NormalDamageRatioPlayerBuffPropertyEntity(Value);
     }
@@ -52,7 +52,7 @@ public class NormalDamageRatioPlayerBuffPropertyData : IPlayerBuffPropertyData
 public class MaxHealthPlayerBuffPropertyData : IPlayerBuffPropertyData
 {
     public IIntegerValue Value;
-    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
+    public IPlayerBuffPropertyEntity CreateEntity(TriggerContext triggerContext)
     {
         return new MaxHealthPlayerBuffPropertyEntity(Value);
     }
@@ -62,7 +62,7 @@ public class MaxHealthPlayerBuffPropertyData : IPlayerBuffPropertyData
 public class MaxEnergyPlayerBuffPropertyData : IPlayerBuffPropertyData
 {
     public IIntegerValue Value;
-    public IPlayerBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
+    public IPlayerBuffPropertyEntity CreateEntity(TriggerContext triggerContext)
     {
         return new MaxEnergyPlayerBuffPropertyEntity(Value);
     }

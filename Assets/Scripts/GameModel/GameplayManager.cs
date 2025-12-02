@@ -5,19 +5,15 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Optional;
 
-public interface IGameplayStatusWatcher
+public interface IGameplayModel
 {
     GameStatus GameStatus { get; }
     IGameContextManager ContextManager { get; }
     Option<SubSelectionInfo> QueryCardSubSelectionInfos(Guid cardIdentity);
-}
-
-public interface IGameplayReactor
-{
     IEnumerable<IGameEvent> UpdateReactorSessionAction(IActionUnit actionUnit);
 }
 
-public interface IGameEventWatcher : IGameplayStatusWatcher
+public interface IGameEventWatcher : IGameplayModel
 {
     event Action OnUseCard;
     event Action OneTurnStart;
@@ -52,7 +48,7 @@ public class UniTaskAwaitableQueue<T>
     }
 }
 
-public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGameplayReactor
+public class GameplayManager : IGameplayModel, IGameEventWatcher
 {
     public event Action OnUseCard;
     public event Action OneTurnStart;
@@ -75,8 +71,8 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
     private GameHistory _gameHistory;
 
     public Option<BattleResult> BattleResult { get { return _battleResult; } }
-    GameStatus IGameplayStatusWatcher.GameStatus { get { return _gameStatus; } }
-    IGameContextManager IGameplayStatusWatcher.ContextManager { get { return _contextMgr; } }
+    GameStatus IGameplayModel.GameStatus { get { return _gameStatus; } }
+    IGameContextManager IGameplayModel.ContextManager { get { return _contextMgr; } }
 
     public GameplayManager(GameStatus initialStatus, GameContextManager contextManager)
     {
@@ -186,10 +182,10 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
         var allyDrawCount = _contextMgr.DispositionLibrary.GetDrawCardCount(_gameStatus.Ally.DispositionManager.CurrentDisposition);
         var enemyDrawCount = _gameStatus.Enemy.TurnStartDrawCardCount;
 
-        var allyDrawEvents = EffectExecutor.DrawCards(this, this, SystemSource.Instance, _gameStatus.Ally, allyDrawCount);
+        var allyDrawEvents = EffectExecutor.DrawCards(this, SystemSource.Instance, _gameStatus.Ally, allyDrawCount);
         _gameEvents.AddRange(allyDrawEvents.Events);
 
-        var enemyDrawEvents = EffectExecutor.DrawCards(this, this, SystemSource.Instance, _gameStatus.Enemy, enemyDrawCount);
+        var enemyDrawEvents = EffectExecutor.DrawCards(this, SystemSource.Instance, _gameStatus.Enemy, enemyDrawCount);
         _gameEvents.AddRange(enemyDrawEvents.Events);
 
         var triggerEvts = _TriggerTiming(GameTiming.DrawCard, SystemSource.Instance);
@@ -344,7 +340,8 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
         {
             var useCardEvents = new List<IGameEvent>();
 
-            var cardRuntimCost = GameFormula.CardCost(this, usedCard, new CardLookIntentAction(usedCard), new CardTrigger(usedCard));
+            var useCardContext = new TriggerContext(this, new CardTrigger(usedCard), new CardLookIntentAction(usedCard));
+            var cardRuntimCost = GameFormula.CardCost(useCardContext, usedCard);
             if (cardRuntimCost <= player.CurrentEnergy)
             {
                 var loseEnergyResult = player.EnergyManager.ConsumeEnergy(cardRuntimCost);
@@ -355,16 +352,16 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                 {
                     var cardPlaySource = new CardPlaySource(usedCard, handCardIndex, handCardsCount, loseEnergyResult, new CardPlayAttributeEntity());
                     var cardPlayTrigger = new CardPlayTrigger(cardPlaySource);
+                    var cardPlayIntent = new CardPlayIntentAction(cardPlaySource);
+                    var cardPlayTriggerContext = new TriggerContext(this, cardPlayTrigger, cardPlayIntent);
                     var cardPlayResultSource = null as CardPlayResultSource;
 
                     using (playCardDisposable)
                     {
                         // Create PlayCardSession
-                        useCardEvents.AddRange(
-                            UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.PlayCardStart, new SystemSource())));
+                        useCardEvents.AddRange(UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.PlayCardStart, new SystemSource())));
 
-                        useCardEvents.AddRange(
-                            UpdateReactorSessionAction(new CardPlayIntentAction(cardPlaySource)));
+                        useCardEvents.AddRange(UpdateReactorSessionAction(cardPlayIntent));
 
                         //TODO: check and remove expired buffs
                         //      trigger events while remove buffs
@@ -374,12 +371,7 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
                         var effectActionResults = new List<BaseResultAction>();
                         foreach (var effect in usedCard.Effects)
                         {
-                            var effectResult = EffectExecutor.ApplyCardEffect(
-                                this,
-                                this,
-                                cardPlaySource,
-                                cardPlayTrigger,
-                                effect);
+                            var effectResult = EffectExecutor.ApplyCardEffect(cardPlayTriggerContext, effect);
                             useCardEvents.AddRange(effectResult.Events);
                             effectActionResults.AddRange(effectResult.ResultActions);
                         }
@@ -412,8 +404,8 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
 
     public IEnumerable<IGameEvent> UpdateReactorSessionAction(IActionUnit actionUnit)
     {
-        var allyEvt = _gameStatus.Ally.Update(this, actionUnit);
-        var enemyEvt = _gameStatus.Enemy.Update(this, actionUnit);
+        var allyEvt = _gameStatus.Ally.Update(new TriggerContext(this, new PlayerTrigger(_gameStatus.Ally), actionUnit));
+        var enemyEvt = _gameStatus.Enemy.Update(new TriggerContext(this, new PlayerTrigger(_gameStatus.Enemy), actionUnit));
 
         return new List<IGameEvent> { allyEvt, enemyEvt };
     }
@@ -426,15 +418,15 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
         foreach (var buff in _gameStatus.Ally.BuffManager.Buffs)
         {
             var buffTrigger = new PlayerBuffTrigger(buff);
-            var conditionalEffectsOpt = _contextMgr.BuffLibrary.GetBuffEffects(buff.PlayerBuffDataId, timing);
+            var buffTriggerContext = new TriggerContext(this, buffTrigger, timingAction);
+            var conditionalEffectsOpt = _contextMgr.PlayerBuffLibrary.GetBuffEffects(buff.PlayerBuffDataId, timing);
             conditionalEffectsOpt.MatchSome(conditionalEffects =>
             {
                 foreach (var conditionalEffect in conditionalEffects)
                 {
-                    if (conditionalEffect.Conditions.All(c => c.Eval(this, buffTrigger, timingAction)))
+                    if (conditionalEffect.Conditions.All(c => c.Eval(buffTriggerContext)))
                     {
-                        var applyEvts = EffectExecutor.ApplyPlayerBuffEffect(
-                            this, this, actionSource, buffTrigger, conditionalEffect.Effect);
+                        var applyEvts = EffectExecutor.ApplyPlayerBuffEffect(buffTriggerContext, conditionalEffect.Effect);
                         triggerBuffEvents.AddRange(applyEvts.Events);
 
                         var nextTriggerSource = new PlayerBuffSource(buff);
@@ -456,16 +448,16 @@ public class GameplayManager : IGameplayStatusWatcher, IGameEventWatcher, IGamep
         foreach (var buff in _gameStatus.Enemy.BuffManager.Buffs)
         {
             var buffTrigger = new PlayerBuffTrigger(buff);
-            var conditionalEffectsOpt = _contextMgr.BuffLibrary.GetBuffEffects(buff.PlayerBuffDataId, timing);
+            var buffTriggerContext = new TriggerContext(this, buffTrigger, timingAction);
+            var conditionalEffectsOpt = _contextMgr.PlayerBuffLibrary.GetBuffEffects(buff.PlayerBuffDataId, timing);
 
             conditionalEffectsOpt.MatchSome(conditionalEffects =>
             {
                 foreach (var conditionalEffect in conditionalEffects)
                 {
-                    if (conditionalEffect.Conditions.All(c => c.Eval(this, buffTrigger, timingAction)))
+                    if (conditionalEffect.Conditions.All(c => c.Eval(buffTriggerContext)))
                     {
-                        var applyEvts = EffectExecutor.ApplyPlayerBuffEffect(
-                            this, this, actionSource, buffTrigger, conditionalEffect.Effect);
+                        var applyEvts = EffectExecutor.ApplyPlayerBuffEffect(buffTriggerContext, conditionalEffect.Effect);
                         triggerBuffEvents.AddRange(applyEvts.Events);
 
                         var nextTriggerSource = new PlayerBuffSource(buff);

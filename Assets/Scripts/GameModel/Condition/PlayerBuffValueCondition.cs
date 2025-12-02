@@ -5,7 +5,7 @@ using Sirenix.OdinInspector;
 
 public interface IPlayerBuffValueCondition
 {
-    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, IPlayerBuffEntity playerBuff);
+    bool Eval(TriggerContext triggerContext, IPlayerBuffEntity playerBuff);
 }
 
 [Serializable]
@@ -17,9 +17,9 @@ public class PlayerBuffSessionCondition : IPlayerBuffValueCondition
     [HorizontalGroup("2")]
     public List<IReactionSessionValueCondition> Conditions = new();
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, IPlayerBuffEntity playerBuff)
+    public bool Eval(TriggerContext triggerContext, IPlayerBuffEntity playerBuff)
     {
         return playerBuff.ReactionSessions.TryGetValue(SessionKey, out var session) &&
-            Conditions.All(condition => condition.Eval(gameWatcher, source, actionUnit, session));
+            Conditions.All(condition => condition.Eval(triggerContext, session));
     }
 }

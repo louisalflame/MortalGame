@@ -4,19 +4,13 @@ using UnityEngine;
 
 public interface ITargetCardBuffValue
 {
-    Option<ICardBuffEntity> Eval(
-        IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger,
-        IActionUnit actionUnit);
+    Option<ICardBuffEntity> Eval(TriggerContext triggerContext);
 }
 
 [Serializable]
 public class NoneCardBuff : ITargetCardBuffValue
 {
-    public Option<ICardBuffEntity> Eval(
-        IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger,
-        IActionUnit actionUnit)
+    public Option<ICardBuffEntity> Eval(TriggerContext triggerContext)
     {
         return Option.None<ICardBuffEntity>();
     }
@@ -25,12 +19,9 @@ public class NoneCardBuff : ITargetCardBuffValue
 [Serializable]
 public class TriggeredCardBuff : ITargetCardBuffValue
 {
-    public Option<ICardBuffEntity> Eval(
-        IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger,
-        IActionUnit actionUnit)
+    public Option<ICardBuffEntity> Eval(TriggerContext triggerContext)
     {
-        return trigger switch
+        return triggerContext.Triggered switch
         {
             CardBuffTrigger cardBuff => cardBuff.Buff.SomeNotNull(),
             _ => Option.None<ICardBuffEntity>()

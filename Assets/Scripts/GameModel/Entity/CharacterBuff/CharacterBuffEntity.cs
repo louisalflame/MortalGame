@@ -85,7 +85,7 @@ public class DummyCharacterBuff : CharacterBuffEntity
 
 public static class CharacterBuffEntityExtensions
 {
-    public static CharacterBuffInfo ToInfo(this ICharacterBuffEntity characterBuff, IGameplayStatusWatcher gameWatcher)
+    public static CharacterBuffInfo ToInfo(this ICharacterBuffEntity characterBuff, IGameplayModel gameWatcher)
     {
         return new CharacterBuffInfo(
             characterBuff.Id,

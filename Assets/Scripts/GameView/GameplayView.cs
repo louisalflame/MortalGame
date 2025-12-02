@@ -11,7 +11,7 @@ public interface IGameplayView : IAllCardDetailPanelView, IInteractionButtonView
     void Init(
         IGameViewModel gameInfoModel,
         IGameplayActionReciever reciever, 
-        IGameplayStatusWatcher statusWatcher, 
+        IGameplayModel statusWatcher, 
         LocalizeLibrary localizeLibrary,
         DispositionLibrary dispositionLibrary);
     void Render(IReadOnlyCollection<IGameEvent> events, IGameplayActionReciever reciever);
@@ -124,7 +124,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
     public void Init(
         IGameViewModel gameInfoModel,
         IGameplayActionReciever reciever, 
-        IGameplayStatusWatcher statusWatcher,
+        IGameplayModel statusWatcher,
         LocalizeLibrary localizeLibrary, 
         DispositionLibrary dispositionLibrary)
     {

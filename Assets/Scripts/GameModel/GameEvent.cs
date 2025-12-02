@@ -36,7 +36,7 @@ public record MoveCardEvent(
     CardCollectionInfo StartZoneInfo,
     CardCollectionInfo DestinationZoneInfo) : IGameEvent
 {
-    public MoveCardEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher, ICardColletionZone start, ICardColletionZone destination)
+    public MoveCardEvent(ICardEntity card, IGameplayModel gameWatcher, ICardColletionZone start, ICardColletionZone destination)
         : this(card.Faction(gameWatcher),
             card.ToInfo(gameWatcher),
             start.ToCardCollectionInfo(gameWatcher),
@@ -48,7 +48,7 @@ public record AddCardEvent(
     CardInfo CardInfo,
     CardCollectionInfo DestinationZoneInfo) : IGameEvent
 {
-    public AddCardEvent(Option<ICardEntity> originCard, ICardEntity card, IGameplayStatusWatcher gameWatcher, ICardColletionZone destination)
+    public AddCardEvent(Option<ICardEntity> originCard, ICardEntity card, IGameplayModel gameWatcher, ICardColletionZone destination)
         : this(card.Faction(gameWatcher),
             originCard.Map(c => c.ToInfo(gameWatcher)),
             card.ToInfo(gameWatcher),
@@ -56,17 +56,17 @@ public record AddCardEvent(
 }
 public record UpdateHandCardsEvent(Faction Faction, CardInfo CardInfo) : IGameEvent
 {
-    public UpdateHandCardsEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher) 
+    public UpdateHandCardsEvent(ICardEntity card, IGameplayModel gameWatcher) 
         : this(card.Faction(gameWatcher), card.ToInfo(gameWatcher)) { }
 }
 public record AddCardBuffEvent(Faction Faction, CardInfo CardInfo) : IGameEvent
 {
-    public AddCardBuffEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher)
+    public AddCardBuffEvent(ICardEntity card, IGameplayModel gameWatcher)
         : this(card.Faction(gameWatcher), card.ToInfo(gameWatcher)) { }
 }
 public record RemoveCardBuffEvent(Faction Faction, CardInfo CardInfo) : IGameEvent
 {
-    public RemoveCardBuffEvent(ICardEntity card, IGameplayStatusWatcher gameWatcher)
+    public RemoveCardBuffEvent(ICardEntity card, IGameplayModel gameWatcher)
         : this(card.Faction(gameWatcher), card.ToInfo(gameWatcher)) { }
 }
 

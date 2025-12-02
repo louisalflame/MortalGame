@@ -4,7 +4,7 @@ using UnityEngine;
 public interface ICardBuffLifeTimeEntity
 {
     bool IsExpired();
-    bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit);
+    bool Update(TriggerContext triggerContext);
     ICardBuffLifeTimeEntity Clone();
 }
 
@@ -15,7 +15,7 @@ public class AlwaysLifeTimeCardBuffEntity : ICardBuffLifeTimeEntity
         return false;
     }
 
-    public bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public bool Update(TriggerContext triggerContext)
         => false;
     
     public ICardBuffLifeTimeEntity Clone() => new AlwaysLifeTimeCardBuffEntity();
@@ -35,9 +35,9 @@ public class TurnLifeTimeCardBuffEntity : ICardBuffLifeTimeEntity
         return _turn <= 0;
     }
 
-    public bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public bool Update(TriggerContext triggerContext)
     {
-        if (actionUnit is UpdateTimingAction timingAction &&
+        if (triggerContext.Action is UpdateTimingAction timingAction &&
             timingAction.Timing == GameTiming.TurnEnd)
         {
             _turn--;
@@ -62,9 +62,9 @@ public class HandCardLifeTimeCardBuffEntity : ICardBuffLifeTimeEntity
         return _expired;
     }
 
-    public bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public bool Update(TriggerContext triggerContext)
     {
-        if (!_CheckInHandCard(gameWatcher))
+        if (!_CheckInHandCard(triggerContext.Model))
         {
             _expired = true;
             return true;
@@ -72,10 +72,10 @@ public class HandCardLifeTimeCardBuffEntity : ICardBuffLifeTimeEntity
         return false;
     }
 
-    private bool _CheckInHandCard(IGameplayStatusWatcher gameWatcher)
+    private bool _CheckInHandCard(IGameplayModel gameModel)
     {
-        foreach (var card in gameWatcher.GameStatus.Ally.CardManager.HandCard.Cards
-            .Concat(gameWatcher.GameStatus.Enemy.CardManager.HandCard.Cards))
+        foreach (var card in gameModel.GameStatus.Ally.CardManager.HandCard.Cards
+            .Concat(gameModel.GameStatus.Enemy.CardManager.HandCard.Cards))
         {
             foreach (var buff in card.BuffManager.Buffs)
             {

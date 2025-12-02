@@ -3,7 +3,7 @@ using UnityEngine;
 public interface ICharacterBuffLifeTimeEntity
 {
     bool IsExpired();
-    bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit);
+    bool Update(TriggerContext triggerContext);
 }
 
 public class AlwaysLifeTimeCharacterBuffEntity : ICharacterBuffLifeTimeEntity
@@ -13,7 +13,7 @@ public class AlwaysLifeTimeCharacterBuffEntity : ICharacterBuffLifeTimeEntity
         return false;
     }
 
-    public bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public bool Update(TriggerContext triggerContext)
         => false;
 }
 
@@ -31,9 +31,9 @@ public class TurnLifeTimeCharacterBuffEntity : ICharacterBuffLifeTimeEntity
         return _turn <= 0;
     }
 
-    public bool Update(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger, IActionUnit actionUnit)
+    public bool Update(TriggerContext triggerContext)
     {
-        if (actionUnit is UpdateTimingAction timingAction &&
+        if (triggerContext.Action is UpdateTimingAction timingAction &&
             timingAction.Timing == GameTiming.TurnEnd)
         {
             _turn--;

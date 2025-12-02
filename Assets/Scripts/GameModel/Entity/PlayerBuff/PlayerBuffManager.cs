@@ -8,19 +8,14 @@ public interface IPlayerBuffManager
 {
     IReadOnlyCollection<IPlayerBuffEntity> Buffs { get; }
     AddPlayerBuffResult AddBuff(
-        PlayerBuffLibrary buffLibrary, 
-        IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource triggerSource,
-        IActionUnit actionUnit,
+        TriggerContext triggerContext,
         string buffId, 
         int level);
     RemovePlayerBuffResult RemoveBuff(
-        PlayerBuffLibrary buffLibrary, 
-        IGameplayStatusWatcher gameWatcher, 
-        IActionUnit actionUnit,
+        TriggerContext triggerContext,
         string buffId);
 
-    IEnumerable<IPlayerBuffEntity> Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit);
+    IEnumerable<IPlayerBuffEntity> Update(TriggerContext triggerContext);
 }
 
 public class PlayerBuffManager : IPlayerBuffManager
@@ -35,10 +30,7 @@ public class PlayerBuffManager : IPlayerBuffManager
     }
 
     public AddPlayerBuffResult AddBuff(
-        PlayerBuffLibrary buffLibrary, 
-        IGameplayStatusWatcher gameWatcher,
-        ITriggerSource triggerSource,
-        IActionUnit actionUnit,
+        TriggerContext triggerContext,
         string buffId, 
         int level)
     {
@@ -55,26 +47,27 @@ public class PlayerBuffManager : IPlayerBuffManager
             }
         }
 
-        var caster = actionUnit.Source switch
+        var caster = triggerContext.Action.Source switch
         {
             PlayerBuffSource playerBuffSource => playerBuffSource.Buff.Caster,
-            CardPlaySource cardPlaySource => cardPlaySource.Card.Owner(gameWatcher),
+            CardPlaySource cardPlaySource => cardPlaySource.Card.Owner(triggerContext.Model),
             _ => Option.None<IPlayerEntity>()
         };
 
+        var buffLibrary = triggerContext.Model.ContextManager.PlayerBuffLibrary;
         var resultBuff = new PlayerBuffEntity(
             buffId, 
             Guid.NewGuid(), 
             level,
             caster,
             buffLibrary.GetBuffProperties(buffId)
-                .Select(p => p.CreateEntity(gameWatcher, triggerSource)),
+                .Select(p => p.CreateEntity(triggerContext)),
             buffLibrary.GetBuffLifeTime(buffId)
-                .CreateEntity(gameWatcher, triggerSource, actionUnit),
+                .CreateEntity(triggerContext),
             buffLibrary.GetBuffSessions(buffId)
                 .ToDictionary(
                     kvp => kvp.Key, 
-                    kvp => kvp.Value.CreateEntity(gameWatcher, triggerSource, actionUnit)));
+                    kvp => kvp.Value.CreateEntity(triggerContext)));
         _buffs.Add(resultBuff);
         return new AddPlayerBuffResult(
             IsNewBuff: true,
@@ -84,9 +77,7 @@ public class PlayerBuffManager : IPlayerBuffManager
     }
     
     public RemovePlayerBuffResult RemoveBuff(
-        PlayerBuffLibrary buffLibrary, 
-        IGameplayStatusWatcher gameWatcher,
-        IActionUnit actionUnit,
+        TriggerContext triggerContext,
         string buffId)
     {
         foreach (var existBuff in _buffs)
@@ -106,7 +97,7 @@ public class PlayerBuffManager : IPlayerBuffManager
     }
     // TODO
     public RemovePlayerBuffResult RemoveExpiredBuff(
-        IGameplayStatusWatcher gameWatcher)
+        TriggerContext triggerContext)
     {
         var expiredBuffs = new List<IPlayerBuffEntity>();
         foreach (var existBuff in _buffs)
@@ -123,18 +114,20 @@ public class PlayerBuffManager : IPlayerBuffManager
         );
     }
 
-    public IEnumerable<IPlayerBuffEntity> Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)
+    public IEnumerable<IPlayerBuffEntity> Update(TriggerContext triggerContext)
     {
         foreach (var buff in _buffs.ToList())
         {
             var isUpdated = false;
             var triggerBuff = new PlayerBuffTrigger(buff);
+            var updateBuffTriggerContext = triggerContext with { Triggered = triggerBuff };
+
             foreach (var session in buff.ReactionSessions.Values)
             {
-                isUpdated |= session.Update(gameWatcher, triggerBuff, actionUnit);
+                isUpdated |= session.Update(updateBuffTriggerContext);
             }
 
-            isUpdated |= buff.LifeTime.Update(gameWatcher, triggerBuff, actionUnit);
+            isUpdated |= buff.LifeTime.Update(updateBuffTriggerContext);
 
             if (isUpdated)
             {

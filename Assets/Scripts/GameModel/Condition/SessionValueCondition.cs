@@ -5,13 +5,13 @@ using Sirenix.OdinInspector;
 
 public interface IReactionSessionValueCondition
 {
-    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, IReactionSessionEntity sessionEntity);
+    bool Eval(TriggerContext triggerContext, IReactionSessionEntity sessionEntity);
 }
 
 [Serializable]
 public class ReactorSessionUpdatedCondition : IReactionSessionValueCondition
 {
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, IReactionSessionEntity sessionEntity)
+    public bool Eval(TriggerContext triggerContext, IReactionSessionEntity sessionEntity)
     {
         return sessionEntity.IsSessionValueUpdated;
     }
@@ -23,12 +23,12 @@ public class ReactionSessionValueBooleanCondition : IReactionSessionValueConditi
     [HorizontalGroup("1")]
     public List<IBooleanValueCondition> Conditions = new();
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, IReactionSessionEntity sessionEntity)
+    public bool Eval(TriggerContext triggerContext, IReactionSessionEntity sessionEntity)
     {
         return sessionEntity
             .BooleanValue
             .Match(
-                value => Conditions.All(condition => condition.Eval(gameWatcher, source, actionUnit, value)),
+                value => Conditions.All(condition => condition.Eval(triggerContext, value)),
                 () => false);
     }
 }
@@ -40,12 +40,12 @@ public class ReactionSessionValueIntegerCondition : IReactionSessionValueConditi
     [HorizontalGroup("1")]
     public List<IIntegerValueCondition> Conditions = new();
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, IReactionSessionEntity sessionEntity)
+    public bool Eval(TriggerContext triggerContext, IReactionSessionEntity sessionEntity)
     {
         return sessionEntity
             .IntegerValue
             .Match(
-                value => Conditions.All(condition => condition.Eval(gameWatcher, source, actionUnit, value)),
+                value => Conditions.All(condition => condition.Eval(triggerContext, value)),
                 () => false);
     }
 }

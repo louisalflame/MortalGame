@@ -85,7 +85,7 @@ public class DummyPlayerBuff : PlayerBuffEntity
 
 public static class PlayerBuffEntityExtensions
 {    
-    public static PlayerBuffInfo ToInfo(this IPlayerBuffEntity playerBuff, IGameplayStatusWatcher gameWatcher)
+    public static PlayerBuffInfo ToInfo(this IPlayerBuffEntity playerBuff, IGameplayModel gameWatcher)
     {
         return new PlayerBuffInfo(
             playerBuff.PlayerBuffDataId,
@@ -99,7 +99,7 @@ public static class PlayerBuffEntityExtensions
         );
     } 
 
-    public static Option<IPlayerEntity> Owner(this IPlayerBuffEntity playerBuffEntity, IGameplayStatusWatcher watcher)
+    public static Option<IPlayerEntity> Owner(this IPlayerBuffEntity playerBuffEntity, IGameplayModel watcher)
     {
         if (watcher.GameStatus.Ally.BuffManager.Buffs.Contains(playerBuffEntity))
             return (watcher.GameStatus.Ally as IPlayerEntity).Some();

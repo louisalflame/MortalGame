@@ -5,7 +5,7 @@ using UnityEngine;
 
 public interface IIntegerValueCondition
 {
-    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, int value);
+    bool Eval(TriggerContext triggerContext, int value);
 }
 
 [Serializable]
@@ -16,9 +16,9 @@ public class IntegerCompare : IIntegerValueCondition
     [HorizontalGroup("1")]
     public IIntegerValue CompareValue;
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, int value)
+    public bool Eval(TriggerContext triggerContext, int value)
     {
-        var compareValue = CompareValue.Eval(gameWatcher, source, actionUnit);
+        var compareValue = CompareValue.Eval(triggerContext);
         return Arithmetic switch
         {
             ArithmeticConditionType.Equal               => value == compareValue,

@@ -6,7 +6,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 public static class CharacterManagerExtensions
 {
-    public static Option<ICharacterEntity> GetCharacter(this IGameplayStatusWatcher gameplayWatcher, Guid identity)
+    public static Option<ICharacterEntity> GetCharacter(this IGameplayModel gameplayWatcher, Guid identity)
     {
         foreach (var character in gameplayWatcher.GameStatus.Ally.Characters)
         {

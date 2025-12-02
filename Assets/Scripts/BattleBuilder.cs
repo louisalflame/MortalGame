@@ -15,15 +15,17 @@ public class BattleBuidler
     public GameContextManager ConstructGameContextManager()
     {
         var cardLibrary = new CardLibrary(_context.CardTable);
-        var CardBuffLibrary = new CardBuffLibrary(_context.CardBuffTable);
-        var buffLibrary = new PlayerBuffLibrary(_context.BuffTable);
+        var cardBuffLibrary = new CardBuffLibrary(_context.CardBuffTable);
+        var playerBuffLibrary = new PlayerBuffLibrary(_context.PlayerBuffTable);
+        var characterBuffLibrary = new CharacterBuffLibrary(_context.CharacterBuffTable);
         var dispositionLibrary = new DispositionLibrary(_context.DispositionSettings);
         var localizeLibrary = new LocalizeLibrary(_context.LocalizeTitleInfoSetting, _context.LocalizeInfoSetting);
 
         return new GameContextManager(
             cardLibrary, 
-            CardBuffLibrary,
-            buffLibrary, 
+            cardBuffLibrary,
+            playerBuffLibrary,
+            characterBuffLibrary,
             dispositionLibrary,
             localizeLibrary);
     }

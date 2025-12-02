@@ -3,13 +3,13 @@ using UnityEngine;
 
 public interface ICardBuffPropertyData
 {
-    ICardBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger);
+    ICardBuffPropertyEntity CreateEntity(TriggerContext triggerContext);
 }
 
 [Serializable]
 public class SealedCardBuffPropertyData : ICardBuffPropertyData
 {
-    public ICardBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
+    public ICardBuffPropertyEntity CreateEntity(TriggerContext triggerContext)
     {
         return new SealedCardBuffPropertyEntity();
     }
@@ -20,7 +20,7 @@ public class PowerCardBuffPropertyData : ICardBuffPropertyData
 {
     public IIntegerValue Value;
 
-    public ICardBuffPropertyEntity CreateEntity(IGameplayStatusWatcher gameWatcher, ITriggerSource trigger)
+    public ICardBuffPropertyEntity CreateEntity(TriggerContext triggerContext)
     {
         return new PowerCardBuffPropertyEntity(Value);
     }

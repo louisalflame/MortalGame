@@ -6,25 +6,23 @@ using UnityEngine;
 public static class UseCardLogic
 {
     public static bool TryGetRecommandSelectCard(
-        IGameplayStatusWatcher gameplayWatcher,
+        IGameplayModel model,
         EnemyEntity enemy,
         out ICardEntity cardEntity
     )
     {
         var totalSelectedCost = enemy.SelectedCards.Cards
             .Sum(card => GameFormula.CardCost(
-                gameplayWatcher,
-                card,
-                new CardLookIntentAction(card),
-                new CardTrigger(card)
-            ));
+                new TriggerContext(model, new CardTrigger(card), new CardLookIntentAction(card)),
+                card));
         var remainCost = enemy.CurrentEnergy - totalSelectedCost;
 
         var candidateCards = enemy.CardManager.HandCard.Cards
-            .Where(c => !enemy.SelectedCards.Cards.Contains(c))
-            .Select(c => (
-                Card: c,
-                Cost: GameFormula.CardCost(gameplayWatcher, c, new CardLookIntentAction(c), new CardTrigger(c))
+            .Where(card => !enemy.SelectedCards.Cards.Contains(card))
+            .Select(card => (
+                Card: card,
+                Cost: GameFormula.CardCost(
+                    new TriggerContext(model, new CardTrigger(card), new CardLookIntentAction(card)), card)
             ))
             .Where(c => c.Cost <= remainCost);
 
@@ -40,18 +38,18 @@ public static class UseCardLogic
     }
 
     public static bool TryGetNextUseCardAction(
-        IGameplayStatusWatcher gameplayWatcher,
+        IGameplayModel model,
         EnemyEntity enemy,
         out UseCardAction useCardAction)
     {
         foreach (var selectedCard in enemy.SelectedCards.Cards)
         {
-            var selectResult = SelectTargetLogic.SelectMainTarget(gameplayWatcher, selectedCard);
+            var selectResult = SelectTargetLogic.SelectMainTarget(model, selectedCard);
             if (!selectResult.IsValid) continue;
 
-            var subSelectResult = SelectTargetLogic.SelectSubTargets(gameplayWatcher, selectedCard);
+            var subSelectResult = SelectTargetLogic.SelectSubTargets(model, selectedCard);
 
-            var cardRuntimeCost = GameFormula.CardCost(gameplayWatcher, selectedCard, new CardLookIntentAction(selectedCard), new CardTrigger(selectedCard));
+            var cardRuntimeCost = GameFormula.CardCost(new TriggerContext(model, new CardTrigger(selectedCard), new CardLookIntentAction(selectedCard)), selectedCard);
             if (cardRuntimeCost <= enemy.CurrentEnergy)
             {
                 useCardAction = new UseCardAction(

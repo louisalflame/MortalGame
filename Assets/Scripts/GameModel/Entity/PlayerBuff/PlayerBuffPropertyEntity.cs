@@ -7,11 +7,11 @@ public interface IPlayerBuffPropertyEntity
 }
 public interface IPlayerBuffIntegerPropertyEntity : IPlayerBuffPropertyEntity
 {
-    int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource);
+    int Eval(TriggerContext triggerContext);
 }
 public interface IPlayerBuffRatioPropertyEntity : IPlayerBuffPropertyEntity
 {
-    float Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource);
+    float Eval(TriggerContext triggerContext);
 }
 
 public class AllCardPowerPlayerBuffPropertyEntity : IPlayerBuffIntegerPropertyEntity
@@ -24,8 +24,8 @@ public class AllCardPowerPlayerBuffPropertyEntity : IPlayerBuffIntegerPropertyEn
         _value = value;
     }
     
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
-        => _value.Eval(gameWatcher, triggerSource, new PlayerBuffPropertyLookAction(this));
+    public int Eval(TriggerContext triggerContext)
+        => _value.Eval(triggerContext with { Action = new PlayerBuffPropertyLookAction(this) });
 }
 
 public class AllCardCostPlayerBuffPropertyEntity : IPlayerBuffIntegerPropertyEntity
@@ -38,8 +38,8 @@ public class AllCardCostPlayerBuffPropertyEntity : IPlayerBuffIntegerPropertyEnt
         _value = value;
     }
 
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
-        => _value.Eval(gameWatcher, triggerSource, new PlayerBuffPropertyLookAction(this));
+    public int Eval(TriggerContext triggerContext)
+        => _value.Eval(triggerContext with { Action = new PlayerBuffPropertyLookAction(this) });
 }
 public class NormalDamageAdditionPlayerBuffPropertyEntity : IPlayerBuffIntegerPropertyEntity
 {
@@ -51,8 +51,8 @@ public class NormalDamageAdditionPlayerBuffPropertyEntity : IPlayerBuffIntegerPr
         _value = value;
     }
 
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
-        => _value.Eval(gameWatcher, triggerSource, new PlayerBuffPropertyLookAction(this));
+    public int Eval(TriggerContext triggerContext)
+        => _value.Eval(triggerContext with { Action = new PlayerBuffPropertyLookAction(this) });
 }
 public class NormalDamageRatioPlayerBuffPropertyEntity : IPlayerBuffRatioPropertyEntity
 {
@@ -64,7 +64,7 @@ public class NormalDamageRatioPlayerBuffPropertyEntity : IPlayerBuffRatioPropert
         _value = value;
     }
     
-    public float Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
+    public float Eval(TriggerContext triggerContext)
         => _value;
 }
 public class MaxHealthPlayerBuffPropertyEntity : IPlayerBuffIntegerPropertyEntity
@@ -76,8 +76,8 @@ public class MaxHealthPlayerBuffPropertyEntity : IPlayerBuffIntegerPropertyEntit
     { 
         _value = value;
     }
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
-        => _value.Eval(gameWatcher, triggerSource, new PlayerBuffPropertyLookAction(this));
+    public int Eval(TriggerContext triggerContext)
+        => _value.Eval(triggerContext with { Action = new PlayerBuffPropertyLookAction(this) });
 }
 public class MaxEnergyPlayerBuffPropertyEntity : IPlayerBuffIntegerPropertyEntity
 {
@@ -88,6 +88,6 @@ public class MaxEnergyPlayerBuffPropertyEntity : IPlayerBuffIntegerPropertyEntit
     { 
         _value = value;
     }
-    public int Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource triggerSource)
-        => _value.Eval(gameWatcher, triggerSource, new PlayerBuffPropertyLookAction(this));
+    public int Eval(TriggerContext triggerContext)
+        => _value.Eval(triggerContext with { Action = new PlayerBuffPropertyLookAction(this) });
 }

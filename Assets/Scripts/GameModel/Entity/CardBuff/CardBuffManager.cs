@@ -9,18 +9,15 @@ public interface ICardBuffManager
     IReadOnlyCollection<ICardBuffEntity> Buffs { get; }
     AddCardBuffResult AddBuff(
         CardBuffLibrary buffLibrary,
-        IGameplayStatusWatcher gameWatcher,
-        ITriggerSource triggerSource,
-        IActionUnit actionUnit,
+        TriggerContext triggerContext,
         string buffId,
         int level);
     RemoveCardBuffResult RemoveBuff(
         CardBuffLibrary buffLibrary,
-        IGameplayStatusWatcher gameWatcher,
-        IActionUnit actionUnit,
+        TriggerContext triggerContext,
         string buffId);
 
-    bool Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit);
+    bool Update(TriggerContext triggerContext);
 }
 
 public class CardBuffManager : ICardBuffManager
@@ -36,9 +33,7 @@ public class CardBuffManager : ICardBuffManager
 
     public AddCardBuffResult AddBuff(
         CardBuffLibrary cardBuffLibrary,
-        IGameplayStatusWatcher gameWatcher,
-        ITriggerSource triggerSource,
-        IActionUnit actionUnit,
+        TriggerContext triggerContext,
         string buffId,
         int level)
     {
@@ -54,9 +49,9 @@ public class CardBuffManager : ICardBuffManager
             }
         }
 
-        var caster = actionUnit switch
+        var caster = triggerContext.Action switch
         {
-            CardPlaySource cardSource => cardSource.Card.Owner(gameWatcher),
+            CardPlaySource cardSource => cardSource.Card.Owner(triggerContext.Model),
             PlayerBuffSource playerBuffSource => playerBuffSource.Buff.Caster,
             _ => Option.None<IPlayerEntity>()
         };
@@ -65,9 +60,7 @@ public class CardBuffManager : ICardBuffManager
             buffId,
             level,
             caster,
-            gameWatcher,
-            triggerSource,
-            actionUnit,
+            triggerContext,
             cardBuffLibrary);
 
         _buffs.Add(resultBuff);
@@ -79,8 +72,7 @@ public class CardBuffManager : ICardBuffManager
 
     public RemoveCardBuffResult RemoveBuff(
         CardBuffLibrary buffLibrary,
-        IGameplayStatusWatcher gameWatcher,
-        IActionUnit actionUnit,
+        TriggerContext triggerContext,
         string buffId)
     {
         foreach (var existBuff in _buffs)
@@ -97,18 +89,22 @@ public class CardBuffManager : ICardBuffManager
             Buff: Array.Empty<ICardBuffEntity>());
     }
 
-    public bool Update(IGameplayStatusWatcher gameWatcher, IActionUnit actionUnit)
+    public bool Update(TriggerContext triggerContext)
     {
         var isUpdated = false;
         foreach (var buff in _buffs.ToList())
         {
             var triggerBuff = new CardBuffTrigger(buff);
+            var updateBuffContext = triggerContext with
+            {
+                Triggered = triggerBuff
+            };
             foreach (var session in buff.ReactionSessions.Values)
             {
-                isUpdated |= session.Update(gameWatcher, triggerBuff, actionUnit);
+                isUpdated |= session.Update(updateBuffContext);
             }
 
-            isUpdated |= buff.LifeTime.Update(gameWatcher, triggerBuff, actionUnit);
+            isUpdated |= buff.LifeTime.Update(updateBuffContext);
         }
         return isUpdated;
     }    

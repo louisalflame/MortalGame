@@ -5,19 +5,13 @@ using UnityEngine;
 
 public interface ITargetPlayerBuffValue
 {
-    Option<IPlayerBuffEntity> Eval(
-        IGameplayStatusWatcher gameWatcher, 
-        ITriggerSource trigger,
-        IActionUnit actionUnit);
+    Option<IPlayerBuffEntity> Eval(TriggerContext triggerContext);
 }
 
 [Serializable]
 public class NoneBuff : ITargetPlayerBuffValue
 {
-    public Option<IPlayerBuffEntity> Eval(
-        IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger,
-        IActionUnit actionUnit)
+    public Option<IPlayerBuffEntity> Eval(TriggerContext triggerContext)
     {
         return Option.None<IPlayerBuffEntity>();
     }
@@ -25,12 +19,9 @@ public class NoneBuff : ITargetPlayerBuffValue
 [Serializable]
 public class TriggeredPlayerBuff : ITargetPlayerBuffValue
 {
-    public Option<IPlayerBuffEntity> Eval(
-        IGameplayStatusWatcher gameWatcher,
-        ITriggerSource trigger,
-        IActionUnit actionUnit)
+    public Option<IPlayerBuffEntity> Eval(TriggerContext triggerContext)
     {
-        return trigger switch
+        return triggerContext.Triggered switch
         {
             PlayerBuffTrigger playerBuffTrigger => playerBuffTrigger.Buff.Some(),
             _ => Option.None<IPlayerBuffEntity>()

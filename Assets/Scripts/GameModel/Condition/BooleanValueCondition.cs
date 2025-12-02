@@ -3,13 +3,13 @@ using UnityEngine;
 
 public interface IBooleanValueCondition
 {
-    bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, bool value);
+    bool Eval(TriggerContext triggerContext, bool value);
 }
 
 [Serializable]
 public class IsTrueCondition : IBooleanValueCondition
 {
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, bool value)
+    public bool Eval(TriggerContext triggerContext, bool value)
     {
         return value;
     }
@@ -18,7 +18,7 @@ public class IsTrueCondition : IBooleanValueCondition
 [Serializable]
 public class IsFalseCondition : IBooleanValueCondition
 {
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, bool value)
+    public bool Eval(TriggerContext triggerContext, bool value)
     {
         return !value;
     }
@@ -29,8 +29,8 @@ public class IsEqualCondition : IBooleanValueCondition
 {
     public IBooleanValue Boolean;
 
-    public bool Eval(IGameplayStatusWatcher gameWatcher, ITriggerSource source, IActionUnit actionUnit, bool value)
+    public bool Eval(TriggerContext triggerContext, bool value)
     {
-        return value == Boolean.Eval(gameWatcher, source, actionUnit);
+        return value == Boolean.Eval(triggerContext);
     }
 }
