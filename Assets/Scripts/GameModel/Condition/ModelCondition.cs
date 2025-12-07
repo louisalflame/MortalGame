@@ -65,19 +65,44 @@ public class InverseCondition : ICardBuffCondition, IPlayerBuffCondition, IChara
 }
 
 [Serializable]
-public class IsSelfTurnCondition : IPlayerBuffCondition, ICharacterBuffCondition
+public class IsTriggeredOwnerTurnCondition : ICardBuffCondition, IPlayerBuffCondition, ICharacterBuffCondition
 {
-    [HorizontalGroup("1")]
-    public ITargetPlayerValue TargetPlayer;
-
     public bool Eval(TriggerContext triggerContext)
     {
-        return triggerContext.Model.GameStatus.CurrentPlayer.Match(
-            currnentPlayer => TargetPlayer.Eval(triggerContext).Match(
-                                targetPlayer => currnentPlayer == targetPlayer,
-                                ()           => false),
-            ()             => false
-        );
+
+        return triggerContext.Triggered switch
+        {
+            CardPlayTrigger cardPlayTrigger => 
+                triggerContext.Model.GameStatus.CurrentPlayer
+                    .Combine(cardPlayTrigger.CardPlay.Card.Owner(triggerContext.Model))
+                    .Map(t => t.Item1 == t.Item2)
+                    .ValueOr(false),
+            CardTrigger cardTrigger => 
+                triggerContext.Model.GameStatus.CurrentPlayer
+                    .Combine(cardTrigger.Card.Owner(triggerContext.Model))
+                    .Map(t => t.Item1 == t.Item2)
+                    .ValueOr(false),
+            CardBuffTrigger cardBuffTrigger => 
+                triggerContext.Model.GameStatus.CurrentPlayer
+                    .Combine(cardBuffTrigger.Buff.Owner(triggerContext.Model))
+                    .Map(t => t.Item1 == t.Item2)
+                    .ValueOr(false),
+            PlayerBuffTrigger playerBuffTrigger => 
+                triggerContext.Model.GameStatus.CurrentPlayer
+                    .Combine(playerBuffTrigger.Buff.Owner(triggerContext.Model))
+                    .Map(t => t.Item1 == t.Item2)
+                    .ValueOr(false),
+            CharacterBuffTrigger characterBuffTrigger => 
+                triggerContext.Model.GameStatus.CurrentPlayer
+                    .Combine(characterBuffTrigger.Buff.Owner(triggerContext.Model))
+                    .Map(t => t.Item1 == t.Item2)
+                    .ValueOr(false),
+            PlayerTrigger playerTrigger => 
+                triggerContext.Model.GameStatus.CurrentPlayer
+                    .Map(currentPlayer => currentPlayer == playerTrigger.Player)
+                    .ValueOr(false),
+            _ => false
+        };
     }
 }
 

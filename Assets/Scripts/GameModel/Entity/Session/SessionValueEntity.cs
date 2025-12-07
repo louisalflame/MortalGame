@@ -98,7 +98,6 @@ public class SessionIntegerEntity : ISessionValueEntity
                 };
                 return true;
             }
-            break;
         }
         return false;
     }

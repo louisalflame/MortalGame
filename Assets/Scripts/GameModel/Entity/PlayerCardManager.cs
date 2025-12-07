@@ -18,7 +18,7 @@ public interface IPlayerCardManager
     (bool Success, IDisposable PlayCardDisposable) TryPlayCard(ICardEntity card, out int handCardIndex, out int handCardsCount);
     IEnumerable<IGameEvent> ClearHandOnTurnEnd(IGameplayModel gameWatcher);
 
-    Option<ICardEntity> GetCard(Guid cardIdentity);
+    Option<ICardEntity> GetCard(Func<ICardEntity, bool> predicate);
     bool TryDiscardCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
     bool TryConsumeCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
     bool TryDisposeCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
@@ -132,30 +132,30 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
         return events;
     }
 
-    public Option<ICardEntity> GetCard(Guid cardIdentity)
+    public Option<ICardEntity> GetCard(Func<ICardEntity, bool> predicate)
     {
-        if (HandCard.TryGetCard(cardIdentity, out var card))
+        if (HandCard.TryGetCard(predicate, out var card))
         {
             return Option.Some(card);
         }
-        else if (Deck.TryGetCard(cardIdentity, out card))
+        else if (Deck.TryGetCard(predicate, out card))
         {
             return Option.Some(card);
         }
-        else if (Graveyard.TryGetCard(cardIdentity, out card))
+        else if (Graveyard.TryGetCard(predicate, out card))
         {
             return Option.Some(card);
         }
-        else if (ExclusionZone.TryGetCard(cardIdentity, out card))
+        else if (ExclusionZone.TryGetCard(predicate, out card))
         {
             return Option.Some(card);
         }
-        else if (DisposeZone.TryGetCard(cardIdentity, out card))
+        else if (DisposeZone.TryGetCard(predicate, out card))
         {
             return Option.Some(card);
         }
         else if (PlayingCard.Match(
-            card => card.Identity == cardIdentity,
+            card => predicate(card),
             () => false))
         {
             return PlayingCard;
@@ -179,7 +179,7 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
         }
 
         card = null;
-        if (HandCard.TryGetCard(cardIdentity, out var handCard))
+        if (HandCard.TryGetCard(card => card.Identity == cardIdentity, out var handCard))
         {
             card = handCard;
             start = HandCard;
@@ -189,7 +189,7 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
             destination.AddCard(handCard);
             return true;
         }
-        else if (Deck.TryGetCard(cardIdentity, out var deckCard))
+        else if (Deck.TryGetCard(card => card.Identity == cardIdentity, out var deckCard))
         {
             card = deckCard;
             start = Deck;
@@ -215,7 +215,7 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
         }
 
         card = null;
-        if (HandCard.TryGetCard(cardIdentity, out var handCard))
+        if (HandCard.TryGetCard(card => card.Identity == cardIdentity, out var handCard))
         {
             card = handCard;
             start = HandCard;
@@ -225,7 +225,7 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
             destination.AddCard(handCard);
             return true;
         }
-        else if (Deck.TryGetCard(cardIdentity, out var deckCard))
+        else if (Deck.TryGetCard(card => card.Identity == cardIdentity, out var deckCard))
         {
             card = deckCard;
             start = Deck;
@@ -235,7 +235,7 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
             destination.AddCard(handCard);
             return true;
         }
-        else if (Graveyard.TryGetCard(cardIdentity, out var graveyardCard))
+        else if (Graveyard.TryGetCard(card => card.Identity == cardIdentity, out var graveyardCard))
         {
             card = graveyardCard;
             start = Graveyard;
@@ -254,7 +254,7 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
     {
         destination = DisposeZone;
         card = null;
-        if (HandCard.TryGetCard(cardIdentity, out var handCard))
+        if (HandCard.TryGetCard(card => card.Identity == cardIdentity, out var handCard))
         {
             card = handCard;
             start = HandCard;
@@ -263,7 +263,7 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
             destination.AddCard(handCard);
             return true;
         }
-        else if (Deck.TryGetCard(cardIdentity, out var deckCard))
+        else if (Deck.TryGetCard(card => card.Identity == cardIdentity, out var deckCard))
         {
             card = deckCard;
             start = Deck;
@@ -272,7 +272,7 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
             destination.AddCard(handCard);
             return true;
         }
-        else if (Graveyard.TryGetCard(cardIdentity, out var graveyardCard))
+        else if (Graveyard.TryGetCard(card => card.Identity == cardIdentity, out var graveyardCard))
         {
             card = graveyardCard;
             start = Graveyard;
@@ -281,7 +281,7 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
             destination.AddCard(handCard);
             return true;
         }
-        else if (ExclusionZone.TryGetCard(cardIdentity, out var exclusionCard))
+        else if (ExclusionZone.TryGetCard(card => card.Identity == cardIdentity, out var exclusionCard))
         {
             card = exclusionCard;
             start = ExclusionZone;

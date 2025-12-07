@@ -6,11 +6,15 @@ public class ScriptableDataLoader : MonoBehaviour
 { 
     [SerializeField]
     private AllCardScriptable _allCardScriptable;
+    
     [SerializeField]
     private AllCardBuffScriptable _allCardBuffScriptable;
 
     [SerializeField]
-    private AllBuffScriptable _allBuffScriptable;
+    private AllPlayerBuffScriptable _allPlayerBuffScriptable;
+
+    [SerializeField]
+    private AllCharacterBuffScriptable _allCharacterBuffScriptable;
 
     [SerializeField]
     private AllPlayerScriptable _allPlayerScriptable;
@@ -20,7 +24,8 @@ public class ScriptableDataLoader : MonoBehaviour
 
     public CardData[] AllCards => _allCardScriptable.AllCardData.Select(c => c.Data).ToArray();
     public CardBuffData[] AllCardBuffs => _allCardBuffScriptable.AllCardBuffData.Select(c => c.Data).ToArray();
-    public PlayerBuffData[] AllBuffs => _allBuffScriptable.AllBuffData.Select(b => b.Data).ToArray();
+    public PlayerBuffData[] AllPlayerBuffs => _allPlayerBuffScriptable.AllBuffData.Select(b => b.Data).ToArray();
+    public CharacterBuffData[] AllCharacterBuffs => _allCharacterBuffScriptable.AllBuffData.Select(b => b.Data).ToArray();
     public AllyData Ally => _allPlayerScriptable.AllyObject.Ally;
     public EnemyData[] AllEnemies => _allPlayerScriptable.EnemyObjects.Select(p => p.Enemy).ToArray();
 

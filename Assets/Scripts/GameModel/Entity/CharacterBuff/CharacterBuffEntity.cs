@@ -97,4 +97,12 @@ public static class CharacterBuffEntityExtensions
                     kvp => kvp.Key,
                     kvp => kvp.Value.IntegerValue.ValueOr(0)));
     }
+    public static Option<IPlayerEntity> Owner(this ICharacterBuffEntity characterBuff, IGameplayModel gameplayWatcher)
+    {
+        if (gameplayWatcher.GameStatus.Ally.Characters.Any(c => c.BuffManager.Buffs.Contains(characterBuff)))
+            return (gameplayWatcher.GameStatus.Ally as IPlayerEntity).Some();
+        if (gameplayWatcher.GameStatus.Enemy.Characters.Any(c => c.BuffManager.Buffs.Contains(characterBuff)))
+            return (gameplayWatcher.GameStatus.Enemy as IPlayerEntity).Some();
+        return Option.None<IPlayerEntity>();
+    }
 }

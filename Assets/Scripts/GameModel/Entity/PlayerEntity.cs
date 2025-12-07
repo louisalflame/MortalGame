@@ -155,7 +155,8 @@ public class EnemyEntity : PlayerEntity
     {
         if (UseCardLogic.TryGetNextUseCardAction(gameplayWatcher, this, out useCardAction))
         {
-            return CardManager.GetCard(useCardAction.CardIndentity)
+            var cardIdentity = useCardAction.CardIndentity;
+            return CardManager.GetCard(card => card.Identity == cardIdentity)
                 .Map(card => SelectedCards.RemoveCard(card))
                 .ValueOr(false);
         }

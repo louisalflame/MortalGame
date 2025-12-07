@@ -110,7 +110,7 @@ public static class PlayerBuffEntityExtensions
 
     public static Option<bool> GetSessionBoolean(
         this IPlayerBuffEntity playerBuffEntity,
-        string key)
+        string key) 
     {
         if (playerBuffEntity.ReactionSessions.TryGetValue(key, out var session))
         {

@@ -9,7 +9,7 @@ public interface ICardColletionZone
 {
     CardCollectionType Type { get; }
     IReadOnlyCollection<ICardEntity> Cards { get; }
-    bool TryGetCard(Guid cardIdentity, out ICardEntity card);
+    bool TryGetCard(Func<ICardEntity, bool> predicate, out ICardEntity card);
     void AddCard(ICardEntity card);
     void AddCards(IEnumerable<ICardEntity> cards);
     bool RemoveCard(ICardEntity card);
@@ -30,9 +30,9 @@ public abstract class CardColletionZone : ICardColletionZone
         _cards = new List<ICardEntity>();
     }
 
-    public bool TryGetCard(Guid cardIdentity, out ICardEntity card)
+    public bool TryGetCard(Func<ICardEntity, bool> predicate, out ICardEntity card)
     {
-        card = _cards.FirstOrDefault(c => c.Identity == cardIdentity);
+        card = _cards.FirstOrDefault(c => predicate(c));
         return card != null;
     }
 

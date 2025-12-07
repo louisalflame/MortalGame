@@ -15,12 +15,12 @@ public class Context
     public IReadOnlyDictionary<LocalizeTitleInfoType, IReadOnlyDictionary<string, LocalizeTitleInfoData>> LocalizeTitleInfoSetting { get; private set; }
     public IReadOnlyDictionary<LocalizeInfoType, IReadOnlyDictionary<string, LocalizeInfoData>> LocalizeInfoSetting { get; private set; }
 
-    public Context(
-        ScriptableDataLoader scriptableDataLoader)
+    public Context(ScriptableDataLoader scriptableDataLoader)
     {
         CardTable = scriptableDataLoader.AllCards.ToDictionary(c => c.ID, c => c);
         CardBuffTable = scriptableDataLoader.AllCardBuffs.ToDictionary(c => c.ID, c => c);
-        PlayerBuffTable = scriptableDataLoader.AllBuffs.ToDictionary(b => b.ID, b => b);
+        PlayerBuffTable = scriptableDataLoader.AllPlayerBuffs.ToDictionary(b => b.ID, b => b);
+        CharacterBuffTable = scriptableDataLoader.AllCharacterBuffs.ToDictionary(b => b.ID, b => b);
         DispositionSettings = scriptableDataLoader.DispositionSettings();
         AllEnemies = scriptableDataLoader.AllEnemies;
 

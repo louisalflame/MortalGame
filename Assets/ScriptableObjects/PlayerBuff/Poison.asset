@@ -52,11 +52,11 @@ MonoBehaviour:
       Data: 
     - Name: BuffEffects
       Entry: 7
-      Data: 3|System.Collections.Generic.Dictionary`2[[TriggerTiming, Assembly-CSharp],[ConditionalPlayerBuffEffect[],
+      Data: 3|System.Collections.Generic.Dictionary`2[[GameTiming, Assembly-CSharp],[ConditionalPlayerBuffEffect[],
         Assembly-CSharp]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 4|System.Collections.Generic.EnumEqualityComparer`1[[TriggerTiming, Assembly-CSharp]],
+      Data: 4|System.Collections.Generic.EnumEqualityComparer`1[[GameTiming, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -94,22 +94,7 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 7
-      Data: 8|IsSelfTurnCondition, Assembly-CSharp
-    - Name: TargetPlayer
-      Entry: 7
-      Data: 9|PlayerBuffContentPlayer, Assembly-CSharp
-    - Name: PlayerBuff
-      Entry: 7
-      Data: 10|TriggeredPlayerBuff, Assembly-CSharp
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: Type
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
+      Data: 8|IsTriggeredOwnerTurnCondition, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -121,19 +106,19 @@ MonoBehaviour:
       Data: 
     - Name: Effect
       Entry: 7
-      Data: 11|EffectiveDamagePlayerBuffEffect, Assembly-CSharp
+      Data: 9|EffectiveDamagePlayerBuffEffect, Assembly-CSharp
     - Name: Targets
       Entry: 7
-      Data: 12|SingleCharacterCollection, Assembly-CSharp
+      Data: 10|SingleCharacterCollection, Assembly-CSharp
     - Name: Target
       Entry: 7
-      Data: 13|MainCharacterOfPlayer, Assembly-CSharp
+      Data: 11|MainCharacterOfPlayer, Assembly-CSharp
     - Name: Player
       Entry: 7
-      Data: 14|PlayerBuffContentPlayer, Assembly-CSharp
+      Data: 12|PlayerBuffContentPlayer, Assembly-CSharp
     - Name: PlayerBuff
       Entry: 7
-      Data: 15|TriggeredPlayerBuff, Assembly-CSharp
+      Data: 13|TriggeredPlayerBuff, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -151,10 +136,10 @@ MonoBehaviour:
       Data: 
     - Name: Value
       Entry: 7
-      Data: 16|PlayerBuffIntegerProperty, Assembly-CSharp
+      Data: 14|PlayerBuffIntegerProperty, Assembly-CSharp
     - Name: PlayerBuff
       Entry: 7
-      Data: 17|TriggeredPlayerBuff, Assembly-CSharp
+      Data: 15|TriggeredPlayerBuff, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 
@@ -187,7 +172,7 @@ MonoBehaviour:
       Data: 
     - Name: PropertyDatas
       Entry: 7
-      Data: 18|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
+      Data: 16|System.Collections.Generic.List`1[[IPlayerBuffPropertyData, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -200,7 +185,7 @@ MonoBehaviour:
       Data: 
     - Name: LifeTimeData
       Entry: 7
-      Data: 19|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
+      Data: 17|AlwaysLifeTimePlayerBuffData, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 

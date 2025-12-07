@@ -32,7 +32,7 @@ public class PlayingCard : ITargetCardValue
 {
     public Option<ICardEntity> Eval(TriggerContext triggerContext)
     {
-        return triggerContext.Triggered switch
+        return triggerContext.Action.Source switch
         {
             CardPlaySource cardPlaySource =>
                 cardPlaySource.Card.SomeNotNull(),
