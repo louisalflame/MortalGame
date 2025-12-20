@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Optional;
@@ -708,6 +709,32 @@ public static class EffectExecutor
     }
     #endregion
 
+    public static EffectResult CreateNewDeckCard(
+        IGameplayModel model,
+        IActionSource source,
+        IPlayerEntity player,
+        IReadOnlyCollection<CardInstance> cardInstances)
+    {
+        var drawCardEvents = new List<IGameEvent>();
+        var resultActions = new List<BaseResultAction>();
+
+        foreach (var cardInstance in cardInstances)
+        {
+            var createResult = player.CardManager.CreateNewCard(
+                cardInstance,
+                CardCollectionType.Deck,
+                model.ContextManager.CardLibrary);
+
+            var createCardResultAction = new CreateCardResultAction(source, new PlayerTarget(player), createResult);
+            var reactorEvents = model.UpdateReactorSessionAction(createCardResultAction);
+
+            resultActions.Add(createCardResultAction);
+            drawCardEvents.AddRange(reactorEvents);
+            drawCardEvents.Add(new AddCardEvent(Option.None<ICardEntity>(), createResult.Card, model, createResult.Zone));
+        }
+
+        return new EffectResult(drawCardEvents, resultActions);
+    }
     public static EffectResult DrawCards(
         IGameplayModel model,
         IActionSource source,
@@ -730,7 +757,7 @@ public static class EffectExecutor
 
                 resultActions.Add(recycleDeckResultAction);
                 drawCardEvents.AddRange(recycleEvents);
-                drawCardEvents.Add(new RecycleGraveyardEvent(
+                drawCardEvents.Add(new RecycleGraveyardToDeckEvent(
                     Faction: player.Faction,
                     CardManagerInfo: player.CardManager.ToInfo(model)
                 ));
@@ -772,6 +799,20 @@ public static class EffectExecutor
             ));
         }
         
+        return new EffectResult(drawCardEvents, resultActions);
+    }
+
+    public static EffectResult RecycleCardOnPlayEnd(
+        IGameplayModel model,
+        IPlayerEntity player,
+        ICardEntity card)
+    {
+        var drawCardEvents = new List<IGameEvent>();
+        var resultActions = new List<BaseResultAction>();
+
+        var recycleEvents = player.CardManager.RecycleCardOnPlayEnd(model, card);
+        drawCardEvents.AddRange(recycleEvents);
+
         return new EffectResult(drawCardEvents, resultActions);
     }
 }

@@ -12,11 +12,8 @@ public interface IDeckEntity : ICardColletionZone
 }
 public class DeckEntity : CardColletionZone, IDeckEntity
 {    
-    public DeckEntity(IEnumerable<CardInstance> cards, CardLibrary cardLibrary) : base(CardCollectionType.Deck)
-    {
-        EnqueueCardsThenShuffle(
-            cards.Select(c => CardEntity.CreateFromInstance(c, cardLibrary)));
-    }
+    public DeckEntity() : base(CardCollectionType.Deck)
+    { }
 
     public bool PopCard(out ICardEntity card)
     {

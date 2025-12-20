@@ -15,12 +15,12 @@ public class GameplayScene : MonoBehaviour
         var battleBuilder = new BattleBuidler(context);
 
         var gameContextManager = battleBuilder.ConstructGameContextManager();
-        var initialState = battleBuilder.ConstructBattle(gameContextManager);
+        var gameStageSetting = battleBuilder.ConstructBattle();
         var gameplayPresenter = new GameplayPresenter(
             _gameplayView,
             _gameResultWinPanel,
             _gameResultLosePanel,
-            initialState,
+            gameStageSetting,
             gameContextManager);
 
         var result = await gameplayPresenter.Run();

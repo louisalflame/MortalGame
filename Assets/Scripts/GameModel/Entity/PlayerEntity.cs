@@ -7,6 +7,7 @@ using UnityEngine;
 
 public interface IPlayerEntity
 {
+    Guid Identity { get; }
     Faction Faction { get; }
     IReadOnlyCollection<ICharacterEntity> Characters { get; }
     IPlayerCardManager CardManager { get; }
@@ -23,6 +24,7 @@ public interface IPlayerEntity
 
 public abstract class PlayerEntity : IPlayerEntity
 {
+    private readonly Guid _identity;
     private readonly Faction _faction;
     private readonly IEnergyManager _energyManager;
     private readonly IPlayerBuffManager _buffManager;
@@ -30,6 +32,7 @@ public abstract class PlayerEntity : IPlayerEntity
     protected IPlayerCardManager _cardManager;
     protected IReadOnlyCollection<CharacterEntity> _characters;
 
+    public Guid Identity => _identity;
     public Faction Faction => _faction;
     public IEnergyManager EnergyManager => _energyManager;
     public IPlayerBuffManager BuffManager => _buffManager;
@@ -53,6 +56,7 @@ public abstract class PlayerEntity : IPlayerEntity
         int maxEnergy
     )
     {
+        _identity = Guid.NewGuid();
         _faction = faction;
         _energyManager = new EnergyManager(currentEnergy, maxEnergy);
         _buffManager = new PlayerBuffManager();
@@ -91,7 +95,6 @@ public class AllyEntity : PlayerEntity
         int handCardMaxCount,
         int currentDisposition,
         int maxDisposition,
-        IEnumerable<CardInstance> deckInstance,
         IGameContextManager gameContext) : 
         base(
             Faction.Ally, 
@@ -103,8 +106,33 @@ public class AllyEntity : PlayerEntity
         _characters = characterParams
             .Select(param => CharacterEntity.Create(param))
             .ToList();
-        _cardManager = new PlayerCardManager(handCardMaxCount, deckInstance, gameContext.CardLibrary);
+        _cardManager = new PlayerCardManager(handCardMaxCount);
         DispositionManager = new DispositionManager(currentDisposition, maxDisposition);
+    }
+
+    public AllyEntity Clone(IGameContextManager gameContext)
+    {
+        var cloneAlly = new AllyEntity(
+            originPlayerInstanceGuid: _originPlayerInstanceGuid.ValueOr(Guid.Empty),
+            characterParams: _characters
+                .Select(c => new CharacterParameter
+                {
+                    NameKey         = c.NameKey,
+                    CurrentHealth   = c.CurrentHealth,
+                    MaxHealth       = c.MaxHealth
+                })
+                .ToArray(),
+            currentEnergy: CurrentEnergy,
+            maxEnergy: MaxEnergy,
+            handCardMaxCount: _cardManager.HandCard.MaxCount,
+            currentDisposition: DispositionManager.CurrentDisposition,
+            maxDisposition: DispositionManager.MaxDisposition,
+            gameContext: gameContext
+        );
+
+        //cloneAlly._cardManager = new PlayerCardManager(); TODO
+
+        return cloneAlly;
     }
 }
 
@@ -119,7 +147,6 @@ public class EnemyEntity : PlayerEntity
         int currentEnergy,
         int maxEnergy,
         int handCardMaxCount,
-        IEnumerable<CardInstance> enemyCardInstances,
         int selectedCardMaxCount,
         int turnStartDrawCardCount,
         int energyRecoverPoint,
@@ -134,7 +161,7 @@ public class EnemyEntity : PlayerEntity
         _characters = characterParams
             .Select(param => CharacterEntity.Create(param))
             .ToList();
-        _cardManager = new PlayerCardManager(handCardMaxCount, enemyCardInstances, gameContext.CardLibrary);
+        _cardManager = new PlayerCardManager(handCardMaxCount);
         SelectedCards = new SelectedCardEntity(selectedCardMaxCount, new List<ICardEntity>());
         TurnStartDrawCardCount = turnStartDrawCardCount;
         EnergyRecoverPoint = energyRecoverPoint;
@@ -163,6 +190,32 @@ public class EnemyEntity : PlayerEntity
 
         useCardAction = null;
         return false;
+    }
+
+    public EnemyEntity Clone(IGameContextManager gameContext)
+    {
+        var cloneEnemy = new EnemyEntity(
+            characterParams: _characters
+                .Select(c => new CharacterParameter
+                {
+                    NameKey         = c.NameKey,
+                    CurrentHealth   = c.CurrentHealth,
+                    MaxHealth       = c.MaxHealth
+                })
+                .ToArray(),
+            currentEnergy: CurrentEnergy,
+            maxEnergy: MaxEnergy,
+            handCardMaxCount: _cardManager.HandCard.MaxCount,
+            selectedCardMaxCount: 0,
+            turnStartDrawCardCount: TurnStartDrawCardCount,
+            energyRecoverPoint: EnergyRecoverPoint,
+            gameContext: gameContext
+        );
+
+        cloneEnemy.SelectedCards = new SelectedCardEntity(SelectedCards.MaxCount, new List<ICardEntity>());
+        // cloneEnemy._cardManager = new PlayerCardManager(); // TODO
+
+        return cloneEnemy;
     }
 }
 
@@ -211,5 +264,13 @@ public static class PlayerEntityExtensions
             }
         }
         return ratio;
+    }
+    public static Option<IPlayerEntity> GetPlayer(this GameStatus status, Guid playerIdentity)
+    {
+        return status.Ally.Identity == playerIdentity ?
+            (status.Ally as IPlayerEntity).Some() :
+            status.Enemy.Identity == playerIdentity ?
+                (status.Enemy as IPlayerEntity).Some() :
+                Option.None<IPlayerEntity>();
     }
 }

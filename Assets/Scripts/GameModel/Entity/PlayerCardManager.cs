@@ -16,16 +16,21 @@ public interface IPlayerCardManager
     ICardColletionZone GetCardCollectionZone(CardCollectionType type);
 
     (bool Success, IDisposable PlayCardDisposable) TryPlayCard(ICardEntity card, out int handCardIndex, out int handCardsCount);
-    IEnumerable<IGameEvent> ClearHandOnTurnEnd(IGameplayModel gameWatcher);
+    IEnumerable<IGameEvent> ClearHandOnTurnEnd(IGameplayModel model);
+    IEnumerable<IGameEvent> RecycleCardOnPlayEnd(IGameplayModel model, ICardEntity card);
 
     Option<ICardEntity> GetCard(Func<ICardEntity, bool> predicate);
     bool TryDiscardCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
     bool TryConsumeCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
     bool TryDisposeCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
     CreateCardResult CreateNewCard(
+        CardInstance cardInstance,
+        CardCollectionType cloneDestination,
+        CardLibrary cardLibrary);
+    CreateCardResult CreateNewCard(
         TriggerContext triggerContext,
         string cardDataId,
-        CardCollectionType cloneDestination,
+        CardCollectionType createDestination,
         CardLibrary cardLibrary,
         CardBuffLibrary cardBuffLibrary,
         IEnumerable<AddCardBuffData> addCardBuffDatas);
@@ -53,11 +58,9 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
     public Option<ICardEntity> PlayingCard { get; private set; }
 
     public PlayerCardManager(
-        int handCardMaxCount,
-        IEnumerable<CardInstance> cardInstances,
-        CardLibrary cardLibrary)
+        int handCardMaxCount)
     {
-        Deck = new DeckEntity(cardInstances, cardLibrary);
+        Deck = new DeckEntity();
         HandCard = new HandCardEntity(handCardMaxCount);
         Graveyard = new GraveyardEntity();
         ExclusionZone = new ExclusionZoneEntity();
@@ -113,21 +116,40 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
         PlayingCard = Option.None<ICardEntity>();
     }
 
-    public IEnumerable<IGameEvent> ClearHandOnTurnEnd(IGameplayModel gameWatcher)
+    public IEnumerable<IGameEvent> ClearHandOnTurnEnd(IGameplayModel model)
     {
         var events = new List<IGameEvent>();
 
+        // TODO:  trigger preserved timing
         var nonePreservedCards = HandCard.ClearHand();
         var excludeCards = nonePreservedCards.Where(c => c.HasProperty(CardProperty.AutoDispose)).ToArray();
         ExclusionZone.AddCards(excludeCards);
 
-        var recycleCards = nonePreservedCards.Except(excludeCards).ToArray();
-        Graveyard.AddCards(recycleCards);
-        events.Add(new RecycleHandCardEvent(
-            Faction: this.Owner(gameWatcher).ValueOr(PlayerEntity.DummyPlayer).Faction,
-            RecycledCardInfos: recycleCards.Select(c => c.ToInfo(gameWatcher)).ToArray(),
-            ExcludedCardInfos: excludeCards.Select(c => c.ToInfo(gameWatcher)).ToArray(),
-            CardManagerInfo: this.ToInfo(gameWatcher)));
+        var discardedCards = nonePreservedCards.Except(excludeCards).ToArray();
+        Graveyard.AddCards(discardedCards);
+        events.Add(new DiscardHandCardEvent(
+            Faction: this.Owner(model).ValueOr(PlayerEntity.DummyPlayer).Faction,
+            DiscardedCardInfos: discardedCards.Select(c => c.ToInfo(model)).ToArray(),
+            ExcludedCardInfos: excludeCards.Select(c => c.ToInfo(model)).ToArray(),
+            CardManagerInfo: this.ToInfo(model)));
+
+        return events;
+    }
+
+    public IEnumerable<IGameEvent> RecycleCardOnPlayEnd(IGameplayModel model, ICardEntity card)
+    {
+        var events = new List<IGameEvent>();
+
+        if(Graveyard.TryGetCard(c => c.Identity == card.Identity, out var recycledCard))
+        {
+            Graveyard.RemoveCard(recycledCard);
+            HandCard.AddCard(recycledCard);
+
+            events.Add(new RecycleGraveyardToHandCardEvent(
+                Faction: this.Owner(model).ValueOr(PlayerEntity.DummyPlayer).Faction,
+                RecycledCardInfo: recycledCard.ToInfo(model),
+                CardManagerInfo: this.ToInfo(model)));
+        }
 
         return events;
     }
@@ -293,6 +315,22 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
 
         start = CardColletionZone.Dummy;
         return false;
+    }
+
+    public CreateCardResult CreateNewCard(
+        CardInstance cardInstance,
+        CardCollectionType cloneDestination,
+        CardLibrary cardLibrary)
+    {
+        var newCard = CardEntity.CreateFromInstance(cardInstance, cardLibrary);
+
+        _AddCard(newCard, cloneDestination);
+
+        return new CreateCardResult(
+            Card: newCard,
+            Zone: GetCardCollectionZone(cloneDestination),
+            AddBuffs: Array.Empty<AddCardBuffResult>()
+        );
     }
 
     public CreateCardResult CreateNewCard(

@@ -59,6 +59,13 @@ public static class GameFormula
 
     public static int CardPower(TriggerContext triggerContext, ICardEntity card)
     {
+        //TODO: if action is CardLookIntentAction , pretend PlayCardStart
+        // using var cloneModel = triggerContext.Model.CloneStatus();
+        // var cloneContext = triggerContext with { Model = cloneModel };
+        // cloneModel.UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.PlayCardStart, new SystemSource()))
+        // cloneModel.UpdateReactorSessionAction(cardPlayIntent);
+        // cloneModel.TriggerTiming(GameTiming.PlayCardStart, cardPlaySource)
+
         var actionAddition = GetAttributeAddition(triggerContext, EffectAttributeAdditionType.PowerAddition, PlayerBuffProperty.AllCardPower);
 
         var cardAddition = card.GetCardProperty(triggerContext, CardProperty.PowerAddition);
@@ -90,7 +97,7 @@ public static class GameFormula
         {
             var cardPlayAttribute = cardPlaySource.Attribute.IntValues
                 .GetValueOrDefault(attribute, 0);
-            var playerAttribute = triggerContext.Model.GameStatus.CurrentPlayer
+            var playerAttribute = triggerContext.Model.GameStatus.CurrentPlayer.Value
                 .Map(player => player.GetPlayerBuffAdditionProperty(triggerContext, playerBuffProperty))
                 .ValueOr(0);
 
@@ -107,7 +114,7 @@ public static class GameFormula
         {
             var cardPlayAttribute = cardPlaySource.Attribute.FloatValues
                 .GetValueOrDefault(attribute, 0);
-            var playerAttribute = triggerContext.Model.GameStatus.CurrentPlayer
+            var playerAttribute = triggerContext.Model.GameStatus.CurrentPlayer.Value
                 .Map(player => player.GetPlayerBuffRatioProperty(triggerContext, playerBuffProperty))
                 .ValueOr(0);
 

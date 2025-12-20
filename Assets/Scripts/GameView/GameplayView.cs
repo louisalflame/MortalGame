@@ -166,11 +166,14 @@ public class GameplayView : MonoBehaviour, IGameplayView
                 case RoundStartEvent roundStartEvent:
                     _UpdateRoundAndPlayer(roundStartEvent);
                     break;
-                case RecycleGraveyardEvent recycleGraveyardEvent:
+                case RecycleGraveyardToDeckEvent recycleGraveyardEvent:
                     _RecycleGraveyardEvent(recycleGraveyardEvent);
                     break;
-                case RecycleHandCardEvent recycleHandCardEvent:
-                    _RecycleHandCardEvent(recycleHandCardEvent);
+                case RecycleGraveyardToHandCardEvent recycleGraveyardHandCardEvent:
+                    _RecycleGraveyardHandCardEvent(recycleGraveyardHandCardEvent);
+                    break;
+                case DiscardHandCardEvent recycleHandCardEvent:
+                    _DiscardHandCardEvent(recycleHandCardEvent);
                     break;
                 case DrawCardEvent drawCardEvent:
                     _DrawCardView(drawCardEvent, reciever);
@@ -326,20 +329,32 @@ public class GameplayView : MonoBehaviour, IGameplayView
         }
     }
 
-    private void _RecycleGraveyardEvent(RecycleGraveyardEvent recycleGraveyardEvent)
+    private void _RecycleGraveyardEvent(RecycleGraveyardToDeckEvent recycleGraveyardEvent)
     {
         _gameViewModel.UpdateCardCollectionInfo(recycleGraveyardEvent.Faction, recycleGraveyardEvent.CardManagerInfo);
     }
-    private void _RecycleHandCardEvent(RecycleHandCardEvent recycleHandCardEvent)
+    private void _RecycleGraveyardHandCardEvent(RecycleGraveyardToHandCardEvent recycleGraveyardHandCardEvent)
     {
-        _gameViewModel.UpdateCardCollectionInfo(recycleHandCardEvent.Faction, recycleHandCardEvent.CardManagerInfo);
-        switch (recycleHandCardEvent.Faction)
+        _gameViewModel.UpdateCardCollectionInfo(recycleGraveyardHandCardEvent.Faction, recycleGraveyardHandCardEvent.CardManagerInfo);
+        switch (recycleGraveyardHandCardEvent.Faction)
         {
             case Faction.Ally:
-                _allyHandCardView.RecycleHandCards(recycleHandCardEvent);
+                _allyHandCardView.CreateCardView(
+                    recycleGraveyardHandCardEvent.RecycledCardInfo,
+                    recycleGraveyardHandCardEvent.CardManagerInfo.CardZoneInfos[CardCollectionType.HandCard]);
+                break;
+        }
+    }
+    private void _DiscardHandCardEvent(DiscardHandCardEvent discardHandCardEvent)
+    {
+        _gameViewModel.UpdateCardCollectionInfo(discardHandCardEvent.Faction, discardHandCardEvent.CardManagerInfo);
+        switch (discardHandCardEvent.Faction)
+        {
+            case Faction.Ally:
+                _allyHandCardView.RecycleHandCards(discardHandCardEvent);
                 break;
             case Faction.Enemy:
-                _enemySelectedCardView.RemoveCardView(recycleHandCardEvent);
+                _enemySelectedCardView.RemoveCardView(discardHandCardEvent);
                 break;
         }
     }

@@ -50,6 +50,13 @@ public record PlayerBuffPropertyLookAction(IPlayerBuffPropertyEntity Property) :
 };
 
 //===
+public record CardCreateSystemAction(
+    IPlayerEntity Player,
+    CardCollectionType Destination) : IActionUnit
+{
+    public GameTiming Timing => GameTiming.GameStart;
+    public IActionSource Source => SystemSource.Instance;
+};
 
 public record CardPlayIntentAction(CardPlaySource CardPlaySource) : IActionUnit
 {

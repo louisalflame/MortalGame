@@ -117,9 +117,9 @@ public class EnemySelectedCardView : MonoBehaviour
         
         _RearrangeCardViews();
     }
-    public void RemoveCardView(RecycleHandCardEvent recycleHandCardEvent)
+    public void RemoveCardView(DiscardHandCardEvent recycleHandCardEvent)
     {
-        foreach(var cardInfo in recycleHandCardEvent.RecycledCardInfos.Concat(recycleHandCardEvent.ExcludedCardInfos))
+        foreach(var cardInfo in recycleHandCardEvent.DiscardedCardInfos.Concat(recycleHandCardEvent.ExcludedCardInfos))
         {
             if(_cardViewDict.TryGetValue(cardInfo.Identity, out var cardView))
             {

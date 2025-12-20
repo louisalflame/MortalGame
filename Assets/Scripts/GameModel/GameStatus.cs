@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using OneOf;
 using Optional;
 using Rayark.Mast;
 using UniRx;
@@ -21,36 +22,63 @@ public enum GameState
 
 public class GameStatus
 {
-    public int TurnCount { get; private set; }
-    public AllyEntity Ally { get; private set; }
-    public EnemyEntity Enemy { get; private set; }
-    public Option<IPlayerEntity> CurrentPlayer { get; private set; } = Option.None<IPlayerEntity>();
-    public Option<IPlayerEntity> OppositePlayer => CurrentPlayer
-        .Map(current => current.Faction == Faction.Ally ? (IPlayerEntity)Enemy : (IPlayerEntity)Ally);
+    private int _turnCount;
+    private AllyEntity _ally;
+    private EnemyEntity _enemy;
+    private IReactiveProperty<Option<Guid>> _currentPlayer = new ReactiveProperty<Option<Guid>>(Option.None<Guid>());
+
+    public int TurnCount => _turnCount;
+    public AllyEntity Ally => _ally;
+    public EnemyEntity Enemy => _enemy;
+    public IReadOnlyReactiveProperty<Option<IPlayerEntity>> CurrentPlayer 
+        => _currentPlayer
+            .Select(value => value
+                .FlatMap(id => this.GetPlayer(id)))
+            .ToReactiveProperty();
+    public IReadOnlyReactiveProperty<Option<IPlayerEntity>> OppositePlayer 
+        => CurrentPlayer
+            .Select(current => current
+                .Map(player => player.Faction == Faction.Ally 
+                    ? (IPlayerEntity)Enemy 
+                    : (IPlayerEntity)Ally))
+            .ToReactiveProperty();
     public UnityEngine.Random.State RandomState => UnityEngine.Random.state;
 
-    public GameStatus(
-        int turnCount,
-        AllyEntity player,
-        EnemyEntity enemy,
-        int randomSeed) 
+    public GameStatus()
     {
-        TurnCount = turnCount;
-        Ally = player;
-        Enemy = enemy;
-        UnityEngine.Random.InitState(randomSeed);
+        _turnCount = 0;
+    }
+    
+    public void SummonAlly(AllyEntity ally)
+    {
+        _ally = ally;
+    }
+    public void SummonEnemy(EnemyEntity enemy)
+    {
+        _enemy = enemy;
     }
 
     public IDisposable SetCurrentPlayer(IPlayerEntity player)
     {
-        CurrentPlayer = player.Some();
+        _currentPlayer.Value = player.Identity.Some();
 
-        return Disposable.Create(() => CurrentPlayer = Option.None<IPlayerEntity>());
+        return Disposable.Create(() => _currentPlayer.Value = Option.None<Guid>());
     }
 
     public void SetNewTurn()
     {
-        TurnCount++;
+        _turnCount++;
+    }
+
+    public GameStatus Clone(IGameContextManager contextManager)
+    {
+        var clonedStatus = new GameStatus();
+        clonedStatus._turnCount = _turnCount;
+        clonedStatus._ally = _ally.Clone(contextManager);
+        clonedStatus._enemy = _enemy.Clone(contextManager);
+        clonedStatus._currentPlayer.Value = _currentPlayer.Value;
+
+        return clonedStatus;
     }
 }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Optional;
+using Optional.Collections;
 using UnityEngine;
 
 public interface ICharacterEntity
@@ -66,16 +67,30 @@ public class DummyCharacter : CharacterEntity
 
 public static class CharacterEntityExtensions
 {
-    public static Option<IPlayerEntity> Owner(this ICharacterEntity character, IGameplayModel gameWatcher)
+    public static Option<ICharacterEntity> GetCharacter(this IGameplayModel model, Guid identity)
     {
-        if (gameWatcher.GameStatus.Ally.Characters.Any(c => c.Identity == character.Identity))
-            return (gameWatcher.GameStatus.Ally as IPlayerEntity).Some();
-        if (gameWatcher.GameStatus.Enemy.Characters.Any(c => c.Identity == character.Identity))
-            return (gameWatcher.GameStatus.Enemy as IPlayerEntity).Some();
+        var allyCharacterOpt = LinqEnumerableExtensions.FirstOrNone(
+            model.GameStatus.Ally.Characters
+                .Where(c => c.Identity == identity));
+        if (allyCharacterOpt.HasValue)
+            return allyCharacterOpt;
+        var enemyCharacterOpt = LinqEnumerableExtensions.FirstOrNone(
+            model.GameStatus.Enemy.Characters
+                .Where(c => c.Identity == identity));
+        if (enemyCharacterOpt.HasValue)
+            return enemyCharacterOpt;
+        return Option.None<ICharacterEntity>();
+    }
+    public static Option<IPlayerEntity> Owner(this ICharacterEntity character, IGameplayModel model)
+    {
+        if (model.GameStatus.Ally.Characters.Any(c => c.Identity == character.Identity))
+            return (model.GameStatus.Ally as IPlayerEntity).Some();
+        if (model.GameStatus.Enemy.Characters.Any(c => c.Identity == character.Identity))
+            return (model.GameStatus.Enemy as IPlayerEntity).Some();
         return Option.None<IPlayerEntity>();
     }
-    public static Faction Faction(this ICharacterEntity character, IGameplayModel watcher)
+    public static Faction Faction(this ICharacterEntity character, IGameplayModel model)
     {
-        return character.Owner(watcher).ValueOr(PlayerEntity.DummyPlayer).Faction;
+        return character.Owner(model).ValueOr(PlayerEntity.DummyPlayer).Faction;
     }
 }

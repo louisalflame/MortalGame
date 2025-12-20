@@ -21,10 +21,9 @@ public class NoneCard : ITargetCardValue
 [Serializable]
 public class SelectedCard : ITargetCardValue
 {
-
     public Option<ICardEntity> Eval(TriggerContext triggerContext)
     {
-        return triggerContext.Model.ContextManager.Context.SelectedCard.SomeNotNull();
+        return triggerContext.Model.GetCard(triggerContext.Model.ContextManager.Context.SelectedCard);
     }
 }
 [Serializable]

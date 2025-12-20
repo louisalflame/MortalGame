@@ -35,7 +35,7 @@ public class SelectedCharacter : ITargetCharacterValue
 {
     public Option<ICharacterEntity> Eval(TriggerContext triggerContext)
     {
-        return triggerContext.Model.ContextManager.Context.SelectedCharacter.SomeNotNull();
+        return triggerContext.Model.GetCharacter(triggerContext.Model.ContextManager.Context.SelectedCharacter);
     }
 }
 

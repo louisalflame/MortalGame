@@ -4,6 +4,7 @@ using System.Linq;
 
 public interface ISelectedCardEntity
 {
+    int MaxCount { get; }
     IReadOnlyCollection<ICardEntity> Cards { get; }
     bool TryGetCard(Guid cardIdentity, out ICardEntity card);
     bool TryAddCard(ICardEntity card);
@@ -15,6 +16,7 @@ public interface ISelectedCardEntity
 public class SelectedCardEntity : ISelectedCardEntity
 {
     public IReadOnlyCollection<ICardEntity> Cards => _cards;
+    public int MaxCount => _maxCount;
 
     private int _maxCount;
     private List<ICardEntity> _cards;

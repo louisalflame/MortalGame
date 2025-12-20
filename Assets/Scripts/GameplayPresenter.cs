@@ -33,12 +33,12 @@ public class GameplayPresenter : IGameplayActionReciever
         GameplayView gameplayView,
         IGameResultWinPanel gameResultWinPanel,
         IGameResultLosePanel gameResultLosePanel,
-        GameStatus gameStatus,
+        GameStageSetting gameStageSetting,
         GameContextManager gameContextManager
     )
     {
         _gameplayView = gameplayView;
-        _gameplayManager = new GameplayManager(gameStatus, gameContextManager);
+        _gameplayManager = new GameplayManager(gameStageSetting, gameContextManager);
         
         _gameInfoModel = new GameViewModel();
         _gameplayView.Init(_gameInfoModel, this, _gameplayManager, gameContextManager.LocalizeLibrary, gameContextManager.DispositionLibrary);

@@ -35,8 +35,8 @@ public enum CardTheme
 public enum CardProperty : int
 {
     None                = 0,
-    EffectTimes         = 1,
-    RecycleTimes        = 1 << 1,
+    EffectRepeat         = 1,
+    Recycle             = 1 << 1,
     PowerAddition       = 1 << 2, 
     CostAddition        = 1 << 3,
     Initialize          = 1 << 4,
@@ -47,7 +47,6 @@ public enum CardProperty : int
     // Dispose means the card will be removed from the game forever.
     Dispose             = 1 << 8,
     AutoDispose         = 1 << 9,
-    AppendEffect        = 1 << 10,
 }
 public enum CardTriggeredTiming
 // TODO: 卡片關鍵字效果 

@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Optional;
 
 public interface IGraveyardEntity : ICardColletionZone
 {
     IReadOnlyCollection<ICardEntity> PopAllCards();
+    IReadOnlyCollection<ICardEntity> PopRecycleCards();
 }
 public class GraveyardEntity : CardColletionZone, IGraveyardEntity
 {        
@@ -18,5 +18,12 @@ public class GraveyardEntity : CardColletionZone, IGraveyardEntity
         var cards = _cards.ToList();
         _cards = new List<ICardEntity>();
         return cards;
+    }
+
+    public IReadOnlyCollection<ICardEntity> PopRecycleCards()
+    {
+        var recycleCards = _cards.Where(c => c.HasProperty(CardProperty.Recycle)).ToList();
+        _cards = _cards.Except(recycleCards).ToList();
+        return recycleCards;
     }
 }

@@ -25,17 +25,16 @@ public class Context
         AllEnemies = scriptableDataLoader.AllEnemies;
 
         // Create player instance
-        Ally = new AllyInstance{
-            Identity = Guid.NewGuid(),
-            NameKey = scriptableDataLoader.Ally.PlayerData.NameKey,
-            CurrentDisposition = scriptableDataLoader.Ally.InitialDisposition,
-            CurrentHealth = scriptableDataLoader.Ally.PlayerData.InitialHealth,
-            MaxHealth = scriptableDataLoader.Ally.PlayerData.MaxHealth,
-            CurrentEnergy = scriptableDataLoader.Ally.PlayerData.MaxEnergy,
-            MaxEnergy = scriptableDataLoader.Ally.PlayerData.MaxEnergy,
-            Deck = scriptableDataLoader.Ally.PlayerData.Deck.Cards.Select(card => CardInstance.Create(card.Data)).ToList(),
-            HandCardMaxCount = scriptableDataLoader.Ally.PlayerData.HandCardMaxCount,
-        };
+        Ally = new AllyInstance(
+            Identity: Guid.NewGuid(),
+            NameKey: scriptableDataLoader.Ally.PlayerData.NameKey,
+            CurrentDisposition: scriptableDataLoader.Ally.InitialDisposition,
+            CurrentHealth: scriptableDataLoader.Ally.PlayerData.InitialHealth,
+            MaxHealth: scriptableDataLoader.Ally.PlayerData.MaxHealth,
+            CurrentEnergy: scriptableDataLoader.Ally.PlayerData.MaxEnergy,
+            MaxEnergy: scriptableDataLoader.Ally.PlayerData.MaxEnergy,
+            Deck: scriptableDataLoader.Ally.PlayerData.Deck.Cards.Select(card => CardInstance.Create(card.Data)).ToList(),
+            HandCardMaxCount: scriptableDataLoader.Ally.PlayerData.HandCardMaxCount);
 
         LocalizeTitleInfoSetting = scriptableDataLoader.LocalizeTitleInfoSetting();
         LocalizeInfoSetting = scriptableDataLoader.LocalizeInfoSetting();

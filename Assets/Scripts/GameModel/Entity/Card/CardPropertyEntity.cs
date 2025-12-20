@@ -72,3 +72,13 @@ public class SealedPropertyEntity : ICardPropertyEntity
     public int Eval(TriggerContext triggerContext) => 0;
     public ICardPropertyEntity Clone() => new SealedPropertyEntity();
 }
+
+public class RecyclePropertyEntity : ICardPropertyEntity
+{
+    public CardProperty Property => CardProperty.Recycle;
+    public IEnumerable<string> Keywords => Property.ToString().WrapAsEnumerable();
+
+    public RecyclePropertyEntity() { }
+    public int Eval(TriggerContext triggerContext) => 0;
+    public ICardPropertyEntity Clone() => new RecyclePropertyEntity();
+}

@@ -142,20 +142,20 @@ public class CardEntity : ICardEntity
 
 public static class CardEntityExtensions
 {
-    public static Option<ICardEntity> GetCard(this IGameplayModel gameplayWatcher, Guid identity)
+    public static Option<ICardEntity> GetCard(this IGameplayModel model, Guid identity)
     {
-        var allyCardOpt = gameplayWatcher.GameStatus.Ally.CardManager.GetCard(card => card.Identity == identity);
+        var allyCardOpt = model.GameStatus.Ally.CardManager.GetCard(card => card.Identity == identity);
         if (allyCardOpt.HasValue)
             return allyCardOpt;
-        var enemyCardOpt = gameplayWatcher.GameStatus.Enemy.CardManager.GetCard(card => card.Identity == identity);
+        var enemyCardOpt = model.GameStatus.Enemy.CardManager.GetCard(card => card.Identity == identity);
         if (enemyCardOpt.HasValue)
             return enemyCardOpt;
         return Option.None<ICardEntity>();
     }
 
-    public static Option<IPlayerEntity> Owner(this ICardEntity card, IGameplayModel gameplayWatcher)
+    public static Option<IPlayerEntity> Owner(this ICardEntity card, IGameplayModel model)
     {
-        var gameStatus = gameplayWatcher.GameStatus;
+        var gameStatus = model.GameStatus;
         var allyCardOpt = gameStatus.Ally.CardManager.GetCard(card => card.Identity == card.Identity);
         if (allyCardOpt.HasValue)
             return (gameStatus.Ally as IPlayerEntity).Some();

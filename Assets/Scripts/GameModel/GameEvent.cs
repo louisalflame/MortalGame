@@ -22,12 +22,14 @@ public record NoneEvent : IGameEvent
 public record AllySummonEvent(AllyEntity Player) : IGameEvent;
 public record EnemySummonEvent(EnemyEntity Enemy) : IGameEvent;
 public record RoundStartEvent(int Round, AllyEntity Player, EnemyEntity Enemy) : IGameEvent;
-public record RecycleGraveyardEvent(Faction Faction, CardManagerInfo CardManagerInfo) : IGameEvent;
-public record RecycleHandCardEvent(
+public record RecycleGraveyardToDeckEvent(Faction Faction, CardManagerInfo CardManagerInfo) : IGameEvent;
+public record DiscardHandCardEvent(
     Faction Faction,
-    IReadOnlyCollection<CardInfo> RecycledCardInfos,
+    IReadOnlyCollection<CardInfo> DiscardedCardInfos,
     IReadOnlyCollection<CardInfo> ExcludedCardInfos,
     CardManagerInfo CardManagerInfo) : IGameEvent;
+public record RecycleGraveyardToHandCardEvent(
+    Faction Faction, CardInfo RecycledCardInfo, CardManagerInfo CardManagerInfo) : IGameEvent;
 public record DrawCardEvent(Faction Faction, CardInfo NewCardInfo, CardManagerInfo CardManagerInfo) : IGameEvent;
 
 public record MoveCardEvent(

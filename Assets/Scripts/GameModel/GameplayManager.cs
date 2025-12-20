@@ -5,14 +5,6 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Optional;
 
-public interface IGameplayModel
-{
-    GameStatus GameStatus { get; }
-    IGameContextManager ContextManager { get; }
-    Option<SubSelectionInfo> QueryCardSubSelectionInfos(Guid cardIdentity);
-    IEnumerable<IGameEvent> UpdateReactorSessionAction(IActionUnit actionUnit);
-}
-
 public interface IGameEventWatcher : IGameplayModel
 {
     event Action OnUseCard;
@@ -63,6 +55,7 @@ public class GameplayManager : IGameplayModel, IGameEventWatcher
         }
     }
 
+    private GameStageSetting _gameStageSetting;
     private GameStatus _gameStatus;
     private Option<BattleResult> _battleResult;
     private List<IGameEvent> _gameEvents;
@@ -74,10 +67,11 @@ public class GameplayManager : IGameplayModel, IGameEventWatcher
     GameStatus IGameplayModel.GameStatus { get { return _gameStatus; } }
     IGameContextManager IGameplayModel.ContextManager { get { return _contextMgr; } }
 
-    public GameplayManager(GameStatus initialStatus, GameContextManager contextManager)
+    public GameplayManager(GameStageSetting gameStageSetting, GameContextManager contextManager)
     {
         // TODO split gamestatus and gamesnapshot and gameparams
-        _gameStatus = initialStatus;
+        _gameStageSetting = gameStageSetting;
+        _gameStatus = new GameStatus();
         _contextMgr = contextManager;
         _gameHistory = new GameHistory(this);
     }
@@ -144,12 +138,72 @@ public class GameplayManager : IGameplayModel, IGameEventWatcher
 
     private void _GameStart()
     {
+        _gameStatus.SummonAlly(_ParseAlly(_gameStageSetting.Ally, _contextMgr));
+        _gameEvents.Add(new AllySummonEvent(_gameStatus.Ally));
+
+        _gameStatus.SummonEnemy(_ParseEnemy(_gameStageSetting.Enemy,  _contextMgr));
+        _gameEvents.Add(new EnemySummonEvent(_gameStatus.Enemy));  
+
+        var createAllyDeckResult = EffectExecutor.CreateNewDeckCard(
+            this,
+            SystemSource.Instance,
+            _gameStatus.Ally,
+            _gameStageSetting.Ally.Deck);
+        _gameEvents.AddRange(createAllyDeckResult.Events);
+
+        var createEnemyDeckResult = EffectExecutor.CreateNewDeckCard(
+            this,
+            SystemSource.Instance,
+            _gameStatus.Enemy,
+            _gameStageSetting.Enemy.PlayerData.Deck.Cards
+                .Select(c => CardInstance.Create(c.Data))
+                .ToList());
+        _gameEvents.AddRange(createEnemyDeckResult.Events);
+
         _gameEvents.AddRange(
             UpdateReactorSessionAction(new UpdateTimingAction(GameTiming.GameStart, new SystemSource())));
-        
-        // TODO: summon characters 
-        _gameEvents.Add(new AllySummonEvent(Player: _gameStatus.Ally));
-        _gameEvents.Add(new EnemySummonEvent(Enemy: _gameStatus.Enemy));
+
+        AllyEntity _ParseAlly(AllyInstance allyInstance, IGameContextManager gameContextManager)
+        {
+            var characterRecord = new CharacterParameter
+            {
+                NameKey         = allyInstance.NameKey,
+                CurrentHealth   = allyInstance.CurrentHealth,
+                MaxHealth       = allyInstance.MaxHealth
+            };
+
+            return new AllyEntity(
+                originPlayerInstanceGuid: allyInstance.Identity,
+                characterParams: characterRecord.WrapAsEnumerable().ToArray(),
+                currentEnergy: allyInstance.CurrentEnergy,
+                maxEnergy: allyInstance.MaxEnergy,
+                handCardMaxCount: allyInstance.HandCardMaxCount,
+                currentDisposition: allyInstance.CurrentDisposition,
+                maxDisposition: gameContextManager.DispositionLibrary.MaxDisposition,
+                gameContext: gameContextManager
+            );
+        }
+
+        EnemyEntity _ParseEnemy(EnemyData enemyData, IGameContextManager gameContextManager)
+        {
+            var characterRecord = new CharacterParameter
+            {
+                NameKey         = enemyData.PlayerData.NameKey,
+                CurrentHealth   = enemyData.PlayerData.InitialHealth,
+                MaxHealth       = enemyData.PlayerData.MaxHealth
+            };
+
+            return new EnemyEntity(
+                characterParams: new[] { characterRecord },
+                currentEnergy: enemyData.PlayerData.InitialEnergy,
+                maxEnergy: enemyData.PlayerData.MaxEnergy,
+                handCardMaxCount: enemyData.PlayerData.HandCardMaxCount,
+                selectedCardMaxCount: enemyData.SelectedCardMaxCount,
+                turnStartDrawCardCount: enemyData.TurnStartDrawCardCount,
+                energyRecoverPoint: enemyData.EnergyRecoverPoint,
+                gameContext: gameContextManager
+            );
+        }
     }
 
     private void _TurnStart()
@@ -313,7 +367,7 @@ public class GameplayManager : IGameplayModel, IGameEventWatcher
         _CheckGameEnd();
     }
 
-    private GameContextManager _SetUseCardSelectTarget(UseCardAction useCardAction)
+    private IGameContextManager _SetUseCardSelectTarget(UseCardAction useCardAction)
     {
         switch (useCardAction.MainSelectionAction.TargetType)
         {
@@ -369,12 +423,19 @@ public class GameplayManager : IGameplayModel, IGameEventWatcher
                         useCardEvents.AddRange(_TriggerTiming(GameTiming.PlayCardStart, cardPlaySource));
 
                         var effectActionResults = new List<BaseResultAction>();
-                        foreach (var effect in usedCard.Effects)
+
+                        var repeatTimes = usedCard.HasProperty(CardProperty.EffectRepeat) ?
+                            1 : Math.Max(1, usedCard.GetCardProperty(cardPlayTriggerContext, CardProperty.EffectRepeat));
+                        for (int i = 0; i < repeatTimes; i++)
                         {
-                            var effectResult = EffectExecutor.ApplyCardEffect(cardPlayTriggerContext, effect);
-                            useCardEvents.AddRange(effectResult.Events);
-                            effectActionResults.AddRange(effectResult.ResultActions);
+                            foreach (var effect in usedCard.Effects)
+                            {
+                                var effectResult = EffectExecutor.ApplyCardEffect(cardPlayTriggerContext, effect);
+                                useCardEvents.AddRange(effectResult.Events);
+                                effectActionResults.AddRange(effectResult.ResultActions);
+                            }
                         }
+
                         cardPlayResultSource = cardPlaySource.CreateResultSource(effectActionResults);
 
                         var usedCardInfo = usedCard.ToInfo(this);
@@ -383,6 +444,12 @@ public class GameplayManager : IGameplayModel, IGameEventWatcher
                             UsedCardInfo: usedCardInfo,
                             CardManagerInfo: player.CardManager.ToInfo(this));
                         useCardEvents.Add(usedCardEvent);
+                    }
+
+                    if(usedCard.HasProperty(CardProperty.Recycle))
+                    {
+                        var recycleResult = EffectExecutor.RecycleCardOnPlayEnd(this, player, usedCard);
+                        useCardEvents.AddRange(recycleResult.Events);
                     }
 
                     useCardEvents.AddRange(_TriggerTiming(GameTiming.PlayCardEnd, cardPlayResultSource));
@@ -408,6 +475,11 @@ public class GameplayManager : IGameplayModel, IGameEventWatcher
         var enemyEvt = _gameStatus.Enemy.Update(new TriggerContext(this, new PlayerTrigger(_gameStatus.Enemy), actionUnit));
 
         return new List<IGameEvent> { allyEvt, enemyEvt };
+    }
+
+    public IEnumerable<IGameEvent> TriggerTiming(GameTiming timing, IActionSource actionSource)
+    {
+        return _TriggerTiming(timing, actionSource);
     }
 
     // TODO: collect reactionEffects created from reactionSessions
@@ -489,5 +561,10 @@ public class GameplayManager : IGameplayModel, IGameEventWatcher
         {
             throw new GameEndException(true);
         }
+    }
+
+    IGameplayModel IGameplayModel.Clone()
+    {
+        return new ClonedGameplayModel(this, _gameStatus.Clone(_contextMgr));
     }
 }

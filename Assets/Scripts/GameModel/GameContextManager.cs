@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Optional;
 
-public interface IGameContextManager
+public interface IGameContextManager : IDisposable
 {
     CardLibrary CardLibrary { get; }
     CardBuffLibrary CardBuffLibrary { get; }
@@ -13,13 +13,13 @@ public interface IGameContextManager
 
     GameContext Context { get; }
 
-    GameContextManager SetClone();
-    GameContextManager SetSelectedPlayer(Option<IPlayerEntity> selectedPlayer);
-    GameContextManager SetSelectedCharacter(Option<ICharacterEntity> selectedCharacter);
-    GameContextManager SetSelectedCard(Option<ICardEntity> selectedCard);
+    IGameContextManager SetClone();
+    IGameContextManager SetSelectedPlayer(Option<IPlayerEntity> selectedPlayer);
+    IGameContextManager SetSelectedCharacter(Option<ICharacterEntity> selectedCharacter);
+    IGameContextManager SetSelectedCard(Option<ICardEntity> selectedCard);
 }
 
-public class GameContextManager : IDisposable, IGameContextManager
+public class GameContextManager : IGameContextManager
 {
     private readonly CardLibrary _cardLibrary;
     private readonly CardBuffLibrary _cardBuffLibrary;
@@ -63,36 +63,36 @@ public class GameContextManager : IDisposable, IGameContextManager
         }
     }
 
-    public GameContextManager SetClone()
+    public IGameContextManager SetClone()
     {
         _contextStack.Push(Context with { });
         return this;
     }
-    public GameContextManager SetSelectedPlayer(Option<IPlayerEntity> selectedPlayer)
+    public IGameContextManager SetSelectedPlayer(Option<IPlayerEntity> selectedPlayer)
     {
         return selectedPlayer.Match(
             some: player => {
-                _contextStack.Push(Context with { SelectedPlayer = player });
+                _contextStack.Push(Context with { SelectedPlayer = player.Identity });
                 return this;
             },
             none: () => SetClone()
         );
     }
-    public GameContextManager SetSelectedCharacter(Option<ICharacterEntity> selectedCharacter)
+    public IGameContextManager SetSelectedCharacter(Option<ICharacterEntity> selectedCharacter)
     {
         return selectedCharacter.Match(
             some: character => {
-                _contextStack.Push(Context with { SelectedCharacter = character });
+                _contextStack.Push(Context with { SelectedCharacter = character.Identity });
                 return this;
             },
             none: () => SetClone()
         );
     }
-    public GameContextManager SetSelectedCard(Option<ICardEntity> selectedCard)
+    public IGameContextManager SetSelectedCard(Option<ICardEntity> selectedCard)
     {
         return selectedCard.Match(
             some: card => {
-                _contextStack.Push(Context with { SelectedCard = card });
+                _contextStack.Push(Context with { SelectedCard = card.Identity });
                 return this;
             },
             none: () => SetClone()
@@ -101,9 +101,9 @@ public class GameContextManager : IDisposable, IGameContextManager
 }
 
 public record GameContext(
-    IPlayerEntity SelectedPlayer,
-    ICharacterEntity SelectedCharacter,
-    ICardEntity SelectedCard)
+    Guid SelectedPlayer,
+    Guid SelectedCharacter,
+    Guid SelectedCard)
 { 
-    public static GameContext EMPTY => new(null, null, null);
+    public static GameContext EMPTY => new(Guid.Empty, Guid.Empty, Guid.Empty);
 }

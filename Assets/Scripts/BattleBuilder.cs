@@ -30,59 +30,13 @@ public class BattleBuidler
             localizeLibrary);
     }
 
-    public GameStatus ConstructBattle(GameContextManager gameContextManager)
+    public GameStageSetting ConstructBattle()
     { 
-        var initialState = new GameStatus(
-            turnCount: 0,
-            player: _ParseAlly(_context.Ally, gameContextManager),
-            enemy: _ParseEnemy(_context.AllEnemies[0], gameContextManager),
-            randomSeed: Environment.TickCount); 
-        return initialState;
-    }
-
-    private AllyEntity _ParseAlly(AllyInstance allyInstance, GameContextManager gameContextManager)
-    {
-        var characterRecord = new CharacterParameter
-        {
-            NameKey         = allyInstance.NameKey,
-            CurrentHealth   = allyInstance.CurrentHealth,
-            MaxHealth       = allyInstance.MaxHealth
-        };
-
-        return new AllyEntity(
-            originPlayerInstanceGuid: allyInstance.Identity,
-            characterParams: new[] { characterRecord },
-            currentEnergy: allyInstance.CurrentEnergy,
-            maxEnergy: allyInstance.MaxEnergy,
-            handCardMaxCount: allyInstance.HandCardMaxCount,
-            currentDisposition: allyInstance.CurrentDisposition,
-            maxDisposition: gameContextManager.DispositionLibrary.MaxDisposition,
-            deckInstance: allyInstance.Deck,
-            gameContext: gameContextManager
-        );
-    }
-
-    private EnemyEntity _ParseEnemy(EnemyData enemyData, GameContextManager gameContextManager)
-    {
-        var enemyCardInstances = enemyData.PlayerData.Deck.Cards.Select(c => CardInstance.Create(c.Data)).ToList(); 
-        var characterRecord = new CharacterParameter
-        {
-            NameKey         = enemyData.PlayerData.NameKey,
-            CurrentHealth   = enemyData.PlayerData.InitialHealth,
-            MaxHealth       = enemyData.PlayerData.MaxHealth
-        };
-
-        return new EnemyEntity(
-            characterParams: new[] { characterRecord },
-            currentEnergy: enemyData.PlayerData.InitialEnergy,
-            maxEnergy: enemyData.PlayerData.MaxEnergy,
-            handCardMaxCount: enemyData.PlayerData.HandCardMaxCount,
-            enemyCardInstances: enemyCardInstances,
-            selectedCardMaxCount: enemyData.SelectedCardMaxCount,
-            turnStartDrawCardCount: enemyData.TurnStartDrawCardCount,
-            energyRecoverPoint: enemyData.EnergyRecoverPoint,
-            gameContext: gameContextManager
-        );
+        return new GameStageSetting(
+            StageID: "StageTest",
+            RandomSeed: Environment.TickCount,
+            Ally: _context.Ally,
+            Enemy: _context.AllEnemies[0]);
     }
 }
 

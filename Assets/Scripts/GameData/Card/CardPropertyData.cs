@@ -61,3 +61,12 @@ public class SealedPropertyData : ICardPropertyData
         return new SealedPropertyEntity();
     }
 }
+
+[Serializable]
+public class RecyclePropertyData : ICardPropertyData
+{
+    public ICardPropertyEntity CreateEntity()
+    {
+        return new RecyclePropertyEntity();
+    }
+}

@@ -103,7 +103,7 @@ public static class SelectTargetLogic
 
     private static SelectMainTargetResult SelectEnemyCharacter(IGameplayModel gameplayWatcher)
     {
-        return gameplayWatcher.GameStatus.OppositePlayer
+        return gameplayWatcher.GameStatus.OppositePlayer.Value
             .FlatMap(oppositePlayer => LinqEnumerableExtensions.FirstOrNone(oppositePlayer.Characters))
             .Map(oppositeCharacter => new SelectMainTargetResult(true, TargetType.EnemyCharacter, oppositeCharacter.Identity))
             .ValueOr(new SelectMainTargetResult(false, TargetType.None, Guid.Empty));
@@ -111,7 +111,7 @@ public static class SelectTargetLogic
 
     private static SelectMainTargetResult SelectAllyCharacter(IGameplayModel gameplayWatcher)
     {
-        return gameplayWatcher.GameStatus.CurrentPlayer
+        return gameplayWatcher.GameStatus.CurrentPlayer.Value
             .FlatMap(currentPlayer => LinqEnumerableExtensions.FirstOrNone(currentPlayer.Characters))
             .Map(currentCharacter => new SelectMainTargetResult(true, TargetType.AllyCharacter, currentCharacter.Identity))
             .ValueOr(new SelectMainTargetResult(false, TargetType.None, Guid.Empty));
@@ -132,7 +132,7 @@ public static class SelectTargetLogic
 
     private static SelectMainTargetResult SelectEnemyCard(IGameplayModel gameplayWatcher)
     {
-        return gameplayWatcher.GameStatus.OppositePlayer
+        return gameplayWatcher.GameStatus.OppositePlayer.Value
             .FlatMap(oppositePlayer => LinqEnumerableExtensions.FirstOrNone(oppositePlayer.CardManager.HandCard.Cards))
             .Map(oppositeCard => new SelectMainTargetResult(true, TargetType.EnemyCard, oppositeCard.Identity))
             .ValueOr(new SelectMainTargetResult(false, TargetType.None, Guid.Empty));
@@ -140,7 +140,7 @@ public static class SelectTargetLogic
 
     private static SelectMainTargetResult SelectAllyCard(IGameplayModel gameplayWatcher)
     {
-        return gameplayWatcher.GameStatus.CurrentPlayer
+        return gameplayWatcher.GameStatus.CurrentPlayer.Value
             .FlatMap(currentPlayer => LinqEnumerableExtensions.FirstOrNone(currentPlayer.CardManager.HandCard.Cards))
             .Map(currentCard => new SelectMainTargetResult(true, TargetType.AllyCard, currentCard.Identity))
             .ValueOr(new SelectMainTargetResult(false, TargetType.None, Guid.Empty));

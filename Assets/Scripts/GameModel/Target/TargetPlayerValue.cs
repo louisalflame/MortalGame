@@ -24,7 +24,7 @@ public class CurrentPlayer : ITargetPlayerValue
 {
     public Option<IPlayerEntity> Eval(TriggerContext triggerContext)
     {
-        return triggerContext.Model.GameStatus.CurrentPlayer;
+        return triggerContext.Model.GameStatus.CurrentPlayer.Value;
     }
 }
 [Serializable]
@@ -90,6 +90,14 @@ public class CharacterOwner : ITargetPlayerValue
     {
         var characterOpt = Character.Eval(triggerContext);
         return characterOpt.FlatMap(character => character.Owner(triggerContext.Model));
+    }
+}
+[Serializable]
+public class SelectedPlayer : ITargetPlayerValue
+{
+    public Option<IPlayerEntity> Eval(TriggerContext triggerContext)
+    {
+        return triggerContext.Model.GameStatus.GetPlayer(triggerContext.Model.ContextManager.Context.SelectedPlayer);
     }
 }
 
