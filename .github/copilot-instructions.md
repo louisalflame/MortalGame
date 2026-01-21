@@ -13,23 +13,29 @@
 ### 必讀文件 - 必須先閱讀
 開始任何分析或文件工作之前，您必須先閱讀核心文件：
 
-**[Document/AI_WorkOutline.md](Document/AI_WorkOutline.md)** - AI 工作指南
+**[AI_WorkOutline.md](../Document/AI_WorkOutline.md)** - AI 工作指南
    - 📋 專案架構概覽
    - 🎯 工作原則與流程  
    - 📝 筆記命名規範
    - ✅ 待辦追蹤系統
 
-**[Document/Documentation_Guidelines.md](Document/Documentation_Guidelines.md)** - 文檔撰寫指導原則
+**[Documentation_Guidelines.md](../Document/Documentation_Guidelines.md)** - 文檔撰寫指導原則
    - 🎯 文檔定位與核心原則
    - ✅ 應該包含的內容指引
    - ❌ 應該避免的內容類型
    - 📋 品質檢查清單與準確性標準
 
-**[Document/Coding_Standards.md](Document/Coding_Standards.md)** - 編程規範指南
+**[Coding_Standards.md](../Document/Coding_Standards.md)** - 編程規範指南
    - 🛠️ 核心技術堆疊規範（UniTask、UniRx、Odin Inspector）
    - 🏗️ 架構設計原則與三層資料架構
    - 📝 命名規範與程式碼組織標準
    - 🎮 卡牌遊戲特化規範
+
+**[SystemArchitecture.md](../Document/SystemArchitecture.md)** - 專案架構總覽
+   - 🏗️ 五大核心系統架構關係
+   - 🔗 系統間協作與資料流向
+   - 📊 技術特色與設計原則
+   - 🎯 專案整體複雜度評估
 
 ## 專案背景
 
@@ -50,10 +56,10 @@ MortalGame/
 │   ├── GameData/           # 遊戲資料定義
 │   ├── Scene/              # 場景管理
 │   └── LevelMap/           # 關卡地圖系統
-└── Documentation/          # AI 文件系統
+└── Document/               # AI 文件系統
     ├── AI_WorkOutline.md   # 🔴 必讀
     ├── AI_Notes_Index.md   # 🔴 必讀
-    └── [System notes].md
+    └── SystemArchitecture.md
 ```
 
 ### 主要技術特色
