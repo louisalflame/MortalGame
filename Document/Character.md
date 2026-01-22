@@ -45,8 +45,3 @@
 ### CharacterBuff 生命週期
 **[CharacterBuffLifeTimeEntity.cs](Assets/Scripts/GameModel/Entity/Character/CharacterBuff/CharacterBuffLifeTimeEntity.cs)** 控制 Buff 的持續時間
 - **動態更新**：基於遊戲狀態的生命週期自動管理
-
----
-
-**子系統複雜度**：⭐⭐⭐⭐ (複雜的多單位狀態管理與 Buff 系統)  
-**維護重點**：生命狀態一致性、多單位協調、Buff 生命週期管理

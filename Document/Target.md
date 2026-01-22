@@ -52,8 +52,3 @@
 **[BooleanValue.cs](Assets/Scripts/GameModel/Target/BooleanValue.cs)** 提供條件判斷的基礎邏輯
 - 固定值：`TrueValue`、`FalseValue` 提供基礎布林常數
 - 支援複雜條件邏輯的組合與評估
-
----
-
-**子系統複雜度**：⭐⭐⭐⭐ (複雜的目標選擇邏輯與條件判斷)  
-**維護重點**：目標評估準確性、編輯器使用體驗、系統擴展性

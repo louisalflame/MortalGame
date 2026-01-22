@@ -13,23 +13,23 @@
 
 ### 核心子系統職責
 
-#### [CardView](Assets/Scripts/GameView/CardView) - 卡牌視覺系統
-處理各種卡牌狀態的視覺呈現，包含手牌、選中卡牌、詳細資訊等不同展示模式
+#### [CardView](CardView.md) - 卡牌視覺系統
+處理所有卡牌的視覺化與互動，涵蓋手牌弧形佈局、敵方卡牌展示、拖拽互動、詳細資訊展示等完整卡牌視覺體驗
 
-#### [CharacterView](Assets/Scripts/GameView/CharacterView) - 角色視覺系統
-管理玩家與敵人角色的視覺呈現，處理生命值、能量、狀態指示器等角色資訊顯示
+#### [CharacterView](CharacterView.md) - 角色視覺系統
+管理盟友與敵人角色的視覺呈現，提供事件驅動的動畫系統，處理傷害、治療、能量、性情等角色狀態變化的豐富動畫效果
 
-#### [BuffView](Assets/Scripts/GameView/BuffView) - 增益視覺系統
-負責各種 Buff 效果的視覺化呈現，包含圖示、數值、持續時間等狀態資訊
+#### [BuffView](BuffView.md) - 增益視覺系統
+負責各種 Buff 效果的視覺化呈現，採用響應式更新與模板化設計，提供統一的 PlayerBuff/CharacterBuff 視覺呈現與互動體驗
 
-#### [EventView](Assets/Scripts/GameView/EventView) - 事件視覺系統
-處理遊戲事件的動畫呈現，如傷害數值、治療效果、能量變化等即時回饋
+#### [EventView](EventView.md) - 事件視覺系統
+處理遊戲效果的動畫展演，提供傷害、治療、護盾、能量、性情等事件的即時數值動畫與 Timeline 視覺回饋
 
-#### [Factory](Assets/Scripts/GameView/Factory) - 工廠創建系統
-實現物件池模式管理 View 元件，優化效能並統一創建流程
+#### [Factory](Factory.md) - 工廠創建系統
+提供統一的 View 元件工廠與物件池管理，優化記憶體使用與創建效能
 
-#### [Panel](Assets/Scripts/GameView/Panel) - 面板介面系統
-管理各種 UI 面板與資訊顯示，提供玩家操作介面
+#### [Panel](GameView_Panel.md) - 統一介面面板架構
+採用三層面板設計（Info/UI/Popup）與 MVP 協調機制，提供完整的介面管理系統，包含即時資訊顯示、操作工具、彈出互動等全方位面板功能
 
 ### 互動選擇機制
 透過 [ISelectableView](Assets/Scripts/GameView/ISelectableView.cs) 介面統一處理玩家選擇互動，支援靈活的目標指定系統
@@ -50,8 +50,3 @@
 **與 GameModel 的連接**：接收遊戲狀態變化，轉換為視覺呈現
 **與 UI 系統的整合**：提供互動回饋，處理玩家操作輸入
 **與資源管理的協作**：透過 Factory 系統優化效能與記憶體使用
-
----
-
-**系統複雜度**：⭐⭐⭐⭐ (複雜的視覺邏輯與互動處理)  
-**維護重點**：效能最佳化、視覺一致性、互動回應性

@@ -64,8 +64,3 @@
 **[PlayerBuffManager.cs](Assets/Scripts/GameModel/Entity/Player/PlayerBuff/PlayerBuffManager.cs)** 統一管理陣營的增益效果
 - **Buff 生命週期**：完整的增益效果生命週期管理
 - **觸發協調**：與其他系統的觸發事件協調
-
----
-
-**子系統複雜度**：⭐⭐⭐⭐⭐ (複雜的多資源管理與獨特的性情機制)  
-**維護重點**：資源狀態一致性、性情機制平衡性、多系統協調穩定性

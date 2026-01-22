@@ -54,8 +54,3 @@ GameplayScene 透過 [BattleBuilder](Assets/Scripts/Presenter/Gameplay/BattleBui
 
 ### 統一場景介面
 SceneLoadManager 提供一致的載入模式，支援未來場景的快速整合
-
----
-
-**系統複雜度**：⭐⭐⭐ (清晰的場景流程管理)  
-**維護重點**：場景轉換流暢度、資源載入效率、生命週期管理
