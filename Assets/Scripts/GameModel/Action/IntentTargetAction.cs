@@ -55,17 +55,17 @@ public record DrawCardIntentTargetAction(
 public record DiscardCardIntentTargetAction(
     IActionSource Source,
     IActionTarget Target,
-    EffectType EffectType = EffectType.DiscardCard) : BaseIntentTargetAction(Source, Target, EffectType);
+    EffectType EffectType = EffectType.MoveCard) : BaseIntentTargetAction(Source, Target, EffectType);
 
 public record ConsumeCardIntentTargetAction(
     IActionSource Source,
     IActionTarget Target,
-    EffectType EffectType = EffectType.ConsumeCard) : BaseIntentTargetAction(Source, Target, EffectType);
+    EffectType EffectType = EffectType.MoveCard) : BaseIntentTargetAction(Source, Target, EffectType);
 
 public record DisposeCardIntentTargetAction(
     IActionSource Source,
     IActionTarget Target,
-    EffectType EffectType = EffectType.DisposeCard) : BaseIntentTargetAction(Source, Target, EffectType);
+    EffectType EffectType = EffectType.MoveCard) : BaseIntentTargetAction(Source, Target, EffectType);
 
 public record CreateCardIntentTargetAction(
     IActionSource Source,
@@ -75,7 +75,7 @@ public record CreateCardIntentTargetAction(
 public record CloneCardIntentTargetAction(
     IActionSource Source,
     IActionTarget Target,
-    EffectType EffectType = EffectType.CloneCard) : BaseIntentTargetAction(Source, Target, EffectType);
+    EffectType EffectType = EffectType.CreateCard) : BaseIntentTargetAction(Source, Target, EffectType);
 
 public record AddPlayerBuffIntentTargetAction(
     IActionSource Source,

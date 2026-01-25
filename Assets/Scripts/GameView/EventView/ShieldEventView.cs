@@ -13,7 +13,7 @@ public class ShieldEventView: MonoBehaviour, IRecyclable, IAnimationNumberEventV
     public void SetEventInfo(GetShieldEvent getShieldEvent, Transform parent)
     {
         transform.SetParent(parent, false);
-        _text.text = getShieldEvent.DeltaShield.ToString();
+        _text.text = getShieldEvent.GetShieldResult.ShieldPoint.ToString();
     }
 
     public void Reset()

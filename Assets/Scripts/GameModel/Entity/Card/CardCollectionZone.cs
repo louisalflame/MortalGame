@@ -1,15 +1,14 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Optional;
-using UnityEngine;
+using Optional.Collections;
 
 public interface ICardColletionZone
 {
     CardCollectionType Type { get; }
     IReadOnlyCollection<ICardEntity> Cards { get; }
-    bool TryGetCard(Func<ICardEntity, bool> predicate, out ICardEntity card);
+    Option<ICardEntity> GetCardOrNone(Func<ICardEntity, bool> predicate);
     void AddCard(ICardEntity card);
     void AddCards(IEnumerable<ICardEntity> cards);
     bool RemoveCard(ICardEntity card);
@@ -30,10 +29,9 @@ public abstract class CardColletionZone : ICardColletionZone
         _cards = new List<ICardEntity>();
     }
 
-    public bool TryGetCard(Func<ICardEntity, bool> predicate, out ICardEntity card)
+    public Option<ICardEntity> GetCardOrNone(Func<ICardEntity, bool> predicate)
     {
-        card = _cards.FirstOrDefault(c => predicate(c));
-        return card != null;
+        return OptionCollectionExtensions.FirstOrNone(_cards, c => predicate(c));
     }
 
     public void AddCard(ICardEntity card)

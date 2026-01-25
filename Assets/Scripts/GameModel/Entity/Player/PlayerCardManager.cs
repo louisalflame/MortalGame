@@ -19,27 +19,15 @@ public interface IPlayerCardManager
     IEnumerable<IGameEvent> ClearHandOnTurnEnd(IGameplayModel model);
     IEnumerable<IGameEvent> RecycleCardOnPlayEnd(IGameplayModel model, ICardEntity card);
 
-    Option<ICardEntity> GetCard(Func<ICardEntity, bool> predicate);
-    bool TryDiscardCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
-    bool TryConsumeCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
-    bool TryDisposeCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination);
+    Option<ICardEntity> GetCardOrNone(Func<ICardEntity, bool> predicate);
+    MoveCardResult MoveCard(
+        ICardEntity card,
+        CardCollectionType start,
+        CardCollectionType destination);
+
     CreateCardResult CreateNewCard(
-        CardInstance cardInstance,
-        CardCollectionType cloneDestination,
-        CardLibrary cardLibrary);
-    CreateCardResult CreateNewCard(
-        TriggerContext triggerContext,
-        string cardDataId,
-        CardCollectionType createDestination,
-        CardLibrary cardLibrary,
-        CardBuffLibrary cardBuffLibrary,
-        IEnumerable<AddCardBuffData> addCardBuffDatas);
-    CloneCardResult CloneNewCard(
-        TriggerContext triggerContext,
-        ICardEntity originCard,
-        CardCollectionType cloneDestination,
-        CardBuffLibrary cardBuffLibrary,
-        IEnumerable<AddCardBuffData> addCardBuffDatas);
+        ICardEntity newCard,
+        CardCollectionType cloneDestination);
 
     IEnumerable<ICardEntity> Update(TriggerContext triggerContext);
 }
@@ -140,7 +128,7 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
     {
         var events = new List<IGameEvent>();
 
-        if(Graveyard.TryGetCard(c => c.Identity == card.Identity, out var recycledCard))
+        if(Graveyard.GetCardOrNone(c => c.Identity == card.Identity).TryGetValue(out var recycledCard))
         {
             Graveyard.RemoveCard(recycledCard);
             HandCard.AddCard(recycledCard);
@@ -154,239 +142,39 @@ public class PlayerCardManager : IPlayerCardManager, IDisposable
         return events;
     }
 
-    public Option<ICardEntity> GetCard(Func<ICardEntity, bool> predicate)
+    public Option<ICardEntity> GetCardOrNone(Func<ICardEntity, bool> predicate)
     {
-        if (HandCard.TryGetCard(predicate, out var card))
-        {
-            return Option.Some(card);
-        }
-        else if (Deck.TryGetCard(predicate, out card))
-        {
-            return Option.Some(card);
-        }
-        else if (Graveyard.TryGetCard(predicate, out card))
-        {
-            return Option.Some(card);
-        }
-        else if (ExclusionZone.TryGetCard(predicate, out card))
-        {
-            return Option.Some(card);
-        }
-        else if (DisposeZone.TryGetCard(predicate, out card))
-        {
-            return Option.Some(card);
-        }
-        else if (PlayingCard.Match(
-            card => predicate(card),
-            () => false))
-        {
-            return PlayingCard;
-        }
-        else
-        {
-            return Option.None<ICardEntity>();
-        }
+        return HandCard.GetCardOrNone(predicate)
+            .Else(Deck.GetCardOrNone(predicate))
+            .Else(Graveyard.GetCardOrNone(predicate))
+            .Else(ExclusionZone.GetCardOrNone(predicate))
+            .Else(DisposeZone.GetCardOrNone(predicate))
+            .Else(PlayingCard.Filter(card => predicate(card)));
     }
 
-    public bool TryDiscardCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination)
+    public MoveCardResult MoveCard(
+        ICardEntity card,
+        CardCollectionType start,
+        CardCollectionType destination)
     {
-        CardCollectionType GetDiscardDestinationZone(ICardEntity card)
-        {
-            if (card.IsConsumable())
-                return CardCollectionType.ExclusionZone;
-            else if (card.IsDisposable())
-                return CardCollectionType.DisposeZone;
-            else
-                return CardCollectionType.Graveyard;
-        }
+        var startZone = GetCardCollectionZone(start);
+        var destinationZone = GetCardCollectionZone(destination);
 
-        card = null;
-        if (HandCard.TryGetCard(card => card.Identity == cardIdentity, out var handCard))
-        {
-            card = handCard;
-            start = HandCard;
-            destination = GetCardCollectionZone(GetDiscardDestinationZone(handCard));
+        startZone.RemoveCard(card);
+        destinationZone.AddCard(card);
 
-            start.RemoveCard(handCard);
-            destination.AddCard(handCard);
-            return true;
-        }
-        else if (Deck.TryGetCard(card => card.Identity == cardIdentity, out var deckCard))
-        {
-            card = deckCard;
-            start = Deck;
-            destination = GetCardCollectionZone(GetDiscardDestinationZone(deckCard));
-
-            start.RemoveCard(deckCard);
-            destination.AddCard(deckCard);
-            return true;
-        }
-
-        start = CardColletionZone.Dummy;
-        destination = CardColletionZone.Dummy;
-        return false;
-    }
-    public bool TryConsumeCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination)
-    {
-        CardCollectionType GetConsumeDestinationZone(ICardEntity card)
-        {
-            if (card.IsDisposable())
-                return CardCollectionType.DisposeZone;
-            else
-                return CardCollectionType.ExclusionZone;
-        }
-
-        card = null;
-        if (HandCard.TryGetCard(card => card.Identity == cardIdentity, out var handCard))
-        {
-            card = handCard;
-            start = HandCard;
-            destination = GetCardCollectionZone(GetConsumeDestinationZone(handCard));
-
-            start.RemoveCard(handCard);
-            destination.AddCard(handCard);
-            return true;
-        }
-        else if (Deck.TryGetCard(card => card.Identity == cardIdentity, out var deckCard))
-        {
-            card = deckCard;
-            start = Deck;
-            destination = GetCardCollectionZone(GetConsumeDestinationZone(deckCard));
-
-            start.RemoveCard(handCard);
-            destination.AddCard(handCard);
-            return true;
-        }
-        else if (Graveyard.TryGetCard(card => card.Identity == cardIdentity, out var graveyardCard))
-        {
-            card = graveyardCard;
-            start = Graveyard;
-            destination = GetCardCollectionZone(GetConsumeDestinationZone(graveyardCard));
-
-            start.RemoveCard(handCard);
-            destination.AddCard(handCard);
-            return true;
-        }
-
-        start = CardColletionZone.Dummy;
-        destination = CardColletionZone.Dummy;
-        return false;
-    }
-    public bool TryDisposeCard(Guid cardIdentity, out ICardEntity card, out ICardColletionZone start, out ICardColletionZone destination)
-    {
-        destination = DisposeZone;
-        card = null;
-        if (HandCard.TryGetCard(card => card.Identity == cardIdentity, out var handCard))
-        {
-            card = handCard;
-            start = HandCard;
-
-            start.RemoveCard(handCard);
-            destination.AddCard(handCard);
-            return true;
-        }
-        else if (Deck.TryGetCard(card => card.Identity == cardIdentity, out var deckCard))
-        {
-            card = deckCard;
-            start = Deck;
-
-            start.RemoveCard(handCard);
-            destination.AddCard(handCard);
-            return true;
-        }
-        else if (Graveyard.TryGetCard(card => card.Identity == cardIdentity, out var graveyardCard))
-        {
-            card = graveyardCard;
-            start = Graveyard;
-
-            start.RemoveCard(handCard);
-            destination.AddCard(handCard);
-            return true;
-        }
-        else if (ExclusionZone.TryGetCard(card => card.Identity == cardIdentity, out var exclusionCard))
-        {
-            card = exclusionCard;
-            start = ExclusionZone;
-
-            start.RemoveCard(handCard);
-            destination.AddCard(handCard);
-            return true;
-        }
-
-        start = CardColletionZone.Dummy;
-        return false;
+        return new MoveCardResult(card, start, destination);
     }
 
     public CreateCardResult CreateNewCard(
-        CardInstance cardInstance,
-        CardCollectionType cloneDestination,
-        CardLibrary cardLibrary)
+        ICardEntity newCard,
+        CardCollectionType cloneDestination)
     {
-        var newCard = CardEntity.CreateFromInstance(cardInstance, cardLibrary);
-
         _AddCard(newCard, cloneDestination);
 
-        return new CreateCardResult(
-            Card: newCard,
-            Zone: GetCardCollectionZone(cloneDestination),
-            AddBuffs: Array.Empty<AddCardBuffResult>()
-        );
+        return new CreateCardResult(newCard, cloneDestination);
     }
-
-    public CreateCardResult CreateNewCard(
-        TriggerContext triggerContext,
-        string cardDataId,
-        CardCollectionType cloneDestination,
-        CardLibrary cardLibrary,
-        CardBuffLibrary cardBuffLibrary,
-        IEnumerable<AddCardBuffData> addCardBuffDatas)
-    {
-        var newCard = CardEntity.RuntimeCreateFromId(cardDataId, cardLibrary);
-
-        var addCardBuffResults = addCardBuffDatas
-            .Select(addCardBuffData => newCard.BuffManager
-                .AddBuff(
-                    cardBuffLibrary,
-                    triggerContext,
-                    addCardBuffData.CardBuffId,
-                    addCardBuffData.Level.Eval(triggerContext)))
-            .ToArray();
-
-        _AddCard(newCard, cloneDestination);
-
-        return new CreateCardResult(
-            Card: newCard,
-            Zone: GetCardCollectionZone(cloneDestination),
-            AddBuffs: addCardBuffResults
-        );
-    }
-    public CloneCardResult CloneNewCard(
-        TriggerContext triggerContext,
-        ICardEntity originCard,
-        CardCollectionType cloneDestination,
-        CardBuffLibrary cardBuffLibrary,
-        IEnumerable<AddCardBuffData> addCardBuffDatas)
-    {
-        var cloneCard = originCard.Clone(includeCardBuffs: false, includeCardProperties: false);
-
-        var addCardBuffResults = addCardBuffDatas
-            .Select(addCardBuffData => cloneCard.BuffManager
-                .AddBuff(
-                    cardBuffLibrary,
-                    triggerContext,
-                    addCardBuffData.CardBuffId,
-                    addCardBuffData.Level.Eval(triggerContext)))
-            .ToArray();
-
-        _AddCard(cloneCard, cloneDestination);
-
-        return new CloneCardResult(
-            OriginCard: originCard,
-            Card: cloneCard,
-            Zone: GetCardCollectionZone(cloneDestination),
-            AddBuffs: addCardBuffResults
-        );
-    }
+    
     private void _AddCard(ICardEntity card, CardCollectionType type)
     {
         switch (type)

@@ -282,12 +282,12 @@ public class GameplayView : MonoBehaviour, IGameplayView
 
     private void _MoveCardView(MoveCardEvent moveCardEvent)
     {
-        _gameViewModel.UpdateCardCollectionInfo(moveCardEvent.Faction, moveCardEvent.StartZoneInfo);
-        _gameViewModel.UpdateCardCollectionInfo(moveCardEvent.Faction, moveCardEvent.DestinationZoneInfo);
+        _gameViewModel.UpdateCardCollectionInfo(moveCardEvent.Faction, moveCardEvent.StartInfo);
+        _gameViewModel.UpdateCardCollectionInfo(moveCardEvent.Faction, moveCardEvent.DestinationInfo);
         switch (moveCardEvent.Faction)
         {
             case Faction.Ally:
-                switch (moveCardEvent.StartZoneInfo.Type)
+                switch (moveCardEvent.StartInfo.Type)
                 {
                     case CardCollectionType.HandCard:
                         _allyHandCardView.RemoveCardView(moveCardEvent);
@@ -295,7 +295,7 @@ public class GameplayView : MonoBehaviour, IGameplayView
                 }
                 break;
             case Faction.Enemy:
-                switch (moveCardEvent.StartZoneInfo.Type)
+                switch (moveCardEvent.StartInfo.Type)
                 {
                     case CardCollectionType.HandCard:
                         _enemySelectedCardView.RemoveCardView(moveCardEvent);
@@ -307,19 +307,19 @@ public class GameplayView : MonoBehaviour, IGameplayView
 
     private void _AddCardView(AddCardEvent addCardEvent)
     {
-        _gameViewModel.UpdateCardCollectionInfo(addCardEvent.Faction, addCardEvent.DestinationZoneInfo);
+        _gameViewModel.UpdateCardCollectionInfo(addCardEvent.Faction, addCardEvent.DestinationInfo);
         switch (addCardEvent.Faction)
         {
             case Faction.Ally:
-                switch (addCardEvent.DestinationZoneInfo.Type)
+                switch (addCardEvent.DestinationInfo.Type)
                 {
                     case CardCollectionType.HandCard:
-                        _allyHandCardView.CreateCardView(addCardEvent.CardInfo, addCardEvent.DestinationZoneInfo);
+                        _allyHandCardView.CreateCardView(addCardEvent.CardInfo, addCardEvent.DestinationInfo);
                         break;
                 }
                 break;
             case Faction.Enemy:
-                switch(addCardEvent.DestinationZoneInfo.Type)
+                switch(addCardEvent.DestinationInfo.Type)
                 {
                     case CardCollectionType.HandCard:
                         _enemySelectedCardView.CreateCardView(addCardEvent);

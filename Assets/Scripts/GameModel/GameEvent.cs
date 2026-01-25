@@ -35,42 +35,20 @@ public record DrawCardEvent(Faction Faction, CardInfo NewCardInfo, CardManagerIn
 public record MoveCardEvent(
     Faction Faction,
     CardInfo CardInfo,
-    CardCollectionInfo StartZoneInfo,
-    CardCollectionInfo DestinationZoneInfo) : IGameEvent
-{
-    public MoveCardEvent(ICardEntity card, IGameplayModel gameWatcher, ICardColletionZone start, ICardColletionZone destination)
-        : this(card.Faction(gameWatcher),
-            card.ToInfo(gameWatcher),
-            start.ToCardCollectionInfo(gameWatcher),
-            destination.ToCardCollectionInfo(gameWatcher)) { }
-}
+    CardCollectionInfo StartInfo,
+    CardCollectionInfo DestinationInfo) : IGameEvent;
 public record AddCardEvent(
     Faction Faction,
-    Option<CardInfo> OriginCardInfo,
     CardInfo CardInfo,
-    CardCollectionInfo DestinationZoneInfo) : IGameEvent
-{
-    public AddCardEvent(Option<ICardEntity> originCard, ICardEntity card, IGameplayModel gameWatcher, ICardColletionZone destination)
-        : this(card.Faction(gameWatcher),
-            originCard.Map(c => c.ToInfo(gameWatcher)),
-            card.ToInfo(gameWatcher),
-            destination.ToCardCollectionInfo(gameWatcher)) { }
-}
+    CardCollectionInfo DestinationInfo) : IGameEvent;
+
 public record UpdateHandCardsEvent(Faction Faction, CardInfo CardInfo) : IGameEvent
 {
     public UpdateHandCardsEvent(ICardEntity card, IGameplayModel gameWatcher) 
         : this(card.Faction(gameWatcher), card.ToInfo(gameWatcher)) { }
 }
-public record AddCardBuffEvent(Faction Faction, CardInfo CardInfo) : IGameEvent
-{
-    public AddCardBuffEvent(ICardEntity card, IGameplayModel gameWatcher)
-        : this(card.Faction(gameWatcher), card.ToInfo(gameWatcher)) { }
-}
-public record RemoveCardBuffEvent(Faction Faction, CardInfo CardInfo) : IGameEvent
-{
-    public RemoveCardBuffEvent(ICardEntity card, IGameplayModel gameWatcher)
-        : this(card.Faction(gameWatcher), card.ToInfo(gameWatcher)) { }
-}
+public record AddCardBuffEvent(Faction Faction, CardInfo CardInfo) : IGameEvent;
+public record RemoveCardBuffEvent(Faction Faction, CardInfo CardInfo) : IGameEvent;
 
 public record EnemySelectCardEvent(CardInfo SelectedCardInfo, IReadOnlyCollection<CardInfo> SelectedCardInfos) : IGameEvent;
 public record EnemyUnselectedCardEvent(IReadOnlyCollection<CardInfo> UnselectedCardInfos) : IGameEvent;
@@ -86,70 +64,20 @@ public record DecreaseDispositionEvent(DispositionInfo Info, int DeltaDispositio
 
 public abstract record HealthEvent(Faction Faction, Guid CharacterIdentity, int Hp, int Dp, int MaxHp) : IGameEvent, IAnimationNumberEvent;
 public record DamageEvent(
-    DamageType Type,
-    DamageStyle Style,
-    int DeltaHp,
-    int DeltaShield,
-    int DamagePoint,
-    Faction Faction, 
-    Guid CharacterIdentity, 
-    int Hp, 
-    int Dp, 
-    int MaxHp) : HealthEvent(Faction, CharacterIdentity, Hp, Dp, MaxHp)
-{
-    public DamageEvent(
-        Faction faction,
-        ICharacterEntity character,
-        TakeDamageResult takeDamageResult,
-        DamageStyle damageStyle) : this(
-            takeDamageResult.Type,
-            damageStyle,
-            takeDamageResult.DeltaHp,
-            takeDamageResult.DeltaDp,
-            takeDamageResult.DamagePoint,
-            faction,
-            character.Identity,
-            character.CurrentHealth,
-            character.CurrentArmor,
-            character.MaxHealth) { }
-}
-
+    Faction Faction,
+    ICharacterEntity Character,
+    TakeDamageResult TakeDamageResult) : HealthEvent(
+        Faction, Character.Identity, Character.CurrentHealth, Character.CurrentArmor, Character.MaxHealth);
 public record GetHealEvent(
-    int DeltaHp,
-    int HealPoint,
     Faction Faction, 
-    Guid CharacterIdentity, 
-    int Hp, 
-    int Dp, 
-    int MaxHp) : HealthEvent(Faction, CharacterIdentity, Hp, Dp, MaxHp)
-{
-    public GetHealEvent(Faction faction, ICharacterEntity character, GetHealResult getHealResult) 
-        : this(getHealResult.DeltaHp,
-            getHealResult.HealPoint,
-            faction,
-            character.Identity,
-            character.CurrentHealth,
-            character.CurrentArmor,
-            character.MaxHealth) { }
-}
+    ICharacterEntity Character, 
+    GetHealResult GetHealResult) : HealthEvent(
+        Faction, Character.Identity, Character.CurrentHealth, Character.CurrentArmor, Character.MaxHealth);
 public record GetShieldEvent(
-    int DeltaShield,
-    int ShieldPoint,
     Faction Faction, 
-    Guid CharacterIdentity, 
-    int Hp, 
-    int Dp, 
-    int MaxHp) : HealthEvent(Faction, CharacterIdentity, Hp, Dp, MaxHp)
-{
-    public GetShieldEvent(Faction faction, ICharacterEntity character, GetShieldResult getShieldResult) 
-        : this(getShieldResult.DeltaDp,
-            getShieldResult.ShieldPoint,
-            faction,
-            character.Identity,
-            character.CurrentHealth,
-            character.CurrentArmor,
-            character.MaxHealth) { }
-}
+    ICharacterEntity Character, 
+    GetShieldResult GetShieldResult) : HealthEvent(
+        Faction, Character.Identity, Character.CurrentHealth, Character.CurrentArmor, Character.MaxHealth);
 
 public record AddPlayerBuffEvent(Faction Faction, PlayerBuffInfo Buff) : IGameEvent
 {

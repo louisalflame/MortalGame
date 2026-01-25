@@ -3,11 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Optional;
+using Optional.Collections;
 using UnityEngine;
 
 public interface IDeckEntity : ICardColletionZone
 {
-    bool PopCard(out ICardEntity card);
+    Option<ICardEntity> PopCardOrNone();
     void EnqueueCardsThenShuffle(IEnumerable<ICardEntity> cards);
 }
 public class DeckEntity : CardColletionZone, IDeckEntity
@@ -15,16 +16,11 @@ public class DeckEntity : CardColletionZone, IDeckEntity
     public DeckEntity() : base(CardCollectionType.Deck)
     { }
 
-    public bool PopCard(out ICardEntity card)
+    public Option<ICardEntity> PopCardOrNone()
     {
-        if (Cards.Count == 0)
-        {
-            card = null;
-            return false;
-        }
-        card = Cards.ElementAt(0);
+        var popCard = OptionCollectionExtensions.ElementAtOrNone(Cards, 0);        
         _cards = Cards.Skip(1).ToList();
-        return true;
+        return popCard;
     }
 
     public void EnqueueCardsThenShuffle(IEnumerable<ICardEntity> cards)

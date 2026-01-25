@@ -144,14 +144,14 @@ public class GameplayManager : IGameplayModel, IGameEventWatcher
         _gameStatus.SummonEnemy(_ParseEnemy(_gameStageSetting.Enemy,  _contextMgr));
         _gameEvents.Add(new EnemySummonEvent(_gameStatus.Enemy));  
 
-        var createAllyDeckResult = EffectExecutor.CreateNewDeckCard(
+        var createAllyDeckResult = EffectCommandExecutor.CreateNewDeckCard(
             this,
             SystemSource.Instance,
             _gameStatus.Ally,
             _gameStageSetting.Ally.Deck);
         _gameEvents.AddRange(createAllyDeckResult.Events);
 
-        var createEnemyDeckResult = EffectExecutor.CreateNewDeckCard(
+        var createEnemyDeckResult = EffectCommandExecutor.CreateNewDeckCard(
             this,
             SystemSource.Instance,
             _gameStatus.Enemy,
@@ -236,10 +236,10 @@ public class GameplayManager : IGameplayModel, IGameEventWatcher
         var allyDrawCount = _contextMgr.DispositionLibrary.GetDrawCardCount(_gameStatus.Ally.DispositionManager.CurrentDisposition);
         var enemyDrawCount = _gameStatus.Enemy.TurnStartDrawCardCount;
 
-        var allyDrawEvents = EffectExecutor.DrawCards(this, SystemSource.Instance, _gameStatus.Ally, allyDrawCount);
+        var allyDrawEvents = EffectCommandExecutor.DrawCards(this, SystemSource.Instance, _gameStatus.Ally, allyDrawCount);
         _gameEvents.AddRange(allyDrawEvents.Events);
 
-        var enemyDrawEvents = EffectExecutor.DrawCards(this, SystemSource.Instance, _gameStatus.Enemy, enemyDrawCount);
+        var enemyDrawEvents = EffectCommandExecutor.DrawCards(this, SystemSource.Instance, _gameStatus.Enemy, enemyDrawCount);
         _gameEvents.AddRange(enemyDrawEvents.Events);
 
         var triggerEvts = _TriggerTiming(GameTiming.DrawCard, SystemSource.Instance);
@@ -430,9 +430,11 @@ public class GameplayManager : IGameplayModel, IGameEventWatcher
                         {
                             foreach (var effect in usedCard.Effects)
                             {
-                                var effectResult = EffectExecutor.ApplyCardEffect(cardPlayTriggerContext, effect);
+                                var effectCommands = EffectExecutor.ResolveCardEffect(cardPlayTriggerContext, effect);
+                                var effectResult = EffectCommandExecutor.ApplyEffectCommands(cardPlayTriggerContext, effectCommands);
+
                                 useCardEvents.AddRange(effectResult.Events);
-                                effectActionResults.AddRange(effectResult.ResultActions);
+                                effectActionResults.AddRange(effectResult.Actions);
                             }
                         }
 

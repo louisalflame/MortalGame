@@ -61,12 +61,14 @@ public record RemoveCharacterBuffResult(
 public record RemoveCardBuffResult(
     IReadOnlyCollection<ICardBuffEntity> Buff) : IEffectResult;
 
+public record MoveCardResult(
+    ICardEntity Card,
+    CardCollectionType Start,
+    CardCollectionType Destination) : IEffectResult;
 public record CreateCardResult(
     ICardEntity Card,
-    ICardColletionZone Zone,
-    AddCardBuffResult[] AddBuffs) : IEffectResult;
+    CardCollectionType Zone) : IEffectResult;
 public record CloneCardResult(
     ICardEntity OriginCard,
     ICardEntity Card,
-    ICardColletionZone Zone,
-    AddCardBuffResult[] AddBuffs) : IEffectResult;
+    CardCollectionType Zone) : IEffectResult;

@@ -13,7 +13,7 @@ public class HealEventView: MonoBehaviour, IRecyclable, IAnimationNumberEventVie
     public void SetEventInfo(GetHealEvent getHealEvent, Transform parent)
     {
         transform.SetParent(parent, false);
-        _text.text = getHealEvent.DeltaHp.ToString();
+        _text.text = getHealEvent.GetHealResult.HealPoint.ToString();
     }
 
     public void Reset()

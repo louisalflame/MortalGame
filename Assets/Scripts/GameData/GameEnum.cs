@@ -69,6 +69,15 @@ public enum EnergyLoseType
     PlayCardConsume,
     LoseEffect,
 }
+public enum MoveCardType
+{
+    None = 0,
+    Draw,
+    Discard,
+    Recycle,
+    Consume,
+    Dispose,
+}
 
 public enum PlayerBuffPropertyDuration
 {
@@ -136,11 +145,8 @@ public enum EffectType
     AdjustDisposition,
     RecycleDeck,
     DrawCard,
-    DiscardCard,
-    ConsumeCard,
-    DisposeCard,
+    MoveCard,
     CreateCard,
-    CloneCard,
     AddPlayerBuff,
     RemovePlayerBuff,
     AddCardBuff,

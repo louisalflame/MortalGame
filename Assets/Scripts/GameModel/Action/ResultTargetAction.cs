@@ -61,23 +61,12 @@ public record DrawCardResultAction(
     ICardEntity Card,
     EffectType EffectType = EffectType.DrawCard) : BaseResultAction(Source, Target, EffectType);
 
-public record DiscardCardResultAction(
+public record MoveCardResultAction(
     IActionSource Source,
     IActionTarget Target,
-    ICardEntity Card,
-    EffectType EffectType = EffectType.DiscardCard) : BaseResultAction(Source, Target, EffectType);
-
-public record ConsumeCardResultAction(
-    IActionSource Source,
-    IActionTarget Target,
-    ICardEntity Card,
-    EffectType EffectType = EffectType.ConsumeCard) : BaseResultAction(Source, Target, EffectType);
-
-public record DisposeCardResultAction(
-    IActionSource Source,
-    IActionTarget Target,
-    ICardEntity Card,
-    EffectType EffectType = EffectType.DisposeCard) : BaseResultAction(Source, Target, EffectType);
+    MoveCardResult MoveCardResult,
+    MoveCardType MoveType,
+    EffectType EffectType = EffectType.MoveCard) : BaseResultAction(Source, Target, EffectType);
 
 public record CreateCardResultAction(
     IActionSource Source,
@@ -88,8 +77,9 @@ public record CreateCardResultAction(
 public record CloneCardResultAction(
     IActionSource Source,
     IActionTarget Target,
-    CloneCardResult CloneResult,
-    EffectType EffectType = EffectType.CloneCard) : BaseResultAction(Source, Target, EffectType);
+    ICardEntity OriginCard,
+    CreateCardResult CreateResult,
+    EffectType EffectType = EffectType.CreateCard) : BaseResultAction(Source, Target, EffectType);
 
 public record AddPlayerBuffResultAction(
     IActionSource Source,

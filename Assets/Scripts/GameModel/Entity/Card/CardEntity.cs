@@ -144,10 +144,10 @@ public static class CardEntityExtensions
 {
     public static Option<ICardEntity> GetCard(this IGameplayModel model, Guid identity)
     {
-        var allyCardOpt = model.GameStatus.Ally.CardManager.GetCard(card => card.Identity == identity);
+        var allyCardOpt = model.GameStatus.Ally.CardManager.GetCardOrNone(card => card.Identity == identity);
         if (allyCardOpt.HasValue)
             return allyCardOpt;
-        var enemyCardOpt = model.GameStatus.Enemy.CardManager.GetCard(card => card.Identity == identity);
+        var enemyCardOpt = model.GameStatus.Enemy.CardManager.GetCardOrNone(card => card.Identity == identity);
         if (enemyCardOpt.HasValue)
             return enemyCardOpt;
         return Option.None<ICardEntity>();
@@ -156,17 +156,17 @@ public static class CardEntityExtensions
     public static Option<IPlayerEntity> Owner(this ICardEntity card, IGameplayModel model)
     {
         var gameStatus = model.GameStatus;
-        var allyCardOpt = gameStatus.Ally.CardManager.GetCard(card => card.Identity == card.Identity);
+        var allyCardOpt = gameStatus.Ally.CardManager.GetCardOrNone(card => card.Identity == card.Identity);
         if (allyCardOpt.HasValue)
             return (gameStatus.Ally as IPlayerEntity).Some();
-        var enemyCardOpt = gameStatus.Enemy.CardManager.GetCard(card => card.Identity == card.Identity);
+        var enemyCardOpt = gameStatus.Enemy.CardManager.GetCardOrNone(card => card.Identity == card.Identity);
         if (enemyCardOpt.HasValue)
             return (gameStatus.Enemy as IPlayerEntity).Some();
         return Option.None<IPlayerEntity>();
     }
-    public static Faction Faction(this ICardEntity card, IGameplayModel gameplayWatcher)
+    public static Faction Faction(this ICardEntity card, IGameplayModel model)
     {
-        return card.Owner(gameplayWatcher).ValueOr(PlayerEntity.DummyPlayer).Faction;
+        return card.Owner(model).ValueOr(PlayerEntity.DummyPlayer).Faction;
     }
 
     public static bool IsConsumable(this ICardEntity card)

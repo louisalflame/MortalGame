@@ -21,11 +21,11 @@ public record RecycleDeckIntentAction() : BaseEffectIntentAction(SystemSource.In
 
 public record DrawCardIntentAction(IActionSource Source) : BaseEffectIntentAction(Source, EffectType.DrawCard);
 
-public record DiscardCardIntentAction(IActionSource Source) : BaseEffectIntentAction(Source, EffectType.DiscardCard);
-public record ConsumeCardIntentAction(IActionSource Source) : BaseEffectIntentAction(Source, EffectType.ConsumeCard);
-public record DisposeCardIntentAction(IActionSource Source) : BaseEffectIntentAction(Source, EffectType.DisposeCard);
+public record DiscardCardIntentAction(IActionSource Source) : BaseEffectIntentAction(Source, EffectType.MoveCard);
+public record ConsumeCardIntentAction(IActionSource Source) : BaseEffectIntentAction(Source, EffectType.MoveCard);
+public record DisposeCardIntentAction(IActionSource Source) : BaseEffectIntentAction(Source, EffectType.MoveCard);
 public record CreateCardIntentAction(IActionSource Source) : BaseEffectIntentAction(Source, EffectType.CreateCard);
-public record CloneCardIntentAction(IActionSource Source) : BaseEffectIntentAction(Source, EffectType.CloneCard);
+public record CloneCardIntentAction(IActionSource Source) : BaseEffectIntentAction(Source, EffectType.CreateCard);
 
 public record AddPlayerBuffIntentAction(IActionSource Source) : BaseEffectIntentAction(Source, EffectType.AddPlayerBuff);
 public record RemovePlayerBuffIntentAction(IActionSource Source) : BaseEffectIntentAction(Source, EffectType.RemovePlayerBuff);

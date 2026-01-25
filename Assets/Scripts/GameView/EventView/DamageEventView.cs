@@ -13,7 +13,7 @@ public class DamageEventView : MonoBehaviour, IRecyclable, IAnimationNumberEvent
     public void SetEventInfo(DamageEvent damageEvent, Transform parent)
     {
         transform.SetParent(parent, false);
-        _text.text = damageEvent.DamagePoint.ToString();
+        _text.text = damageEvent.TakeDamageResult.DamagePoint.ToString();
     }
 
     public void Reset()

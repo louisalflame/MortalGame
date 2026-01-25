@@ -131,9 +131,9 @@ public static class CardBuffEntityExtensions
 {
     public static Option<IPlayerEntity> Owner(this ICardBuffEntity cardBuff, IGameplayModel gameplayWatcher)
     {
-        if (gameplayWatcher.GameStatus.Ally.CardManager.GetCard(card => card.BuffManager.Buffs.Contains(cardBuff)).HasValue)
+        if (gameplayWatcher.GameStatus.Ally.CardManager.GetCardOrNone(card => card.BuffManager.Buffs.Contains(cardBuff)).HasValue)
             return (gameplayWatcher.GameStatus.Ally as IPlayerEntity).Some();
-        if (gameplayWatcher.GameStatus.Enemy.CardManager.GetCard(card => card.BuffManager.Buffs.Contains(cardBuff)).HasValue)
+        if (gameplayWatcher.GameStatus.Enemy.CardManager.GetCardOrNone(card => card.BuffManager.Buffs.Contains(cardBuff)).HasValue)
             return (gameplayWatcher.GameStatus.Enemy as IPlayerEntity).Some();
         return Option.None<IPlayerEntity>();
     }
